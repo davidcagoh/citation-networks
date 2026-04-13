@@ -1,0 +1,6 @@
+deps/igraph/build
+deps/igraph/install
+deps/install
+*.mexmaci64
+*.mexa64
+*.mexw64

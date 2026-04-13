@@ -1,15 +1,32 @@
 # Ignore nested git repos (tracked separately)
 lit-review/robust-literature-discovery/
+lit-review/automated-lit-reviews-v2/
+
+# Large data directories (not version-controlled)
+citation-dynamics/data/
+lit-review/automated-lit-reviews/
+
+# Vendored C library source (igraph, 77MB — not tracked)
+citation-dynamics/deps/+leiden/private/deps/igraph/
 
 # Python
 .venv/
 __pycache__/
 *.pyc
 *.pyo
+*.egg-info/
 .env
+
+# Jupyter
+.ipynb_checkpoints/
 
 # macOS
 .DS_Store
 
-# Large binary files in wiki
+# Large binary / generated files
 wiki/*.pdf
+citation-dynamics/thesislitreview.pdf
+citation-dynamics/writings/*.pdf
+citation-dynamics/utils/*.mat
+*.log
+texput.log

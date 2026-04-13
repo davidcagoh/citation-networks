@@ -129,6 +129,25 @@ The paper should describe the production semantics (in-degree of frontier paper)
 **Wording:** "We set yield threshold at 5%; any value above ~1% produces identical results for these survey types, as depth-2 screen yield (0.3–1.5%) falls below any practical threshold."
 **Rationale:** For niche/specialised topics with low screen yield, the threshold is effectively inactive — the BFS naturally terminates when the graph is exhausted. Framing it as a tunable robustness knob would be misleading given the empirical data.
 
+## Venue
+
+### Target venue ranking (2026-04-12)
+The paper is an **empirical systems validation** — citation graph traversal + LLM screening + yield stopping, benchmarked on APS corpus and live surveys. It is not a pure NLP/ML paper.
+
+| Venue | Type | Fit | Notes |
+|---|---|---|---|
+| **ICASR 2026** | Conference/Workshop | ⭐⭐⭐⭐ Best | Dedicated to automated systematic reviews (DESTs). 2025 was July Potsdam. Watch for 2026 call. |
+| **ALTARS 2026/2027** | Workshop @ TheWebConf | ⭐⭐⭐ Very Good | AI in Technology-Assisted Review. April 2026 Copenhagen may be past deadline — watch ALTARS 2027. |
+| **JCDL 2026/2027** | Conference | ⭐⭐⭐ Good | Digital libraries + IR; systematic review automation in scope. |
+| **JASIST** | Journal | ⭐⭐⭐ Good | Longer cycle (6–12 months); no page limit — better for full rewrite. |
+| **CIKM / SIGIR 2026** | Conference | ⭐⭐ OK | More competitive; needs stronger retrieval theory framing. |
+| **ISPOR / ASE** | Conference | ⭐ No | Wrong domain focus. |
+| **arXiv preprint** | Preprint | Always | Post first, target venue second. |
+
+**Decision:** Share with PI first. ICASR is the ideal dedicated venue. JASIST as journal fallback.
+
+---
+
 ## Naming
 
 ### LitDiscover (not "LitReview v2")

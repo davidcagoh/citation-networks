@@ -111,37 +111,13 @@ The area has exploded. Key tools to be aware of:
 
 ## FIGURE FIXES (not blockers but needed before submission)
 
-### Q6: ~~Fix Fig 4 title and depth-0 bar annotation~~ ✅ RESOLVED
-Title now reads "seeded from top-5 gold references." Depth-0 bar annotation is correct.
-
-### ~~Q7: Add out-degree comparison to Fig 7~~ SKIPPED
-Out-degree of missed papers is not the direct cause of their being missed (low in-degree is). Dropped to keep fig7 clean.
-
-### ~~Q8: Add oracle callout to Fig 2~~ ✅ RESOLVED
-Fig 2 suptitle now reads: "oracle seeds: k=5 drawn from gold bibliography — upper bound on cold-start performance". Fig 2 image caption in paper also updated.
-
 ### Q11: Add [CITATION NEEDED] at yellow-highlighted locations
 Paper text has yellow-highlighted locations that need citations. Must be completed before submission.
-
-### ~~Q12: Move related work to §2~~ ✅ RESOLVED
-§2 Related Work is now in correct position (after Introduction). Restructured with bold subheadings per area (citation-graph analysis, automated SR, graph compression). Snowballing [22] and ASReview [23] added.
-
-### ~~Q13: Conclusion — mention k=1 result~~ ✅ RESOLVED
-§9 Conclusion rewritten from scratch (2026-04-11). Now explicitly states: "At k=1, S3 achieves 91.2% recall from a single seed paper in round 1 alone, and S2 reaches 96.8% from three seeds." Live k=1 result (K17-RGC 100% from one seed, one round) also stated.
-
-### ~~Q14: §5 text update to match new fig2~~ ✅ RESOLVED
-§5 text already describes directional comparison correctly (rewritten session 8). Added sentence: "Figure 2 makes this visible: the Pareto-80 curve closely tracks unfiltered bidirectional coverage at every depth..." Fig 2 caption in paper updated to note oracle seeding and all four curves.
 
 ### Q15: §5 note — yield lines overlap
 In fig9b, yield threshold lines overlap (different yield thresholds produce identical recall curves). This is a finding: yield threshold doesn't affect final recall, only screening cost. §5 needs an explicit sentence stating this.
 
-### ~~Q16: S1 non-monotonicity in fig6 — recall drops at some seed size k then recovers~~
-**RESOLVED (2026-04-10 session 4):** Both effects explained and addressed.
-- Top-k dip at k=2: nearest-neighbor seeds share backward neighborhoods, so the second seed adds little new coverage in round 1.
-- Contaminated decline with k: each off-topic seed opens a separate traversal frontier into unrelated graph regions.
-- Both effects resolve by round 2.
-- **Caption updated** in `06_publication_figures.py` (2-sentence subtitle). Fig6 PNG regenerated.
-- **§5 paragraph added** to paper text explaining both effects.
+**Resolved figure fixes:** Q6 (fig4 title), Q7 (fig7 out-degree skipped), Q8 (fig2 oracle callout), Q12 (related work moved to §2), Q13 (k=1 in conclusion), Q14 (§5 fig2 text update), Q16 (fig6 non-monotonicity caption + §5 paragraph) — all ✅.
 
 ---
 

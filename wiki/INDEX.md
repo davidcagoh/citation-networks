@@ -18,33 +18,18 @@ Each file is short by design — the goal is to hold the full argument in your h
 | [decisions.md](decisions.md) | Design choices made and why | Before changing any parameter |
 | [simulation-vs-production.md](simulation-vs-production.md) | How APS simulation relates to production system | Before framing paper claims or touching production code |
 | [session-log.md](session-log.md) | Reverse-chronological log of what was done each session | Start of every session |
+| [codebase-map.md](codebase-map.md) | citation-dynamics/ directory tree, what's implemented vs stub | Before touching citation-dynamics code |
+| [nst-timecurves-comparison.md](nst-timecurves-comparison.md) | NST vs Time Curves analysis; novel pipeline verdict | Before starting NST/TimeCurves implementation |
 
 ---
 
 ## Figures
 
-Publication figures live at:
-**`../data-aps/outputs/pub_figures/`** — relative to this wiki directory.
+Active pub figures: **fig1–fig7** (fig8/8b/8c and fig9a–d all DROPPED).
 
-The figure index (filename + one-line description of each figure) is at:
-**[../data-aps/outputs/pub_figures/FIGURE_INDEX.md](../data-aps/outputs/pub_figures/FIGURE_INDEX.md)**
-
-Per-figure argumentative role, status, and priority are in **[figure-roles.md](figure-roles.md)** (this wiki).
-
-Current pub figures:
-- `fig1_degree_distributions.png` — degree distributions + Lorenz curves
-- `fig2_bfs_reachability.png` — BFS reachability vs depth (directional comparison)
-- `fig3_strategy_comparison.png` — strategy scatter (bidir+Pareto vs alternatives)
-- `fig4_screen_yield_collapse.png` — yield vs BFS depth
-- `fig5_cold_start_recall_per_round.png` — per-round recall at k=5
-- `fig6_recall_vs_seed_size.png` — recall vs seed size k=1–10
-- `fig7_miss_analysis.png` — structural properties of missed papers
-- `fig8_efficiency_frontier.png` — Pareto sweep: recall vs corpus size (pareto10–90)
-- `fig8b_depth_pareto_heatmap.png` — depth × Pareto grid heatmap (in progress)
-- ~~`fig9a_pareto_yield_heatmap.png`~~ — DROPPED (covered by fig8c)
-- ~~`fig9b_recall_vs_pareto.png`~~ — DROPPED (vacuous yield threshold sweep)
-- ~~`fig9c_recall_vs_nrounds.png`~~ — DROPPED (covered by fig4)
-- ~~`fig9d_corpus_size_heatmap.png`~~ — DROPPED (covered by fig8b)
+Publication figures: `../data-aps/outputs/pub_figures/`
+Figure index (filenames): `../data-aps/outputs/pub_figures/FIGURE_INDEX.md`
+Per-figure status, roles, and blockers: **[figure-roles.md](figure-roles.md)**
 
 ---
 
@@ -74,21 +59,9 @@ Current pub figures:
 
 ## Venue analysis
 
-The paper is an **empirical systems validation** — citation graph traversal + LLM screening + yield stopping, benchmarked on APS corpus and live surveys. It is not a pure NLP/ML paper.
+See **[decisions.md — Venue](decisions.md)** for full ranking table.
 
-| Venue | Type | Fit | Notes |
-|---|---|---|---|
-| **ICASR 2026** | Conference/Workshop | ⭐⭐⭐⭐ Best | International Collaboration for Automation of Systematic Reviews. Dedicated to trustworthy digital evidence synthesis tools (DESTs), automated screening, extraction. 2025 was July Potsdam. Watch for 2026 call announcement. |
-| **ALTARS 2026** | Workshop @ TheWebConf | ⭐⭐⭐ Very Good | 4th Workshop on Augmented Intelligence in Technology-Assisted Review Systems. April 2026, Copenhagen. May be past deadline — check. Watch for ALTARS 2027. |
-| **JCDL 2026/2027** | Conference | ⭐⭐⭐ Good | Digital libraries + IR; systematic review automation in scope. Check deadline. |
-| **JASIST** | Journal | ⭐⭐⭐ Good | Systematic review automation squarely in scope. Longer cycle (6–12 months). No page limit — better for a full rewrite. |
-| **CIKM 2026** | Conference | ⭐⭐ OK | Information + knowledge management; graph traversal fits. More competitive. |
-| **SIGIR 2026** | Conference | ⭐⭐ OK | Short paper track (4pp) may fit. Expects stronger retrieval theory framing. |
-| **ISPOR** | Conference | ⭐ No | Health economics / clinical outcomes focus — domain too narrow for general-purpose LitDiscover. |
-| **ASE / AIware** | Conference | ⭐ No | Software engineering focus — not relevant. |
-| **arXiv preprint** | Preprint | Always | Post first, target venue second. |
-
-**Recommendation:** ICASR is the ideal dedicated venue — watch for 2026 call. ALTARS is a high-fit workshop track. JASIST as the journal backup if more time is needed for the full rewrite.
+**Short answer:** ICASR 2026 ⭐⭐⭐⭐ (watch for call), ALTARS workshop ⭐⭐⭐, JASIST journal ⭐⭐⭐. Post to arXiv first regardless.
 
 ---
 
