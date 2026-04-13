@@ -4,6 +4,28 @@ Reverse-chronological log of what was done each session. Read this at the start 
 
 ---
 
+## 2026-04-13 (session 14) — Git tidy: citation-dynamics/ tracked; wiki condensed; .gitignore hardened
+
+### What was done
+- **Committed citation-dynamics/ source** to outer repo for the first time (141 files: MATLAB src/, deps/, utils/, writings/, notebooks/, config.py, README.md)
+- **Hardened .gitignore**: now excludes citation-dynamics/data/ (663MB), citation-dynamics/deps/+leiden/private/deps/igraph/ (77MB C vendor source), citation-dynamics/utils/*.mat + writings/*.pdf, lit-review/automated-lit-reviews/ (1.5GB), lit-review/automated-lit-reviews-v2/ (nested git repo), *.log, .ipynb_checkpoints/, *.egg-info/
+- **Wiki cleanup**: deleted Architecture Design_ LitReview v2.md and N_ROUNDS_Extension.md (stale/merged); condensed session-log pre-session-13; added Venue section to decisions.md; collapsed resolved Q6–Q16 figure fixes into single summary line in open-questions.md; condensed INDEX.md figures section
+- No remote configured — push deferred (repo is local-only at present)
+
+### State at end of session
+- Working tree clean; one commit (ff07e66) on master
+- citation-dynamics/ fully tracked (source only, data excluded)
+- Wiki consistent and condensed
+- Planner + architect agents still need re-launching after Apr 15 2pm ET rate limit reset
+
+### What to do next session
+1. **Re-launch planner agent** (after Apr 15 2pm ET): "Plan Zeitgeist validation experiment + NST/TimeCurves integration" — see session 13 entry for full prompt context
+2. **Re-launch architect agent**: "Architect NST-TimeCurves integration design" — same context
+3. **Do NOT start implementation** until both have returned with a plan
+4. Consider adding a git remote if the repo should be pushed to GitHub
+
+---
+
 ## 2026-04-12 (session 13) — NST/Time Curves exploration initiated; TWO AGENTS STILL RUNNING
 
 ### What was done
