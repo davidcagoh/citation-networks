@@ -13,15 +13,28 @@ Reverse-chronological log of what was done each session. Read this at the start 
   2. **Research agent** (a8ae71cd38f08a059): Neural Spacetimes vs Time Curves comparison — goal fit, technical compatibility, experimental design, open-source availability
 - Working hypothesis (unconfirmed): NST = representation layer, Time Curves = visualization layer, SG-t-SNE replaceable by NST→TimeCurves pipeline. Research agent will confirm or refute.
 
-### ⚠️ NEXT SESSION MUST DO FIRST
-1. Check if background agent results landed (they may have completed — check notifications)
-2. If results in: hand to planner + architect agents to produce experimental roadmap
-3. If not in: re-launch with same prompts (agent IDs above are from previous session, not reusable)
-4. Do NOT start implementation until planner+architect have produced a plan
+### Updates within session 13 (explore agent returned)
 
-### State at end of session 13
-- No new commits (agents still running at handover)
-- Agents: a6620dd4869e6f1e0 (explore), a8ae71cd38f08a059 (research) — background, may or may not complete
+**Explore agent COMPLETE** — codebase map written to `wiki/codebase-map.md`. Key findings:
+- SG-t-SNE: ✅ working via Julia SGtSNEpi bridge
+- BlueRed DT-II + Leiden: ✅ both implemented
+- Temporal window analysis: ✅ implemented (`query_XY_subgraph`, `analyze_citation_window`)
+- **Phase detection (quantitative model)**: ❌ THE CORE GAP
+- **Backward influence dedicated pipeline**: ⚠️ partial
+- **Zeitgeist validation experiment**: ❌ not implemented
+
+**Research agent (a8ae71cd38f08a059) still running** — NST vs Time Curves comparison
+
+### ⚠️ NEXT SESSION MUST DO FIRST
+1. Research agent (a8ae71cd38f08a059) may have completed — check for notification
+2. If complete: synthesize findings → launch planner + architect to produce experimental roadmap
+3. If not complete: re-launch research agent with same prompt (NST vs Time Curves, goal fit, experimental design)
+4. Read `wiki/codebase-map.md` before planning — it tells you exactly what's implemented vs missing
+
+### State at end of session 13 (updated)
+- New file: `wiki/codebase-map.md` committed
+- Research agent still pending
+- Core thesis gap confirmed: Zeitgeist validation experiment not yet implemented
 
 ---
 
