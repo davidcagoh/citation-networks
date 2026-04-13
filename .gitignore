@@ -1,0 +1,15 @@
+# Ignore nested git repos (tracked separately)
+lit-review/robust-literature-discovery/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# macOS
+.DS_Store
+
+# Large binary files in wiki
+wiki/*.pdf
