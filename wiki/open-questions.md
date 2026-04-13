@@ -6,10 +6,33 @@ Unresolved issues that block or weaken the paper. Ordered by importance.
 
 ## BROADER PROJECT QUESTIONS (citation-dynamics / synthesis stage)
 
-### Q-SOTA: Is the citation-dynamics lit review still current? What is the state of the art in 2026?
-**Why it matters:** The literature review in `citation-dynamics/writings/` was written ~2022–2024. The cutting edge at that time was Nakis et al. 2024 (Single Event Networks / Dynamic Impact Single-Event Embedding). Two years have passed. The field may have produced: (a) follow-ups to SEN embedding that make the Zeitgeist approach redundant; (b) LLM-based synthesis tools that reframe the problem entirely; (c) new temporal community detection methods.
-**How to resolve:** Run a literature search (Semantic Scholar / Google Scholar, 2024–2026) on: temporal citation phase analysis, time-varying citation community detection, LLM-based literature synthesis/review generation, Zeitgeist models, citation cascade evolution. Check Google Scholar forward citations on Nakis 2024.
-**Blocking:** Scoping the synthesis stage contribution. If SOTA has moved significantly, the Zeitgeist hypothesis needs repositioning.
+### ~~Q-SOTA: Is the citation-dynamics lit review still current? What is the state of the art in 2026?~~
+**RESOLVED (2026-04-12, session 12).** Search run over 2024–2026. Full source list in session-log.md.
+
+**Verdict: Zeitgeist hypothesis is still a gap.** No paper formalizes the specific claim that the global APS citation distribution is a temporal mixture of individually scale-free subcommunity distributions corresponding to distinct research generations, nor does any paper combine backward-influence mapping + spherical-geometry t-SNE for phase detection.
+
+**Nearest prior art to cite and differentiate from:**
+- Costa & Frigori (2024). "Complexity and phase transitions in citation networks." *Frontiers Research Metrics*, 9:1456978. Uses entropy + fractal dimension to detect phase transitions in AI literature only; no mixture decomposition, no geometric embedding.
+- Aparício et al. (2024). "Using dynamic knowledge graphs to detect emerging communities of knowledge." *Knowledge-Based Systems*, 294:111671. Temporal community trajectories in KDD conference; no scale-free mixture modeling, no APS corpus.
+- Castillo-Castillo et al. (2025). "A growth model for citations networks." *Applied Network Science*. Generative model formalizing mixture-of-subcommunities picture, but no temporal phases or empirical APS test.
+- Ke, Gates & Barabási (2023). "A network-based normalized impact measure." *PNAS* 120(47). Characterizes temporal "golden periods" of scientific discovery; measures impact, not structural subcommunity decomposition.
+
+**Competition on the embedding front (action required):**
+- Romero et al. (2024). "Gaussian Embedding of Temporal Networks" (TGNE). arXiv:2405.17253. Richer geometry than prior parametric embeddings.
+- **Choudhary et al. (2024). "Neural Spacetimes for DAG Representation Learning." arXiv:2408.13885. ICLR 2025.** Embeds DAGs (= citation networks) into product manifolds with quasi-metric + partial order. Universal embedding theorem. This is the strongest geometric competitor to SG-t-SNE — thesis must either compare against NST or reframe SG-t-SNE as a visualization tool (complementary, not competing).
+
+**LLM synthesis SOTA (for synthesis stage framing):**
+The area has exploded. Key tools to be aware of:
+- AutoSurvey (Wang et al., NeurIPS 2024 workshop): two-stage parallel LLM survey generation with live RAG
+- PaSa (He et al., 2025, arXiv:2501.10120): RL-trained agentic paper search — direct candidate for the retrieval stage
+- GraphRAG (Edge et al., Microsoft Research, arXiv:2404.16130): LLM-built community graph → hierarchical summarization. Directly applicable to citation corpus synthesis
+- LiRA (Agrawal et al., 2024, arXiv:2510.05138): multi-agent SLR pipeline
+
+**Repositioning actions for thesis:**
+1. Claim APS corpus + backward-influence mapping as the empirical instantiation (no one has done this combination)
+2. Claim Zeitgeist hypothesis as an original statistical conjecture (mixture of scale-free subcommunities) — still untested in the literature
+3. SG-t-SNE framing: reposition as *visualization* relative to NST (representation); direct comparison optional but strengthens chapter
+4. Add Costa & Frigori (2024) and Aparício et al. (2024) to related work as nearest prior art
 
 ### Q-SYNTH: What does the synthesis pipeline experiment look like concretely?
 **Why it matters:** The planned synthesis step is: take a discovered paper set (output of robust-literature-discovery), apply Leiden community detection + temporal window slicing + SG-t-SNE to produce a structured lit review. But this is vague — what would the output actually be? A cluster map? Temporal narrative? Something else?

@@ -12,15 +12,18 @@ Reverse-chronological log of what was done each session. Read this at the start 
 - Added `README.md` at `citation-networks/` root with project structure, Zeitgeist hypothesis, pipeline diagram
 - Added `project_citation_networks.md` to `~/.claude-shared/projects/` and indexed in `MEMORY.md`
 - Launched background SOTA gap search (2024–2026) covering Q1: temporal citation phases, Q2: LLM synthesis SOTA, Q3: temporal graph embedding advances since Nakis 2024
+- Search completed same session; results integrated into `open-questions.md` (Q-SOTA resolved)
 
 ### State at end of session
-- Outer repo: 1 commit, wiki tracked, nested RLD repo correctly gitignored
-- SOTA search results pending — will appear as agent notification
+- Outer repo: 3 commits (eadf9ef, ffe6b7e, + this one)
+- Wiki tracked; nested RLD repo correctly gitignored
+- Q-SOTA resolved: Zeitgeist hypothesis confirmed as a gap; nearest prior art identified; repositioning actions written
+- Neural Spacetimes (ICLR 2025) is the key new competitor — thesis needs to address it
 
 ### What to do next session
-1. Review SOTA gap search results → update `open-questions.md` with verdict on whether Zeitgeist is still a gap
-2. If gap confirmed: scope the synthesis step (citation-dynamics → discovered set → structured lit review) as a concrete contribution
-3. If gap partially filled: determine what to reposition
+1. Decide SG-t-SNE vs Neural Spacetimes framing: comparison experiment, or reframe as visualization vs representation
+2. Scope the synthesis pipeline experiment concretely (Q-SYNTH): pick one survey (K17-RGC is already complete), define what "structured lit review" output looks like, prototype
+3. Update `citation-dynamics/` related work section to add Costa & Frigori 2024, Aparício 2024, NST 2025, Castillo-Castillo 2025
 
 ---
 
