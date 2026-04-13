@@ -23,18 +23,22 @@ Reverse-chronological log of what was done each session. Read this at the start 
 - **Backward influence dedicated pipeline**: ⚠️ partial
 - **Zeitgeist validation experiment**: ❌ not implemented
 
-**Research agent (a8ae71cd38f08a059) still running** — NST vs Time Curves comparison
+**Research agent COMPLETE** — written to `wiki/nst-timecurves-comparison.md`. Key verdict:
+- NST = representation layer (before SG-t-SNE), handles DAG directionality natively
+- Time Curves = macro trajectory visualization (after any embedding), loops=phases, cusps=transitions
+- SG-t-SNE = keep for spatial layout
+- **Novel pipeline: Citation DAG → NST → SG-t-SNE → Time Curves** (no prior work found combining all three)
+- NST adaptation: 2-3 days (OGBN-Arxiv demo in repo); Time Curves: reimplement in Python (simple algorithm)
+- Planner + architect agents launched to produce experimental roadmap
 
 ### ⚠️ NEXT SESSION MUST DO FIRST
-1. Research agent (a8ae71cd38f08a059) may have completed — check for notification
-2. If complete: synthesize findings → launch planner + architect to produce experimental roadmap
-3. If not complete: re-launch research agent with same prompt (NST vs Time Curves, goal fit, experimental design)
-4. Read `wiki/codebase-map.md` before planning — it tells you exactly what's implemented vs missing
+1. Check for planner + architect agent results
+2. If complete: review experimental roadmap → approve → start implementation with tdd-guide
+3. Read `wiki/nst-timecurves-comparison.md` and `wiki/codebase-map.md` before starting
 
-### State at end of session 13 (updated)
-- New file: `wiki/codebase-map.md` committed
-- Research agent still pending
-- Core thesis gap confirmed: Zeitgeist validation experiment not yet implemented
+### State at end of session 13 (final)
+- New files committed: `wiki/codebase-map.md`, `wiki/nst-timecurves-comparison.md`
+- Planner + architect agents running in background
 
 ---
 
