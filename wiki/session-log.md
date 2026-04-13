@@ -4,6 +4,26 @@ Reverse-chronological log of what was done each session. Read this at the start 
 
 ---
 
+## 2026-04-12 (session 12) — Outer repo init; wiki moved; memory written; SOTA search launched
+
+### What was done
+- `git init` at `citation-networks/` root (outer repo, commit `eadf9ef`)
+- Moved `paper-wiki/` → `citation-networks/wiki/`; `.gitignore` excludes `lit-review/robust-literature-discovery/` and PDFs
+- Added `README.md` at `citation-networks/` root with project structure, Zeitgeist hypothesis, pipeline diagram
+- Added `project_citation_networks.md` to `~/.claude-shared/projects/` and indexed in `MEMORY.md`
+- Launched background SOTA gap search (2024–2026) covering Q1: temporal citation phases, Q2: LLM synthesis SOTA, Q3: temporal graph embedding advances since Nakis 2024
+
+### State at end of session
+- Outer repo: 1 commit, wiki tracked, nested RLD repo correctly gitignored
+- SOTA search results pending — will appear as agent notification
+
+### What to do next session
+1. Review SOTA gap search results → update `open-questions.md` with verdict on whether Zeitgeist is still a gap
+2. If gap confirmed: scope the synthesis step (citation-dynamics → discovered set → structured lit review) as a concrete contribution
+3. If gap partially filled: determine what to reposition
+
+---
+
 ## 2026-04-12 (session 11) — Wiki relocation decision; memory architecture settled
 
 ### What was done
@@ -16,10 +36,10 @@ Reverse-chronological log of what was done each session. Read this at the start 
 - `paper-wiki/` still at old location (`lit-review/robust-literature-discovery/paper-wiki/`) — move deferred to next session
 - All prior session 10 changes committed (a114e26)
 
-### What to do next session
-1. `git init` at `citation-networks/`; move `paper-wiki/` → `citation-networks/wiki/`; update any cross-references; commit in outer repo
-2. Add citation-networks project entry to `~/.claude-shared/projects/MEMORY.md` (Zeitgeist hypothesis, pipeline stages, SOTA gap question)
-3. Run SOTA gap assessment for citation-dynamics (Q-SOTA in open-questions.md) — search 2024–2026 for temporal citation phase analysis and LLM-based synthesis work
+### What to do next session (was session 11, completed in session 12)
+1. ~~`git init` at `citation-networks/`; move `paper-wiki/` → `citation-networks/wiki/`; update any cross-references; commit in outer repo~~ ✓
+2. ~~Add citation-networks project entry to `~/.claude-shared/projects/MEMORY.md`~~ ✓
+3. ~~Run SOTA gap assessment for citation-dynamics~~ ✓ (search running)
 
 ---
 
