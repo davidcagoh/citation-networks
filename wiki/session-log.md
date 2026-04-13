@@ -4,6 +4,27 @@ Reverse-chronological log of what was done each session. Read this at the start 
 
 ---
 
+## 2026-04-12 (session 13) — NST/Time Curves exploration initiated; TWO AGENTS STILL RUNNING
+
+### What was done
+- User confirmed openness to exploring Neural Spacetimes and/or Time Curves as replacement/supplement for SG-t-SNE
+- Launched two background agents (results NOT yet in wiki — must check on next session start):
+  1. **Explore agent** (a6620dd4869e6f1e0): mapping citation-dynamics/ codebase — directory tree, algorithms implemented, what's complete vs stub
+  2. **Research agent** (a8ae71cd38f08a059): Neural Spacetimes vs Time Curves comparison — goal fit, technical compatibility, experimental design, open-source availability
+- Working hypothesis (unconfirmed): NST = representation layer, Time Curves = visualization layer, SG-t-SNE replaceable by NST→TimeCurves pipeline. Research agent will confirm or refute.
+
+### ⚠️ NEXT SESSION MUST DO FIRST
+1. Check if background agent results landed (they may have completed — check notifications)
+2. If results in: hand to planner + architect agents to produce experimental roadmap
+3. If not in: re-launch with same prompts (agent IDs above are from previous session, not reusable)
+4. Do NOT start implementation until planner+architect have produced a plan
+
+### State at end of session 13
+- No new commits (agents still running at handover)
+- Agents: a6620dd4869e6f1e0 (explore), a8ae71cd38f08a059 (research) — background, may or may not complete
+
+---
+
 ## 2026-04-12 (session 12) — Outer repo init; wiki moved; memory written; SOTA search launched
 
 ### What was done
