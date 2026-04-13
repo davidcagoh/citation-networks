@@ -31,14 +31,29 @@ Reverse-chronological log of what was done each session. Read this at the start 
 - NST adaptation: 2-3 days (OGBN-Arxiv demo in repo); Time Curves: reimplement in Python (simple algorithm)
 - Planner + architect agents launched to produce experimental roadmap
 
-### ⚠️ NEXT SESSION MUST DO FIRST
-1. Check for planner + architect agent results
-2. If complete: review experimental roadmap → approve → start implementation with tdd-guide
-3. Read `wiki/nst-timecurves-comparison.md` and `wiki/codebase-map.md` before starting
+**Planner + architect agents HIT RATE LIMIT** — zero output. Rate limit resets Apr 15 at 2pm ET.
+
+### ⚠️ NEXT SESSION MUST DO FIRST (after Apr 15 2pm ET)
+1. Re-launch planner agent: "Plan Zeitgeist validation experiment" — see session-log for full prompt context
+2. Re-launch architect agent: "Architect NST-TimeCurves integration design" — see session-log for full prompt context
+3. Both agents need: codebase-map.md + nst-timecurves-comparison.md as context (already in wiki)
+4. Do NOT start implementation until both have returned
+
+### What to tell the planner agent (re-launch prompt summary)
+- Goal: sprint plan for Zeitgeist validation experiment + NST + Time Curves integration
+- Existing: SG-t-SNE, BlueRed, Leiden, temporal windows all in MATLAB
+- Missing: Zeitgeist validation (global = mixture of per-cluster power laws), NST (Python/PyTorch), Time Curves (Python reimplement)
+- New pipeline: Citation DAG → NST → SG-t-SNE → Time Curves
+- Need: ordered phases, files to create, success criteria, LOE per phase
+
+### What to tell the architect agent (re-launch prompt summary)
+- Goal: design data handoff (MATLAB ↔ Python), NST scalability for 709K nodes, pipeline orchestration, Time Curves Python reimplement design
+- Key questions: MAT vs CSV vs HDF5 for export, mini-batch NST training, MATLAB→Python orchestration strategy
 
 ### State at end of session 13 (final)
-- New files committed: `wiki/codebase-map.md`, `wiki/nst-timecurves-comparison.md`
-- Planner + architect agents running in background
+- Commits: codebase-map.md, nst-timecurves-comparison.md (3ebac11)
+- Rate limit hit — planner + architect not run
+- All research complete; implementation planning blocked until Apr 15
 
 ---
 
