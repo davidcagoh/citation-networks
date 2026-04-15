@@ -4,6 +4,27 @@ Reverse-chronological log of what was done each session. Read this at the start 
 
 ---
 
+## 2026-04-15 (session 15) — Wiki restructured; LitDiscover marked complete
+
+### What was done
+- **Wiki restructured**: `wiki/INDEX.md` retitled from "LitDiscover Paper" to "Citation Networks — Project Wiki"; scope is now explicitly cross-project. Active files (session-log, open-questions, codebase-map, nst-timecurves-comparison) separated from frozen LitDiscover docs (thesis, decisions, argument-map, figure-roles, simulation-vs-production).
+- **paper-wiki frozen**: Added archive notice to `paper-wiki/INDEX.md`; it is now read-only.
+- **Duplicate PDF removed**: Barabasi Network Science PDF deleted from `wiki/`; canonical copy remains in `paper-wiki/`.
+- **LitDiscover editorial tasks complete**: All three live experiments done (K17-RGC 100%, Ge21-HSS 100%, Le25-GLLM 73.7%); Q11 citations and PI review done. Venue decision pending.
+
+### State at end of session
+- `wiki/` = live cross-project wiki; session-wrap targets this going forward
+- `paper-wiki/` = frozen archive; do not edit
+- citation-dynamics active work: awaiting planner + architect agent outputs
+
+### What to do next session
+1. **Re-launch planner agent**: sprint plan for Zeitgeist validation + NST/TimeCurves integration
+2. **Re-launch architect agent**: MATLAB↔Python data handoff, NST scalability at 709K nodes
+3. **Write `wiki/synthesis-experiment.md`**: concrete Q-SYNTH spec (test case: K17-RGC recovered set)
+4. Do NOT implement anything until planner + architect have returned
+
+---
+
 ## 2026-04-13 (session 14) — Git tidy: citation-dynamics/ tracked; wiki condensed; .gitignore hardened
 
 ### What was done
