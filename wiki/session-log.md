@@ -4,6 +4,69 @@ Reverse-chronological log of what was done each session. Read this at the start 
 
 ---
 
+## 2026-04-16 (session 20) — Phases 1/2/5 pipeline runs confirmed; Phase 3 NST adapter written
+
+### What was done
+
+**All pipeline steps from session 19 plan now run successfully:**
+
+| Step | Script | Result |
+|---|---|---|
+| Phase 1 (HDF5 build) | `build_aps_hdf5.py` | 709,803 nodes, 9,833,191 edges, 99.3% year coverage |
+| Phase 1 (round-trip) | `load_aps.py` | PASSED |
+| Phase 5 (subgraph) | `build_synthesis_subgraph.py` | 90 nodes (2 gold + 88 neighbors), nnz=189 |
+| Phase 2 (full Leiden) | `leiden_cluster.py` | 446 communities, Q=0.7883 → `aps-2022-leiden-1p00.npz` |
+| Phase 5 (subgraph Leiden) | `leiden_cluster.py --subgraph` | 7 communities, Q=0.4291 → `k17-rgc-subgraph-leiden-1p00.npz` |
+
+**Phase 3 — NST adapter written and smoke-tested:**
+
+| File | Purpose | Status |
+|---|---|---|
+| `src/nst/aps_adapter.py` | Builds NST input from HDF5 + Leiden | **Written, self-test PASSED** |
+| `src/nst/train_aps.py` | Trains NeuralSpacetime, exports embeddings | **Written, smoke-test PASSED (10 epochs)** |
+
+**Key note — K17-RGC gold DOI match rate:**
+Only 2/51 gold DOIs matched in the APS corpus. K17-RGC papers are topology/TDA literature (math/CS journals), not APS physics. The subgraph is 90 nodes. This is expected but worth noting — the synthesis experiment will need to document this as a corpus coverage limitation.
+
+**NST adapter design decisions:**
+- Feature dim = 4: [year_norm, log_indegree_norm, log_outdegree_norm, community_norm]
+- No pre-trained embeddings (APS has none); structural features only
+- Edge weights = cosine similarity of node feature vectors (same convention as OGBN-Arxiv adapter)
+- Default: sample 500K / 9.8M edges for training; cache results in `data/exported/`
+- Model (default): space_dim=4, time_dim=4, J_encoder=6 → 53,373 parameters — fits CPU
+
+### State at end of session
+
+- `src/nst/aps_adapter.py`: created, PASSED self-test
+- `src/nst/train_aps.py`: created, smoke-test (10 epochs, 10K edges) PASSED
+- `data/exported/aps-2022-leiden-1p00.npz`: Leiden full-corpus result
+- `data/synthesis/k17-rgc-subgraph-leiden-1p00.npz`: Leiden subgraph result
+
+### What to do next session
+
+1. **Run full NST training** (Phase 3):
+   ```bash
+   source .venv/bin/activate
+   python citation-dynamics/src/nst/train_aps.py \
+       --num_epochs 500 --batch_size 2000 --max_edges 500000 --display_epoch 50
+   # Expect: ~30-60 min CPU; space loss < 0.05 at convergence
+   # Output: data/exported/aps-nst-model.pt + aps-nst-embeddings.npy
+   ```
+
+2. **Start Phase 4 — Time Curves** (`src/timecurves/timecurves.py`):
+   - Python reimplementation: MDS init → stress majorization with temporal ordering penalty
+   - ~150–200 lines, numpy+scipy only (see session 16 architect spec)
+   - Apply to subgraph first (90 nodes), then to a per-cluster sample
+
+3. **Start Phase 2 zeitgeist scripts** (pure Python, no new dependencies):
+   - `src/zeitgeist/zeitgeist_percluster_fit.py` — per-cluster in-degree distribution fitting
+   - Goal: confirm each cluster is approximately power-law (Zeitgeist hypothesis)
+   - Input: Leiden membership + HDF5 degree data
+
+4. **Commit** `src/nst/` scripts
+
+---
+
 ## 2026-04-16 (session 19) — Python pipeline replaces MATLAB for Phases 1/2/5; bluered stays MATLAB
 
 ### What was done

@@ -40,27 +40,26 @@ Cross-project knowledge base covering citation-dynamics, the synthesis pipeline,
 - Live results: K17-RGC 100% (56/56), Ge21-HSS 100% (202/202), Le25-GLLM 73.7% (42/57)
 - Paper docs frozen in `paper-wiki/`
 
-### citation-dynamics — ACTIVE (Python pipeline replacing MATLAB for Phases 1/2/5)
+### citation-dynamics — ACTIVE (Phase 3 NST adapter written; training ready)
 
-- **MATLAB blocker resolved for Phases 1, 2, 5**: full Python pipeline written (session 19)
-- `src/python/build_aps_hdf5.py` — rebuilds HDF5 from CSV + JSON (replaces Phase 1 MATLAB) — **not yet run**
-- `src/python/build_synthesis_subgraph.py` — Phase 5 subgraph (replaces MATLAB) — **not yet run**
-- `src/python/leiden_cluster.py` — Leiden clustering via leidenalg (replaces MATLAB dep) — **not yet run**
-- `data/exported/` is still empty — HDF5 must be built before any downstream step
-- Phase 3 (`aps_adapter.py`) still blocked until HDF5 verified
+- Phases 1, 2, 5 pipeline: **all run successfully** (session 20)
+  - HDF5: 709,803 nodes, 9,833,191 edges, 99.3% year coverage
+  - Leiden full corpus: 446 communities, Q=0.7883
+  - Synthesis subgraph: 90 nodes, 7 communities, Q=0.4291
+- Phase 3 (NST): `src/nst/aps_adapter.py` + `src/nst/train_aps.py` written and smoke-tested
+- **Next**: run full NST training (500 epochs, 500K edges) + start Phase 4 Time Curves
 - **bluered stays MATLAB-only** — no port planned
 
-### Synthesis — SPEC COMPLETE, PYTHON PIPELINE READY TO RUN
+### Synthesis — PIPELINE COMPLETE, TRAINING PENDING
 
-- `wiki/synthesis-experiment.md` written (K17-RGC test case, Option B 1-hop subgraph)
-- 51 gold DOIs in `data/synthesis/k17-rgc-gold-dois.txt`
-- `build_synthesis_subgraph.py` written, awaiting HDF5 from `build_aps_hdf5.py`
+- Subgraph built: 90 nodes (2 gold APS seeds + 88 neighbors)
+- Leiden communities: 7
+- Caveat: 49/51 K17-RGC gold DOIs are non-APS (math/CS journals) — corpus coverage gap
 
 ---
 
 ## Next priorities
 
-1. **Run `build_aps_hdf5.py`** — produces `data/exported/aps-2022-citation-graph.h5`; verify with `load_aps.py` round-trip
-2. **Run `build_synthesis_subgraph.py`** — record gold match count + C_sub nnz
-3. **Run `leiden_cluster.py --subgraph`** on the subgraph — record n_communities + modularity
-4. **Start Phase 3** — `src/nst/aps_adapter.py` (wire HDF5 into NST training loop)
+1. **Run full NST training**: `python src/nst/train_aps.py --num_epochs 500 --max_edges 500000`
+2. **Start Phase 4**: `src/timecurves/timecurves.py` (MDS + stress majorization)
+3. **Start Phase 2 zeitgeist**: per-cluster power-law fitting to validate Zeitgeist hypothesis
