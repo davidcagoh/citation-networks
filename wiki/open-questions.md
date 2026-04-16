@@ -35,9 +35,8 @@ The area has exploded. Key tools to be aware of:
 4. Add Costa & Frigori (2024) and Aparício et al. (2024) to related work as nearest prior art
 
 ### Q-SYNTH: What does the synthesis pipeline experiment look like concretely?
-**Why it matters:** The planned synthesis step is: take a discovered paper set (output of robust-literature-discovery), apply Leiden community detection + temporal window slicing + SG-t-SNE to produce a structured lit review. But this is vague — what would the output actually be? A cluster map? Temporal narrative? Something else?
-**How to resolve:** Design a concrete experiment: (1) run robust-literature-discovery on one of the existing surveys (K17-RGC, Ge21-HSS), (2) take recovered papers as input to citation-dynamics pipeline, (3) define what "structured lit review" means as output — clusters with representative papers? Temporal emergence curves? Influence hubs?
-**Blocking:** Starting the synthesis implementation.
+**PARTIALLY RESOLVED (2026-04-16, sessions 17–18).** Spec written in `wiki/synthesis-experiment.md`. Option B (1-hop subgraph) chosen. 51 gold DOIs extracted. `build_synthesis_subgraph.m` written. Remaining: run MATLAB scripts to get C_sub, then proceed to Leiden clustering on subgraph + temporal analysis.
+**Still blocking:** Phase 1 HDF5 export (needs MATLAB); Phase 5 subgraph build (needs MATLAB).
 
 ---
 

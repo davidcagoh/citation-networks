@@ -31,7 +31,7 @@ Cross-project knowledge base covering citation-dynamics, the synthesis pipeline,
 
 ---
 
-## Project status (2026-04-15)
+## Project status (2026-04-16)
 
 ### LitDiscover — COMPLETE
 
@@ -40,21 +40,25 @@ Cross-project knowledge base covering citation-dynamics, the synthesis pipeline,
 - Live results: K17-RGC 100% (56/56), Ge21-HSS 100% (202/202), Le25-GLLM 73.7% (42/57)
 - Paper docs frozen in `paper-wiki/`
 
-### citation-dynamics — ACTIVE
+### citation-dynamics — ACTIVE (implementation phase)
 
-- Research complete: NST/TimeCurves pipeline design (see nst-timecurves-comparison.md), SOTA gap confirmed (Zeitgeist hypothesis is novel)
-- Implementation blocked pending planner + architect agent outputs (rate limit reset Apr 15 2pm ET)
-- Core gap: Zeitgeist validation experiment not yet implemented; NST + Time Curves not yet integrated
+- Sprint plan + architecture complete (sessions 16–17). HDF5 handoff design finalized.
+- Phase 1 script (`export_for_python.m`) and Phase 2 script (`zeitgeist_cluster.m`) written — **not yet run** (need MATLAB)
+- Phase 5 Q-SYNTH subgraph script (`build_synthesis_subgraph.m`) written — **not yet run**
+- NST OGBN-Arxiv demo verified on CPU (169K nodes, 1.16M edges). `deps/nst/REQUIREMENTS.md` created.
+- Phase 3 (`aps_adapter.py`) blocked until Phase 1 HDF5 verified
 
-### Synthesis — DESIGN PHASE
+### Synthesis — SPEC COMPLETE, IMPLEMENTATION IN PROGRESS
 
-- Concept: take LitDiscover-recovered paper set → citation-dynamics pipeline → structured lit review output
-- Concrete experiment design (Q-SYNTH) must be written to `wiki/synthesis-experiment.md` before implementation
+- `wiki/synthesis-experiment.md` written (K17-RGC test case, Option B 1-hop subgraph)
+- 51 gold DOIs extracted to `data/synthesis/k17-rgc-gold-dois.txt`
+- `build_synthesis_subgraph.m` written, awaiting MATLAB run
 
 ---
 
 ## Next priorities
 
-1. **Re-launch planner agent** — sprint plan for Zeitgeist validation + NST/TimeCurves integration (see session-log session 13/14 for full prompt)
-2. **Re-launch architect agent** — MATLAB↔Python data handoff design, NST scalability at 709K nodes
-3. **Write synthesis-experiment.md** — concrete spec for Q-SYNTH (test case: K17-RGC recovered set)
+1. **Run Phase 1 in MATLAB** — `export_for_python.m` → verify HDF5 → `python load_aps.py` round-trip
+2. **Run Phase 2 in MATLAB** — `zeitgeist_cluster.m` → record Q value + cluster count
+3. **Run Phase 5 in MATLAB** — `build_synthesis_subgraph.m` → record C_sub size + gold match count
+4. **Start Phase 3** — `src/nst/aps_adapter.py` (once Phase 1 HDF5 confirmed)
