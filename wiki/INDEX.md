@@ -40,25 +40,27 @@ Cross-project knowledge base covering citation-dynamics, the synthesis pipeline,
 - Live results: K17-RGC 100% (56/56), Ge21-HSS 100% (202/202), Le25-GLLM 73.7% (42/57)
 - Paper docs frozen in `paper-wiki/`
 
-### citation-dynamics — ACTIVE (implementation phase)
+### citation-dynamics — ACTIVE (Python pipeline replacing MATLAB for Phases 1/2/5)
 
-- Sprint plan + architecture complete (sessions 16–17). HDF5 handoff design finalized.
-- Phase 1 script (`export_for_python.m`) and Phase 2 script (`zeitgeist_cluster.m`) written — **not yet run** (need MATLAB)
-- Phase 5 Q-SYNTH subgraph script (`build_synthesis_subgraph.m`) written — **not yet run**
-- NST OGBN-Arxiv demo verified on CPU (169K nodes, 1.16M edges). `deps/nst/REQUIREMENTS.md` created.
-- Phase 3 (`aps_adapter.py`) blocked until Phase 1 HDF5 verified
+- **MATLAB blocker resolved for Phases 1, 2, 5**: full Python pipeline written (session 19)
+- `src/python/build_aps_hdf5.py` — rebuilds HDF5 from CSV + JSON (replaces Phase 1 MATLAB) — **not yet run**
+- `src/python/build_synthesis_subgraph.py` — Phase 5 subgraph (replaces MATLAB) — **not yet run**
+- `src/python/leiden_cluster.py` — Leiden clustering via leidenalg (replaces MATLAB dep) — **not yet run**
+- `data/exported/` is still empty — HDF5 must be built before any downstream step
+- Phase 3 (`aps_adapter.py`) still blocked until HDF5 verified
+- **bluered stays MATLAB-only** — no port planned
 
-### Synthesis — SPEC COMPLETE, IMPLEMENTATION IN PROGRESS
+### Synthesis — SPEC COMPLETE, PYTHON PIPELINE READY TO RUN
 
 - `wiki/synthesis-experiment.md` written (K17-RGC test case, Option B 1-hop subgraph)
-- 51 gold DOIs extracted to `data/synthesis/k17-rgc-gold-dois.txt`
-- `build_synthesis_subgraph.m` written, awaiting MATLAB run
+- 51 gold DOIs in `data/synthesis/k17-rgc-gold-dois.txt`
+- `build_synthesis_subgraph.py` written, awaiting HDF5 from `build_aps_hdf5.py`
 
 ---
 
 ## Next priorities
 
-1. **Run Phase 1 in MATLAB** — `export_for_python.m` → verify HDF5 → `python load_aps.py` round-trip
-2. **Run Phase 2 in MATLAB** — `zeitgeist_cluster.m` → record Q value + cluster count
-3. **Run Phase 5 in MATLAB** — `build_synthesis_subgraph.m` → record C_sub size + gold match count
-4. **Start Phase 3** — `src/nst/aps_adapter.py` (once Phase 1 HDF5 confirmed)
+1. **Run `build_aps_hdf5.py`** — produces `data/exported/aps-2022-citation-graph.h5`; verify with `load_aps.py` round-trip
+2. **Run `build_synthesis_subgraph.py`** — record gold match count + C_sub nnz
+3. **Run `leiden_cluster.py --subgraph`** on the subgraph — record n_communities + modularity
+4. **Start Phase 3** — `src/nst/aps_adapter.py` (wire HDF5 into NST training loop)

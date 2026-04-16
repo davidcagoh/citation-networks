@@ -41,6 +41,7 @@ def load_h5(h5_path: str | Path = _DEFAULT_H5) -> dict:
         edge_row : int32 ndarray [E]
         edge_col : int32 ndarray [E]
         year     : float32 ndarray [N]
+        doi      : str ndarray [N]   (empty array if not present in HDF5)
         n_nodes  : int
         n_edges  : int
     """
@@ -48,7 +49,7 @@ def load_h5(h5_path: str | Path = _DEFAULT_H5) -> dict:
     if not h5_path.exists():
         raise FileNotFoundError(
             f"HDF5 not found: {h5_path}\n"
-            "Run src/export/export_for_python.m in MATLAB first."
+            "Run src/python/build_aps_hdf5.py first."
         )
 
     with h5py.File(h5_path, "r") as f:
@@ -57,11 +58,16 @@ def load_h5(h5_path: str | Path = _DEFAULT_H5) -> dict:
         year     = f["/year"][:].squeeze()
         n_nodes  = int(f.attrs.get("n_nodes", len(year)))
         n_edges  = int(f.attrs.get("n_edges", len(edge_row)))
+        if "doi" in f:
+            doi = np.array([d.decode("ascii") for d in f["/doi"][:]])
+        else:
+            doi = np.array([], dtype=str)
 
     return dict(
         edge_row=edge_row,
         edge_col=edge_col,
         year=year,
+        doi=doi,
         n_nodes=n_nodes,
         n_edges=n_edges,
     )

@@ -4,6 +4,73 @@ Reverse-chronological log of what was done each session. Read this at the start 
 
 ---
 
+## 2026-04-16 (session 19) — Python pipeline replaces MATLAB for Phases 1/2/5; bluered stays MATLAB
+
+### What was done
+
+- **Diagnosed MATLAB blocker**: `mat73` can read `C` (scipy sparse, 705 181 × 705 181, 9.7M nnz) from the `.mat` but cannot parse MATLAB string arrays — `doi` and `pubDate` return `None`. `scipy.io.loadmat` also fails on v7.3 HDF5 mats with string arrays.
+- **Decision: rebuild from source, skip mat73 for strings.** Read edges from `aps-dataset-citations-2022.csv` (9.8M pairs); read pubDate from JSON metadata. No dependency on the existing `.mat` files.
+- **Found JSON metadata**: `aps-dataset-metadata-2022/` exists at `/Users/davidgoh/LocalFiles/2024_duke_thesis_deprecated/cs493/aps-dataset-metadata-2022` — 720 535 JSON files.
+- **Decision: bluered stays MATLAB-only.** ~20 MATLAB files, no Python equivalent, manual port not worth the tokens.
+- **Installed Python deps** into `.venv`: `leidenalg`, `igraph`, `umap-learn`, `mat73`.
+
+**New Python scripts (all syntax-checked OK):**
+
+| Script | Replaces | Status |
+|---|---|---|
+| `src/python/build_aps_hdf5.py` | `export_for_python.m` + Phase 1/2 | Written, **not yet run** |
+| `src/python/build_synthesis_subgraph.py` | `build_synthesis_subgraph.m` (Phase 5) | Written, **not yet run** |
+| `src/python/leiden_cluster.py` | `deps/+leiden/` MATLAB wrapper | Written, **not yet run** |
+
+**Updated:** `src/python/load_aps.py` — now also loads `doi` field from HDF5 (previously ignored).
+
+### How to run next session
+
+**Step 1 — Build HDF5** (≈10–20 min on CPU; reads 9.8M CSV edges + 720K JSON files):
+```bash
+cd citation-networks
+.venv/bin/python citation-dynamics/src/python/build_aps_hdf5.py
+# Expect: data/exported/aps-2022-citation-graph.h5
+# Check: ~705K nodes, ~9.7M edges, year coverage ~80%+
+```
+
+**Step 2 — Verify round-trip:**
+```bash
+.venv/bin/python citation-dynamics/src/python/load_aps.py
+# Expect: "Round-trip test PASSED"
+```
+
+**Step 3 — Build Phase 5 subgraph:**
+```bash
+.venv/bin/python citation-dynamics/src/python/build_synthesis_subgraph.py
+# Expect: data/synthesis/k17-rgc-subgraph.npz + k17-rgc-subgraph-dois.txt
+# Record: gold matched count (≤51), neighbor count, C_sub nnz
+```
+
+**Step 4 — Leiden on subgraph:**
+```bash
+.venv/bin/python citation-dynamics/src/python/leiden_cluster.py \
+    --subgraph citation-dynamics/data/synthesis/k17-rgc-subgraph.npz \
+    --out citation-dynamics/data/synthesis
+# Expect: k17-rgc-subgraph-leiden-1p00.npz
+# Record: n_communities, modularity
+```
+
+### State at end of session
+- `src/python/build_aps_hdf5.py`: written, not yet run
+- `src/python/build_synthesis_subgraph.py`: written, not yet run
+- `src/python/leiden_cluster.py`: written, not yet run
+- `src/python/load_aps.py`: updated (doi field), not yet run end-to-end
+- `data/exported/`: still empty — HDF5 needs to be produced
+
+### What to do next session
+1. **Run `build_aps_hdf5.py`** → verify HDF5 exists and round-trip passes
+2. **Run `build_synthesis_subgraph.py`** → record gold match count + C_sub nnz
+3. **Run `leiden_cluster.py` on subgraph** → record n_communities + modularity
+4. **Start Phase 3** (`src/nst/aps_adapter.py`) — wire HDF5 into NST training loop
+
+---
+
 ## 2026-04-16 (session 18) — NST demo verified; Phase 5 Q-SYNTH subgraph script written
 
 ### What was done

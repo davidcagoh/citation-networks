@@ -35,8 +35,8 @@ The area has exploded. Key tools to be aware of:
 4. Add Costa & Frigori (2024) and Aparício et al. (2024) to related work as nearest prior art
 
 ### Q-SYNTH: What does the synthesis pipeline experiment look like concretely?
-**PARTIALLY RESOLVED (2026-04-16, sessions 17–18).** Spec written in `wiki/synthesis-experiment.md`. Option B (1-hop subgraph) chosen. 51 gold DOIs extracted. `build_synthesis_subgraph.m` written. Remaining: run MATLAB scripts to get C_sub, then proceed to Leiden clustering on subgraph + temporal analysis.
-**Still blocking:** Phase 1 HDF5 export (needs MATLAB); Phase 5 subgraph build (needs MATLAB).
+**MOSTLY RESOLVED (2026-04-16, sessions 17–19).** Spec written in `wiki/synthesis-experiment.md`. Option B (1-hop subgraph) chosen. 51 gold DOIs extracted. Python scripts for Phase 1 HDF5 (`build_aps_hdf5.py`), Phase 5 subgraph (`build_synthesis_subgraph.py`), and Leiden clustering (`leiden_cluster.py`) all written.
+**Still open:** None of these scripts have been run yet — `data/exported/` is empty. Run `build_aps_hdf5.py` first (≈10–20 min).
 
 ---
 

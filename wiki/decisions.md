@@ -4,6 +4,11 @@ Choices that have already been made and why. Read this before changing any param
 
 ---
 
+## Python-first pipeline; bluered stays MATLAB-only
+**Decision date:** 2026-04-16
+**Why:** `mat73` can read the sparse matrix `C` from the MATLAB `.mat` files but silently drops all MATLAB string arrays (`doi`, `pubDate`, `authorName`, `affiliationName`), returning `None`. The alternative — reading `doi`/`pubDate` by manually decoding MATLAB's internal uint32 string-array format via `h5py` — is brittle and opaque. The correct source data (CSV + JSON) is available locally, so rebuilding the full graph from source in Python is cleaner, reproducible, and dependency-free. `bluered` (~20 MATLAB files implementing the blue-red bisection algorithm) has no Python equivalent and a manual port would be expensive; it stays MATLAB-only and is called only for the full-corpus analysis, not for the synthesis pipeline.
+**Implication:** `src/python/build_aps_hdf5.py` is the canonical entry point for the Python pipeline. HDF5 node ordering is determined by first-occurrence order in the CSV (same as MATLAB's `containers.Map` insertion order). All downstream scripts (`build_synthesis_subgraph.py`, `leiden_cluster.py`, NST adapter) read from HDF5, not from `.mat`.
+
 ## Wiki lives at `citation-networks/wiki/` (top-level), not inside lit-review
 **Decision date:** 2026-04-12
 **Why:** The wiki covers both citation-dynamics and robust-literature-discovery. Keeping it inside `lit-review/robust-literature-discovery/paper-wiki/` implies wrong ownership and buries shared decisions inside one sub-project. Top-level placement is neutral and discoverable. Version control is preserved by `git init`-ing at `citation-networks/` root; the nested lit-review `.git` is unaffected (git doesn't recurse into nested repos). The `~/.claude-shared/projects/` memory system handles Claude cross-session context; the wiki handles human-readable state.
