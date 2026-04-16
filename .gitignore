@@ -3,6 +3,7 @@ lit-review/robust-literature-discovery/
 lit-review/automated-lit-reviews-v2/
 
 # Large data directories (not version-controlled)
+# Exceptions: citation-dynamics/data/synthesis/*.txt tracked via git add -f
 citation-dynamics/data/
 lit-review/automated-lit-reviews/
 
