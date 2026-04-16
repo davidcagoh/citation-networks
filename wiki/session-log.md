@@ -4,6 +4,75 @@ Reverse-chronological log of what was done each session. Read this at the start 
 
 ---
 
+## 2026-04-16 (session 18) — NST demo verified; Phase 5 Q-SYNTH subgraph script written
+
+### What was done
+
+- **Tasks 1 + 2 (Phase 1 + 2 MATLAB)**: Cannot be run from CLI — MATLAB required. Instructions below. VS Code option documented.
+- **Task 3 — NST OGBN-Arxiv demo** (`deps/nst/`):
+  - Confirmed NST already cloned. PyG and OGB not in default Python env (3.13.1).
+  - Installed via pip: `torch-geometric==2.7.0`, `ogb==1.3.6`.
+  - Ran `arxiv_embedding/train_real.py --num_epochs 1 --batch_size 1000` successfully on CPU.
+  - Dataset downloaded to `/tmp/ogbn-arxiv` (~80 MB). Processed: **169 343 nodes**, **1 165 974 edges** (269 rejected at cosine sim > 0.99).
+  - CUDA not available on this machine (Apple Silicon, no GPU).
+  - Created `deps/nst/REQUIREMENTS.md` with Python version, CUDA status, install steps, timings.
+- **Task 4 — Phase 5 Q-SYNTH** (`src/synthesis/build_synthesis_subgraph.m`):
+  - Reads `data/synthesis/k17-rgc-gold-dois.txt` (51 DOIs).
+  - Matches DOIs to corpus via `ismember(gold_dois, doi)`.
+  - Expands to 1-hop: `C(gold_idx,:)` (gold→others) + `C(:,gold_idx)` (others→gold).
+  - Builds induced subgraph `C_sub = C(sub_idx, sub_idx)`.
+  - Saves `data/synthesis/k17-rgc-subgraph.mat` with C_sub, sub_dois, sub_idx, gold_mask, gold_idx, counts.
+  - **Not yet run** — requires MATLAB with MAT file loaded.
+
+### MATLAB (Tasks 1 + 2) — how to run when MATLAB is available
+
+**VS Code option**: Install the [MATLAB extension by MathWorks](https://marketplace.visualstudio.com/items?itemName=MathWorks.language-matlab) (extension ID `MathWorks.language-matlab`). It provides syntax highlighting and `Run File` button support. Requires a local MATLAB install or MATLAB Online with the extension's language server. For running `.m` files directly in VS Code, MATLAB must be on PATH.
+
+**Phase 1 — export_for_python.m**:
+```
+cd citation-dynamics/src/export
+% In MATLAB:
+run('export_for_python.m')
+% Expect: data/exported/aps-2022-citation-graph.h5 (~80 MB)
+% Check /edge_row ~9.7M entries, /year ~709K entries
+% Then verify round-trip:
+python citation-dynamics/src/python/load_aps.py
+% Expect: PASSED
+```
+
+**Phase 2 — zeitgeist_cluster.m**:
+```
+cd citation-dynamics/src/zeitgeist
+% In MATLAB:
+run('zeitgeist_cluster.m')
+% Record: Q value, cluster count, top-10 cluster sizes
+% Output: data/processed/aps-2022-leiden-clusters.mat
+```
+
+**Phase 5 — build_synthesis_subgraph.m** (NEW this session):
+```
+cd citation-dynamics/src/synthesis
+% In MATLAB:
+run('build_synthesis_subgraph.m')
+% Expect: reports gold matched count (≤51), neighbor count, C_sub nnz
+% Output: data/synthesis/k17-rgc-subgraph.mat
+```
+
+### State at end of session
+- `deps/nst/REQUIREMENTS.md`: created, committed — NST Python/CUDA requirements documented
+- `src/synthesis/build_synthesis_subgraph.m`: created — **not yet run** (needs MATLAB)
+- `src/export/export_for_python.m`: **not yet run**
+- `src/python/load_aps.py`: **not yet run** (needs H5 from Phase 1)
+- `src/zeitgeist/zeitgeist_cluster.m`: **not yet run**
+
+### What to do next session
+1. **Run Phase 1** in MATLAB: `export_for_python.m` → verify H5 → `python load_aps.py`
+2. **Run Phase 2** in MATLAB: `zeitgeist_cluster.m` → record Q + cluster count
+3. **Run Phase 5** in MATLAB: `build_synthesis_subgraph.m` → record C_sub size
+4. **Start Phase 3**: `src/nst/aps_adapter.py` (once Phase 1 H5 verified)
+
+---
+
 ## 2026-04-16 (session 17) — Phase 1 + 2 implementation; Q-SYNTH DOI extraction
 
 ### What was done
