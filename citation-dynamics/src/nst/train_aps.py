@@ -28,6 +28,7 @@ import argparse
 import sys
 from pathlib import Path
 
+import h5py
 import numpy as np
 import torch
 import torch.nn as nn
@@ -73,12 +74,20 @@ def train(
     time_dim:      int   = 4,
     batch_size:    int   = 2000,
     num_epochs:    int   = 500,
-    max_grad_norm: float = 0.5,
+    lr:            float = 1e-4,
+    weight_decay:  float = 1e-4,
+    max_grad_norm: float = 1.0,
     display_epoch: int   = 50,
     device: torch.device = torch.device("cpu"),
 ) -> nn.Module:
-    """Train NeuralSpacetime and return the trained model."""
+    """Train NeuralSpacetime and return the trained model.
 
+    data_x layout: [feat_v (cited/older) || feat_u (citing/newer)] per edge u→v.
+    Model is called as model(feat_v, feat_u) so that po_x tracks the OLDER (cited)
+    node and po_y tracks the NEWER (citing) node — matching the OGBN-Arxiv convention
+    in real_train_functions.py. The time criterion then correctly scores orderings where
+    time[older] < time[newer].
+    """
     model = NeuralSpacetime(
         N  = feature_dim,
         D  = space_dim,
@@ -92,7 +101,7 @@ def train(
     print(f"NeuralSpacetime: {n_params:,} trainable parameters")
 
     criterion_space = nn.MSELoss()
-    optimizer = optim.AdamW(model.parameters(), lr=1e-3)
+    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
     loader = DataLoader(
         TensorDataset(data_x, data_y),
@@ -103,13 +112,17 @@ def train(
     for epoch in range(1, num_epochs + 1):
         running_loss = running_space = running_time = 0.0
         distortions: list[torch.Tensor] = []
+        correct = 0.0
 
         for inputs, labels in loader:
             inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
 
-            # inputs = [feat_v || feat_u]  (convention from train_real.py)
-            distance, po_x, po_y = model(inputs[:, feature_dim:], inputs[:, :feature_dim])
+            # data_x = [feat_v (cited/older) || feat_u (citing/newer)]
+            # Call model(feat_v, feat_u) so po_x = time[cited], po_y = time[citing].
+            # diff = time[cited] - time[citing] < 0 for correct ordering → matches
+            # the OGBN-Arxiv convention in the upstream real_train_functions.py.
+            distance, po_x, po_y = model(inputs[:, :feature_dim], inputs[:, feature_dim:])
             distance = distance.squeeze(1)
 
             connected = labels != 0
@@ -135,13 +148,25 @@ def train(
         avg_time  = running_time  / n_batches
 
         if epoch % display_epoch == 0:
-            dist_all = torch.cat(distortions)
+            if distortions:
+                dist_all = torch.cat(distortions)
+                dist_str = f"distortion avg={dist_all.mean():.3f} std={dist_all.std():.3f}"
+            else:
+                dist_str = "distortion avg=nan std=nan"
             print(
                 f"Epoch {epoch:4d} | loss {avg_loss:.4f} "
                 f"(space {avg_space:.4f}, time {avg_time:.4f}) | "
-                f"distortion avg={dist_all.mean():.3f} std={dist_all.std():.3f} | "
-                f"order_correct={correct:.3f}"
+                f"{dist_str} | order_correct={correct:.3f}"
             )
+
+        # Early exit on NaN — indicates gradient explosion; reduce lr and retry
+        if not torch.isfinite(torch.tensor(avg_loss)):
+            print(
+                f"\nERROR: NaN/Inf loss detected at epoch {epoch}. "
+                "Training diverged. Try: lower --lr (current default 1e-4), "
+                "tighter --max_grad_norm, or fewer encoder layers (J_encoder)."
+            )
+            break
 
     return model
 
@@ -166,8 +191,6 @@ def export_embeddings(
         aps-nst-embeddings.npy          float32[N, D+T]
         aps-nst-embeddings-meta.npz     doi, year, membership arrays
     """
-    import h5py
-
     model.eval()
     N = node_features.shape[0]
     D_T = model.D + model.T
@@ -186,7 +209,7 @@ def export_embeddings(
     print(f"Saved embeddings: {emb_path}  shape={emb_np.shape}")
 
     # Save metadata for plotting
-    with h5py.File(h5_path, "r") as f:
+    with h5py.File(h5_path, "r") as f:  # h5py imported at top of module
         doi  = f["doi"][:]
         year = f["year"][:].ravel()
     d = np.load(leiden_path)
@@ -212,6 +235,10 @@ def main() -> None:
     parser.add_argument("--time_dim",    type=int,   default=4)
     parser.add_argument("--display_epoch", type=int, default=50)
     parser.add_argument("--seed",        type=int,   default=42)
+    parser.add_argument("--lr",          type=float, default=1e-4,
+                        help="AdamW learning rate (default 1e-4; original NST uses 1e-4)")
+    parser.add_argument("--weight_decay", type=float, default=1e-4)
+    parser.add_argument("--max_grad_norm", type=float, default=1.0)
     parser.add_argument("--force_rebuild", action="store_true")
     args = parser.parse_args()
 
@@ -242,6 +269,9 @@ def main() -> None:
         time_dim      = args.time_dim,
         batch_size    = args.batch_size,
         num_epochs    = args.num_epochs,
+        lr            = args.lr,
+        weight_decay  = args.weight_decay,
+        max_grad_norm = args.max_grad_norm,
         display_epoch = args.display_epoch,
         device        = device,
     )

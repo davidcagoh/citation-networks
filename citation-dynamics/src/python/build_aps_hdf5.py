@@ -33,7 +33,9 @@ import numpy as np
 _HERE = Path(__file__).parent
 _ROOT = _HERE / "../.."
 _DEFAULT_CSV  = _ROOT / "data/processed/aps-dataset-citations-2022.csv"
-_DEFAULT_META = Path("/Users/davidgoh/LocalFiles/2024_duke_thesis_deprecated/cs493/aps-dataset-metadata-2022")
+# No default for metadata — it lives outside the repo. Pass --metadata explicitly or
+# set the APS_METADATA_DIR environment variable.
+_DEFAULT_META = Path(os.environ["APS_METADATA_DIR"]) if "APS_METADATA_DIR" in os.environ else None
 _DEFAULT_OUT  = _ROOT / "data/exported/aps-2022-citation-graph.h5"
 
 
@@ -191,15 +193,17 @@ def write_hdf5(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build APS HDF5 citation graph")
+    meta_default = str(_DEFAULT_META) if _DEFAULT_META is not None else ""
     parser.add_argument("--csv",      default=str(_DEFAULT_CSV),  help="Citations CSV path")
-    parser.add_argument("--metadata", default=str(_DEFAULT_META), help="JSON metadata directory")
+    parser.add_argument("--metadata", default=meta_default,
+                        help="JSON metadata directory (or set APS_METADATA_DIR env var)")
     parser.add_argument("--out",      default=str(_DEFAULT_OUT),  help="Output HDF5 path")
     parser.add_argument("--skip-metadata", action="store_true",
                         help="Skip JSON scan; year will be all zeros")
     args = parser.parse_args()
 
     csv_path  = Path(args.csv)
-    meta_dir  = Path(args.metadata)
+    meta_dir  = Path(args.metadata) if args.metadata else None
     out_path  = Path(args.out)
 
     if not csv_path.exists():
@@ -210,6 +214,11 @@ def main() -> None:
     if args.skip_metadata:
         pubdate_map: dict[str, float] = {}
         print("Skipping metadata scan (--skip-metadata).")
+    elif meta_dir is None:
+        print("WARNING: No metadata directory provided.")
+        print("  Pass --metadata PATH or set APS_METADATA_DIR env var.")
+        print("  Continuing without year data (year will be zeros).")
+        pubdate_map = {}
     elif not meta_dir.exists():
         print(f"WARNING: metadata dir not found: {meta_dir}")
         print("Continuing without year data (year will be zeros).")

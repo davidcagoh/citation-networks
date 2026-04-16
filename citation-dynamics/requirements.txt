@@ -1,0 +1,25 @@
+# citation-dynamics Python pipeline requirements
+# Install with: pip install -r requirements.txt
+#
+# Phase 1 — HDF5 build + loader
+h5py>=3.10
+numpy>=1.26
+scipy>=1.12
+
+# Phase 2 / 5 — Leiden community detection
+leidenalg>=0.10
+igraph>=0.11
+
+# Phase 3 — Neural Spacetime training
+torch>=2.2
+torch-geometric>=2.5
+ogb>=1.3.6              # only needed to run the upstream OGBN-Arxiv demo
+
+# Phase 4 — Time Curves (MDS + stress majorization — numpy/scipy only, no extras)
+
+# Utilities
+mat73>=0.65             # read MATLAB v7.3 .mat files (for legacy MAT inputs)
+umap-learn>=0.5         # optional: UMAP projection for quick-look plots
+
+# Development / notebooks
+matplotlib>=3.8
