@@ -1,65 +1,38 @@
 # Citation Networks — Project Wiki
 
-Cross-project knowledge base covering citation-dynamics, the synthesis pipeline, and LitDiscover (archived). Updated by LLM; read in any order.
-
-**Start every session here, then go to [session-log.md](session-log.md) to see what was last done.**
-
-> **Wiki scope:** This wiki tracks active cross-project work. LitDiscover paper docs (figures, argument map, simulation notes) are frozen in [`lit-review/robust-literature-discovery/paper-wiki/`](../lit-review/robust-literature-discovery/paper-wiki/INDEX.md) and should not need further edits.
+**Start every session:** read session-log.md → check open-questions.md.
 
 ---
 
 ## Wiki Files
 
-### Active (citation-dynamics + synthesis)
-
 | File | Purpose | Read when |
 |---|---|---|
-| [session-log.md](session-log.md) | Reverse-chronological log of what was done each session | Start of every session |
-| [open-questions.md](open-questions.md) | Unresolved issues spanning both projects (Q-SYNTH is the current blocker) | When deciding what to work on next |
-| [codebase-map.md](codebase-map.md) | citation-dynamics/ directory tree, what's implemented vs stub | Before touching citation-dynamics code |
-| [nst-timecurves-comparison.md](nst-timecurves-comparison.md) | NST vs Time Curves research verdict; novel pipeline design | Before starting NST/TimeCurves implementation |
+| [session-log.md](session-log.md) | What was done each session + UofT cluster reference | Start of every session |
+| [open-questions.md](open-questions.md) | Unresolved issues by project | Deciding what to work on |
+| [codebase-map.md](codebase-map.md) | citation-dynamics/ directory, pipeline status, key results | Before touching code |
+| [nst-timecurves-comparison.md](nst-timecurves-comparison.md) | NST vs Time Curves research verdict; pipeline design | Before §§5–6 work |
+| [synthesis-experiment.md](synthesis-experiment.md) | K17-RGC Q-SYNTH spec and pipeline | Before synthesis work |
 
-### Frozen (LitDiscover paper — do not edit)
-
-| File | Purpose |
-|---|---|
-| [thesis.md](thesis.md) | LitDiscover core argument |
-| [decisions.md](decisions.md) | LitDiscover design decisions and parameter choices |
-| [argument-map.md](argument-map.md) | Section → claim → evidence → figure |
-| [figure-roles.md](figure-roles.md) | Per-figure status and argumentative role |
-| [simulation-vs-production.md](simulation-vs-production.md) | How APS simulation relates to production LitDiscover |
+### Frozen (LitDiscover — do not edit)
+`thesis.md`, `decisions.md`, `argument-map.md`, `figure-roles.md`, `simulation-vs-production.md`
 
 ---
 
 ## Project status (2026-04-16)
 
-### LitDiscover — COMPLETE
+### LitDiscover — COMPLETE (venue pending)
+- Paper: "Robust Literature Discovery from Minimal Seeds"
+- Live results: K17-RGC 100%, Ge21-HSS 100%, Le25-GLLM 73.7%
+- ICASR 2026 watch; no active deadline
+- Docs frozen in `paper-wiki/`
 
-- Paper: "Robust Literature Discovery from Minimal Seeds: Validating LitDiscover on APS Citation Benchmarks and Live Surveys"
-- All editorial tasks done; venue decision pending (ICASR 2026 watch)
-- Live results: K17-RGC 100% (56/56), Ge21-HSS 100% (202/202), Le25-GLLM 73.7% (42/57)
-- Paper docs frozen in `paper-wiki/`
+### citation-dynamics — ACTIVE
+- **Done:** HDF5 pipeline, Leiden (446 communities, Q=0.788), Zeitgeist fitting (γ_c ∈ [2.1, 3.3], 100% KS pass), Time Curves implementation (proxy verified)
+- **Running:** NST training, UofT cluster job 159670 (email at daveed@cs.toronto.edu)
+- **Next:** Download NST results → run Time Curves → label communities by physics area → write §§5–6
+- **Paper target:** COMPLEX NETWORKS 2026
 
-### citation-dynamics — ACTIVE (Phase 3 NST adapter written; training ready)
-
-- Phases 1, 2, 5 pipeline: **all run successfully** (session 20)
-  - HDF5: 709,803 nodes, 9,833,191 edges, 99.3% year coverage
-  - Leiden full corpus: 446 communities, Q=0.7883
-  - Synthesis subgraph: 90 nodes, 7 communities, Q=0.4291
-- Phase 3 (NST): `src/nst/aps_adapter.py` + `src/nst/train_aps.py` written and smoke-tested
-- **Next**: run full NST training (500 epochs, 500K edges) + start Phase 4 Time Curves
-- **bluered stays MATLAB-only** — no port planned
-
-### Synthesis — PIPELINE COMPLETE, TRAINING PENDING
-
-- Subgraph built: 90 nodes (2 gold APS seeds + 88 neighbors)
-- Leiden communities: 7
-- Caveat: 49/51 K17-RGC gold DOIs are non-APS (math/CS journals) — corpus coverage gap
-
----
-
-## Next priorities
-
-1. **Run full NST training**: `python src/nst/train_aps.py --num_epochs 500 --max_edges 500000`
-2. **Start Phase 4**: `src/timecurves/timecurves.py` (MDS + stress majorization)
-3. **Start Phase 2 zeitgeist**: per-cluster power-law fitting to validate Zeitgeist hypothesis
+### Synthesis — subgraph built, pending NST
+- K17-RGC subgraph: 90 nodes (2 gold APS + 88 neighbors), 7 communities
+- Caveat: 49/51 gold DOIs are non-APS; document as corpus coverage limitation

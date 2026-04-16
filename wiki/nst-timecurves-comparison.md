@@ -93,13 +93,9 @@ This three-stage pipeline is novel: no published work was found combining NST + 
 
 | Method | Language | Status | Notes |
 |---|---|---|---|
-| SG-t-SNE | C++/Julia/MATLAB | ✅ Already in codebase | `deps/+jl_interface/sgtsnepi.jl` |
-| NST | Python (PyTorch) | 🆕 Need to add | ICLR 2025, research-grade; OGBN-Arxiv demo in repo |
-| Time Curves | JavaScript/Java | 🆕 Need to add | No Python — either use Java server or reimplement core algorithm in Python (algorithm is not complex) |
-
-**NST adaptation effort:** Low-medium. The OGBN-Arxiv pipeline in the repo handles directed citation DAGs. APS data needs: convert MAT sparse matrix to edge list, add year labels as node features, run `arxiv_generation.py` equivalent.
-
-**Time Curves adaptation effort:** Low if reimplementing in Python (MDS-like projection preserving 1D temporal parameterization). Medium if using Java server.
+| SG-t-SNE | C++/Julia/MATLAB | ✅ In codebase | `deps/+jl_interface/sgtsnepi.jl` |
+| NST | Python (PyTorch) | ✅ Adapted + training | `src/phase3_nst_adapter.py`, `src/phase3_nst_train.py`; job 159670 on UofT cluster |
+| Time Curves | Python (reimplemented) | ✅ Implemented | `src/phase4_timecurves.py`; proxy run verified; full run pending NST |
 
 ---
 

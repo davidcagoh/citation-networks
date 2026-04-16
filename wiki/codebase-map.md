@@ -1,100 +1,71 @@
 # Codebase Map: citation-dynamics/
 
-Generated session 13, 2026-04-12 via Explore agent.
+Last updated: session 21, 2026-04-16.
 
-## Status Summary
+## Pipeline Status
 
-**MATLAB-dominant** research infrastructure. Julia used only for SGtSNEpi embedding backend.
+| Phase | Script | Status | Output |
+|---|---|---|---|
+| 1 — HDF5 build | `src/phase1_build_graph.py` | ✅ | `data/exported/aps-2022-citation-graph.h5` |
+| 2 — Leiden full corpus | `src/phase2_leiden_cluster.py` | ✅ | `data/exported/aps-2022-leiden-1p00.npz` |
+| 2b — Zeitgeist fitting | `src/phase2b_zeitgeist_fit.py` | ✅ | `data/analysis/zeitgeist_community_fits.csv` |
+| 3 — NST training | `src/phase3_nst_train.py` | 🔄 cluster job 159670 | `data/exported/aps-nst-model.pt` + `aps-nst-embeddings.npy` |
+| 4 — Time Curves | `src/phase4_timecurves.py` | ⏳ awaits Phase 3 | `data/analysis/timecurves_nst_result.npz` |
+| 5 — Synthesis subgraph | `src/phase5_synthesis_subgraph.py` | ✅ | `data/synthesis/k17-rgc-subgraph.npz` |
 
-| Layer | Status |
-|---|---|
-| Data parsing (CSV/JSON → MAT) | ✅ Complete |
-| Sparse matrix ops (sort, WCC, trim) | ✅ Complete |
-| Statistics (degree, Gini, Pareto, power-law γ) | ✅ Complete |
-| SG-t-SNE embedding (2D/3D via Julia SGtSNEpi) | ✅ Complete |
-| BlueRed DT-II spectral clustering | ✅ Complete |
-| Leiden community detection (MEX/igraph) | ✅ Complete |
-| Temporal sliding windows + per-window metrics | ✅ Complete |
-| Visualizations (animated embedding, cluster overlay, distributions) | ✅ Complete |
-| **Phase detection (emergence/growth/decay model)** | ⚠️ Partial — tracking exists, quantitative model missing |
-| **Backward influence mapping (dedicated pipeline)** | ⚠️ Partial — `query_XY_subgraph` enables it; full pipeline TBD |
-| **Zeitgeist validation** (global = mixture of subcommunity distributions) | ❌ Not implemented |
-| Aging/background outdegree model | ❌ Not implemented |
+Run everything: `make -f citation-dynamics/Makefile all`
 
-## Directory Tree (key files only)
+## MATLAB-only components (not ported)
+
+| Component | Files | Status |
+|---|---|---|
+| SG-t-SNE embedding | `deps/+sgtsne/`, `deps/+jl_interface/` | ✅ Working (Julia bridge) |
+| BlueRed DT-II spectral | `deps/+bluered/` (23 files, `dtii.m` core) | ✅ Working |
+| Temporal window analysis | `utils/analyze_citation_window.m`, `utils/query_XY_subgraph.m` | ✅ Working |
+| Backward influence interface | `src/analysis/showEmbedding.m` | ⚠️ Exists, no standalone pipeline |
+
+BlueRed stays MATLAB-only — ~20 files, no Python equivalent, not worth porting for paper scope.
+
+## Directory Tree (key files)
 
 ```
 citation-dynamics/
-├── config.py                     Python path config
-├── setup.m                       MATLAB path setup
+├── Makefile                          Pipeline orchestration
+├── train_cluster.slurm               UofT cluster job (gpunodes)
 ├── src/
-│   ├── parse/                    CSV/JSON → sparse MAT (7 files, all complete)
-│   ├── analysis/
-│   │   ├── main_window.m         Temporal window loop (198 lines) ← KEY
-│   │   ├── main_window2.m        Revised version (222 lines) ← KEY
-│   │   ├── blueRed_largestWCC.m  BlueRed on WCC
-│   │   ├── showEmbedding.m       Animate 3D t-SNE through time (82 lines)
-│   │   ├── cluster_dates_analysis.m  Track cluster emergence/decay
-│   │   └── cluster_size_analysis.m   Cluster size distribution
-│   └── graph_select/             Synthetic test graph loader
-├── utils/
-│   ├── analyze_citation_window.m  ← CORE: per-window degree/Gini/γ/Pareto
-│   ├── query_XY_subgraph.m        ← CORE: cited/citing subgraph by date
-│   ├── estimateStableParameter.m  Power-law exponent γ, λ
-│   ├── compute_pareto_stats.m     Gini + Pareto ratios
-│   ├── orderByDate.m              Sort C by publication date
-│   ├── getLargestWCC.m            Extract largest WCC
-│   └── show_highlight_embedding.m  Highlight cluster in 2D layout
+│   ├── phase1_build_graph.py         CSV+JSON → HDF5
+│   ├── phase2_leiden_cluster.py      Full-corpus Leiden
+│   ├── phase2b_zeitgeist_fit.py      Per-community power-law fitting
+│   ├── phase3_nst_adapter.py         APS→NST data adapter
+│   ├── phase3_nst_train.py           NST training + embedding export
+│   ├── phase4_timecurves.py          Time Curves (SMACOF + cusp/loop detection)
+│   ├── phase5_synthesis_subgraph.py  K17-RGC 1-hop subgraph
+│   └── load_aps.py                   HDF5 loader utility
 ├── deps/
-│   ├── +sgtsne/     SG-t-SNE MATLAB implementation (9 files)
-│   ├── +bluered/    BlueRed DT-II spectral (23 files) ← dtii.m is CORE
-│   ├── +leiden/     Leiden MEX wrapper → igraph C++ (142-line cluster.m)
-│   ├── +jl_interface/  Julia SGtSNEpi bridge (sgtsnepi.jl + sgtsnepi.m)
-│   └── +utilities/  Math utils (modularity, isapprox)
+│   ├── +bluered/                     BlueRed DT-II (MATLAB, 23 files)
+│   ├── +sgtsne/, +jl_interface/      SG-t-SNE via Julia SGtSNEpi
+│   ├── +leiden/                      Leiden MEX wrapper
+│   └── nst/arxiv_embedding/          NST source (neural_spacetime.py, layers.py)
 ├── data/
-│   └── processed/   APS 2022: 709,803 articles, 9.76M citations
-│       ├── aps-2022-author-doi-citation-affil.mat  (82 MB, C+B+D+E)
-│       └── aps-2022-doi-citation.mat               (33 MB, C only)
+│   ├── processed/                    Raw MAT files (82MB+33MB, gitignored)
+│   ├── exported/                     HDF5, Leiden NPZ, NST outputs (gitignored)
+│   ├── synthesis/                    K17-RGC subgraph files (gitignored)
+│   └── analysis/                     Zeitgeist fits, Time Curves outputs (gitignored)
 └── writings/
-    ├── Thesis Text.md              Full thesis outline Chapters 1-6
-    ├── Literature Review_*.md      ~50 paper survey
-    └── Year by Year.md             Temporal statistics summary
+    ├── paper_draft_sections.md       Paper outline (§§1–8)
+    └── Thesis Text.md                Original thesis chapter outline
 ```
 
-## Core Algorithm Signatures
+## Key data formats
 
-```matlab
-% Temporal window: extract subgraph + stats
-[C_sub, doi_cited, doi_citing, ...] = query_XY_subgraph(C, doi, pubDate, t1, t2, t3, t4)
-[num_cited, num_citing, intra, avg_in, avg_out, gini, gamma, lambda, pareto] = analyze_citation_window(C, paretoParameter)
+- HDF5: `/edge_row` int32[E], `/edge_col` int32[E], `/year` float32[N], `/doi` bytes[N]
+- Leiden NPZ: `membership` int32[N], `modularity` float, `n_communities` int
+- NST embeddings NPZ: `coords` float32[N, space_dim+time_dim], `doi`, `year`, `membership`
+- Time Curves NPZ: `coords` float32[T,2], `years` int[T], `cusps` int[], `loops` int[L,2]
 
-% Power-law exponent
-[gamma, lambda_est] = estimateStableParameter(C)
-[slope, intercept] = regionFit(logX, logY, 'range')  % robust log-log fit
+## Core key results (APS 2022)
 
-% Embedding
-y = sgtsne.embed(P, labels, no_dims, opt)    % SG-t-SNE (MATLAB backend)
-% OR: deps/+jl_interface/sgtsnepi.m → Julia SGtSNEpi
-
-% Clustering
-categories = runBlueRed(C, gname)            % BlueRed spectral
-[cid, qq] = leiden.cluster(A, func, opt)    % Leiden community detection
-
-% BlueRed core
-[cid_f, ha_f, hr_f, ...] = dtii(A, strfunc, opt)   % Descending Triangulation II
-```
-
-## Data Format
-
-- `C`: sparse n×n, C(i,j) = paper j cites paper i (indegree on rows)
-- `pubDate`: string array 'YYYY-MM-DD'
-- `doi`: cell array of strings
-
-## What the Thesis Needs Next
-
-The three claimed contributions and their implementation status:
-1. **Temporal embedding** → ✅ SG-t-SNE via SGtSNEpi working
-2. **Backward influence mapping** → ⚠️ `query_XY_subgraph` exists but no dedicated pipeline
-3. **Quantitative phase characterization** → ❌ core gap — cluster tracking exists but no emergence/growth/decay model
-
-The **Zeitgeist validation experiment** (global distribution = mixture of subcommunity distributions) is the missing empirical centrepiece. It requires: temporal window → Leiden clusters → per-cluster power-law fit → mixture decomposition test.
+- N=709,803 papers, L=9,833,191 citations, 1893–2022
+- Leiden: 446 communities, Q=0.7883; 25 major communities (≥30 nodes) cover 99.8% of papers
+- Zeitgeist: γ_c ∈ [2.099, 3.268], mean=2.50, std=0.246; 100% pass KS test; 68% have year IQR<20y
+- K17-RGC subgraph: 90 nodes (2 gold APS + 88 neighbors), 7 communities, Q=0.4291; 49/51 gold DOIs are non-APS

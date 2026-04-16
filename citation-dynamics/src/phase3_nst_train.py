@@ -298,7 +298,7 @@ def main() -> None:
     parser.add_argument("--force_rebuild", action="store_true")
     args = parser.parse_args()
 
-    device = torch.device("cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
 
     h5_path     = Path(args.h5)

@@ -153,6 +153,25 @@ The paper is an **empirical systems validation** — citation graph traversal + 
 
 ---
 
+## citation-dynamics paper — session 21 decisions (2026-04-16)
+
+### Target venue: COMPLEX NETWORKS 2026
+**Decision date:** 2026-04-16
+**Why:** Network science community understands both the domain question (Zeitgeist) and methodology (NST, community detection). Hard deadline forces the paper to completion. Scientometrics was the alternative but slower review and less methodological audience.
+**Implication:** ~August CFP deadline. Paper must be submission-ready before NST results grow stale.
+
+### Power-law fitting: K_min scan, not fixed K_min=1
+**Decision date:** 2026-04-16
+**Why:** Fixed K_min=1 gives γ≈1.38, inconsistent with Barabasi (2016) §4.13 (γ=2.79 for APS, K_min=49). Scan gives γ_c ∈ [2.1, 3.3], mean=2.50 — consistent with literature and reveals genuine inter-community variation.
+**Implication:** Always use `--xmin_strategy scan --ks_boots 500` for paper runs. K_min=1 is debug-only.
+
+### Zeitgeist framing: heterogeneous exponents
+**Decision date:** 2026-04-16
+**Why:** With proper K_min scan, γ_c varies (2.1–3.3, std=0.246). Different research generations attract citations at different rates AND occupy different temporal windows. Both axes of variation are real.
+**Implication:** §4 claims communities differ in temporal position AND citation attraction rate.
+
+---
+
 ## Naming
 
 ### LitDiscover (not "LitReview v2")
