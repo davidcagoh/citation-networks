@@ -12,8 +12,7 @@
 # Set APS_METADATA_DIR to the directory containing aps-dataset-metadata-2022/ JSON files.
 
 PYTHON     = ../.venv/bin/python
-SRC_PY     = src/python
-SRC_NST    = src/nst
+SRC        = src
 DATA_EXP   = data/exported
 DATA_SYN   = data/synthesis
 
@@ -40,32 +39,32 @@ all: nst
 # --- Phase 1 -----------------------------------------------------------------
 hdf5: $(HDF5)
 
-$(HDF5): $(SRC_PY)/build_aps_hdf5.py \
+$(HDF5): $(SRC)/phase1_build_graph.py \
          data/processed/aps-dataset-citations-2022.csv
-	$(PYTHON) $(SRC_PY)/build_aps_hdf5.py
+	$(PYTHON) $(SRC)/phase1_build_graph.py
 	@echo "[Phase 1] HDF5 written: $@"
 
 # --- Phase 2 -----------------------------------------------------------------
 leiden: $(LEIDEN)
 
-$(LEIDEN): $(SRC_PY)/leiden_cluster.py $(HDF5)
-	$(PYTHON) $(SRC_PY)/leiden_cluster.py
+$(LEIDEN): $(SRC)/phase2_leiden_cluster.py $(HDF5)
+	$(PYTHON) $(SRC)/phase2_leiden_cluster.py
 	@echo "[Phase 2] Leiden written: $@"
 
 # --- Phase 5 -----------------------------------------------------------------
 subgraph: $(SUBGRAPH)
 
-$(SUBGRAPH): $(SRC_PY)/build_synthesis_subgraph.py $(HDF5) \
+$(SUBGRAPH): $(SRC)/phase5_synthesis_subgraph.py $(HDF5) \
              $(DATA_SYN)/k17-rgc-gold-dois.txt
-	$(PYTHON) $(SRC_PY)/build_synthesis_subgraph.py
+	$(PYTHON) $(SRC)/phase5_synthesis_subgraph.py
 	@echo "[Phase 5] Subgraph written: $@"
 
 # --- Phase 3 -----------------------------------------------------------------
 nst: $(NST_EMB)
 
-$(NST_EMB): $(SRC_NST)/train_aps.py $(SRC_NST)/aps_adapter.py \
+$(NST_EMB): $(SRC)/phase3_nst_train.py $(SRC)/phase3_nst_adapter.py \
             $(HDF5) $(LEIDEN)
-	$(PYTHON) $(SRC_NST)/train_aps.py \
+	$(PYTHON) $(SRC)/phase3_nst_train.py \
 	    --num_epochs 500 --max_edges 500000 --display_epoch 50
 	@echo "[Phase 3] NST embeddings written: $@"
 
