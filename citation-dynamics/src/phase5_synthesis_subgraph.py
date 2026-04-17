@@ -30,11 +30,11 @@ import h5py
 import numpy as np
 import scipy.sparse as sp
 
-_HERE = Path(__file__).parent
-_ROOT = _HERE / ".."
-_DEFAULT_H5    = _ROOT / "data/exported/aps-2022-citation-graph.h5"
-_DEFAULT_GOLD  = _ROOT / "data/synthesis/k17-rgc-gold-dois.txt"
-_DEFAULT_OUTDIR = _ROOT / "data/synthesis"
+from config import APS_H5, APS_GOLD, DATA_SYNTHESIS
+
+_DEFAULT_H5     = APS_H5
+_DEFAULT_GOLD   = APS_GOLD
+_DEFAULT_OUTDIR = DATA_SYNTHESIS
 
 
 def load_gold_dois(path: Path) -> list[str]:

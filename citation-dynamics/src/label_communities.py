@@ -24,13 +24,13 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-_HERE = Path(__file__).parent
-_ROOT = _HERE / ".."
+from config import APS_H5, APS_LEIDEN, APS_FITS, DATA_ANALYSIS
+from utils import compute_indegree
 
-_DEFAULT_H5     = _ROOT / "data/exported/aps-2022-citation-graph.h5"
-_DEFAULT_LEIDEN = _ROOT / "data/exported/aps-2022-leiden-1p00.npz"
-_DEFAULT_FITS   = _ROOT / "data/analysis/zeitgeist_community_fits.csv"
-_OUT_CSV        = _ROOT / "data/analysis/community_labels_template.csv"
+_DEFAULT_H5     = APS_H5
+_DEFAULT_LEIDEN = APS_LEIDEN
+_DEFAULT_FITS   = APS_FITS
+_OUT_CSV        = DATA_ANALYSIS / "community_labels_template.csv"
 
 
 def load_data(
@@ -44,12 +44,6 @@ def load_data(
         n    = int(f.attrs["n_nodes"])
     membership = np.load(leiden_path)["membership"].ravel().astype(np.int32)
     return doi, year, col, membership, n
-
-
-def compute_indegree(col: np.ndarray, n: int) -> np.ndarray:
-    indeg = np.zeros(n, dtype=np.int64)
-    np.add.at(indeg, col, 1)
-    return indeg
 
 
 def load_fits(fits_path: Path) -> dict[int, dict]:

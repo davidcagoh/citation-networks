@@ -27,10 +27,10 @@ import igraph as ig
 import leidenalg
 import numpy as np
 
-_HERE = Path(__file__).parent
-_ROOT = _HERE / ".."
-_DEFAULT_H5  = _ROOT / "data/exported/aps-2022-citation-graph.h5"
-_DEFAULT_OUT = _ROOT / "data/exported"
+from config import APS_H5, DATA_EXPORTED
+
+_DEFAULT_H5  = APS_H5
+_DEFAULT_OUT = DATA_EXPORTED
 
 
 def load_edges_from_hdf5(h5_path: Path) -> tuple[np.ndarray, np.ndarray, int]:

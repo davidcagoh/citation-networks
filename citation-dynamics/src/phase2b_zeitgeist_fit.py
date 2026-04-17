@@ -27,72 +27,13 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-from scipy import stats
 
-_HERE = Path(__file__).parent
-_ROOT = _HERE / ".."
+from config import APS_H5, APS_LEIDEN, DATA_ANALYSIS
+from utils import mle_powerlaw_exponent, ks_pvalue
 
-_DEFAULT_H5     = _ROOT / "data/exported/aps-2022-citation-graph.h5"
-_DEFAULT_LEIDEN = _ROOT / "data/exported/aps-2022-leiden-1p00.npz"
-_OUT_DIR        = _ROOT / "data/analysis"
-
-
-# ---------------------------------------------------------------------------
-# Power-law MLE (Clauset et al. 2009, discrete case)
-# ---------------------------------------------------------------------------
-
-def mle_powerlaw_exponent(degrees: np.ndarray, xmin: int) -> float:
-    """Maximum-likelihood estimate of power-law exponent γ.
-
-    Only uses values >= xmin. Returns nan if fewer than 2 values qualify.
-    Formula: γ = 1 + n [Σ ln(k_i / (xmin - 0.5))]^{-1}
-    """
-    tail = degrees[degrees >= xmin].astype(float)
-    n = len(tail)
-    if n < 2:
-        return float("nan")
-    return 1.0 + n / np.sum(np.log(tail / (xmin - 0.5)))
-
-
-def ks_pvalue(degrees: np.ndarray, xmin: int, gamma: float, n_boot: int = 500) -> float:
-    """KS p-value via bootstrap (Clauset et al. §4).
-
-    Fraction of bootstrap samples with KS stat >= observed KS stat.
-    Uses n_boot=500 for speed; increase for publication-quality.
-    """
-    tail = degrees[degrees >= xmin].astype(float)
-    n = len(tail)
-    if n < 10 or np.isnan(gamma):
-        return float("nan")
-
-    # Observed KS stat against fitted power-law CDF
-    def powerlaw_cdf(k: np.ndarray, g: float, xm: int) -> np.ndarray:
-        return 1.0 - (k / xm) ** (1.0 - g)
-
-    k_unique = np.unique(tail)
-    empirical_cdf = np.array([np.mean(tail <= k) for k in k_unique])
-    theoretical_cdf = powerlaw_cdf(k_unique, gamma, xmin)
-    ks_obs = np.max(np.abs(empirical_cdf - theoretical_cdf))
-
-    # Bootstrap: draw synthetic samples from power-law, refit, compute KS
-    rng = np.random.default_rng(42)
-    count_exceed = 0
-    for _ in range(n_boot):
-        # Inverse CDF sampling for discrete power law (approximate)
-        u = rng.uniform(size=n)
-        synth = np.floor(xmin * (1.0 - u) ** (1.0 / (1.0 - gamma))).astype(float)
-        synth = np.clip(synth, xmin, None)
-        g_synth = mle_powerlaw_exponent(synth, xmin)
-        if np.isnan(g_synth):
-            continue
-        k_s = np.unique(synth)
-        emp_s = np.array([np.mean(synth <= k) for k in k_s])
-        th_s  = powerlaw_cdf(k_s, g_synth, xmin)
-        ks_s  = np.max(np.abs(emp_s - th_s))
-        if ks_s >= ks_obs:
-            count_exceed += 1
-
-    return count_exceed / n_boot
+_DEFAULT_H5     = APS_H5
+_DEFAULT_LEIDEN = APS_LEIDEN
+_OUT_DIR        = DATA_ANALYSIS
 
 
 def find_xmin(degrees: np.ndarray, xmin_strategy: str = "fixed", fixed_xmin: int = 1) -> int:

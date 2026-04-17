@@ -12,7 +12,8 @@
 | [open-questions.md](open-questions.md) | Unresolved issues by project | Deciding what to work on |
 | [codebase-map.md](codebase-map.md) | citation-dynamics/ directory, pipeline status, key results | Before touching code |
 | [nst-timecurves-comparison.md](nst-timecurves-comparison.md) | NST vs Time Curves research verdict; pipeline design | Before §§5–6 work |
-| [synthesis-experiment.md](synthesis-experiment.md) | K17-RGC Q-SYNTH spec and pipeline | Before synthesis work |
+| [concepts.md](concepts.md) | Methodological concepts: metric families, fitting theory | When designing statistical validation |
+| [synthesis-experiment.md](synthesis-experiment.md) | K17-RGC Q-SYNTH spec and pipeline *(on hold — synthesis paused)* | Before synthesis work resumes |
 
 ### Frozen (LitDiscover — do not edit)
 `thesis.md`, `decisions.md`, `argument-map.md`, `figure-roles.md`, `simulation-vs-production.md`
@@ -29,8 +30,8 @@
 
 ### citation-dynamics — ACTIVE
 - **Scope:** §§1–4 only — Zeitgeist hypothesis → Leiden → per-community power-law → temporal localization
-- **Done:** HDF5, Leiden (446 communities, Q=0.788), Zeitgeist fitting (γ_c ∈ [2.1, 3.3], 100% KS pass), community labelling (25 areas), all §§1–4 figures (γ_global=2.74, figs 1–4)
-- **Next:** Rewrite §§1+8 (remove NST/Time Curves) → LaTeX §4 table
+- **Done:** HDF5, Leiden (446 communities, Q=0.788), Zeitgeist fitting (γ_c ∈ [2.1, 3.3], 100% KS pass), community labelling (25 areas), all §§1–4 figures (γ_global=2.74, figs 1–4); src/ refactored (config + utils)
+- **Next:** Rewrite §§1+8 → LaTeX §4 table
 - **Paper target:** COMPLEX NETWORKS 2026 (~Aug deadline)
 
 ### Synthesis — subgraph built, on hold

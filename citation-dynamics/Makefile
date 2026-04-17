@@ -17,32 +17,29 @@ SRC        = $(MAKEFILE_DIR)src
 DATA_EXP   = $(MAKEFILE_DIR)data/exported
 DATA_SYN   = $(MAKEFILE_DIR)data/synthesis
 DATA_ANA   = $(MAKEFILE_DIR)data/analysis
+DATA_FIG   = $(MAKEFILE_DIR)data/figures
 DATA_PROC  = $(MAKEFILE_DIR)data/processed
 
 # Output files (used as make targets)
 HDF5       = $(DATA_EXP)/aps-2022-citation-graph.h5
 LEIDEN     = $(DATA_EXP)/aps-2022-leiden-1p00.npz
-SUBGRAPH   = $(DATA_SYN)/k17-rgc-subgraph.npz
-NST_MODEL  = $(DATA_EXP)/aps-nst-model.pt
-NST_EMB    = $(DATA_EXP)/aps-nst-embeddings.npy
 ZEITGEIST  = $(DATA_ANA)/zeitgeist_community_fits.csv
-TIMECURVES = $(DATA_ANA)/timecurves_nst_result.npz
+FIGURES    = $(DATA_FIG)/fig1_indegree_ccdf.pdf
+SUBGRAPH   = $(DATA_SYN)/k17-rgc-subgraph.npz
 
-.PHONY: all hdf5 leiden subgraph nst zeitgeist timecurves timecurves-proxy clean help
+.PHONY: all hdf5 leiden zeitgeist figures subgraph clean help
 
 help:
 	@echo "Targets:"
-	@echo "  all             — full pipeline (hdf5 → leiden → zeitgeist → nst → timecurves)"
-	@echo "  hdf5            — Phase 1: build HDF5 citation graph from CSV + JSON"
-	@echo "  leiden          — Phase 2: full-corpus Leiden clustering"
-	@echo "  zeitgeist       — Phase 2b: per-community power-law fitting"
-	@echo "  subgraph        — Phase 5: Q-SYNTH 1-hop subgraph around K17-RGC gold DOIs"
-	@echo "  nst             — Phase 3: train Neural Spacetime + export embeddings"
-	@echo "  timecurves      — Phase 4: Time Curves on NST embeddings"
-	@echo "  timecurves-proxy— Phase 4 (proxy): Time Curves on structural features (no NST)"
-	@echo "  clean           — remove all generated data/exported/ and data/synthesis/ outputs"
+	@echo "  all       — full §§1–4 pipeline (hdf5 → leiden → zeitgeist → figures)"
+	@echo "  hdf5      — Phase 1: build HDF5 citation graph from CSV + JSON"
+	@echo "  leiden    — Phase 2: full-corpus Leiden clustering"
+	@echo "  zeitgeist — Phase 2b: per-community power-law fitting"
+	@echo "  figures   — Generate all §§1–4 paper figures"
+	@echo "  subgraph  — Phase 5 (on hold): Q-SYNTH 1-hop subgraph around K17-RGC gold DOIs"
+	@echo "  clean     — remove generated data/exported/, data/analysis/, data/figures/ outputs"
 
-all: timecurves
+all: zeitgeist figures
 
 # --- Phase 1 -----------------------------------------------------------------
 hdf5: $(HDF5)
@@ -74,38 +71,30 @@ $(ZEITGEIST): $(SRC)/phase2b_zeitgeist_fit.py $(HDF5) $(LEIDEN)
 	$(PYTHON) $(SRC)/phase2b_zeitgeist_fit.py --ks_boots 500
 	@echo "[Phase 2b] Zeitgeist fits written: $@"
 
-# --- Phase 3 -----------------------------------------------------------------
-nst: $(NST_EMB)
+# --- Figures -----------------------------------------------------------------
+figures: $(FIGURES)
 
-$(NST_EMB): $(SRC)/phase3_nst_train.py $(SRC)/phase3_nst_adapter.py \
-            $(HDF5) $(LEIDEN)
-	$(PYTHON) $(SRC)/phase3_nst_train.py \
-	    --num_epochs 500 --max_edges 500000 --display_epoch 50
-	@echo "[Phase 3] NST embeddings written: $@"
+$(FIGURES): $(SRC)/generate_figures.py $(HDF5) $(LEIDEN) $(ZEITGEIST)
+	$(PYTHON) $(SRC)/generate_figures.py --out $(DATA_FIG)
+	@echo "[Figures] All §§1–4 figures written: $(DATA_FIG)/"
 
-# --- Phase 4 -----------------------------------------------------------------
-timecurves: $(TIMECURVES)
+# --- Phase 5 (on hold) -------------------------------------------------------
+subgraph: $(SUBGRAPH)
 
-$(TIMECURVES): $(SRC)/phase4_timecurves.py $(NST_EMB)
-	$(PYTHON) $(SRC)/phase4_timecurves.py \
-	    --embeddings $(NST_EMB) \
-	    --meta $(DATA_EXP)/aps-nst-embeddings-meta.npz \
-	    --out $(DATA_ANA)/
-	@echo "[Phase 4] Time Curves written: $@"
-
-timecurves-proxy:
-	$(PYTHON) $(SRC)/phase4_timecurves.py --proxy \
-	    --features $(DATA_EXP)/aps_nst_seed42_maxe500k_node_features.npy \
-	    --meta $(DATA_EXP)/aps-nst-embeddings-meta.npz \
-	    --out $(DATA_ANA)/
-	@echo "[Phase 4 proxy] Time Curves (structural features) written."
+$(SUBGRAPH): $(SRC)/phase5_synthesis_subgraph.py $(HDF5) \
+             $(DATA_SYN)/k17-rgc-gold-dois.txt
+	$(PYTHON) $(SRC)/phase5_synthesis_subgraph.py
+	@echo "[Phase 5] Subgraph written: $@"
 
 # --- Housekeeping ------------------------------------------------------------
 clean:
 	@echo "Removing generated outputs..."
 	rm -f $(DATA_EXP)/aps-2022-citation-graph.h5
 	rm -f $(DATA_EXP)/aps-2022-leiden-*.npz
-	rm -f $(DATA_EXP)/aps-nst-*.pt $(DATA_EXP)/aps-nst-*.npy $(DATA_EXP)/aps-nst-*.npz
-	rm -f $(DATA_EXP)/aps_nst_*.pt $(DATA_EXP)/aps_nst_*.npy
+	rm -f $(DATA_ANA)/zeitgeist_community_fits.csv
+	rm -f $(DATA_ANA)/zeitgeist_summary.txt
+	rm -f $(DATA_ANA)/zeitgeist_gamma_dist.npy
+	rm -f $(DATA_ANA)/global_fit.txt
+	rm -rf $(DATA_FIG)
 	rm -f $(DATA_SYN)/k17-rgc-subgraph.npz $(DATA_SYN)/k17-rgc-subgraph-dois.txt
 	rm -f $(DATA_SYN)/k17-rgc-subgraph-leiden-*.npz

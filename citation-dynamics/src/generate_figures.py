@@ -24,6 +24,9 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
+from config import APS_H5, APS_LEIDEN, APS_FITS, APS_LABELS, DATA_FIGURES
+from utils import mle_powerlaw_exponent as mle_gamma
+
 mpl.rcParams.update({
     "font.family":      "serif",
     "font.size":        9,
@@ -39,25 +42,10 @@ mpl.rcParams.update({
     "axes.spines.right":False,
 })
 
-_HERE = Path(__file__).parent
-_ROOT = _HERE / ".."
-
-_H5      = _ROOT / "data/exported/aps-2022-citation-graph.h5"
-_LEIDEN  = _ROOT / "data/exported/aps-2022-leiden-1p00.npz"
-_FITS    = _ROOT / "data/analysis/zeitgeist_community_fits.csv"
-_LABELS  = _ROOT / "data/analysis/community_labels.csv"
-
-
-# ---------------------------------------------------------------------------
-# Power-law utilities (inline — no import dependency on phase2b)
-# ---------------------------------------------------------------------------
-
-def mle_gamma(degrees: np.ndarray, xmin: int) -> float:
-    tail = degrees[degrees >= xmin].astype(float)
-    n = len(tail)
-    if n < 2:
-        return float("nan")
-    return 1.0 + n / np.sum(np.log(tail / (xmin - 0.5)))
+_H5     = APS_H5
+_LEIDEN = APS_LEIDEN
+_FITS   = APS_FITS
+_LABELS = APS_LABELS
 
 
 def scan_xmin(degrees: np.ndarray, xmin_max: int = 100) -> tuple[int, float]:
@@ -311,7 +299,7 @@ def _save(fig: plt.Figure, out_dir: Path, stem: str, dpi: int) -> None:
 # Main
 # ---------------------------------------------------------------------------
 
-def main(out_dir: Path = _ROOT / "data/figures", dpi: int = 300) -> None:
+def main(out_dir: Path = DATA_FIGURES, dpi: int = 300) -> None:
     print("Loading data …")
     indeg  = load_indegree()
     sizes  = load_community_sizes()
@@ -329,7 +317,7 @@ def main(out_dir: Path = _ROOT / "data/figures", dpi: int = 300) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--out", type=Path, default=_ROOT / "data/figures")
+    parser.add_argument("--out", type=Path, default=DATA_FIGURES)
     parser.add_argument("--dpi", type=int, default=300)
     args = parser.parse_args()
     main(args.out, args.dpi)

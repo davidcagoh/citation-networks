@@ -30,13 +30,11 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-_HERE = Path(__file__).parent
-_ROOT = _HERE / ".."
-_DEFAULT_CSV  = _ROOT / "data/processed/aps-dataset-citations-2022.csv"
-# No default for metadata — it lives outside the repo. Pass --metadata explicitly or
-# set the APS_METADATA_DIR environment variable.
-_DEFAULT_META = Path(os.environ["APS_METADATA_DIR"]) if "APS_METADATA_DIR" in os.environ else None
-_DEFAULT_OUT  = _ROOT / "data/exported/aps-2022-citation-graph.h5"
+from config import APS_METADATA_DIR, DATA_PROCESSED, APS_H5
+
+_DEFAULT_CSV  = DATA_PROCESSED / "aps-dataset-citations-2022.csv"
+_DEFAULT_META = APS_METADATA_DIR
+_DEFAULT_OUT  = APS_H5
 
 
 # ---------------------------------------------------------------------------
