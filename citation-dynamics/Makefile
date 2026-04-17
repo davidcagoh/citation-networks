@@ -11,10 +11,13 @@
 #
 # Set APS_METADATA_DIR to the directory containing aps-dataset-metadata-2022/ JSON files.
 
-PYTHON     = ../.venv/bin/python
-SRC        = src
-DATA_EXP   = data/exported
-DATA_SYN   = data/synthesis
+MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+PYTHON     = $(MAKEFILE_DIR)../.venv/bin/python
+SRC        = $(MAKEFILE_DIR)src
+DATA_EXP   = $(MAKEFILE_DIR)data/exported
+DATA_SYN   = $(MAKEFILE_DIR)data/synthesis
+DATA_ANA   = $(MAKEFILE_DIR)data/analysis
+DATA_PROC  = $(MAKEFILE_DIR)data/processed
 
 # Output files (used as make targets)
 HDF5       = $(DATA_EXP)/aps-2022-citation-graph.h5
@@ -22,8 +25,8 @@ LEIDEN     = $(DATA_EXP)/aps-2022-leiden-1p00.npz
 SUBGRAPH   = $(DATA_SYN)/k17-rgc-subgraph.npz
 NST_MODEL  = $(DATA_EXP)/aps-nst-model.pt
 NST_EMB    = $(DATA_EXP)/aps-nst-embeddings.npy
-ZEITGEIST  = data/analysis/zeitgeist_community_fits.csv
-TIMECURVES = data/analysis/timecurves_nst_result.npz
+ZEITGEIST  = $(DATA_ANA)/zeitgeist_community_fits.csv
+TIMECURVES = $(DATA_ANA)/timecurves_nst_result.npz
 
 .PHONY: all hdf5 leiden subgraph nst zeitgeist timecurves timecurves-proxy clean help
 
@@ -45,7 +48,7 @@ all: timecurves
 hdf5: $(HDF5)
 
 $(HDF5): $(SRC)/phase1_build_graph.py \
-         data/processed/aps-dataset-citations-2022.csv
+         $(DATA_PROC)/aps-dataset-citations-2022.csv
 	$(PYTHON) $(SRC)/phase1_build_graph.py
 	@echo "[Phase 1] HDF5 written: $@"
 
@@ -87,14 +90,14 @@ $(TIMECURVES): $(SRC)/phase4_timecurves.py $(NST_EMB)
 	$(PYTHON) $(SRC)/phase4_timecurves.py \
 	    --embeddings $(NST_EMB) \
 	    --meta $(DATA_EXP)/aps-nst-embeddings-meta.npz \
-	    --out data/analysis/
+	    --out $(DATA_ANA)/
 	@echo "[Phase 4] Time Curves written: $@"
 
 timecurves-proxy:
 	$(PYTHON) $(SRC)/phase4_timecurves.py --proxy \
 	    --features $(DATA_EXP)/aps_nst_seed42_maxe500k_node_features.npy \
 	    --meta $(DATA_EXP)/aps-nst-embeddings-meta.npz \
-	    --out data/analysis/
+	    --out $(DATA_ANA)/
 	@echo "[Phase 4 proxy] Time Curves (structural features) written."
 
 # --- Housekeeping ------------------------------------------------------------

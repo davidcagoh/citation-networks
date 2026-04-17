@@ -29,8 +29,9 @@
 
 ### citation-dynamics — ACTIVE
 - **Done:** HDF5 pipeline, Leiden (446 communities, Q=0.788), Zeitgeist fitting (γ_c ∈ [2.1, 3.3], 100% KS pass), Time Curves implementation (proxy verified)
-- **Running:** NST training, UofT cluster job 159670 (email at daveed@cs.toronto.edu)
-- **Next:** Download NST results → run Time Curves → label communities by physics area → write §§5–6
+- **Scope:** §§1–4 only (NST §5 and Time Curves §6 dropped — neither produced informative results)
+- **Done:** Full pipeline through Zeitgeist fitting; NST + Time Curves archived but not in paper
+- **Next:** Community physics labelling → §§1–4 figures → rewrite §§1+8 to remove NST/Time Curves framing
 - **Paper target:** COMPLEX NETWORKS 2026
 
 ### Synthesis — subgraph built, pending NST

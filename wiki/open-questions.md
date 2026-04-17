@@ -11,18 +11,17 @@ Ordered by project and priority. Check this at the start of each session.
 **How:** Script to extract top-5 cited papers per community → identify by journal/title as condensed matter / particle / quantum optics etc.
 **Status:** Not started. Can be done now (no GPU needed).
 
-### NEXT: SG-t-SNE baseline for §5 comparison
-**Why:** §5 claims NST gives better temporal ordering than SG-t-SNE. Need the baseline to support this.
-**How:** Run existing MATLAB pipeline on same data subset; report Spearman ρ(embedding coord, year).
-**Status:** Not started. Requires MATLAB.
+### NEXT: Generate §§1–4 figures
+**Why:** Paper has no figures yet.
+**What:** Fig 1 (global in-degree log-log), Fig 2 (community size dist), Fig 3 (γ_c histogram), Fig 4 (year-median timeline)
+**Status:** Not started. All input data ready.
 
-### Backward influence mapping scope (§7 decision)
-**Why:** Thesis contribution 2 (backward influence mapping) needs a concrete pipeline, not just `query_XY_subgraph` availability.
-**Options:** (a) Full section with 2 case studies; (b) Fold into §6 as a Time Curves case study; (c) Cut to 1 paragraph in discussion.
-**Status:** Decision pending — hold until §§5–6 results are in.
+### NEXT: Rewrite §§1 and 8
+**Why:** Intro still pitches NST + Time Curves pipeline; §8 discussion references them. Both dropped.
+**Status:** Not started. Do after figures are confirmed.
 
 ### Aging model π(C)
-**Why:** Thesis contribution 3 (quantitative phase characterization) originally included an aging term. Not in the paper scope but needed for the thesis chapter.
+**Why:** Thesis contribution 3 originally included an aging term. Not in paper scope but needed for thesis chapter.
 **Status:** Not started. Post-paper.
 
 ---
@@ -46,6 +45,12 @@ Session 15 marked LitDiscover complete with all three live experiments done (K17
 ---
 
 ## RESOLVED (for reference)
+
+**NST §5 (2026-04-17):** Dropped. Spatial PCA not community-separating; temporal Spearman ρ=−0.668 ambiguous. Not worth a paper section.
+
+**Time Curves §6 (2026-04-17):** Dropped. Corpus-level centroid trajectory averages over 446 communities and produces uninformative result. Wrong level of analysis for a multi-community network.
+
+**SG-t-SNE baseline for §5 (2026-04-17):** Moot — §5 dropped.
 
 **Q-SOTA (session 12):** Zeitgeist hypothesis confirmed as a gap. Nearest prior art: Costa & Frigori 2024, Aparício et al. 2024, Castillo-Castillo et al. 2025, Ke et al. 2023 PNAS. NST (Choudhary ICLR 2025) is a tool, not a competitor.
 

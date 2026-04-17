@@ -153,6 +153,11 @@ The paper is an **empirical systems validation** — citation graph traversal + 
 
 ---
 
+## §§5–6 (NST + Time Curves) dropped from paper (2026-04-17)
+**Decision date:** 2026-04-17
+**Why:** Time Curves on the full corpus computes per-year centroids averaged over 446 communities — the corpus-level signal is noise. NST diagnostic figures (spatial PCA, temporal vs year Spearman ρ=−0.668) were not interpretable or compelling enough to justify a section. Both were adopted for methodological novelty rather than because they answered a specific research question. The Zeitgeist hypothesis (§§1–4) is a complete contribution without them.
+**Implication:** Paper scope is now §§1–4 only. §§5–8 in `paper_draft_sections.md` should be collapsed into a short discussion section. NST embeddings and Time Curves outputs are archived in `data/` but not cited in the paper.
+
 ## citation-dynamics paper — session 21 decisions (2026-04-16)
 
 ### Target venue: COMPLEX NETWORKS 2026

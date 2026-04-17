@@ -35,6 +35,37 @@ scancel <jobid>                     # cancel
 
 ---
 
+## 2026-04-17 (session 22) — NST fetched; Time Curves + NST dropped; paper scoped to §§1–4
+
+### What was done
+
+- **NST job 159738** completed on RTX A4000; 500 epochs, 500K edges; downloaded all outputs
+  - Final loss 0.0532; temporal order_correct=98.1%; embeddings (709,803 × 8)
+- **Makefile fixed:** all paths now absolute via `MAKEFILE_DIR`; works correctly from repo root with `-f`
+- **Time Curves full run:** stress=0.006452, 8 cusps, 7 loops — results saved but visualisation not useful
+- **NST diagnostic figures run:**
+  - Spatial PCA: PC1=43%, PC2=25% — communities not clearly separated
+  - Temporal vs year: Spearman ρ=−0.668 — weak/ambiguous ordering signal
+- **Major scope decision:** §§5 (NST) and §6 (Time Curves) both dropped from paper
+- **Paper rescoped to §§1–4 only:** Zeitgeist hypothesis → Leiden → per-community power-law fitting → temporal localization. This is a complete contribution without NST/Time Curves.
+
+### State at end of session
+
+| Artifact | Location | Status |
+|---|---|---|
+| NST model + embeddings | `data/exported/aps-nst-*.pt/.npy/.npz` | ✅ (archived, not in paper) |
+| Time Curves output | `data/analysis/timecurves_nst_{coords,plot}` | ✅ (archived, not in paper) |
+| Paper outline | `writings/paper_draft_sections.md` | ⚠️ Still shows §§5–8 — needs rewrite |
+| Zeitgeist fits | `data/analysis/zeitgeist_community_fits.csv` | ✅ Final |
+
+### Next session
+
+1. **Community physics labelling** — script: top-5 cited papers per community → hand-label as condensed matter / particle / etc. Unblocks §4 table.
+2. **Generate §§1–4 figures** — global degree dist (Fig 1), community size dist (Fig 2), γ_c histogram (Fig 3), year-median timeline (Fig 4)
+3. **Rewrite §§1 and 8** — remove all NST/Time Curves framing from intro and discussion
+
+---
+
 ## 2026-04-16 (session 21) — Paper outline; Zeitgeist fitting; Time Curves; NST on cluster
 
 ### What was done

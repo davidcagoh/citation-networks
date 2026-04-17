@@ -268,8 +268,8 @@ def plot_timecurves(
     out_path: Optional[Path] = None,
 ) -> None:
     try:
+        import matplotlib
         import matplotlib.pyplot as plt
-        import matplotlib.cm as cm
     except ImportError:
         print("matplotlib not available — skipping plot")
         return
@@ -281,7 +281,7 @@ def plot_timecurves(
     fig, ax = plt.subplots(figsize=(10, 8))
 
     # Colour the curve by year
-    cmap = cm.colormaps.get_cmap("plasma")
+    cmap = matplotlib.colormaps["plasma"]
     colours = cmap(np.linspace(0, 1, T - 1))
 
     for i in range(T - 1):
