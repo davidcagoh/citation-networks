@@ -51,6 +51,17 @@ Choices that have already been made and why. Read this before changing any param
 
 ---
 
+## Related work to cite in §2
+
+| Paper | Relevance | How to position |
+|---|---|---|
+| Costa & Frigori (2024) | Phase transitions in citation networks via entropy/fractal measures | Narrower than Zeitgeist: single-corpus, different formalism; does not formalize the mixture-of-subcommunities claim |
+| Aparício et al. (2024) — Knowledge-Based Systems | Temporal community trajectories in KDD citation network | Closest in spirit to Zeitgeist's temporal localization claim; different domain and no power-law fitting |
+| Castillo-Castillo et al. (2025) — Applied Network Science | Generative mixture-of-subcommunities model | Structural complement: generative framing vs our empirical detection approach; must cite as parallel contribution |
+| Choudhary et al. (ICLR 2025) — Neural Spacetimes | Embeds citation DAGs into product manifolds, proven universality | **We implemented and ran this** (`src/phase3_nst_adapter.py`, job 159670). Dropped from paper scope (§§5–6 cut) but must cite in §2 as the embedding method used in exploration. Not a competitor — cite as prior art we built on. |
+
+---
+
 ## Canonical data lives in `citation-dynamics/data/processed/`; lit-review symlinks there
 **Decision date:** 2026-04-12
 **Why:** Eliminates 662 MB of duplication. Single canonical copy; symlink is gitignored in lit-review.

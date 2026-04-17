@@ -6,6 +6,13 @@
 
 ## Thesis: Recognizing Signature Patterns and Phases of Time-Varying Networks
 
+**Supervisor:** Xiaobai Sun | **Started:** Sept 2024
+
+Formal thesis contributions:
+1. Temporal embedding of citation networks
+2. Backward influence mapping
+3. Quantitative phase characterization
+
 Three contributions, each with its own subdirectory:
 
 | Contribution | Status | Target |

@@ -217,3 +217,18 @@ The synthesis pipeline is a downstream application of the core Zeitgeist hypothe
 - The mixture of per-cluster distributions should reconstruct the subgraph's global distribution
 
 This is an informal sanity check, not the main validation experiment. The formal Zeitgeist validation runs on the full corpus and is defined in the planner agent's sprint plan.
+
+---
+
+## LLM Synthesis SOTA (2024–2025)
+
+Directly applicable to scoping the synthesis pipeline against prior art:
+
+| System | Key idea |
+|---|---|
+| AutoSurvey (2024) | Automated literature survey generation via LLM; section-by-section synthesis from retrieved papers |
+| PaSa (2024) | RL-trained paper search agent; learns to crawl citation graphs to satisfy coverage criteria |
+| GraphRAG (Microsoft, 2024) | Graph-augmented RAG over document clusters; community summaries as retrieval units |
+| LiRA (2025) | Literature review agent; iterative retrieval + synthesis loop with grounding citations |
+
+**Positioning:** The synthesis contribution is not survey generation — it is applying citation-dynamics (Leiden clustering, power-law fitting, temporal localization) to the *already-recovered* paper set from LitDiscover. The above systems recover or summarize papers; we analyze the recovered set's citation structure. Cite as background, not as competitors.
