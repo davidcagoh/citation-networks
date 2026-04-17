@@ -6,19 +6,18 @@ Ordered by project and priority. Check this at the start of each session.
 
 ## citation-dynamics (ACTIVE)
 
-### NEXT: Community physics labelling
-**Why:** Paper §4 table shows community IDs, not physics areas. Reviewers need interpretable labels.
-**How:** Script to extract top-5 cited papers per community → identify by journal/title as condensed matter / particle / quantum optics etc.
-**Status:** Not started. Can be done now (no GPU needed).
+### DONE: Community physics labelling
+**Result:** All 25 communities labelled from top-cited DOIs. Script: `src/label_communities.py`. Labels: `data/analysis/community_labels.csv`.
+**Verify:** Communities 13 (Nonlinear Dynamics), 14 (Magnetism), 16 (QHE), 19 (Semiconductor) are less certain — cross-check against APS journal names if needed for the table.
 
-### NEXT: Generate §§1–4 figures
-**Why:** Paper has no figures yet.
-**What:** Fig 1 (global in-degree log-log), Fig 2 (community size dist), Fig 3 (γ_c histogram), Fig 4 (year-median timeline)
-**Status:** Not started. All input data ready.
+### DONE: Generate §§1–4 figures
+**Result:** All four figures generated at `data/figures/fig{1..4}_*.pdf`. Global γ=2.74 (K_min=96), consistent with Barabasi 2.79.
 
 ### NEXT: Rewrite §§1 and 8
 **Why:** Intro still pitches NST + Time Curves pipeline; §8 discussion references them. Both dropped.
-**Status:** Not started. Do after figures are confirmed.
+**Status:** Figures confirmed ✅ — ready to rewrite now.
+**§1 new pitch:** Zeitgeist hypothesis → community detection (Leiden) → per-community power-law validation → temporal localization. No NST or Time Curves.
+**§8 new framing:** What we showed (mixture validated), universal γ interpretation, limitations (APS only, no text features), future (aging model π(C), cross-corpus).
 
 ### Aging model π(C)
 **Why:** Thesis contribution 3 originally included an aging term. Not in paper scope but needed for thesis chapter.

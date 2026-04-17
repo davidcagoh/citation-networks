@@ -39,9 +39,9 @@
 **Global degree distribution:**
 - Looks approximately power-law; Barabasi fits this exact dataset type at γ=2.79 (K_min=49) or γ=3.03 with saturation+cutoff
 - Note: pure power law fails KS test globally (p<10^-4 per Barabasi) — motivates the mixture decomposition
-- **TODO:** run `phase2b_zeitgeist_fit.py --xmin_strategy scan` to get our proper γ_global with optimal K_min (currently K_min=1 gives artificially low γ≈1.38; Barabasi gets 2.79 with K_min=49)
+- **OUR RESULT:** γ_global=2.738 (K_min=96, K_min scan over [1,100]) — consistent with Barabasi 2.79. Saved to `data/figures/global_fit.txt`
 
-**Figure:** in-degree distribution log-log; annotate K_min and fitted line
+**Figure:** Fig 1 — in-degree CCDF log-log, power-law fit (γ=2.74, K_min=96) ✅ `data/figures/fig1_indegree_ccdf.pdf`
 
 ---
 
@@ -59,9 +59,7 @@
 
 ### 4.3 Per-community power-law fitting
 - Method: discrete MLE (Clauset et al. 2009) with K_min scanning (not fixed K_min=1)
-- **TODO:** rerun with `--xmin_strategy scan --ks_boots 500` for paper-quality results
-- Current results (K_min=1, ks_boots=200): all 25 pass KS test; γ_c ∈ [1.35, 1.48], mean 1.40
-- **NOTE on γ values:** K_min=1 underestimates γ (cf. Barabasi: optimal K_min=49 gives γ=2.79). With scan, expect γ_c ∈ [2–3]. The key claim (each community is scale-free) holds regardless; the exact exponent range will change.
+- **FINAL RESULTS** (K_min scan, ks_boots=500): 25/25 pass KS test; γ_c ∈ [2.099, 3.268], mean=2.500±0.246
 - Key finding: 100% of large communities pass KS power-law test — validates prediction (i)
 
 ### 4.4 Temporal localization
@@ -70,8 +68,12 @@
 - Medians span 1950–2017: community 20 (median 1950, IQR 16y) through community 12 (median 2017, IQR 7y)
 - Validates prediction (ii)
 
-**Table:** top-10 communities by size — n, γ_c (after rerun), KS p, year median, year IQR  
-**Figure:** histogram of γ_c across 25 communities; map of community year medians (timeline)
+**Table:** top-10 communities by size — n, γ_c, KS p, year median, year IQR, physics label  
+(labels in `data/analysis/community_labels.csv` — verify communities 13/14/16/19 against APS journal context)
+
+**Figures:** ✅
+- Fig 3: γ_c histogram — `data/figures/fig3_gamma_histogram.pdf`
+- Fig 4: community year-median timeline — `data/figures/fig4_timeline.pdf`
 
 ---
 
@@ -131,21 +133,21 @@
 
 | Fig | Content | Status |
 |-----|---------|--------|
-| 1 | In-degree distribution (global, log-log, with power-law fit) | TODO — need scan results |
-| 2 | Community size distribution (446 communities) | Can generate now |
-| 3 | Table: top-10 communities (n, γ_c, KS p, yr median, IQR) | Need scan rerun |
-| 4 | Histogram of γ_c across 25 communities | Need scan rerun |
-| 5 | NST spatial embedding, coloured by community | Pending job 159670 |
-| 6 | NST temporal coord vs. publication year | Pending job 159670 |
-| 7 | Time Curves plot (annotated) | Pending job 159670 |
-| 8 | Backward influence case study | Optional |
+| 1 | In-degree CCDF (global, log-log, γ=2.74, K_min=96) | ✅ `fig1_indegree_ccdf.pdf` |
+| 2 | Community size distribution (446 communities) | ✅ `fig2_community_sizes.pdf` |
+| 3 | Histogram of γ_c across 25 communities | ✅ `fig3_gamma_histogram.pdf` |
+| 4 | Community year-median timeline (sorted horizontal bars) | ✅ `fig4_timeline.pdf` |
+| Table §4 | Top-10 communities (n, γ_c, KS p, yr median, IQR, physics label) | Needs LaTeX markup from community_labels.csv |
 
 ---
 
-## Open methodological TODOs (before any drafting)
+## Open methodological TODOs
 
-1. **Rerun Zeitgeist fit with K_min scan:** `python src/phase2b_zeitgeist_fit.py --xmin_strategy scan --ks_boots 500` — will take longer but gives correct γ_c values comparable to Barabasi's γ=2.79
-2. **Label communities by physics area:** write script to extract top-5 cited papers per community → identify as condensed matter / particle / quantum optics etc.
-3. **NST training result:** await job 159670; then run `make timecurves`
-4. **SG-t-SNE baseline:** run existing MATLAB pipeline on same data for comparison in §5
-5. **Increase ks_boots to 500 for final paper run**
+1. **Rewrite §§1 and 8** — remove NST/Time Curves framing. §1 currently pitches 4-stage pipeline; §8 discusses NST/Time Curves. Both dropped.
+2. **LaTeX table for §4** — format top-10 communities from community_labels.csv into a proper table with physics labels.
+3. **Verify 4 uncertain community labels** — communities 13, 14, 16, 19 (see community_labels.csv). Cross-check APS journal names for the top DOIs if needed.
+
+**DONE:**
+- ✅ K_min scan + γ_global=2.74 (K_min=96)
+- ✅ Community physics labelling (all 25)
+- ✅ All four §§1–4 figures generated

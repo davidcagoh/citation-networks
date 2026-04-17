@@ -19,7 +19,7 @@
 
 ---
 
-## Project status (2026-04-16)
+## Project status (2026-04-17)
 
 ### LitDiscover — COMPLETE (venue pending)
 - Paper: "Robust Literature Discovery from Minimal Seeds"
@@ -28,12 +28,11 @@
 - Docs frozen in `paper-wiki/`
 
 ### citation-dynamics — ACTIVE
-- **Done:** HDF5 pipeline, Leiden (446 communities, Q=0.788), Zeitgeist fitting (γ_c ∈ [2.1, 3.3], 100% KS pass), Time Curves implementation (proxy verified)
-- **Scope:** §§1–4 only (NST §5 and Time Curves §6 dropped — neither produced informative results)
-- **Done:** Full pipeline through Zeitgeist fitting; NST + Time Curves archived but not in paper
-- **Next:** Community physics labelling → §§1–4 figures → rewrite §§1+8 to remove NST/Time Curves framing
-- **Paper target:** COMPLEX NETWORKS 2026
+- **Scope:** §§1–4 only — Zeitgeist hypothesis → Leiden → per-community power-law → temporal localization
+- **Done:** HDF5, Leiden (446 communities, Q=0.788), Zeitgeist fitting (γ_c ∈ [2.1, 3.3], 100% KS pass), community labelling (25 areas), all §§1–4 figures (γ_global=2.74, figs 1–4)
+- **Next:** Rewrite §§1+8 (remove NST/Time Curves) → LaTeX §4 table
+- **Paper target:** COMPLEX NETWORKS 2026 (~Aug deadline)
 
-### Synthesis — subgraph built, pending NST
+### Synthesis — subgraph built, on hold
 - K17-RGC subgraph: 90 nodes (2 gold APS + 88 neighbors), 7 communities
 - Caveat: 49/51 gold DOIs are non-APS; document as corpus coverage limitation

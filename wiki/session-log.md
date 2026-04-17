@@ -35,6 +35,58 @@ scancel <jobid>                     # cancel
 
 ---
 
+## 2026-04-17 (session 23) — Community labelling + all §§1–4 figures
+
+### What was done
+
+- **`src/label_communities.py`** (new): ranks nodes by in-degree within each community, prints top-5 DOI+year, writes `data/analysis/community_labels_template.csv`
+- **25 communities labelled** from landmark papers — all identifiable from top-cited DOIs:
+
+  | cid | n | Physics area |
+  |-----|---|---|
+  | 0 | 93k | Condensed Matter — Electronic Structure / DFT |
+  | 1 | 62k | Condensed Matter — Magnetism / Disordered Systems |
+  | 2 | 56k | Nuclear Physics |
+  | 3 | 55k | Particle Physics — Field Theory / QCD |
+  | 4 | 53k | Mesoscopic Physics / Quantum Chaos |
+  | 5 | 49k | Quantum Information / Computing |
+  | 6 | 47k | AMO Physics / Quantum Optics |
+  | 7 | 45k | Astrophysics / Gravitational Waves / Cosmology |
+  | 8 | 38k | High-Temperature Superconductivity |
+  | 9 | 37k | Cold Atoms / BEC / Laser Cooling |
+  | 10 | 33k | Particle Physics — Standard Model / HEP |
+  | 11 | 27k | Strongly Correlated Electrons |
+  | 12 | 24k | Topological Matter / Graphene |
+  | 13–24 | <20k | (see community_labels.csv) |
+
+  Saved → `data/analysis/community_labels.csv`. Four uncertain labels: cid 13, 14, 16, 19.
+
+- **`src/generate_figures.py`** (new): generates all four §§1–4 figures in one run
+- **Global γ fit** (K_min scan [1,100]): xmin=96, γ_global=2.738 — matches Barabasi (2016) γ=2.79 ✅
+- **Fig 1** (in-degree CCDF, γ=2.74, K_min=96) → `data/figures/fig1_indegree_ccdf.pdf`
+- **Fig 2** (community size distribution, 446 communities) → `data/figures/fig2_community_sizes.pdf`
+- **Fig 3** (γ_c histogram, 25 communities, mean 2.50±0.25) → `data/figures/fig3_gamma_histogram.pdf`
+- **Fig 4** (year-median timeline, sorted by median, IQR bars, labelled) → `data/figures/fig4_timeline.pdf`
+- **Paper draft** updated: §3 global fit result, §4.3 final results, figures table, TODOs pared to 3 items
+
+### State at end of session
+
+| Artifact | Status |
+|---|---|
+| `src/label_communities.py` | ✅ |
+| `src/generate_figures.py` | ✅ |
+| `data/analysis/community_labels.csv` | ✅ (4 labels need verification) |
+| `data/figures/fig{1..4}_*.pdf` | ✅ all four generated |
+| `writings/paper_draft_sections.md` | ✅ updated; §§5–8 stubs still present |
+
+### What to do next session
+
+1. **Rewrite §1** — new pitch: Zeitgeist hypothesis → Leiden → per-community power-law → temporal localization. Remove NST/Time Curves framing entirely.
+2. **Rewrite §8** — keep: mixture validated, universal γ interpretation, limitations, future. Remove NST/Time Curves.
+3. **LaTeX §4 table** — top-10 communities from `community_labels.csv` (n, γ_c, KS p, yr median, IQR, physics label).
+
+---
+
 ## 2026-04-17 (session 22) — NST fetched; Time Curves + NST dropped; paper scoped to §§1–4
 
 ### What was done
