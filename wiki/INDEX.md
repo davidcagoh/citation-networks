@@ -1,39 +1,68 @@
 # Citation Networks — Project Wiki
 
-**Start every session:** read session-log.md → check open-questions.md.
+**Start every session:** read `session-log.md` → check the relevant project's `open-questions.md`.
 
 ---
 
-## Wiki Files
+## Thesis: Recognizing Signature Patterns and Phases of Time-Varying Networks
+
+Three contributions, each with its own subdirectory:
+
+| Contribution | Status | Target |
+|---|---|---|
+| [LitDiscover](litdiscover/) | Complete (venue pending) | ICASR 2026 |
+| [Zeitgeist / citation-dynamics](citation-dynamics/) | Active — §§1–4 figures done, §§1+8 rewrite next | COMPLEX NETWORKS 2026 (~Aug) |
+| [Synthesis](synthesis/) | Subgraph built, on hold | Post-Zeitgeist thesis chapter |
+
+---
+
+## Global files (read across all projects)
 
 | File | Purpose | Read when |
 |---|---|---|
-| [session-log.md](session-log.md) | What was done each session + UofT cluster reference | Start of every session |
-| [open-questions.md](open-questions.md) | Unresolved issues by project | Deciding what to work on |
-| [codebase-map.md](codebase-map.md) | citation-dynamics/ directory, pipeline status, key results | Before touching code |
-| [nst-timecurves-comparison.md](nst-timecurves-comparison.md) | NST vs Time Curves research verdict; pipeline design | Before §§5–6 work |
-| [concepts.md](concepts.md) | Methodological concepts: metric families, fitting theory | When designing statistical validation |
-| [synthesis-experiment.md](synthesis-experiment.md) | K17-RGC Q-SYNTH spec and pipeline *(on hold — synthesis paused)* | Before synthesis work resumes |
+| [session-log.md](session-log.md) | What was done each session + UofT cluster SSH reference | Start of every session |
+| [concepts.md](concepts.md) | Cross-cutting methodological ideas (metric families, distribution fitting) | When designing statistical validation |
 
-### Frozen (LitDiscover — do not edit)
-`thesis.md`, `decisions.md`, `argument-map.md`, `figure-roles.md`, `simulation-vs-production.md`
+---
+
+## LitDiscover
+
+| File | Purpose |
+|---|---|
+| [litdiscover/thesis.md](litdiscover/thesis.md) | Core claim, mechanism, what the paper does NOT claim |
+| [litdiscover/argument-map.md](litdiscover/argument-map.md) | Section-by-section argument chain |
+| [litdiscover/decisions.md](litdiscover/decisions.md) | Algorithm parameters, experiment design, paper structure, venue |
+| [litdiscover/open-questions.md](litdiscover/open-questions.md) | Believed resolved; verify before submission |
+| [litdiscover/figure-roles.md](litdiscover/figure-roles.md) | Per-figure argumentative role + status |
+| [litdiscover/simulation-vs-production.md](litdiscover/simulation-vs-production.md) | APS simulation vs production system gap |
+| [litdiscover/n-rounds-extension.md](litdiscover/n-rounds-extension.md) | Empirical sweep justifying N_ROUNDS=2 |
+
+---
+
+## citation-dynamics (Zeitgeist)
+
+| File | Purpose |
+|---|---|
+| [citation-dynamics/decisions.md](citation-dynamics/decisions.md) | Venue, K_min scan, scope cuts, Python pipeline |
+| [citation-dynamics/open-questions.md](citation-dynamics/open-questions.md) | §§1+8 rewrite, LaTeX table, uncertain labels |
+| [citation-dynamics/codebase-map.md](citation-dynamics/codebase-map.md) | Pipeline status, directory tree, key results |
+| [citation-dynamics/nst-timecurves-comparison.md](citation-dynamics/nst-timecurves-comparison.md) | NST vs SG-t-SNE vs Time Curves method anatomy (archived — not in paper scope) |
+
+---
+
+## Synthesis
+
+| File | Purpose |
+|---|---|
+| [synthesis/experiment-spec.md](synthesis/experiment-spec.md) | K17-RGC Q-SYNTH pipeline spec |
+| [synthesis/methods-comparison.md](synthesis/methods-comparison.md) | Leiden vs BlueRed + NST vs SG-t-SNE vs UMAP comparison plan |
 
 ---
 
 ## Project status (2026-04-17)
 
-### LitDiscover — COMPLETE (venue pending)
-- Paper: "Robust Literature Discovery from Minimal Seeds"
-- Live results: K17-RGC 100%, Ge21-HSS 100%, Le25-GLLM 73.7%
-- ICASR 2026 watch; no active deadline
-- Docs frozen in `paper-wiki/`
+**LitDiscover:** All three live experiments complete (K17-RGC 100%, Ge21-HSS 100%, Le25-GLLM 73.7%). No active deadline — watch ICASR 2026 call.
 
-### citation-dynamics — ACTIVE
-- **Scope:** §§1–4 only — Zeitgeist hypothesis → Leiden → per-community power-law → temporal localization
-- **Done:** HDF5, Leiden (446 communities, Q=0.788), Zeitgeist fitting (γ_c ∈ [2.1, 3.3], 100% KS pass), community labelling (25 areas), all §§1–4 figures (γ_global=2.74, figs 1–4); src/ refactored (config + utils)
-- **Next:** Rewrite §§1+8 → LaTeX §4 table
-- **Paper target:** COMPLEX NETWORKS 2026 (~Aug deadline)
+**citation-dynamics:** §§1–4 complete with figures (γ_global=2.74, 25 communities, γ_c ∈ [2.1, 3.3], 100% KS pass). Next: rewrite §§1+8, LaTeX §4 table.
 
-### Synthesis — subgraph built, on hold
-- K17-RGC subgraph: 90 nodes (2 gold APS + 88 neighbors), 7 communities
-- Caveat: 49/51 gold DOIs are non-APS; document as corpus coverage limitation
+**Synthesis:** K17-RGC subgraph built (90 nodes, 7 communities). On hold until Zeitgeist paper submitted. Caveat: 49/51 gold DOIs are non-APS.

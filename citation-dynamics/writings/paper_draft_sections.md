@@ -7,12 +7,13 @@
 
 ## §1 Introduction
 
-- Citation networks encode causal structure of knowledge propagation — directed, irreversible, trustworthy
+- Citation networks encode the causal structure of knowledge propagation — directed, irreversible, trustworthy
 - Existing work: scale-free degree distributions documented since 1960s; single-process models fit global corpus
 - The puzzle: a 1935 nuclear physics paper and a 2010 topological insulator paper live in the same global distribution. Implausible that one preferential attachment process governs both.
 - **Zeitgeist hypothesis:** the global citation distribution is a mixture of subcommunity distributions, each individually scale-free, each corresponding to a distinct research generation
-- What we do: decompose (Leiden) → validate mixture (per-community power-law fitting) → embed with causal awareness (NST) → visualize phase evolution (Time Curves)
-- Why now: NST (ICLR 2025) makes causal-aware embedding tractable; Time Curves visualization not previously applied to citation networks; APS 2022 corpus gives 130 years of data
+- What we do: decompose (Leiden community detection, 446 communities, Q=0.7883) → validate each subcommunity passes power-law KS test (25/25 large communities pass, γ_c ∈ [2.099, 3.268]) → show temporal localization (68% of communities have year IQR < 20 years, medians span 1950–2017)
+- Why this matters: existing work fits one global model and misses the mixture structure; we provide the first empirical validation of the mixture decomposition on a 130-year, 700k-paper longitudinal corpus
+- Why now: APS 2022 corpus gives 130 years of longitudinal data; Leiden algorithm makes large-scale community detection tractable; discrete MLE (Clauset et al. 2009) with K_min scanning gives statistically valid power-law fits per community
 
 ---
 
@@ -71,6 +72,26 @@
 **Table:** top-10 communities by size — n, γ_c, KS p, year median, year IQR, physics label  
 (labels in `data/analysis/community_labels.csv` — verify communities 13/14/16/19 against APS journal context)
 
+\begin{tabular}{rrrccrl}
+\hline
+cid & $n$ & $\gamma_c$ & KS & yr med & yr IQR & Label \\
+\hline
+0 & 93{,}221 & 2.48 & \checkmark & 1999 & 23y & Condensed Matter --- Electronic Structure / DFT \\
+1 & 62{,}216 & 2.53 & \checkmark & 2003 & 20y & Condensed Matter --- Magnetism / Disordered Systems \\
+2 & 55{,}859 & 2.63 & \checkmark & 1987 & 37y & Nuclear Physics \\
+3 & 54{,}598 & 2.37 & \checkmark & 1997 & 35y & Particle Physics --- Field Theory / QCD \\
+4 & 52{,}502 & 2.29 & \checkmark & 2006 & 17y & Mesoscopic Physics / Quantum Chaos \\
+5 & 49{,}428 & 2.24 & \checkmark & 2011 & 15y & Quantum Information / Computing \\
+6 & 47{,}156 & 2.68 & \checkmark & 1992 & 32y & AMO Physics / Quantum Optics \\
+7 & 45{,}155 & 2.33 & \checkmark & 2010 & 17y & Astrophysics / Gravitational Waves \\
+8 & 37{,}730 & 2.54 & \checkmark & 2007 & 16y & High-Temperature Superconductivity \\
+9 & 36{,}510 & 2.32 & \checkmark & 2002 & 16y & Cold Atoms / BEC / Laser Cooling \\
+\hline
+\multicolumn{7}{l}{\small Caption: Top-10 communities by size. KS: all 25 large communities pass the Kolmogorov--Smirnov} \\
+\multicolumn{7}{l}{\small power-law test ($p > 0.05$). $\gamma_c$ fitted via discrete MLE with $K_{\min}$ scanning (Clauset et al.\ 2009).} \\
+\multicolumn{7}{l}{\small yr = publication year.} \\
+\end{tabular}
+
 **Figures:** ✅
 - Fig 3: γ_c histogram — `data/figures/fig3_gamma_histogram.pdf`
 - Fig 4: community year-median timeline — `data/figures/fig4_timeline.pdf`
@@ -122,10 +143,24 @@
 
 ## §8 Discussion
 
-- **What we showed:** Zeitgeist validated; NST gives causal-aware embeddings; Time Curves reveals phase structure
-- **Universal γ_c:** communities don't have heterogeneous exponents — same universal preferential attachment dynamics, different temporal windows. The Zeitgeist is about when, not how fast.
-- **Limitations:** APS corpus only; NST uses structural features (no text/semantic); K17-RGC synthesis subgraph has 49/51 non-APS papers (corpus coverage gap)
-- **Future:** aging model π(C) per community; cross-corpus validation; semantic features for NST
+**What we showed:**
+- Zeitgeist hypothesis validated: 25/25 large communities pass KS power-law test
+- Communities are temporally localized (mean IQR 18.4y, 68% < 20y), spanning medians from 1950 (Early Nuclear Physics) to 2017 (Topological Matter/Graphene)
+- The global distribution (γ_global=2.74, K_min=96) is consistent with Barabasi (2016) γ=2.79 — but this masks per-community variation γ_c ∈ [2.099, 3.268]
+
+**Universal γ_c interpretation:**
+- Communities don't have wildly heterogeneous exponents — mean γ_c=2.500±0.246. The same preferential attachment dynamics operate across research generations; what differs is WHEN each generation dominated (temporal window), not HOW FAST citations accumulate (exponent)
+- The Zeitgeist is about temporal position, not citation velocity
+
+**Limitations:**
+- APS corpus only — generalisation to biomedical, social science corpora untested
+- Leiden community detection is resolution-dependent; 446 communities at resolution=1.0 may merge or split at other resolutions
+- No semantic/text features — communities are structure-only; two communities citing the same hub papers might be merged even if topically distinct
+
+**Future work:**
+- Aging model π(C) per community: does community temporal IQR predict the fitted γ_c? Does a younger community attract citations faster?
+- Cross-corpus validation: bioRxiv, Semantic Scholar open corpus
+- Semantic community labelling: LLM-assisted from abstract text rather than manual DOI lookup
 
 ---
 
@@ -143,7 +178,7 @@
 
 ## Open methodological TODOs
 
-1. **Rewrite §§1 and 8** — remove NST/Time Curves framing. §1 currently pitches 4-stage pipeline; §8 discusses NST/Time Curves. Both dropped.
+1. ✅ DONE **Rewrite §§1 and 8** — removed NST/Time Curves framing. §1 now pitches Zeitgeist hypothesis + 3-stage pipeline; §8 now covers results, γ_c interpretation, limitations, and future work.
 2. **LaTeX table for §4** — format top-10 communities from community_labels.csv into a proper table with physics labels.
 3. **Verify 4 uncertain community labels** — communities 13, 14, 16, 19 (see community_labels.csv). Cross-check APS journal names for the top DOIs if needed.
 
