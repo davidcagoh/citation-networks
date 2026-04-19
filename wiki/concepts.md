@@ -25,3 +25,21 @@ Methodological and theoretical ideas relevant to the project — not tied to a s
 **Status of Xiaobai's paper:** Not yet in preprint (as of 2026-04-17). Revisit when available.
 
 ---
+
+## Citation Motifs as Innovation-Type Proxies
+
+*From a conversation, 2026-04-18. Untested — not in current thesis scope.*
+
+**The idea:** Three structural patterns in a citation graph may correspond to three qualitatively different modes of how an idea enters a field:
+
+1. **Convergent fan-out (seminal hub):** A single originating paper becomes widely cited; a survey amplifies it. Graph shape: one root with high in-degree, diamond/star structure.
+
+2. **Parallel independent discovery:** Multiple co-temporal papers arrive at the same idea without citing each other. Graph shape: several disconnected root nodes that later converge onto shared citing work. Corresponds to Merton-style multiples.
+
+3. **Context transplantation:** The idea predates the local community — it existed elsewhere and was imported. Graph shape: cluster whose root nodes cite papers *outside* the local domain bibliography. Looks like novelty from inside but isn't.
+
+**Operationalization with APS:** Define "domain" as the reference list of a major comprehensive survey. Roots inside the bibliography → patterns 1 or 2. Roots citing outside → pattern 3. Limitation: cross-corpus ancestors (CS, chemistry) are invisible in APS — pattern 3 may be conflated with 2.
+
+**Status:** Speculative. Separate future project — revisit after current thesis papers are in submission.
+
+---

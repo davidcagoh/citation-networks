@@ -4,24 +4,20 @@ Check this at the start of each session.
 
 ---
 
-## NEXT: Rewrite §§1 and 8
-**Why:** Intro still pitches NST + Time Curves pipeline; §8 discussion references them. Both dropped.
-**Status:** Figures confirmed ✅ — ready to rewrite now.
-**§1 new pitch:** Zeitgeist hypothesis → community detection (Leiden) → per-community power-law validation → temporal localization. No NST or Time Curves.
-**§8 new framing:** What we showed (mixture validated), universal γ interpretation, limitations (APS only, no text features), future (aging model π(C), cross-corpus).
+## NEXT: push 2 commits ahead of origin
+**Action:** `git push` when ready.
 
-## LaTeX §4 table
-**Why:** Paper needs a community table: top-10 communities, columns: n, γ_c, KS p, yr median, IQR, physics label.
-**Source:** `data/analysis/community_labels.csv`
-**Status:** Not yet written.
-
-## Uncertain community labels (cids 13, 14, 16, 19)
-**Why:** Four of the 25 large communities were less confidently identified from top-cited DOIs.
-**Action:** Cross-check against APS journal names if needed for the table.
+---
 
 ---
 
 ## RESOLVED (for reference)
+
+**Uncertain community labels (2026-04-18):** All four corrected in `data/analysis/community_labels.csv`. cid 13 was "Nonlinear Dynamics" → "Laser-Plasma Physics / High-Intensity Laser Interactions" (RMP papers on laser-QED, strongly coupled plasmas, laser wakefield accelerators). cid 14 → "Spintronics / Anomalous Hall Effect" (AHE distinct from cid 1 spin glasses). cid 16 was "Quantum Hall Effect" → "Quantum Optics / Orbital Angular Momentum of Light" (Allen et al. 1992 PRA OAM paper is top-5; year median 2009 consistent). cid 19 → "Conducting Polymers / SSH Model" (RMP paper is Heeger/SSH solitons, not surface physics).
+
+**§§1 and 8 rewrite (2026-04-18):** Done. §1 pitches Zeitgeist → Leiden → per-community KS → temporal localization; no NST/Time Curves. §8 covers mixture validation, universal γ_c interpretation, limitations (APS-only, structure-only), future (aging model, cross-corpus, LLM labelling). See `writings/paper_draft_sections.md`.
+
+**LaTeX §4 table (2026-04-18):** Done. Top-10 communities by size in `writings/paper_draft_sections.md` §4.
 
 **NST §5 (2026-04-17):** Dropped. Spatial PCA not community-separating; temporal Spearman ρ=−0.668 ambiguous.
 
