@@ -110,7 +110,7 @@ The paper should describe the production semantics (in-degree of frontier paper)
 | **JASIST** | Journal | ⭐⭐⭐ Good | Longer cycle (6–12 months); no page limit — better for full rewrite. |
 | **CIKM / SIGIR 2026** | Conference | ⭐⭐ OK | More competitive; needs stronger retrieval theory framing. |
 
-**Decision:** ICASR is the ideal dedicated venue. JASIST as journal fallback.
+**Decision (2026-04-21):** Submitting to **JCDL 2026** (June 30 deadline). ICASR 2026 call not yet live; JCDL deadline is concrete and the fit is strong. EasyChair record filed.
 
 ---
 

@@ -66,9 +66,9 @@ Three contributions, each with its own subdirectory:
 
 ---
 
-## Project status (2026-04-17)
+## Project status (2026-04-21)
 
-**LitDiscover:** All three live experiments complete (K17-RGC 100%, Ge21-HSS 100%, Le25-GLLM 73.7%). No active deadline — watch ICASR 2026 call.
+**LitDiscover:** ⚡ JCDL 2026 submission filed (EasyChair). PDF: 9 pages, ACM sigconf, anonymous, 300 DPI figures. Deadline June 30. Next: send to PI Xiaobai (~June 8), get her ORCID, verify JCDL city.
 
 **citation-dynamics:** §§1–4 complete with figures (γ_global=2.74, 25 communities, γ_c ∈ [2.1, 3.3], 100% KS pass). Next: rewrite §§1+8, LaTeX §4 table.
 

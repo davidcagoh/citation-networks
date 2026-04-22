@@ -35,6 +35,37 @@ scancel <jobid>                     # cancel
 
 ---
 
+## 2026-04-21 (session 25) — LitDiscover: JCDL 2026 submission formatted and filed
+
+### What was done
+
+- **Venue confirmed:** JCDL 2026 (June 30 AoE deadline, Texas, USA). Full paper, ≤10 pages body, ACM sigconf, double-blind.
+- **`paper-drafts/jcdl-submission/`** (new folder under `lit-review/robust-literature-discovery/paper-drafts/`):
+  - `litdiscover_jcdl.tex` — IEEEtran → ACM sigconf migration (`\documentclass[sigconf,anonymous,review]{acmart}`); abstract moved before `\maketitle`; conflicting packages removed; `\Description{}` added to all 7 figures; `\acmConference` set to JCDL '26 Texas; CCS concept IDs filled in from ACM CCS tool; real author block (incl. ORCID 0009-0009-7241-6906) commented out for camera-ready.
+  - `refs.bib` — patched copy: added `address` to Barabasi2016, `publisher`+`address` to Floros2024, `pages`+`publisher`+`address` to Wohlin2014 (pages: 321–330).
+- **Figures regenerated at 300 DPI** via `06_publication_figures.py` (was 150 DPI). All 7 pub figures now at 300 DPI, effective rendered DPI ~300–330 at `\linewidth`.
+- **Compile result:** 9 pages, 0 errors, 0 undefined references. PDF metadata shows "Anonymous Author(s)" — clean for double-blind. Single cosmetic overfull \hbox (2.5pt in §5) left unfixed.
+- **EasyChair submission record created** at https://easychair.org/conferences/?conf=jcdl26.
+
+### Decisions made
+
+- No production-ready system required for paper validity — live Semantic Scholar experiments in §7 are sufficient to demonstrate operational deployment.
+- Wohlin2014 pages used as 321–330 (user's best recollection; verify against ACM DL before camera-ready).
+- CCS concepts: Information systems~Information retrieval [500], Information systems~Digital libraries and archives [300], Theory of computation~Graph algorithms analysis [100].
+
+### State at end of session
+
+LitDiscover submission is in good shape. PDF compiles clean at 9 pages with all content, figures, and references. EasyChair record filed. Two items needed before final submission: Xiaobai's ORCID, and PI review pass. No in-flight code changes.
+
+### What to do next session
+
+1. **Send PDF to Xiaobai Sun** for PI review — target send by June 8, ask for 1-week turnaround.
+2. **Get Xiaobai's ORCID** — add to commented-out `\orcid{TODO-verify-with-PI}` block in the tex.
+3. **Verify JCDL 2026 city** — update `\acmConference` once confirmed (user thinks Texas).
+4. **Zeitgeist paper** — rewrite §1 + §8 (was next session's priority from session 24; now deferred).
+
+---
+
 ## 2026-04-17 (session 24) — Concepts page + src/ refactor (config + utils)
 
 ### What was done
