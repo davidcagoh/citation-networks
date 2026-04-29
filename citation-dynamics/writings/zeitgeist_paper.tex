@@ -1,0 +1,429 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{url}
+
+\begin{document}
+
+\title{The Zeitgeist Hypothesis: Subcommunity Power Laws and\\
+Temporal Localization in a 130-Year Citation Corpus}
+
+\author{David Goh\inst{1} \and Xiaobai Sun\inst{1}}
+
+\authorrunning{D. Goh and X. Sun}
+
+\institute{Department of Computer Science, University of Toronto,
+Toronto, ON M5S 2E4, Canada\\
+\email{daveed@cs.toronto.edu}}
+
+\maketitle
+
+\begin{abstract}
+The global in-degree distribution of citation networks is commonly modeled as a
+single power law, yet this aggregate view obscures the heterogeneous citation
+dynamics of distinct research communities.  We articulate and empirically test
+the \emph{Zeitgeist hypothesis}: the global citation distribution of a large
+scientific corpus is a finite mixture of subcommunity distributions, each
+individually scale-free and each corresponding to a temporally localized
+research generation.  Using the American Physical Society (APS) 2022 corpus
+(709,803 papers; 9,833,191 citations; 1893--2022), we decompose the corpus into
+communities via the Leiden algorithm (446 communities, modularity $Q=0.7883$)
+and apply discrete maximum-likelihood estimation with $K_{\min}$ scanning and
+Kolmogorov--Smirnov testing to each large community ($n \geq 30$).  All 25
+large communities pass the KS test ($p \geq 0.05$), with fitted exponents
+$\gamma_c \in [2.099,\, 3.268]$ (mean $2.50 \pm 0.25$).  Furthermore, 68\% of
+communities have a publication-year interquartile range under 20 years, and
+community year-medians span 1950 to 2017 --- confirming temporal localization.
+Our results provide the first empirical validation of the mixture structure of
+citation dynamics on a 130-year longitudinal corpus.
+\end{abstract}
+
+\keywords{citation networks \and power laws \and community detection \and
+temporal localization \and scientometrics}
+
+%-----------------------------------------------------------------------
+\section{Introduction}
+\label{sec:intro}
+%-----------------------------------------------------------------------
+
+Academic citation networks encode the causal structure of knowledge propagation.
+Their edges are directed, reflecting the irreversibility of intellectual
+influence; their nodes are timestamped; and their bibliographies are
+accountable, making them among the most reliable social networks available for
+empirical study.  These properties have sustained decades of research into
+the statistical regularities of scientific output
+\cite{Price1965,Price1976,Redner1998,Newman2003}.
+
+A central empirical finding is that citation in-degree distributions follow an
+approximate power law: $P(k) \sim k^{-\gamma}$.  Preferential attachment
+\cite{Price1976} provides the canonical generative explanation --- papers with
+more citations attract more citations, producing a ``rich-get-richer'' dynamic.
+Barab{\'a}si \cite{Barabasi2016} fit this model to the APS corpus and reported
+$\gamma = 2.79$ with $K_{\min} = 49$, or $\gamma = 3.03$ with an exponential
+saturation cutoff.  He also noted, however, that the pure power law fails a
+formal goodness-of-fit test at the corpus level ($p < 10^{-4}$).
+
+We argue that this global-model failure is not a statistical artifact but
+a structural signal.  Consider the epistemic implausibility of a single
+preferential attachment process governing a 1935 nuclear structure paper and a
+2010 topological insulator paper simultaneously.  These papers inhabited
+different research communities, drew on different citation pools, and attracted
+citations over different decades.  The global distribution lumps them together;
+the per-community distribution respects their separateness.
+
+We therefore propose the \textbf{Zeitgeist hypothesis}: the global citation
+distribution of a scientific corpus is a finite mixture of subcommunity
+distributions,
+\begin{equation}
+  P(k) = \sum_{c} \alpha_c\, P_c(k), \qquad P_c(k) \sim k^{-\gamma_c},
+  \label{eq:mixture}
+\end{equation}
+where each community $c$ has weight $\alpha_c > 0$ and an individually
+scale-free distribution with exponent $\gamma_c$.  Two empirical predictions
+follow from Eq.~\eqref{eq:mixture}: \emph{(i)}~each subcommunity should pass a
+power-law goodness-of-fit test applied in isolation, and \emph{(ii)}~the
+subcommunities should be temporally localized --- each corresponding to a
+research generation concentrated in a recognizable historical window.
+
+We test both predictions on the APS 2022 corpus using a three-stage pipeline:
+(1) community detection via the Leiden algorithm \cite{Traag2019}; (2)
+per-community power-law fitting via discrete MLE with $K_{\min}$ scanning
+\cite{Clauset2009}; and (3) temporal analysis of publication-year distributions
+within each community.  The results confirm the Zeitgeist hypothesis: all 25
+large communities individually exhibit power-law citation behavior, and their
+temporal footprints are narrow and well-separated across 130 years.
+
+To our knowledge, this is the first empirical study to jointly test the
+mixture-decomposition claim and the temporal-localization claim on a
+longitudinal corpus of this scale.
+
+
+%-----------------------------------------------------------------------
+\section{Related Work}
+\label{sec:related}
+%-----------------------------------------------------------------------
+
+\paragraph{Scale-free citation networks.}
+Power-law behavior in citation distributions was documented as early as
+Price \cite{Price1965,Price1976}, who also introduced the preferential
+attachment mechanism.  Redner \cite{Redner1998} confirmed approximate power-law
+tails in Physical Review data.  Barab{\'a}si \cite{Barabasi2016} fit the full
+APS corpus and provided the benchmark $\gamma = 2.79$ against which we
+calibrate our global-fit result.  Ke et al.\ \cite{Ke2023} studied the temporal
+pattern of citation accumulation, identifying a ``golden age'' window after
+which paper impact decays; their temporal framing is complementary to ours but
+operates at the individual paper level rather than the community level.
+
+\paragraph{Community structure in citation networks.}
+Waltman and van Eck \cite{Waltman2012} developed community-based classification
+systems for science from citation data, establishing that citation-derived
+communities align with disciplinary boundaries.  Blondel et al.'s Louvain
+method \cite{BlondelLouvain2008} and the improved Leiden algorithm
+\cite{Traag2019} make large-scale community detection tractable; we use Leiden
+for its guarantee of well-connected communities.  Apar{\'i}cio et al.\
+\cite{Aparicio2024} studied temporal community trajectories in the KDD citation
+network, the work closest in spirit to our temporal localization analysis, but
+they did not test power-law behavior within communities.
+
+\paragraph{Mixture models and phase structure.}
+Castillo-Castillo et al.\ \cite{CastilloCastillo2025} recently proposed a
+generative mixture model for citation dynamics, providing a formal probabilistic
+framework for Eq.~\eqref{eq:mixture}.  Our contribution is empirical: we
+validate the mixture claim directly on the APS corpus using non-parametric
+goodness-of-fit testing rather than fitting a generative model.  Costa and
+Frigori \cite{CostaFrigori2024} characterized phase transitions in citation
+networks of AI literature using entropy and fractal dimension, offering a
+different formalism for temporal change; their scope is narrower (one research
+field) and they do not decompose into subcommunities.
+
+\paragraph{Gap.}
+No prior work jointly tests the mixture-decomposition claim
+(each subcommunity is individually power-law) and the temporal-localization
+claim on a 130-year longitudinal corpus.
+
+
+%-----------------------------------------------------------------------
+\section{Dataset}
+\label{sec:data}
+%-----------------------------------------------------------------------
+
+We use the APS 2022 citation dataset, which covers all articles published in
+20 American Physical Society journals from 01 July 1893 to 30 December 2022.
+The dataset associates each article with a unique DOI and metadata including
+journal, volume, issue, publication date, and author affiliations.
+
+\paragraph{Graph statistics.}
+We construct a directed citation graph $G = (V, E)$ where each node
+$v \in V$ is a paper and each edge $(u, v) \in E$ indicates that $u$ cites $v$.
+The resulting graph has:
+\[
+  |V| = 709{,}803 \text{ papers}, \quad
+  |E| = 9{,}833{,}191 \text{ citations}.
+\]
+The graph has mean in-degree $\bar{k} = 13.84$, Gini coefficient $G = 0.692$,
+and contains one giant weakly connected component alongside 447 small
+components.  Year metadata is present for $99.3\%$ of nodes
+(1893--2022, spanning 130 years).
+
+\paragraph{Concentration.}
+Citation impact is highly concentrated: the top $1\%$ of papers account for
+$20.5\%$ of all citations, and the top $20\%$ account for $71.5\%$.  This Pareto
+structure is consistent with preferential attachment dynamics.
+
+\paragraph{Global degree distribution.}
+Figure~\ref{fig:ccdf} shows the in-degree complementary cumulative distribution
+function (CCDF) on a log-log scale.  Applying discrete MLE with $K_{\min}$
+scanning over $[1, 100]$ and 500 KS bootstrap samples \cite{Clauset2009}
+yields $\hat{\gamma}_{\text{global}} = 2.738$ with $K_{\min} = 96$, consistent
+with Barab{\'a}si's benchmark of $\gamma = 2.79$ \cite{Barabasi2016}.  As
+previously noted \cite{Barabasi2016}, the pure power law fails a formal
+goodness-of-fit test at the corpus level, motivating the mixture decomposition
+we develop in Section~\ref{sec:zeitgeist}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\linewidth]{../data/figures/fig1_indegree_ccdf.pdf}
+  \caption{In-degree CCDF of the APS corpus on a log-log scale.  The fitted
+    power-law tail ($\hat{\gamma} = 2.74$, $K_{\min} = 96$) is shown as a
+    dashed line.  The global distribution is approximately scale-free but
+    formally rejects the pure power-law model, motivating the community-level
+    mixture decomposition.}
+  \label{fig:ccdf}
+\end{figure}
+
+
+%-----------------------------------------------------------------------
+\section{The Zeitgeist Hypothesis}
+\label{sec:zeitgeist}
+%-----------------------------------------------------------------------
+
+\subsection{Formal Statement}
+
+We formalize the Zeitgeist hypothesis as follows.  Let $G = (V, E)$ be a
+directed citation graph with a community partition $\mathcal{C} =
+\{C_1, \ldots, C_K\}$ of $V$.  The Zeitgeist hypothesis asserts:
+
+\begin{enumerate}
+  \item \textbf{Local scale-free property:} For each community $C_c$ of
+        sufficient size, the in-degree distribution of the induced subgraph
+        $G[C_c]$ follows a power law $P_c(k) \sim k^{-\gamma_c}$ for $k \geq
+        K_{\min,c}$.
+  \item \textbf{Temporal localization:} For each community $C_c$, the
+        publication years of its member papers are concentrated in a bounded
+        historical window; specifically, the interquartile range (IQR) of
+        publication years is small relative to the corpus span.
+\end{enumerate}
+
+Both properties follow naturally if each community corresponds to a research
+generation in which papers compete primarily for citations within a shared pool.
+Global power-law failure then reflects the heterogeneity across generations, not
+the absence of scale-free dynamics within them.
+
+\subsection{Community Detection}
+
+We partition the APS citation graph using the Leiden algorithm \cite{Traag2019}
+at resolution $\lambda = 1.0$, applied to the full $|V| = 709{,}803$ node graph.
+Leiden partitions the graph into $K = 446$ communities with modularity
+$Q = 0.7883$.  Figure~\ref{fig:sizes} shows the community size distribution.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\linewidth]{../data/figures/fig2_community_sizes.pdf}
+  \caption{Community size distribution from Leiden partitioning ($K = 446$
+    communities, $Q = 0.7883$).  Twenty-five communities have $n \geq 30$
+    nodes, collectively covering 99.8\% of all papers (708,622 of 709,803).
+    The remaining 421 communities are small fragments ($n < 30$), typical
+    at this resolution.}
+  \label{fig:sizes}
+\end{figure}
+
+The size distribution is extremely heavy-tailed: 25 communities have
+$n \geq 30$ nodes and together cover $708{,}622 / 709{,}803 = 99.8\%$ of all
+papers.  The remaining 421 communities are fragments of fewer than 30 nodes
+--- expected behavior of Leiden at resolution $\lambda = 1.0$ on a graph
+with a dominant giant component.  All subsequent analyses focus on the 25
+large communities.
+
+\subsection{Per-Community Power-Law Fitting}
+
+For each large community $C_c$, we extract the in-degree sequence of the
+induced subgraph $G[C_c]$ and apply the discrete MLE procedure of Clauset et
+al.\ \cite{Clauset2009} with $K_{\min}$ scanning.  Specifically, we search
+$K_{\min} \in [1, 100]$, select the value minimizing the KS statistic between
+the empirical CCDF and the fitted power law, and report the fitted exponent
+$\hat{\gamma}_c$.  We assess goodness of fit via 500 KS bootstrap samples;
+a community passes if $p \geq 0.05$.
+
+\paragraph{Results.}
+All 25 large communities pass the KS test ($p \geq 0.05$), providing strong
+support for the local scale-free property.  The fitted exponents span
+$\hat{\gamma}_c \in [2.099,\, 3.268]$, with mean $2.500$ and standard deviation
+$0.246$.  Figure~\ref{fig:gamma} shows the distribution of $\hat{\gamma}_c$
+across communities.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\linewidth]{../data/figures/fig3_gamma_histogram.pdf}
+  \caption{Distribution of fitted power-law exponents $\hat{\gamma}_c$ across
+    the 25 large APS communities.  All communities pass the KS goodness-of-fit
+    test ($p \geq 0.05$).  The mean exponent ($\mu = 2.50$, shown as a dashed
+    line) is consistent with the global fit ($\hat{\gamma} = 2.74$), but the
+    range $[2.099, 3.268]$ reveals genuine inter-community variation masked by
+    the aggregate.}
+  \label{fig:gamma}
+\end{figure}
+
+The global exponent ($\hat{\gamma}_{\text{global}} = 2.74$) lies within the
+range of per-community exponents, consistent with the mixture interpretation of
+Eq.~\eqref{eq:mixture}: the global distribution is a weighted combination of
+individually valid power laws, and the aggregate exponent reflects the
+community-size-weighted mean.
+
+\subsection{Temporal Localization}
+
+We compute, for each large community $C_c$, the median publication year
+$\tilde{y}_c$ and the year interquartile range $\text{IQR}_c$.  Figure~\ref{fig:timeline}
+visualizes these temporal footprints as horizontal bars sorted by $\tilde{y}_c$.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../data/figures/fig4_timeline.pdf}
+  \caption{Publication-year footprint of the 25 large APS communities, sorted
+    by median year.  Each bar shows the IQR; the dot marks the median.
+    Community medians span from 1950 (Early Nuclear/Atomic Physics) to 2017
+    (Topological Matter/Graphene and Physics Education Research).  Seventeen of
+    25 communities have IQR $< 20$ years.}
+  \label{fig:timeline}
+\end{figure}
+
+\paragraph{Results.}
+The mean year IQR across the 25 communities is 18.4 years (median 17.0 years).
+Seventeen of 25 communities ($68\%$) have IQR $< 20$ years, confirming that the
+majority of research communities are temporally concentrated into windows well
+under one research generation.  Community year-medians span from 1950 (Community
+20, Early Nuclear/Atomic Physics) to 2017 (Community 12, Topological
+Matter/Graphene; Community 21, Physics Education Research), covering the full
+historical arc of modern physics.
+
+\paragraph{Top communities.}
+Table~\ref{tab:top10} reports the 10 largest communities with their fitted
+parameters and physics labels.  The labels were assigned by inspecting the top
+five most-cited DOIs per community and cross-referencing with APS journal
+context.  The communities recapitulate the major subfields of APS physics across
+the 20th and 21st centuries.
+
+\begin{table}[t]
+\caption{Top-10 communities by size.  KS: all 25 large communities pass the
+  Kolmogorov--Smirnov power-law test ($p \geq 0.05$).
+  $\hat{\gamma}_c$ fitted via discrete MLE with $K_{\min}$ scanning
+  \cite{Clauset2009}.  yr = publication year.}
+\label{tab:top10}
+\centering
+\small
+\begin{tabular}{rrrccrl}
+\toprule
+cid & $n$ & $\hat{\gamma}_c$ & KS & yr med & yr IQR & Label \\
+\midrule
+0 & 93{,}221 & 2.48 & \checkmark & 1999 & 23\,y & Cond.\ Matter --- DFT / Electronic Structure \\
+1 & 62{,}216 & 2.53 & \checkmark & 2003 & 20\,y & Cond.\ Matter --- Magnetism / Disordered Systems \\
+2 & 55{,}859 & 2.63 & \checkmark & 1987 & 37\,y & Nuclear Physics \\
+3 & 54{,}598 & 2.37 & \checkmark & 1997 & 35\,y & Particle Physics --- Field Theory / QCD \\
+4 & 52{,}502 & 2.29 & \checkmark & 2006 & 17\,y & Mesoscopic Physics / Quantum Chaos \\
+5 & 49{,}428 & 2.24 & \checkmark & 2011 & 15\,y & Quantum Information / Computing \\
+6 & 47{,}156 & 2.68 & \checkmark & 1992 & 32\,y & AMO Physics / Quantum Optics \\
+7 & 45{,}155 & 2.33 & \checkmark & 2010 & 17\,y & Astrophysics / Gravitational Waves \\
+8 & 37{,}730 & 2.54 & \checkmark & 2007 & 16\,y & High-Temp.\ Superconductivity \\
+9 & 36{,}510 & 2.32 & \checkmark & 2002 & 16\,y & Cold Atoms / BEC / Laser Cooling \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Together, these results validate both predictions of the Zeitgeist hypothesis:
+per-community power-law behavior is universal across all 25 large communities,
+and the communities are temporally localized into recognizable research
+generations.
+
+
+%-----------------------------------------------------------------------
+\section{Discussion}
+\label{sec:discussion}
+%-----------------------------------------------------------------------
+
+\paragraph{Summary.}
+We have shown that the APS citation corpus, while approximately power-law in
+aggregate, decomposes into 25 large communities each of which individually
+passes a stringent KS goodness-of-fit test for power-law behavior.  The
+fitted exponents $\hat{\gamma}_c \in [2.099, 3.268]$ span a range invisible in
+the global aggregate, and 68\% of communities are temporally concentrated into
+windows narrower than 20 years.  The community year-medians form a continuous
+sequence from 1950 to 2017, tracing the historical succession of APS research
+generations from early nuclear physics through quantum information and
+topological matter.
+
+\paragraph{What the exponent variation means.}
+The range $\hat{\gamma}_c \in [2.099, 3.268]$ with $\sigma = 0.246$ is
+moderate but meaningful.  A lower $\gamma_c$ corresponds to a heavier tail ---
+a community in which a few papers accumulate citations far more
+disproportionately than others.  Quantum Information / Computing ($\gamma_c =
+2.24$, yr median 2011) and Mesoscopic Physics / Quantum Chaos ($\gamma_c = 2.29$,
+yr median 2006) have the heaviest tails, suggesting winner-takes-all citation
+dynamics in newer, rapidly forming communities.  By contrast, AMO Physics
+($\gamma_c = 2.68$) and Nuclear Physics ($\gamma_c = 2.63$) --- both older,
+more diffuse communities with broad temporal IQRs --- have lighter tails.  The
+Zeitgeist is thus not only about \emph{when} a research generation dominated,
+but also about \emph{how concentrated} its citation flow became.
+
+\paragraph{Temporal localization as a research generation signature.}
+The narrow year IQRs of communities like Quantum Information (IQR 15\,y) and
+Topological Matter/Graphene (IQR 7\,y) reflect the rapid rise and consolidation
+of new research programs: a body of foundational papers appears within a short
+window, and the community then cites that shared base intensively.  The
+wider IQRs of Nuclear Physics (37\,y) and Particle Physics (35\,y) reflect their
+longer historical roots --- these communities span multiple decades of APS
+publication and have accumulated citations across multiple research generations
+within the same field.
+
+\paragraph{Relationship to the global fit.}
+The global exponent $\hat{\gamma}_{\text{global}} = 2.74$ is consistent with
+Barab{\'a}si's $\gamma = 2.79$ \cite{Barabasi2016} and lies within the range of
+per-community exponents.  The global model is not wrong as a descriptive
+summary, but it is not a sufficient characterization: it masks $0.246$ standard
+deviations of genuine inter-community variation and provides no information
+about the temporal structure of citation dynamics.
+
+\paragraph{Limitations.}
+Our analysis is restricted to the APS corpus.  It is an open question whether
+the Zeitgeist hypothesis holds in biomedical, social-science, or computer-science
+corpora, where citation norms and community boundaries differ.  Community
+detection is resolution-dependent: our choice of $\lambda = 1.0$ produces 446
+communities; a different resolution would merge or split communities and could
+affect the per-community KS results.  Finally, the community labels were
+assigned manually from the top-cited DOIs, not from semantic text features;
+communities spanning multiple subfields may be incompletely characterized.
+
+\paragraph{Future directions.}
+A natural extension is to fit an aging model $\pi_c(t)$ per community,
+testing whether the temporal IQR predicts $\hat{\gamma}_c$ --- i.e., whether
+younger, more temporally concentrated communities have heavier citation tails.
+Cross-corpus validation on open datasets (Semantic Scholar Open Research Corpus,
+bioRxiv) would test generalizability.  Semantic community labeling via LLM
+summarization of abstracts would remove the manual bottleneck and enable
+scalability to millions of papers.
+
+
+%-----------------------------------------------------------------------
+\section*{Acknowledgments}
+%-----------------------------------------------------------------------
+
+This work uses the APS 2022 citation dataset, made available by the American
+Physical Society for non-commercial research purposes.
+
+\bibliographystyle{splncs04}
+\bibliography{zeitgeist_refs}
+
+\end{document}

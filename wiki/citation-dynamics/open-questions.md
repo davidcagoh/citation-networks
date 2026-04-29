@@ -4,10 +4,11 @@ Check this at the start of each session.
 
 ---
 
-## NEXT: push 2 commits ahead of origin
-**Action:** `git push` when ready.
+## NEXT: address PDF review feedback
+**Action:** User is reviewing `writings/zeitgeist_paper.pdf`. Address any content or formatting issues next session.
 
----
+## VERIFY: bibliography entries
+**Action:** Before submission, cross-check Aparicio2024, CostaFrigori2024, and CastilloCastillo2025 exact venues and page numbers — written from memory, may need correction.
 
 ---
 

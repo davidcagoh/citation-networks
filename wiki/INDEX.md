@@ -66,10 +66,10 @@ Three contributions, each with its own subdirectory:
 
 ---
 
-## Project status (2026-04-21)
+## Project status (2026-04-29)
 
-**LitDiscover:** ⚡ JCDL 2026 submission filed (EasyChair). PDF: 9 pages, ACM sigconf, anonymous, 300 DPI figures. Deadline June 30. Next: send to PI Xiaobai (~June 8), get her ORCID, verify JCDL city.
+**LitDiscover (solo):** ⏸ On hold — Xiaobai MIA. JCDL 2026 EasyChair record exists; PDF clean at 9 pages. Open decisions: arXiv timing, v2 demo, authorship. Deadline Jun 30.
 
-**citation-dynamics:** §§1–4 complete with figures (γ_global=2.74, 25 communities, γ_c ∈ [2.1, 3.3], 100% KS pass). Next: rewrite §§1+8, LaTeX §4 table.
+**citation-dynamics / Zeitgeist (joint w/ Xiaobai):** ⚡ First full LNCS draft compiled — `writings/zeitgeist_paper.pdf`, 10 pages, 0 errors. User reviewing PDF. Next: address review feedback, verify bibliography, then iterate toward submission.
 
-**Synthesis:** K17-RGC subgraph built (90 nodes, 7 communities). On hold until Zeitgeist paper submitted. Caveat: 49/51 gold DOIs are non-APS.
+**Synthesis:** On hold until Zeitgeist submitted.
