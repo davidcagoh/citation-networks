@@ -17,7 +17,7 @@ Three contributions, each with its own subdirectory:
 
 | Contribution | Status | Target |
 |---|---|---|
-| [LitDiscover](litdiscover/) | Complete (venue pending) | ICASR 2026 |
+| [LitDiscover](litdiscover/) | **Submitted** (2026-07-06) | Information Processing & Management |
 | [Zeitgeist / citation-dynamics](citation-dynamics/) | Active — §§1–4 figures done, §§1+8 rewrite next | COMPLEX NETWORKS 2026 (~Aug) |
 | [Synthesis](synthesis/) | Subgraph built, on hold | Post-Zeitgeist thesis chapter |
 
@@ -66,9 +66,9 @@ Three contributions, each with its own subdirectory:
 
 ---
 
-## Project status (2026-04-29)
+## Project status (2026-07-06)
 
-**LitDiscover (solo):** ⏸ On hold — Xiaobai MIA. JCDL 2026 EasyChair record exists; PDF clean at 9 pages. Open decisions: arXiv timing, v2 demo, authorship. Deadline Jun 30.
+**LitDiscover (solo):** ✅ **Submitted to Information Processing & Management** (2026-07-06), via Elsevier's Editorial Manager. Venue odyssey in one day: JCDL 2026 deadline (June 30) missed → reformatted for JASIST → switched to ACM TOIS (best acceptance/turnaround stats) → **TOIS abandoned** after discovering its ~20-page minimum (paper is a focused 12pp) → **IP&M**, chosen on genuine content fit rather than stats. Submitted with cover letter, anonymized manuscript, title page, and highlights (IP&M uses anonymized review — discovered mid-submission and handled). Repo (`github.com/davidcagoh/robust-literature-discovery`, now with an MIT license) linked as "Original data," pushed and in sync with what reviewers see. Dead-end drafts (JCDL, JASIST, TOIS) archived in `paper-drafts/archive/`. **Xiaobai Sun dropped as co-author** for this paper (no contribution; her work still cited). Next: nothing — awaiting IP&M's decision (~5–6mo typical first-decision turnaround).
 
 **citation-dynamics / Zeitgeist (joint w/ Xiaobai):** ⚡ First full LNCS draft compiled — `writings/zeitgeist_paper.pdf`, 10 pages, 0 errors. User reviewing PDF. Next: address review feedback, verify bibliography, then iterate toward submission.
 

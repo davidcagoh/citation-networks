@@ -107,10 +107,33 @@ The paper should describe the production semantics (in-degree of frontier paper)
 | **ICASR 2026** | Conference/Workshop | ⭐⭐⭐⭐ Best | Dedicated to automated systematic reviews. 2025 was July Potsdam. Watch for 2026 call. |
 | **ALTARS 2026/2027** | Workshop @ TheWebConf | ⭐⭐⭐ Very Good | AI in Technology-Assisted Review. April 2026 Copenhagen may be past deadline. |
 | **JCDL 2026/2027** | Conference | ⭐⭐⭐ Good | Digital libraries + IR; systematic review automation in scope. |
-| **JASIST** | Journal | ⭐⭐⭐ Good | Longer cycle (6–12 months); no page limit — better for full rewrite. |
+| **JASIST** | Journal | ⭐⭐⭐ Good | Rolling submission; broad info-science scope. Reformatted 2026-07-06, superseded by TOIS same day. |
 | **CIKM / SIGIR 2026** | Conference | ⭐⭐ OK | More competitive; needs stronger retrieval theory framing. |
+| **ACM TOIS** | Journal | ⭐⭐⭐⭐ Best on paper | IR-specific scope, exact match, 24% acceptance, ~2mo/review round, no mandatory APC — but enforces a ~20-page minimum (excl. refs) that this 12-page paper doesn't meet. Abandoned 2026-07-06. |
+| **Information Processing & Management** | Journal | ⭐⭐⭐⭐ **Active target** | Strong IR scope, and better content fit than JASIST/TOIS: IP&M explicitly spans both system-level (algorithmic) and human-centered research, matching this paper's systems-with-empirical-validation framing. No page-length floor. Weaker/noisier turnaround data (~5.9mo, low SciRev satisfaction) but that's normal journal latency, not a red flag specific to this venue. |
+| **Research Synthesis Methods** | Journal | ⭐⭐⭐⭐ Very Good (topically) | Ruled out: mandatory $3,400 APC, no waiver available. |
 
 **Decision (2026-04-21):** Submitting to **JCDL 2026** (June 30 deadline). ICASR 2026 call not yet live; JCDL deadline is concrete and the fit is strong. EasyChair record filed.
+
+**Update (2026-07-06): JCDL 2026 deadline missed — not submitted.** EasyChair record existed but paper was never sent by June 30. Rechecked venue landscape same day:
+- **ALTARS 2026** deadline was Jan 23, 2026 — also already passed (workshop itself is June 30, 2026, Dubai, co-located w/ TheWebConf).
+- **ICASR 2026** — no event announced yet (2025 ran July; possible 2026 announcement could still land later this year — watch for it).
+- **JASIST** — journal, rolling submission, no fixed deadline. Only venue currently open.
+- **JCDL 2027** — next-cycle fallback, ~11 months out.
+
+**Decision (2026-07-06): targeting JASIST.** Reformatted paper from ACM sigconf to plain `article` class — see `lit-review/robust-literature-discovery/paper-drafts/archive/jasist-submission/litdiscover_jasist.tex`. Compiles clean (0 errors, 0 undefined refs), 21 pages double-spaced, ~5200 words body (well under 7,000-word JASIST cap). Solo-authored: dropped Xiaobai Sun as second author (no contribution to this paper; her work is cited where relevant instead). Still open: cover letter, ORCID already have, ScholarOne submission, GenAI-use declaration required by JASIST.
+
+**Update (2026-07-06, same day): switched from JASIST to ACM TOIS.** Compared JASIST against three other IR/methods venues:
+- **ACM TOIS** — scope is a near-exact match ("new principled IR models/algorithms with sound empirical validation"). Official metrics: 24% acceptance rate for in-scope work, median ~2 months per review round. No mandatory APC (hybrid journal).
+- **Information Processing & Management** — also strong IR scope fit, but weaker data: ~5.9 months to first decision and 2.0/5 author satisfaction on SciRev (small self-reported sample, so noisy), including a report of same-week desk rejection without review. No mandatory APC.
+- **Research Synthesis Methods** — tightest topical match (explicitly names "literature retrieval and information science" in scope) but fully open-access with a **mandatory $3,400 USD APC**, no waiver unless affiliated with a specific list of Dutch institutions. Ruled out on cost.
+- **Scientometrics / Journal of Informetrics** — weaker fit, bibliometrics/research-evaluation focused rather than IR-systems focused.
+
+**Decision:** TOIS — best-documented acceptance odds and turnaround, tightest scope match, no forced OA cost. Reformatted again: `paper-drafts/archive/tois-submission/litdiscover_tois.tex`, `\documentclass[manuscript,review,anonymous]{acmart}` (same acmart engine as the old JCDL draft, just `sigconf`→`manuscript` plus `\acmJournal{TOIS}` instead of `\acmConference{}`). Compiles clean, 12 pages, double-anonymous review (author identity hidden from reviewers per ACM journal policy). JASIST draft kept on disk but not the active target.
+
+**Update (2026-07-06, later same day): TOIS abandoned — 20-page minimum.** ScholarOne's TOIS submission form states a minimum manuscript length of ~20 pages excluding references. Our paper is a focused 12-page contribution; hitting 20+ pages genuinely would mean substantial new content (deeper related work, more experiments/ablations), not reformatting. Chose to switch venue rather than pad the paper.
+
+**Decision: targeting Information Processing & Management.** Reconsidered fit directly (not just acceptance/turnaround stats this time): IP&M explicitly positions itself around *both* system-level and human-centered research, meaning it's built to hold a "new algorithm/architecture, validated empirically" paper — a tighter match to LitDiscover's actual content than JASIST's more behavioral/sociotechnical lean. Also has no page-length floor, so no repeat of the TOIS problem. IP&M's own Guide for Authors specifies **APA author-date citations**, not the numbered Vancouver style generically assumed for Elsevier journals — confirmed this before reformatting to avoid the same kind of surprise. Reformatted using elsarticle's `authoryear` class option (critical: omitting it silently defaults to numeric citations even with `\citet`/`\citep` in the source — caught by checking rendered PDF text, not just compile success) and `elsarticle-harv` bibliography style. Added the required CRediT authorship statement and a GenAI-use declaration. Compiles clean, 19 pages, 0 errors. Draft: `paper-drafts/ipm-submission/litdiscover_ipm.tex`.
 
 ---
 
