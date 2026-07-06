@@ -141,3 +141,10 @@ The paper should describe the production semantics (in-degree of frontier paper)
 **Decision date:** ~2026-04-06
 **Why:** "LitReview" sounds like the output (a review). "LitDiscover" is the process (discovery).
 **Status:** ✅ Renamed throughout — pyproject.toml, CLI, and paper draft.
+
+**Update (2026-07-06): naming completed end-to-end.** Internal package `litreview2` → `litdiscover`, and the GitHub repo itself renamed `automated-lit-reviews-v2` → `litdiscover` (old URL auto-redirects). Reasoning: the `-v2` suffix only made sense internally (v1 is archived, no outside user knows the lineage), and it was inconsistent with the already-renamed package/CLI. PyPI distribution name is also `litdiscover` (matches import name — no split like beautifulsoup4/bs4).
+
+## Distribution: published to PyPI as `litdiscover` (2026-07-06)
+**Why:** Goal was "make LitDiscover available for seamless use." Considered three tiers: (1) pip-installable CLI with user-provided Supabase + API keys, (2) a hosted multi-tenant API, (3) do nothing beyond git clone. Chose (1) — the schema is single-tenant (no `user_id`/auth layer), so a hosted service would need real product-engineering (multi-tenancy, billing, rate limiting), a different project from "package the existing engine."
+**Status:** ✅ Live at `pypi.org/project/litdiscover/2.0.0/`. `v2.0.0` tagged. `robust-literature-discovery` deliberately NOT renamed or merged into this repo — it's named after the paper (correct convention for a reproducibility repo) and serves a different audience (public, frozen-at-submission, no credentials) than the engine (private, evolving, credentialed).
+**Also fixed in this pass:** `citation-dynamics` promoted to its own repo (`github.com/davidcagoh/citation-dynamics`) for the same reason — `citation-networks` should be a thin umbrella, not a mixed-tracking-model monorepo. And a genuinely broken `launchd` watchdog job (stale path, failing silently every 10 min) was caught and fixed while investigating a doc-staleness flag — see session-log session 28.

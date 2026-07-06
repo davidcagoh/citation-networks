@@ -133,3 +133,16 @@ Barabasi (2016) §4.13 fits APS corpus at γ=2.79 (K_min=49, pure power law fail
 ## Sessions 1–11 — archived
 
 Figure redesigns, paper rewrites (Abstract + §§1,2,5,9), LaTeX fixes, project reorganization (thesis→citation-dynamics/, wiki relocated, outer git init).
+
+---
+
+## 2026-04-17 (session 23) — Community labelling + all §§1–4 figures
+
+- **`src/label_communities.py`** (new): ranks nodes by in-degree within each community, prints top-5 DOI+year, writes `data/analysis/community_labels_template.csv`
+- **25 communities labelled** from landmark papers, saved → `data/analysis/community_labels.csv`. Four uncertain labels: cid 13, 14, 16, 19.
+- **`src/generate_figures.py`** (new): generates all four §§1–4 figures in one run
+- **Global γ fit** (K_min scan [1,100]): xmin=96, γ_global=2.738 — matches Barabasi (2016) γ=2.79 ✅
+- Fig 1 (in-degree CCDF), Fig 2 (community sizes, 446 communities), Fig 3 (γ_c histogram, mean 2.50±0.25), Fig 4 (year-median timeline) all generated to `data/figures/`
+- Paper draft updated: §3 global fit result, §4.3 final results, figures table, TODOs pared to 3 items
+
+Next at the time: rewrite §1/§8 to drop NST/Time Curves framing, add LaTeX §4 top-10 communities table.

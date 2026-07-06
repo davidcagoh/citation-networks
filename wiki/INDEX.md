@@ -17,8 +17,8 @@ Three contributions, each with its own subdirectory:
 
 | Contribution | Status | Target |
 |---|---|---|
-| [LitDiscover](litdiscover/) | **Submitted** (2026-07-06) | Information Processing & Management |
-| [Zeitgeist / citation-dynamics](citation-dynamics/) | Active — §§1–4 figures done, §§1+8 rewrite next | COMPLEX NETWORKS 2026 (~Aug) |
+| [LitDiscover](litdiscover/) | Paper **submitted** (2026-07-06); engine **published to PyPI** (2026-07-06) | Information Processing & Management |
+| [Zeitgeist / citation-dynamics](citation-dynamics/) | Active — §§1–4 figures done, §§1+8 rewrite next; **now its own repo** (`github.com/davidcagoh/citation-dynamics`) | COMPLEX NETWORKS 2026 (~Aug) |
 | [Synthesis](synthesis/) | Subgraph built, on hold | Post-Zeitgeist thesis chapter |
 
 ---
@@ -68,8 +68,10 @@ Three contributions, each with its own subdirectory:
 
 ## Project status (2026-07-06)
 
-**LitDiscover (solo):** ✅ **Submitted to Information Processing & Management** (2026-07-06), via Elsevier's Editorial Manager. Venue odyssey in one day: JCDL 2026 deadline (June 30) missed → reformatted for JASIST → switched to ACM TOIS (best acceptance/turnaround stats) → **TOIS abandoned** after discovering its ~20-page minimum (paper is a focused 12pp) → **IP&M**, chosen on genuine content fit rather than stats. Submitted with cover letter, anonymized manuscript, title page, and highlights (IP&M uses anonymized review — discovered mid-submission and handled). Repo (`github.com/davidcagoh/robust-literature-discovery`, now with an MIT license) linked as "Original data," pushed and in sync with what reviewers see. Dead-end drafts (JCDL, JASIST, TOIS) archived in `paper-drafts/archive/`. **Xiaobai Sun dropped as co-author** for this paper (no contribution; her work still cited). Next: nothing — awaiting IP&M's decision (~5–6mo typical first-decision turnaround).
+**LitDiscover (solo):** ✅ **Submitted to Information Processing & Management** (2026-07-06), via Elsevier's Editorial Manager. Venue odyssey in one day: JCDL 2026 deadline (June 30) missed → reformatted for JASIST → switched to ACM TOIS (best acceptance/turnaround stats) → **TOIS abandoned** after discovering its ~20-page minimum (paper is a focused 12pp) → **IP&M**, chosen on genuine content fit rather than stats. Submitted with cover letter, anonymized manuscript, title page, and highlights (IP&M uses anonymized review — discovered mid-submission and handled). Repo (`github.com/davidcagoh/robust-literature-discovery`, now with an MIT license) linked as "Original data," pushed and in sync with what reviewers see. Dead-end drafts (JCDL, JASIST, TOIS) archived in `paper-drafts/archive/`. **Xiaobai Sun dropped as co-author** for this paper (no contribution; her work still cited).
 
-**citation-dynamics / Zeitgeist (joint w/ Xiaobai):** ⚡ First full LNCS draft compiled — `writings/zeitgeist_paper.pdf`, 10 pages, 0 errors. User reviewing PDF. Next: address review feedback, verify bibliography, then iterate toward submission.
+**LitDiscover the engine (same day, separate track):** ✅ **Published to PyPI** — `pip install litdiscover`, v2.0.0. Repo renamed `automated-lit-reviews-v2` → `litdiscover` (package + GitHub repo, matching product name). `citation-dynamics` promoted to its own standalone repo in the same pass, so `citation-networks` is now a thin umbrella (wiki + pointers) with every paper/engine as an independent sibling repo. Found and fixed a real bug along the way: the `launchd` watchdog job had been failing silently on a stale path for an unknown period — fixed and confirmed running clean. `lightroom-pal` retired from the watchdog rotation (converged, 0 included). Next: nothing blocking — future releases are just version bump → build → upload.
+
+**citation-dynamics / Zeitgeist (joint w/ Xiaobai):** ⚡ First full LNCS draft compiled — `writings/zeitgeist_paper.pdf`, 10 pages, 0 errors. User reviewing PDF. Repo is now `github.com/davidcagoh/citation-dynamics` (private, promoted from `citation-networks` 2026-07-06). Next: address review feedback, verify bibliography, then iterate toward submission.
 
 **Synthesis:** On hold until Zeitgeist submitted.

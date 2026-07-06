@@ -35,6 +35,32 @@ scancel <jobid>                     # cancel
 
 ---
 
+## 2026-07-06 (session 28) — LitDiscover: engine promoted to standalone PyPI package; citation-dynamics split out; watchdog bug fixed
+
+### What was done
+
+- **Repo restructure decided:** `citation-networks` is now a thin umbrella (wiki + pointers only); every paper/engine gets its own repo, matching the existing `lit-review/` sibling-repo pattern rather than mixing tracking models.
+- **`citation-dynamics` promoted to its own repo** (`github.com/davidcagoh/citation-dynamics`, private): extracted full history with `git-filter-repo --subdirectory-filter`, pushed, then detached from `citation-networks` tracking (index-only removal, no working-tree files touched — the dirty `nst` submodule and in-progress LaTeX build artifacts survived untouched). Added a fresh `.gitignore` inside the new repo carrying over the rules that used to live in the parent.
+- **`automated-lit-reviews-v2` → `litdiscover` (package + repo, both renamed):** internal Python package renamed `litreview2` → `litdiscover` (all imports, CLI entry point, 80 tests still pass), then the GitHub repo itself renamed `davidcagoh/automated-lit-reviews-v2` → `davidcagoh/litdiscover` (auto-redirects old URL) to match. Fixed every cross-reference: local folder rename, this repo's own README, `robust-literature-discovery`'s README links, parent `.gitignore`.
+- **Published to PyPI:** added `LICENSE` (MIT), `.env.example`, and full metadata (readme, classifiers, keywords) to `pyproject.toml`; built + `twine check`'d; uploaded — **live at `pypi.org/project/litdiscover/2.0.0/`**. Tagged `v2.0.0`. Verified via clean-venv smoke test (`pip install litdiscover` resolves to the real PyPI package, not a local path artifact).
+- **Found and fixed a real production bug while investigating a doc-staleness flag:** the `launchd` job driving `watchdog.py` (`com.litreview2.watchdog`) had a stale absolute path that never matched the repo's actual location — it had been failing silently every 10 minutes (confirmed via `/tmp/litreview_watchdog.log`, wall of repeated `ModuleNotFoundError`/`FileNotFoundError`). Fixed the path in `watchdog.py`/`watch_jepa_pipeline.py`, rebuilt the plist under a renamed label (`com.litdiscover.watchdog`), reloaded — confirmed running clean.
+- **Retired `lightroom-pal`** from the watchdog's project rotation — 60+ screening rounds, converged at 0 included / 1000 excluded / 0 pending. Done, no longer worth monitoring.
+- **PyPI token hygiene:** user pasted a raw API token into chat mid-session (now in transcript) — flagged it as exposed, wired `~/.pypirc` from `.env` without ever printing the value, and the user rotated the token afterward (old one now dead; `~/.pypirc` refreshed with the new one).
+- **README fix:** Quick Start step 2 implied a Supabase project + `schema.sql` were just sitting there ready; neither is true for a fresh `pip install` — made explicit that a Supabase project must be created first and `schema.sql` isn't bundled in the pip package.
+- **Explicit decision: `robust-literature-discovery` stays as-is** — not renamed, not merged with `litdiscover`. It's named after the paper (correct academic-repo convention), and merging would collapse a public/frozen benchmark repo into a private/continuously-evolving production engine.
+
+### State at end of session
+
+`litdiscover` v2.0.0 is live on PyPI and installable by anyone (`pip install litdiscover`) — this closes the "make LitDiscover available for seamless use" goal from earlier in the session. `citation-dynamics` is now independently versioned. Watchdog is running clean again after an unknown period of silent failure.
+
+### What to do next session
+
+1. No blocking action on `litdiscover` distribution — future releases are just bump version → `python -m build` → `twine upload dist/*`.
+2. Consider whether `watchdog.py`'s failure window means any of the 3 rotation projects (`self-supervised-pretraining`, `automated-lit-review-methodology`) silently stalled for a while — worth a status check.
+3. Continue Zeitgeist/citation-dynamics work in its new standalone repo location.
+
+---
+
 ## 2026-07-06 (session 27) — LitDiscover: venue odyssey ends in IP&M submission; repo reorg + cleanup
 
 ### What was done
@@ -149,55 +175,4 @@ LitDiscover submission is in good shape. PDF compiles clean at 9 pages with all 
 
 ---
 
-## 2026-04-17 (session 23) — Community labelling + all §§1–4 figures
-
-### What was done
-
-- **`src/label_communities.py`** (new): ranks nodes by in-degree within each community, prints top-5 DOI+year, writes `data/analysis/community_labels_template.csv`
-- **25 communities labelled** from landmark papers — all identifiable from top-cited DOIs:
-
-  | cid | n | Physics area |
-  |-----|---|---|
-  | 0 | 93k | Condensed Matter — Electronic Structure / DFT |
-  | 1 | 62k | Condensed Matter — Magnetism / Disordered Systems |
-  | 2 | 56k | Nuclear Physics |
-  | 3 | 55k | Particle Physics — Field Theory / QCD |
-  | 4 | 53k | Mesoscopic Physics / Quantum Chaos |
-  | 5 | 49k | Quantum Information / Computing |
-  | 6 | 47k | AMO Physics / Quantum Optics |
-  | 7 | 45k | Astrophysics / Gravitational Waves / Cosmology |
-  | 8 | 38k | High-Temperature Superconductivity |
-  | 9 | 37k | Cold Atoms / BEC / Laser Cooling |
-  | 10 | 33k | Particle Physics — Standard Model / HEP |
-  | 11 | 27k | Strongly Correlated Electrons |
-  | 12 | 24k | Topological Matter / Graphene |
-  | 13–24 | <20k | (see community_labels.csv) |
-
-  Saved → `data/analysis/community_labels.csv`. Four uncertain labels: cid 13, 14, 16, 19.
-
-- **`src/generate_figures.py`** (new): generates all four §§1–4 figures in one run
-- **Global γ fit** (K_min scan [1,100]): xmin=96, γ_global=2.738 — matches Barabasi (2016) γ=2.79 ✅
-- **Fig 1** (in-degree CCDF, γ=2.74, K_min=96) → `data/figures/fig1_indegree_ccdf.pdf`
-- **Fig 2** (community size distribution, 446 communities) → `data/figures/fig2_community_sizes.pdf`
-- **Fig 3** (γ_c histogram, 25 communities, mean 2.50±0.25) → `data/figures/fig3_gamma_histogram.pdf`
-- **Fig 4** (year-median timeline, sorted by median, IQR bars, labelled) → `data/figures/fig4_timeline.pdf`
-- **Paper draft** updated: §3 global fit result, §4.3 final results, figures table, TODOs pared to 3 items
-
-### State at end of session
-
-| Artifact | Status |
-|---|---|
-| `src/label_communities.py` | ✅ |
-| `src/generate_figures.py` | ✅ |
-| `data/analysis/community_labels.csv` | ✅ (4 labels need verification) |
-| `data/figures/fig{1..4}_*.pdf` | ✅ all four generated |
-| `writings/paper_draft_sections.md` | ✅ updated; §§5–8 stubs still present |
-
-### What to do next session
-
-1. **Rewrite §1** — new pitch: Zeitgeist hypothesis → Leiden → per-community power-law → temporal localization. Remove NST/Time Curves framing entirely.
-2. **Rewrite §8** — keep: mixture validated, universal γ interpretation, limitations, future. Remove NST/Time Curves.
-3. **LaTeX §4 table** — top-10 communities from `community_labels.csv` (n, γ_c, KS p, yr median, IQR, physics label).
-
-
-> Archived: sessions 22 and earlier (2026-04-17 and before) moved to session-log-archive.md
+> Archived: sessions 23 and earlier (2026-04-17 and before) moved to session-log-archive.md
