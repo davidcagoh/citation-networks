@@ -17,7 +17,7 @@ Three contributions, each with its own subdirectory:
 
 | Contribution | Status | Target |
 |---|---|---|
-| [LitDiscover](litdiscover/) | Paper **submitted** (2026-07-06); engine **published to PyPI** (2026-07-06) | Information Processing & Management |
+| [LitDiscover](litdiscover/) | Paper **desk-rejected by IP&M** (2026-07-07) — redo planned; engine on PyPI but **out of date** (v2.0.0 has a known bug, fixed locally 2026-07-07, not yet republished) | Information Processing & Management (redo) |
 | [Zeitgeist / citation-dynamics](citation-dynamics/) | Active — §§1–4 figures done, §§1+8 rewrite next; **now its own repo** (`github.com/davidcagoh/citation-dynamics`) | COMPLEX NETWORKS 2026 (~Aug) |
 | [Synthesis](synthesis/) | Subgraph built, on hold | Post-Zeitgeist thesis chapter |
 
@@ -66,12 +66,12 @@ Three contributions, each with its own subdirectory:
 
 ---
 
-## Project status (2026-07-06)
+## Project status (2026-07-07)
 
-**LitDiscover (solo):** ✅ **Submitted to Information Processing & Management** (2026-07-06), via Elsevier's Editorial Manager. Venue odyssey in one day: JCDL 2026 deadline (June 30) missed → reformatted for JASIST → switched to ACM TOIS (best acceptance/turnaround stats) → **TOIS abandoned** after discovering its ~20-page minimum (paper is a focused 12pp) → **IP&M**, chosen on genuine content fit rather than stats. Submitted with cover letter, anonymized manuscript, title page, and highlights (IP&M uses anonymized review — discovered mid-submission and handled). Repo (`github.com/davidcagoh/robust-literature-discovery`, now with an MIT license) linked as "Original data," pushed and in sync with what reviewers see. Dead-end drafts (JCDL, JASIST, TOIS) archived in `paper-drafts/archive/`. **Xiaobai Sun dropped as co-author** for this paper (no contribution; her work still cited).
+**LitDiscover (solo):** ❌ **Desk-rejected by IP&M** (2026-07-07): "not suitable for full review... several existing publications address this stage of research... leverage SOTA baselines and research, especially LLMs... reference the most updated articles from the current year, which you have not done." Reads as a scoping/currency problem (traversal set too shallow/dated), not a fundamental-idea problem. **Next: redo the underlying lit-review run** with SOTA/LLM-focused baselines and current-year references, once the engine is republished (see below).
 
-**LitDiscover the engine (same day, separate track):** ✅ **Published to PyPI** — `pip install litdiscover`, v2.0.0. Repo renamed `automated-lit-reviews-v2` → `litdiscover` (package + GitHub repo, matching product name). `citation-dynamics` promoted to its own standalone repo in the same pass, so `citation-networks` is now a thin umbrella (wiki + pointers) with every paper/engine as an independent sibling repo. Found and fixed a real bug along the way: the `launchd` watchdog job had been failing silently on a stale path for an unknown period — fixed and confirmed running clean. `lightroom-pal` retired from the watchdog rotation (converged, 0 included). Next: nothing blocking — future releases are just version bump → build → upload.
+**LitDiscover the engine:** ⚠ **PyPI v2.0.0 is out of date** — fixed a real bug 2026-07-07 (two embedding calls were silently 404ing: wrong model names for the Gemini OpenAI-compat endpoint) but haven't republished yet. Same session: added reviewable per-stage artifacts (`run` now exports a citation graph as HDF5 + full paper metadata as JSON; `extract` writes a markdown vetting report) and absorbed two standalone `.bib` scripts into the engine as DB-backed `forward-cites`/`verify` commands. Full plan at `~/.claude-main/plans/elegant-inventing-scroll.md`. **Next: bump + republish to PyPI before the paper redo**, then smoke-test the new commands against a real project.
 
-**citation-dynamics / Zeitgeist (joint w/ Xiaobai):** ⚡ First full LNCS draft compiled — `writings/zeitgeist_paper.pdf`, 10 pages, 0 errors. User reviewing PDF. Repo is now `github.com/davidcagoh/citation-dynamics` (private, promoted from `citation-networks` 2026-07-06). Next: address review feedback, verify bibliography, then iterate toward submission.
+**citation-dynamics / Zeitgeist (joint w/ Xiaobai):** ⚡ First full LNCS draft compiled — `writings/zeitgeist_paper.pdf`, 10 pages, 0 errors. User reviewing PDF. Repo is `github.com/davidcagoh/citation-dynamics` (private, promoted from `citation-networks` 2026-07-06). **Relevant to Synthesis below:** litdiscover's traversal stage now exports the same HDF5 citation-graph format this repo's `phase1_build_graph.py`/`phase2_leiden_cluster.py` already use — opens up citation-network-aware synthesis clustering as a future redesign (see litdiscover's session-log entry, 2026-07-07). Next: address review feedback, verify bibliography, then iterate toward submission.
 
 **Synthesis:** On hold until Zeitgeist submitted.

@@ -35,6 +35,34 @@ scancel <jobid>                     # cancel
 
 ---
 
+## 2026-07-07 (session 29) — LitDiscover: fixed embedding-model naming bug; added per-stage vetting artifacts + forward-cites/verify commands; IP&M desk-rejected
+
+### What was done
+
+- **User ran litdiscover for real and hit a spend cap.** Root-caused via the run's own cost-breakdown trace: the dominant cost was genuinely the extraction step (full-paper text to `gemini-2.5-flash`, not abstracts), but two embedding calls were also silently 404ing on every attempt — a real bug, though it cost nothing since the calls errored before Gemini processed anything.
+- **Fixed the embedding-model naming bug (2 sites):** `litdiscover/screen/llm.py::_get_embedding()` defaulted to `"text-embedding-3-small"` (an OpenAI model name) sent through a client actually pointed at Gemini's OpenAI-compat endpoint; `litdiscover/extract/synthesizer.py::_embed_papers()` defaulted to `"models/gemini-embedding-001"` — the `models/` prefix belongs to the native Gemini SDK, not the OpenAI-compat endpoint (which the working chat calls already call bare, e.g. `"gemini-2.5-flash"`). Both now use bare `"gemini-embedding-001"`. All 30 affected tests still pass.
+- **Investigated Mistral OCR (from the unrelated `khanacademy-for-any-course-v2` repo) as a possible cheaper extraction path — ruled out.** That repo's Mistral usage is pure image-to-text OCR on scanned PDFs with zero structured-field extraction; litdiscover already works from clean extracted text, so there's nothing to port. Real levers for extraction cost stay: truncate further, cheaper Gemini tier, or batch multiple papers per call — not acted on this session.
+- **Designed and implemented reviewable per-stage artifacts + absorbed two standalone scripts into litdiscover**, via a full plan-mode design pass (plan saved at `~/.claude-main/plans/elegant-inventing-scroll.md`). Rationale: the pipeline (`init`→`run`→`extract`→`synthesize`) was already stage-able (separate CLI commands, DB-persisted state) but nothing produced something to actually *look at* between stages before spending more money on the next one.
+  - **Traversal stage (`run`) now writes `<slug>_graph.h5` + `<slug>_papers.json`** instead of a markdown table (markdown was explicitly rejected — nobody reads a linear table of hundreds of papers; the real use case is querying/filtering). The `.h5` format matches the existing convention in `citation-dynamics/src/phase1_build_graph.py` (COO edge list, index-aligned per-node arrays) so it stays compatible with `phase2_leiden_cluster.py`-style tooling. Node scope is **every paper row regardless of status** (not just included) — `edges` FK-references `papers.id` directly, so pre-filtering by status would silently drop real graph structure. An `included` 0/1 vector lets you derive the induced included-only subgraph via `diag(v) @ A @ diag(v)` without needing a separate filtered export.
+  - **Extraction stage (`extract`) now writes `<slug>_extraction_report.md`** — this one stayed markdown since it's a genuine linear-read use case (skim for extraction quality before spending on synthesis), flagging `⚠ MISSING EXTRACTION` for included papers with no usable extraction.
+  - **Ported `forward_cites.py` and `verify_refs.py`** (previously untracked standalone scripts operating on an exported `.bib` with their own from-scratch S2 client) into `litdiscover/intake/forward_cites.py` and `litdiscover/intake/verify.py` — new `forward-cites`/`verify` CLI commands operating directly on a project's own `papers`/`edges` tables, reusing existing S2 client code (`paginate_edges`, shared rate-limit/retry) instead of re-implementing it. `forward-cites` is report-only by default (what's citing the included set, that traversal's hub-filter/yield-gate might have missed); `--ingest` optionally adds findings to the pending queue. `verify` re-resolves included papers against S2 and flags title drift (VERIFIED/UNCERTAIN/NOT_FOUND) — a read-only diagnostic, never auto-corrects.
+  - Added `db/client.py::get_all_papers()`/`get_edges()` (paginated via `.range()`, unlike some existing unpaginated helpers — correctness of a full graph export matters more than a screening-batch helper silently truncating at 1000 rows). Added `h5py` to `pyproject.toml`. New test files `test_reports.py`/`test_forward_cites.py`/`test_verify.py` (13 new tests, including a matrix-mult induced-subgraph check and an order-preservation regression guard for `verify`). Full suite: **97 passed**. Updated `CLAUDE.md` with the new command list and a "Recommended Vetting Workflow" section.
+  - Explicitly **out of scope this session:** citation-network-aware synthesis clustering (separate design conversation — see Next below), and deleting the two now-ported root-level scripts (left for the user once verified working).
+- **`robust-literature-discovery` (LitDiscover paper) was desk-rejected by IP&M** after the session-27/28 submission: "not suitable for a full review... several existing publications in IP&M and/or other outlets address this stage of research... leverage state-of-the-art baselines and research, especially LLMs... reference the most updated articles from the current year, which you have not done." Reads as a scoping/currency problem (traversal set too shallow/dated), not a fundamental-idea problem.
+
+### State at end of session
+
+Embedding bug fixed and tested but **not yet re-published to PyPI** (current `litdiscover` v2.0.0 on PyPI still has the bug). New vetting-artifact commands and forward-cites/verify are implemented and unit-tested but **not yet smoke-tested against a live Supabase project** — the plan's manual verification step (run against `lightroom-pal`) was left for the user to trigger, since it touches real project state.
+
+### What to do next session
+
+1. **Bump and republish `litdiscover` to PyPI** (v2.0.1) with today's fixes before using the engine for the redo run below — resubmitting IP&M reviewers to an engine that's already known to work correctly.
+2. **Redo the `robust-literature-discovery`/LitDiscover paper's underlying lit-review run** to address the IP&M rejection — needs SOTA/LLM-focused baselines and current-year references specifically; consider whether this should also incorporate item 3 or ship first and layer that in.
+3. **Citation-network-aware synthesis** — now that the traversal stage exports a real citation graph (`.h5` with COO edges + included vector), design Pass 1 clustering to use graph structure (citation adjacency, not just embedding similarity) instead of embedding-only k-means. Connects to the untested `concept_citation_motifs.md` idea (seminal hub / parallel discovery / context transplantation motifs) — worth revisiting whether motif detection belongs in this redesign.
+4. Manually smoke-test `forward-cites`/`verify`/the graph export against a real (low-stakes) project before relying on them for a paid run.
+
+---
+
 ## 2026-07-06 (session 28) — LitDiscover: engine promoted to standalone PyPI package; citation-dynamics split out; watchdog bug fixed
 
 ### What was done
@@ -149,30 +177,4 @@ LitDiscover submission is in good shape. PDF compiles clean at 9 pages with all 
 
 ---
 
-## 2026-04-17 (session 24) — Concepts page + src/ refactor (config + utils)
-
-### What was done
-
-- **`wiki/concepts.md`** (new): seeded with Xiaobai Sun's distribution-fitting framework — three complementary metric families (head / middle / tail-sensitive). Relevance notes added for Zeitgeist KS validation and synthesis sub-community fitting. Paper not yet in preprint.
-- **`wiki/INDEX.md`** updated: concepts.md added to file table; synthesis-experiment.md marked on-hold.
-- **`src/config.py`** (new): single path registry for all pipeline scripts — `DATA_EXPORTED`, `DATA_ANALYSIS`, `DATA_FIGURES`, `DATA_SYNTHESIS`, `APS_H5`, `APS_LEIDEN`, `APS_FITS`, `APS_LABELS`, `APS_GOLD`, `APS_SUBGRAPH`. Scripts import from here rather than repeating `_HERE / ".."` per-file.
-- **`src/utils.py`** (new): shared I/O and statistical helpers — `load_h5`, `load_leiden`, `compute_indegree`, `mle_powerlaw_exponent`, `ks_pvalue`. Removes duplication between `phase2b_zeitgeist_fit.py` and `generate_figures.py`.
-- **All active scripts updated** to `from config import ...` + `from utils import ...`:
-  - `phase1_build_graph.py`, `phase2_leiden_cluster.py`, `phase2b_zeitgeist_fit.py`
-  - `generate_figures.py`, `label_communities.py`, `phase5_synthesis_subgraph.py`
-- **Archived to `archive/python/`**: `phase3_nst_adapter.py`, `phase3_nst_train.py`, `phase4_timecurves.py`, `load_aps.py` (NST + Time Curves dropped from scope session 22).
-- **`Makefile` updated**: `all` now targets `zeitgeist figures` (was pointing at dead `timecurves`); `figures` target added with proper dependencies; `DATA_FIG` variable added; `clean` now covers analysis + figures outputs; NST/timecurves targets removed.
-
-### State at end of session
-
-`src/` is clean — only live pipeline scripts present. Future analysis scripts should `from config import ...` and `from utils import ...` rather than redeclaring paths or power-law math.
-
-### What to do next session
-
-1. **Rewrite §1** — new pitch: Zeitgeist hypothesis → Leiden → per-community power-law → temporal localization. Remove NST/Time Curves framing entirely.
-2. **Rewrite §8** — keep: mixture validated, universal γ interpretation, limitations, future. Remove NST/Time Curves.
-3. **LaTeX §4 table** — top-10 communities from `community_labels.csv` (n, γ_c, KS p, yr median, IQR, physics label).
-
----
-
-> Archived: sessions 23 and earlier (2026-04-17 and before) moved to session-log-archive.md
+> Archived: sessions 24 and earlier (2026-04-17 and before) moved to session-log-archive.md
