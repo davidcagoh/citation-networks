@@ -2,6 +2,8 @@
 
 **Start every session:** read `session-log.md` → check the relevant project's `open-questions.md`.
 
+**Presenting this program to someone new?** Read [research-program.md](research-program.md) first — narrative overview of all three pillars + the two speculative extensions, written for a potential collaborator.
+
 ---
 
 ## Thesis: Recognizing Signature Patterns and Phases of Time-Varying Networks
