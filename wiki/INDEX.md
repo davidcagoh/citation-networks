@@ -30,7 +30,8 @@ Three contributions, each with its own subdirectory:
 | File | Purpose | Read when |
 |---|---|---|
 | [session-log.md](session-log.md) | What was done each session + UofT cluster SSH reference | Start of every session |
-| [concepts.md](concepts.md) | Cross-cutting methodological ideas (metric families, distribution fitting) | When designing statistical validation |
+| [concepts.md](concepts.md) | Cross-cutting methodological ideas (metric families, distribution fitting, citation motifs, HDP, traversal visualization) | When designing statistical validation or scoping future work |
+| [research-program.md](research-program.md) | Plain-language narrative overview of all three pillars + two speculative extensions | Sharing the program with a collaborator |
 
 ---
 
@@ -68,7 +69,7 @@ Three contributions, each with its own subdirectory:
 
 ---
 
-## Project status (2026-07-07)
+## Project status (2026-07-08)
 
 **LitDiscover (solo):** ❌ **Desk-rejected by IP&M** (2026-07-07): "not suitable for full review... several existing publications address this stage of research... leverage SOTA baselines and research, especially LLMs... reference the most updated articles from the current year, which you have not done." Reads as a scoping/currency problem (traversal set too shallow/dated), not a fundamental-idea problem. **Next: redo the underlying lit-review run** with SOTA/LLM-focused baselines and current-year references, once the engine is republished (see below).
 
@@ -76,4 +77,6 @@ Three contributions, each with its own subdirectory:
 
 **citation-dynamics / Zeitgeist (joint w/ Xiaobai):** ⚡ First full LNCS draft compiled — `writings/zeitgeist_paper.pdf`, 10 pages, 0 errors. User reviewing PDF. Repo is `github.com/davidcagoh/citation-dynamics` (private, promoted from `citation-networks` 2026-07-06). **Relevant to Synthesis below:** litdiscover's traversal stage now exports the same HDF5 citation-graph format this repo's `phase1_build_graph.py`/`phase2_leiden_cluster.py` already use — opens up citation-network-aware synthesis clustering as a future redesign (see litdiscover's session-log entry, 2026-07-07). Next: address review feedback, verify bibliography, then iterate toward submission.
 
-**Synthesis:** On hold until Zeitgeist submitted.
+**Synthesis:** On hold until Zeitgeist submitted. Identified (2026-07-08) as the piece where LitDiscover's new traversal-visualization export and Zeitgeist's potential HDP-based soft community resolution would actually combine — currently the most stalled part of the program despite being the connective tissue.
+
+**Wiki / program framing (2026-07-08):** No code changes this session. Captured two strengtheners (LitDiscover traversal visualization, Zeitgeist HDP-based resolution) and two speculative future directions (4th citation motif "coupled fields," HDP as its detection method) in `concepts.md`. Wrote `research-program.md` — plain-language, collaborator-facing overview of the full pipeline with schematics. Ran an ad hoc Shapiro-Wilk test on Zeitgeist's 25 per-community γ_c values (W=0.919, p=0.047, right-skewed) — not yet reflected in the paper, flagged as a possible addition.
