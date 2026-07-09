@@ -35,6 +35,26 @@ scancel <jobid>                     # cancel
 
 ---
 
+## 2026-07-09 (session 31) — LitDiscover: engine reworked to staged-by-default workflow; redo run against automated-lit-review-methodology to address IP&M rejection
+
+**2-tier exp:** Shipped a full staged/autopilot rework of the litdiscover engine (TDD, 8 commits, 174 tests) with two real bugs found and fixed via live use, then used the new staged workflow to redo the underlying lit-review corpus behind the desk-rejected LitDiscover paper — added 8 SOTA/current-year seeds, ran traverse+prefilter, and hand-marked 698 candidates (366 included / 344 excluded) to directly address IP&M's "missing SOTA/LLM baselines, missing current-year articles" rejection reason.
+
+<details>
+
+- **Design discussion → plan → implementation.** User wanted litdiscover's `run` to stop auto-chaining traverse→screen unsupervised (root cause of a prior Gemini-spend-cap incident) and replace automated LLM screening with a human+agent eyeball pass over a cheap keyword-prefiltered shortlist, plus a new `related-work-mine` step to study how closest-match papers frame their own prior work. Hashed out design points one at a time (mode default, staged-run semantics, criteria-refinement gating, audit trail) before handing to a `planner` agent, which produced a 7-phase plan; corrected one design point mid-plan (staged `run` = traversal-only, never auto-screens — planner's first draft assumed a full expand+screen cycle).
+- **Implemented via `tdd-guide` agent in an isolated worktree**, merged fast-forward into `litdiscover` main (8 commits): `[loop] mode = "staged"` (new default) vs `"autopilot"` (opt-in, byte-for-bit unchanged old behavior, guarded by characterization tests); new `traverse`/`screen`/`prefilter`/`mark`/`related-work-mine` CLI commands; `screening_log` gained `screener_type`/`note`/`mode` columns (migration applied directly to the live `litreview-v2` Supabase project); `watchdog.py` and its launchd job removed (host-side plist teardown still needed manually). 171→174 tests passing; new code 96-100% covered.
+- **Smoke-tested for real** by using it to redo `automated-lit-review-methodology` — the project whose lit-review run underlies the desk-rejected LitDiscover paper (IP&M: "several existing publications address this stage of research... leverage SOTA baselines, especially LLMs... reference the most updated articles from the current year, which you have not done"). Full reset (38k stale papers deleted via batched raw SQL — PostgREST's bulk-delete timed out at that scale), then re-seeded with the original 5 + 5 fresh 2025-2026 anchors (AISysRev, LLM4SCREENLIT, DeepSurvey-Bench, etc.) found via web search.
+- **`related-work-mine` surfaced 3 more direct SOTA competitors** (AutoSurvey, ChatCite, LitLLM) from one seed's own Related Work section — added as seeds too. Confirmed Gemini's monthly spend cap is exhausted (blocks embedding-based ranking and will block `extract`/`synthesize` later) but doesn't block `traverse` (S2/PDF-only).
+- **Found and fixed two real bugs surfaced by this live run** (both committed, both got regression tests): (1) `relwork.py`'s section-heading regex matched "Background"/"Related Work" as a substring anywhere in the PDF text, including mid-prose mentions — caused a real mis-extraction; fixed by requiring the heading alone on its own line, preferring explicit Related/Prior Work over bare Background. (2) `prefilter.py`'s `derive_terms` tokenized the *entire* criteria string including Exclude bullets and boilerplate framing prose, pulling in generic words ("paper", "meets", "must") that matched 94% of candidates — fixed by scoping term derivation to Include-bullet content only, and fixing heading detection (was requiring an exact "Include:" label, silently produced zero terms against real prose-style criteria).
+- **Manually eyeballed all 698 prefiltered candidates together** (traverse: 844 pending → prefilter: 698 survivors), batch by batch, applying one consistent litmus test: include if the paper's *contribution* is proposing/evaluating a review-automation method (screening, extraction, stopping, generation) regardless of domain; exclude domain-specific SRs where AI/LLM use is incidental. Caught one real transcription error mid-`mark` (a paper I'd told the user was included got left out of the compiled list) by cross-checking counts before writing — fixed before it landed in the DB.
+- **Applied via a one-off Python script** (`apply_mark.py` in scratchpad, not committed) calling `litdiscover mark` in chunks rather than retyping ~700 IDs by hand. Final state: 366 included, 344 excluded, 147 still pending (non-prefilter-survivors, untouched by design).
+
+</details>
+
+**Next:** Run `traverse` again from the enlarged included set (13→366 papers) to expand the citation graph further. Check/raise the Gemini spend cap at ai.studio/spend before attempting `extract`/`synthesize` on this project. Manually tear down the old watchdog launchd job (`~/Library/LaunchAgents/com.litdiscover.watchdog.plist` + `/tmp/litreview_watchdog*` state/logs) — code-side removal is done but host state isn't. Decide whether `mark`'s `get_project` error handling (currently mislabels any exception as "project not found") is worth fixing.
+
+---
+
 ## 2026-07-08 (session 30) — Wiki: next-step brainstorm captured, new research-program overview written
 
 **2-tier exp:** Explored strengtheners for LitDiscover (traversal visualization) and Zeitgeist (Hierarchical Dirichlet Process for soft community resolution) plus two speculative future directions (4th citation motif: coupled fields; HDP as its detection method); wrote `wiki/concepts.md` entries for all three and a new `wiki/research-program.md` narrative overview for sharing with a potential collaborator.
@@ -134,33 +154,4 @@ LitDiscover is **submitted** to Information Processing & Management. Repo is pus
 
 ---
 
-## 2026-04-29 (session 26) — Zeitgeist: first full LaTeX draft compiled (10 pages, LNCS)
-
-### What was done
-
-- **Authorship clarified:** LitDiscover = David solo; Zeitgeist = joint with Xiaobai. Updated memory accordingly.
-- **LitDiscover tabled:** Xiaobai is MIA. Submission on hold (need her ORCID + PI review). Open questions remain: arXiv upload timing, whether to build a user-facing v2 before going public, authorship decision.
-- **`citation-dynamics/writings/zeitgeist_paper.tex`** (new): Full 10-page LNCS paper written from scratch. Sections:
-  - §1 Introduction — Zeitgeist hypothesis, mixture model Eq. (1), two testable predictions
-  - §2 Related Work — scale-free models, temporal communities, mixture models, gap statement
-  - §3 Dataset — N=709,803, L=9,833,191, γ_global=2.74, Pareto stats
-  - §4 The Zeitgeist Hypothesis — 4.1 formal statement, 4.2 Leiden (446 communities, Q=0.7883), 4.3 per-community fitting (25/25 KS pass, γ_c ∈ [2.099, 3.268]), 4.4 temporal localization (68% IQR < 20y), top-10 table
-  - §5 Discussion — exponent variation interpretation, temporal localization as research generation signature, limitations, future work
-- **`citation-dynamics/writings/zeitgeist_refs.bib`** (new): 13-entry bibliography (Barabasi, Clauset, Traag, Ke2023, Aparicio, CostaFrigori, CastilloCastillo, Choudhary, Price×2, Redner, Newman, Waltman, Blondel).
-- **Compiled:** `pdflatex` + `bibtex` + 2× `pdflatex` → clean PDF, 0 errors, 10 pages.
-  - PDF: `citation-dynamics/writings/zeitgeist_paper.pdf`
-
-### State at end of session
-
-PDF compiled and handed to user for review. No in-flight code changes. Two untracked utility scripts (`forward_cites.py`, `verify_refs.py`) remain uncommitted at repo root.
-
-### What to do next session
-
-1. **Review PDF** — user is checking it; address any content or formatting feedback
-2. **Verify bibliography entries** — Aparicio2024, CostaFrigori2024, CastilloCastillo2025 were written from memory; cross-check exact venues/page numbers before submission
-3. **LitDiscover roadmap** — decide: (a) arXiv now vs. wait for v2 demo; (b) Xiaobai co-author vs. acknowledgement (requires her agreement); (c) whether to build a wrapper/dashboard for public-facing v2
-4. **Commit `forward_cites.py` + `verify_refs.py`** if they're keepers
-
----
-
-> Archived: sessions 25 and earlier (2026-04-21 and before) moved to session-log-archive.md
+> Archived: sessions 26 and earlier (2026-04-29 and before) moved to session-log-archive.md

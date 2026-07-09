@@ -144,6 +144,63 @@ The paper should describe the production semantics (in-degree of frontier paper)
 
 **Update (2026-07-06): naming completed end-to-end.** Internal package `litreview2` → `litdiscover`, and the GitHub repo itself renamed `automated-lit-reviews-v2` → `litdiscover` (old URL auto-redirects). Reasoning: the `-v2` suffix only made sense internally (v1 is archived, no outside user knows the lineage), and it was inconsistent with the already-renamed package/CLI. PyPI distribution name is also `litdiscover` (matches import name — no split like beautifulsoup4/bs4).
 
+## Engine rework: staged-by-default workflow, autopilot opt-in (2026-07-09)
+
+**Decision:** Flip `run`'s default behavior. Today's fully-unattended traverse→screen→repeat
+loop becomes an explicit opt-in (`[loop] mode = "autopilot"` in `project.toml`); the new default
+(`mode = "staged"`, or the field simply omitted) breaks the pipeline into individually-triggered
+stages that each write an inspectable artifact before the next stage runs.
+
+**Why:** Driving litdiscover from a different project (`adaptive-learner`'s WAILS 2026
+related-work search, 2026-07-09 — see `open-questions.md`'s "Engine feature requests" section)
+surfaced that the automated loop's failure mode (silent 0%-yield retry burning ~13 rounds after a
+Gemini spend-cap error) and its screening quality (David: "litdiscover's LLMs aren't that smart")
+are the same underlying problem: nothing gates the loop except the loop itself. What actually
+worked in that session was a human+agent (Claude, in a chat session) eyeballing a keyword-prefiltered
+candidate list together (2017 → 135 candidates, caught ~60 false positives an LLM screen likely
+would've missed) — genuinely closer to HITL-with-an-agent than automated screening. Also surfaced
+a stronger idea: once some papers are included, mine the closest-match paper's own Related Work
+section for framing/grouping and unaddressed context, and use that to hand-refine criteria/keywords
+— something pure citation-graph traversal structurally can't recover.
+
+**What changes:**
+- `traverse` and `screen` become individually-callable CLI commands (currently interleaved inside
+  `loop.py`'s state machine) — `run` under `mode = "staged"` does one traversal cycle and stops.
+- New `litdiscover prefilter <slug>` — formalizes the keyword/regex triage validated manually in
+  the WAILS session (auto-derives terms from `project.toml`'s `criteria`), ranks by citation
+  count, writes a skimmable `<slug>_candidates.md` sized for a chat-session read-through.
+- New `litdiscover mark <slug> --include/--exclude/--uncertain <ids> [--note]` — the write-back
+  primitive staged mode needs, since `screen/llm.py` is currently the *only* code path that sets
+  `papers.status`. Writes to `screening_log` with a new `screener_type` column
+  (`'llm' | 'human' | 'prefilter'`) so mixed-mode history stays legible in `verify`/`forward-cites`
+  reports.
+- New `litdiscover related-work-mine <paper_id>` (already speculative in `open-questions.md`,
+  now promoted to the core workflow) — fetches full text where available, extracts just the
+  Related Work section. "Closest match" ranking reuses `synthesize`'s existing embedding infra
+  (`gemini-embedding-001`), not a new pipeline.
+- Autopilot mode's existing automatic criteria-refinement (LLM-proposed, cosine-similarity-guarded)
+  stays exactly as-is for `mode = "autopilot"` projects. Staged mode skips it entirely — the
+  related-work-mining step replaces it there, and running both would mean the LLM silently
+  rewrites criteria out from under a change just made by hand.
+- No yield-gating machinery in staged mode — `traverse` just prints a one-line cycle-yield summary
+  and exits; the human decides whether another cycle is worth it.
+- **No migration needed for existing autopilot-mode projects** — the three watchdog-rotation
+  projects (`self-supervised-pretraining`, `automated-lit-review-methodology`, and whichever third
+  was in `watchdog.py`'s hardcoded rotation) are being scrapped outright rather than flagged
+  `mode = "autopilot"`, since they're stale and can be redone from scratch if ever needed. The
+  `launchd` watchdog job itself (`com.litdiscover.watchdog`) is being unloaded/removed as part of
+  this change — nothing left for it to poll.
+
+**Status:** ✅ Implemented and merged to `main` same day (2026-07-09), via `planner` + `tdd-guide`
+agents, 8 commits, 174 tests passing. `CLAUDE.md`/`README.md` rewritten to describe the new
+staged-default/autopilot-opt-in architecture. `screening_log`'s `screener_type`/`note`/`mode`
+migration applied directly to the live `litreview-v2` Supabase project. Not yet republished to
+PyPI (still v2.0.0). Host-side launchd plist/state teardown still needs to be done manually
+(code-side watchdog removal is done, but `~/Library/LaunchAgents/com.litdiscover.watchdog.plist`
+and `/tmp/litreview_watchdog*` files are outside the repo and weren't touched).
+
+---
+
 ## Distribution: published to PyPI as `litdiscover` (2026-07-06)
 **Why:** Goal was "make LitDiscover available for seamless use." Considered three tiers: (1) pip-installable CLI with user-provided Supabase + API keys, (2) a hosted multi-tenant API, (3) do nothing beyond git clone. Chose (1) — the schema is single-tenant (no `user_id`/auth layer), so a hosted service would need real product-engineering (multi-tenancy, billing, rate limiting), a different project from "package the existing engine."
 **Status:** ✅ Live at `pypi.org/project/litdiscover/2.0.0/`. `v2.0.0` tagged. `robust-literature-discovery` deliberately NOT renamed or merged into this repo — it's named after the paper (correct convention for a reproducibility repo) and serves a different audience (public, frozen-at-submission, no credentials) than the engine (private, evolving, credentialed).
