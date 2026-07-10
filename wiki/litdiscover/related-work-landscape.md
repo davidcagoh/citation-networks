@@ -42,6 +42,21 @@ problem in a different shape; (2) **LiRA has a working, benchmarked citation-gro
 (CQF1) and Reviewer Agent** that is the single most directly reusable precedent found — see the
 Extract/Synthesize Technique Audit in `open-questions.md`.
 
+**Code-level ground-truth check (2026-07-11):** cloned `sr-lab/ProfOlaf` and
+`lira-workflow/auto-review-writing` into `lit-review/` to verify the CQF1/Reviewer-Agent claims
+against actual code, not just the paper's description. **Correction:** CQF1 is not a live in-loop
+check — it's an **offline eval metric** (`utils/eval_metrics/citation_quality.py`, explicitly
+commented `# Code adapted from https://github.com/AutoSurveys/AutoSurvey`, reusing AutoSurvey's
+NLI-entailment-per-claim code near-verbatim) computed after generation for benchmarking, not
+something the pipeline runs during writing. `src/reviewer.py`'s actual `ReviewerAgent` is a
+general-purpose completeness/clarity/transparency quality gate (parses a `SUFFICIENT yes/no`
+verdict, up to 3 regeneration rounds) — not citation-specific. The real anti-hallucination
+mechanism during generation is citing full article titles while writing (grounds the model on
+real strings, not placeholder numbers), not a live grounding check. **Implication:**
+LitDiscover's `check_citation_grounding()` (shipped 2026-07-11, see `open-questions.md`) is
+actually more advanced than either precedent on this specific axis — it's wired into the
+pipeline as a live diagnostic on every synthesis run, not an offline benchmarking-only metric.
+
 **Full-text pull, round 3 (2026-07-11):** Human-Centred Research Automation obtained (user
 supplied the PDF directly — ACM DL is paywalled, no open-access mirror was findable) and read.
 Table entry confirmed accurate, with one new nuance: their own classical-vs-LLM filter comparison

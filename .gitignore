@@ -4,6 +4,10 @@ lit-review/litdiscover/
 lit-review/automated-lit-reviews/
 citation-dynamics/
 
+# External reference clones (competitor codebases, not our own repo content)
+lit-review/ProfOlaf/
+lit-review/auto-review-writing/
+
 # Python
 .venv/
 __pycache__/

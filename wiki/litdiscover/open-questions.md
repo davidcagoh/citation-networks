@@ -27,11 +27,13 @@ now read (`fulltext/`):
 
 1. **Citation grounding — is any claim ever checked against its cited paper?** AutoSurvey's
    citation-quality metric (`h(c_i, Ref_i)`, an NLI check per claim) is the only reason it can
-   claim citation recall/precision numbers at all. **LiRA goes further and is the strongest
-   precedent found across all 6 papers:** it defines Citation Quality F1 (CQF1) — precision/recall
-   over citation grounding — and beats AutoSurvey substantially on it (0.76/0.73 vs. ≤0.63) via a
-   dedicated **Reviewer Agent** that checks intermediate outputs and triggers regeneration on
-   failure. Audit: read `_write_theme_section`, the map-reduce path (`map_prompt`/`reduce_prompt`,
+   claim citation recall/precision numbers at all. LiRA reports beating AutoSurvey on this via
+   CQF1 (0.76/0.73 vs. ≤0.63) — **but code-level check (2026-07-11, cloned
+   `lira-workflow/auto-review-writing`) found CQF1 is an offline eval metric copied near-verbatim
+   from AutoSurvey's own code, not a live in-loop check, and `ReviewerAgent` is a general
+   completeness/clarity gate, not citation-specific** (see `related-work-landscape.md`'s
+   code-level correction). Neither precedent actually runs a live per-claim grounding check during
+   generation. Audit: read `_write_theme_section`, the map-reduce path (`map_prompt`/`reduce_prompt`,
    ~`synthesizer.py` line 645–669), and `number_citations.py` in full — confirm there is genuinely
    no post-hoc check that a `[ID]` citation is supported by that paper's extracted fields, and scope
    a CQF1-style metric plus a lightweight reviewer pass (reusing extraction fields already in the
@@ -122,6 +124,12 @@ pass), writes `<slug>_grounding_report.md`, never rewrites the review — purely
 tests, 181/181 passing. **Not yet run against a real project** — next actual step is running
 `litdiscover synthesize` on a live project and reading the resulting grounding score, which is
 what decides whether #2 (plan-based generation) is worth doing at all.
+
+Post-ship code-level check (2026-07-11, see `related-work-landscape.md`) found this fix is
+actually ahead of both precedents on this specific axis: LiRA's CQF1 and AutoSurvey's
+`h(c_i,Ref_i)` are both offline benchmarking metrics computed after generation, not live checks
+during synthesis. `check_citation_grounding()` runs on every `synthesize` call — no competitor
+codebase examined does this live.
 
 ---
 
