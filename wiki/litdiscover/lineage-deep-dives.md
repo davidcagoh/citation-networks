@@ -1,0 +1,570 @@
+# Automated Literature Review — Method & Evaluation Deep Dives
+
+Working document. Each method entry follows: Problem it is trying to solve / How it works / How
+it is evaluated / How it performed on those evaluations / Relation to methods that came before it
+/ Named limitations and directions for future work. Evaluation-benchmark entries (not methods)
+use a narrower template. Six pre-LLM/classical papers are cited in one line each at the end
+without a full deep-dive, since they predate the LLM-native cohort this review is really about.
+
+Source material for the 7 entries below: full-text PDFs already read this session, archived in
+`fulltext/`. Everything after that was written by parallel subagents — see the model/date tag on
+each entry.
+
+---
+
+## Table 1 — Methods
+
+| Method | Authors, Year | Venue | Core Approach | Status |
+|---|---|---|---|---|
+| SciReviewGen | Kasanishi et al., 2023 | ACL Findings | Query-weighted FiD (QFiD) — dataset + baseline for query-focused chapter summarization | Full text read |
+| AutoSurvey | Wang et al., 2024 | NeurIPS | Retrieval → outline → parallel subsection drafting → refine → Multi-LLM-as-Judge best-of-N | Full text read |
+| LitLLM | Agarwal et al., 2024 | arXiv | Keyword search → LLM re-rank (permutation/debate) → single-pass RAG generation | Full text read |
+| LitLLMs (are we there yet?) | Agarwal et al., 2024/25 | TMLR | Same team, formalizes retrieval + plan-based generation w/ rolling contamination-free eval | Full text read |
+| LiRA | Go et al., 2026 | AAAI | Multi-agent: Outline Drafter → Subsection Writer → Editor → Reviewer, CQF1 metric | Full text read + repo cloned |
+| ProfOlaf | Afonso et al., 2025 | FSE '26 Companion | Iterative snowballing + human-in-the-loop screening + TopicGPT + Task Assistant | Full text read + repo cloned |
+| Human-Centred Research Automation | Mulla et al., 2026 | HCAI-EP | Agentic discovery/filter/gap-ID pipeline, HCAI trust/transparency principles | Full text read |
+| SurveyGen | Bao et al., 2025 | EMNLP | Dataset + QUAL-SG quality-aware retrieval (topical + academic-impact + diversity re-ranking) | Full text read |
+| SurveyGen-I | Chen et al., 2025 | IJCNLP-AACL | PlanEvo (dependency-DAG dynamic outline) + citation-tracing for indirect citations | Full text read |
+| System for SLR using Multiple AI Agents | Sami et al., 2024 | arXiv | 4-agent sequential pipeline: planner → identification → extraction → compilation | Full text read |
+| Scholar Augment | Unconfirmed, 2026 | IEEE Xplore | Multi-LLM platform for full-text data extraction, 99.32% time reduction | **Abstract-only — paywalled** |
+| IntrAgent | Ma et al., 2026 | arXiv | Section-ranking + iterative reading for single-paper content-grounded QA (IntraView task) | Full text read |
+| SocLitGen | Hu, Wei & Sun, 2026 | Information Processing & Mgmt | LLM-assisted social-science literature review framework | **Blocked — fully paywalled, no abstract indexed anywhere** |
+| TriSem-LLM | Unverified | Unverified | Tri-Level Semantic + LLM-Assisted SLR methodology | **Not found — possibly mis-transcribed title** |
+| InteractiveSurvey | Wen et al., 2025 | arXiv | Interactive web pipeline — editable clustering/outline/content, HDBSCAN + HyDE | Full text read |
+| PROMPTHEUS | Torres et al., 2024 | arXiv | GPT query expansion → BERTopic clustering → T5 summarization → GPT post-edit → LaTeX | Full text read |
+| Meow | Ma et al., 2025 | arXiv | Fine-tuned Qwen3-8B (SFT+GRPO), outline generation as a standalone trained task | Full text read |
+| LLAssist | Haryanto, 2024 | arXiv | Lightweight open-source screening/relevance-triage tool, model-agnostic | Full text read |
+| GEAR-Up | Roy et al., 2024 | AAAI Demo | KG + LLM query expansion feeding PubMed search + FAISS re-ranker (query-side only) | Full text read |
+| ReviewGenie | Unconfirmed, 2025 | Systematic Reviews (Springer) | 7-stage linear pipeline: multi-DB search → dedup → filter → zero-shot GPT screening | Full text read |
+| Bio-SIEVE | Robinson et al., 2023 | arXiv | QLoRA-fine-tuned LLaMA/Guanaco specifically for biomedical abstract screening | Full text read |
+
+**Classical / pre-LLM cohort (one-line citations only — see bottom of doc for the six entries):** ToC-RWG, Target-aware Abstractive RW Generation, ASReview LAB v.2, SYMBALS, SWIFT-Active Screener, Capturing Relations between Scientific Papers.
+
+---
+
+## Table 2 — Evaluation Methods
+
+| Evaluation Method | Introduced/Used By | What It Measures |
+|---|---|---|
+| SGSimEval | Guo et al., 2025 | Composite outline+content+reference quality with human-similarity-weighted scoring (HP/Balanced schemes) — the only benchmark unifying all three survey components in one framework |
+| CQF1 (Citation Quality F1) | AutoSurvey (2024), reused verbatim by LiRA (2026) | NLI-style entailment precision/recall over per-claim citation grounding |
+| Multi-LLM-as-Judge | AutoSurvey | Coverage/Structure/Relevance scored by 3 LLMs (GPT-4, Claude-3-haiku, Gemini-1.5-pro), validated against human pairwise rankings via Spearman's ρ |
+| RollingEval (Aug/Dec) | LitLLM / LitLLMs are we there yet? | Contamination-free retrieval+re-ranking eval using arXiv papers posted after a fixed cutoff date |
+| IntraBench | IntrAgent | 315-instance multiple-choice benchmark for single-paper content-grounded QA across 5 STEM domains |
+| Prometheus 2 (LLM-judge) | LiRA | Open-source LLM evaluator scoring coverage/structure/relevance, cross-checked against SME human ratings |
+| Tree Edit Distance (structural reward) | Meow | Distance between generated and human-written outline trees — used both as an eval metric and as a live GRPO training reward |
+| IoU / semantic / LLM-judged reference relevance | SurveyX | Three-way check of whether retrieved references match a human-curated reference set |
+| Wohlin SLR efficiency metric | ProfOlaf (reused from Wohlin 2014) | included papers / total candidates examined per snowball iteration |
+| SciReviewGen (dataset-as-benchmark) | SciReviewGen, reused by LiRA/SGSimEval | 10k literature reviews + 690k cited papers — the field's most-reused training/eval corpus |
+| Cohen's Kappa | ProfOlaf, ReviewGenie, Bio-SIEVE (Test set annotation) | Inter-rater agreement between LLM screening decisions and human consensus |
+| Flesch Reading Ease Score (FRES) | PROMPTHEUS | Readability of generated summaries/final document vs. original abstracts |
+| Key Point Recall (KPR) | SurveyGen | LLM-extracted key points from human survey, QA-checked for presence in generated survey |
+| ROUGE-1/L | SciReviewGen, AutoSurvey (indirectly), PROMPTHEUS, LiRA (ROUGE-L), SurveyGen | Lexical n-gram overlap with human-written reference text |
+| Wilcoxon signed-rank (paired significance) | IntrAgent | Statistical significance of accuracy improvements over each baseline, Holm–Bonferroni corrected |
+
+---
+---
+
+## Methods
+
+### SciReviewGen (Kasanishi et al., ACL Findings 2023)
+- **Problem it is trying to solve:** The absence of a large-scale dataset for training/evaluating
+  automatic literature review generation was blocking progress on the task. GALACTICA (Taylor et
+  al., 2022a) had attempted broad science-writing at scale but was shut down within days due to
+  hallucination — underscoring the need for a proper benchmark, not just a bigger model.
+- **How it works:** Built from S2ORC — extracted 13,984 candidate literature reviews (CS field,
+  title contains "survey"/"overview"/"literature review"/"a review"), trained a SciBERT classifier
+  (gold-standard 889 hand-annotated papers, 3 annotators, Cohen's κ=0.66) to filter down to 10,269
+  genuine reviews with 210,049 chapters and 698,049 cited papers. Proposes Query-weighted
+  Fusion-in-Decoder (QFiD), extending FiD to weight each cited paper's encoder hidden states by
+  cosine-similarity relevance to the query (review title + chapter title) before decoding, so the
+  model explicitly down-weights cited papers that are only tangentially related to a given chapter.
+- **How it is evaluated:** The filtered (chapter-split) dataset is used for query-focused
+  multi-document summarization; baselines are LEAD, LexRank, Ext-oracle, Big Bird, and vanilla FiD.
+  Automatic eval via ROUGE-1/2/L; human eval (3 graduate-level CV-research annotators) on 30
+  chapters from 5 held-out computer-vision reviews, rated ground-truth-vs-generated on five
+  criteria: relevance, coherence, informativeness, factuality, overall.
+- **How it performed on those evaluations:** QFiD achieves the best ROUGE among neural models
+  (34.00/7.75/16.52), beating vanilla FiD (32.40/6.75/16.17) and Big Bird. Human eval shows
+  generated chapters comparable-or-superior to ground truth on relevance (74.5%) and reasonable on
+  coherence, but badly underperform on informativeness (only 35.6% comparable-or-better) and
+  factuality (60.0%); overall, 68.9% of ground-truth chapters were preferred vs. 22.2% preferring
+  the generated chapter.
+- **Relation to methods that came before it:** Extends Multi-XScience (Lu et al. 2020 —
+  related-work-section generation from an abstract + reference list) to full literature reviews
+  with much longer input/output and far more cited documents per summary; contrasts with MS² (short,
+  explicit-methodology biomedical systematic-review summaries). Adapts FiD (originally built for
+  open-domain QA) to the query-focused multi-document summarization setting.
+- **Named limitations and directions for future work:** The paper's own §5.3 explicitly
+  root-causes the factuality/informativeness failures to feeding **abstracts-only** (not full
+  text) of cited papers into the model — "hallucinations tend to occur when the target text
+  contains a large amount of information absent from the source." Full-text incorporation is
+  named as necessary future work, along with extending beyond Computer Science into other domains
+  (the dataset-construction pipeline is explicitly domain-agnostic by design).
+
+---
+
+### AutoSurvey (Wang et al., NeurIPS 2024)
+- **Problem it is trying to solve:** Survey-writing doesn't scale with publication volume (4,000+
+  LLM-related papers submitted to arXiv in the first four months of 2024 alone). LLMs face a
+  context-window limit (can't read hundreds of source papers and write tens of thousands of words
+  in one pass), parametric-knowledge staleness/hallucination, and — until this paper — no
+  dedicated evaluation benchmark for the survey-generation task existed.
+- **How it works:** A four-phase pipeline. (1) *Initial Retrieval & Outline Generation*:
+  embedding-based retrieval over a 530k-paper CS corpus pulls ~1,200 relevant papers, split into
+  chunks (30k-token windows) to generate multiple partial outlines, merged into one comprehensive
+  8-section outline. (2) *Subsection Drafting*: for each section, retrieves ~60 more specific
+  papers and drafts the subsection in parallel via specialized LLMs. (3) *Integration &
+  Refinement*: refines each section, merges into a single document, checks/corrects citation
+  correctness. (4) *Rigorous Evaluation & Iteration*: a Multi-LLM-as-Judge strategy (GPT-4,
+  Claude-3-haiku, Gemini-1.5-pro) scores N candidate surveys on Citation Quality (an NLI-based
+  `h(c_i, Ref_i)` entailment check per claim, giving recall/precision) and Content Quality
+  (coverage/structure/relevance, 5-point rubric); the best of N is selected.
+- **How it is evaluated:** Compared against human-written surveys (20 CS/LLM topics from arXiv)
+  and Naive RAG (+Reflection, +Query-Rewriting variants) across four survey lengths (8k/16k/32k/
+  64k tokens). A meta-evaluation checks the automated judge against human pairwise "which is
+  better" rankings via Spearman's ρ. Ablations remove the retrieval mechanism and the reflection
+  phase; three different base LLM writers are tested (GPT-4, Claude-haiku, Gemini-1.5-pro); a
+  141-person user study (93 valid responses) rates relevance/structure/usefulness 1–5.
+- **How it performed on those evaluations:** At 64k tokens, AutoSurvey reaches 82.25%
+  citation recall / 77.41% precision vs. Naive RAG's 68.79%/61.97%, approaching human writing's
+  86.33%/77.78%. Content quality at 64k: 4.73 coverage / 4.33 structure / 4.86 relevance, close to
+  human (5.00/4.66/5.00). Speed: 73.59 surveys/hour at 64k vs. 0.07 for human writing and 12.56 for
+  naive RAG. Ablation: removing retrieval drops citation recall from 83.48%→60.11% (the single
+  largest effect in the paper — retrieval is the load-bearing mechanism); removing reflection has a
+  smaller effect, mainly on structure. Meta-eval reaches Spearman ρ up to 0.5429 (mixture-of-judges)
+  vs. human rankings. Manual audit of 100 unsupported claims: overgeneralization 51%, misalignment
+  39%, misinterpretation 10%.
+- **Relation to methods that came before it:** Builds on long-form generation techniques
+  (RecurrentGPT, Temp-Lora, hierarchical modeling) and citation-grounded RAG work; positions itself
+  as the first system to explore large-model-agent survey writing at real length (>4k tokens) with
+  a dedicated evaluation methodology, contrasting with STORM (wiki-style Q&A-based generation) and
+  PaperRobot (abstract-only expository generation).
+- **Named limitations and directions for future work:** Overgeneralization (51% of unsupported
+  claims) is the dominant citation-quality failure — the model still leans on parametric knowledge
+  despite retrieval augmentation. The NLI-based citation-quality metric itself needed a 100-claim
+  manual audit to validate its own imprecision. No explicit future-work section beyond the implicit
+  conclusion that tightening the retrieval-grounding loop further is the highest-leverage next step,
+  since overgeneralization remains the largest error category even with RAG already in place.
+
+---
+
+### LitLLM (Agarwal et al., ServiceNow/Mila, arXiv 2024, 2402.01788)
+- **Problem it is trying to solve:** Literature-review writing is tedious; existing LLM-based
+  approaches (ChatGPT-based ad hoc use, Galactica) hallucinate and miss the latest research not
+  present in their training data.
+- **How it works:** A modular pipeline. (1) *Paper Retrieval Module*: an LLM summarizes the
+  user-provided abstract into ≤5 keywords, queries Semantic Scholar + OpenAlex (300M+ metadata
+  records combined), optionally supplemented with user-provided keywords or a seed paper via S2's
+  Recommendations API. (2) *Paper Re-Ranking Module*: the LLM is given the query abstract plus
+  candidate abstracts and either generates an ordered permutation (instructional permutation
+  generation) or does debate-ranking-with-attribution — generate arguments for/against including a
+  candidate, output a probability of inclusion, with an attribution-verification step checking
+  whether the extracted supporting sentence actually appears in the candidate's abstract.
+  (3) *Generator Module*: a single-pass RAG-style prompt generates the related-work section citing
+  the top-k re-ranked papers, optionally guided by a sentence plan (number of sentences, words, and
+  which citation to place at which line).
+- **How it is evaluated:** Two RollingEval datasets (arXiv papers from August/December 2023) built
+  specifically to avoid train/test contamination. Retrieval coverage (% of ground-truth references
+  in the top-100) is measured across single/multi-query keyword search, SERP/Google, Semantic
+  Scholar API, and SPECTER2 embeddings. Re-ranking is measured via Precision@k and Normalized
+  Recall@k on a 500-paper set, plus a 100-paper attribution-ablation subset at k=40. A small,
+  informal user-experience study with 5 researchers closes the loop.
+- **How it performed on those evaluations:** Multi-query Semantic Scholar API + SPECTER2 combined
+  reaches 9.80% (Aug) / 8.20% (Dec) top-100 coverage — the best configuration tested, vs. 0.65–6.80%
+  for weaker single-method configurations. SPECTER2 embedding-based re-ranking outperforms
+  LLM-prompting-based re-ranking on precision/normalized recall at low k. GPT-4-based permutation
+  re-ranking is fragile: an incomplete ranked list 40.2–41.5% of the time, repeated/garbage values
+  0.1–3.3% of the time. Removing the attribution-verification step from debate-ranking
+  significantly drops both precision (p=4.7×10⁻⁴) and normalized recall (p=1.9×10⁻⁶). Users found
+  0-shot generation more informative overall, plan-based generation more accessible/tailored.
+- **Relation to methods that came before it:** Builds on Multi-XScience (Lu et al. 2020 —
+  related-work generation from an abstract + reference list, favors abstractive models). Directly
+  and explicitly extended by its own follow-up paper, "LitLLMs, are we there yet?"
+  (arXiv 2412.15249), which formalizes and rigorously re-benchmarks the retrieval + plan-based
+  generation ideas introduced here.
+- **Named limitations and directions for future work:** The paper's own Conclusion/Future Work
+  explicitly names the key bottleneck: "this work only considered abstracts of the query paper and
+  the retrieved papers, which creates a bottleneck in effective literature review generation" —
+  and explicitly wants to move to whole-paper ingestion via an efficient LLM-based PDF parser.
+  Also flags exploring additional search APIs (Google Scholar), and stresses that LLM-writing-
+  assistant usage should be disclosed to readers, with authors observing caution about possible
+  hallucinations.
+
+---
+
+### LitLLMs, are we there yet? (Agarwal et al., TMLR 2024/2025, arXiv 2412.15249)
+- **Problem it is trying to solve:** Deepens LitLLM's question — decomposing literature-review
+  generation into retrieval and generation sub-tasks and rigorously measuring whether recent LLMs
+  are actually good enough at either, using a genuinely contamination-free evaluation protocol
+  rather than the informal user study LitLLM ran.
+- **How it works:** *Retrieval*: LLM-generated keyword search (with a timestamp filter restricting
+  results to papers published strictly before the query paper) combined with SPECTER2
+  embedding-based retrieval, re-ranked via either instructional permutation generation or debate
+  ranking with attribution (re-prompting the model if its claimed supporting excerpt isn't
+  verifiably present in the candidate abstract). *Generation*: two strategies compared — a
+  model-generated plan (the LLM proposes its own sentence-by-sentence plan, then writes conditioned
+  on it) vs. a user-/ground-truth-provided plan (a detailed line-by-line citation plan the model
+  must follow) — plus "per-cite" (write 1–2 lines per citation, then merge/summarize) and
+  "sentence-by-sentence" (condition each new sentence on the prior draft + one specific citation)
+  baselines.
+- **How it is evaluated:** The same two RollingEval datasets as LitLLM (Aug/Dec 2023 arXiv papers,
+  1,000 each), built specifically to avoid LLM-training-data contamination. Retrieval: %
+  ground-truth-reference coverage in top-100 across search-engine/query-type combinations.
+  Re-ranking: Precision@k and Normalized Recall@k at varying k on the full 500-paper set and a
+  100-paper attribution-ablation subset. Generation: similarity of generated text to ground-truth
+  related-work sections plus human assessment.
+- **How it performed on those evaluations:** Combining keyword-based and SPECTER2 embedding-based
+  search improves precision and normalized recall by ~10% and ~30% respectively vs. either method
+  alone. Debate-ranking-with-attribution substantially outperforms permutation-ranking at small k,
+  though GPT-4-based permutation ranking is unreliable (incomplete lists ~40% of the time). SPECTER
+  embeddings alone are competitive with or better than LLM-prompting-based re-ranking. Plan-based
+  generation reduces hallucinated references by 18–26% versus the zero-shot/per-cite/
+  sentence-by-sentence baselines.
+- **Relation to methods that came before it:** Directly extends and formalizes LitLLM (same team),
+  replacing its informal 5-researcher demo evaluation with a rigorous, rolling, contamination-free
+  benchmark. Engages directly with LLM-as-reranker literature (Sun et al. 2023's instructional
+  permutation generation; Rahaman et al. 2024's debate framing) and RAG literature (Lewis et al.
+  2020) as the two methodological pillars being combined and stress-tested.
+- **Named limitations and directions for future work:** The rolling-eval protocol is presented as
+  the paper's key contribution precisely because it's designed to be *reused* as new LLMs are
+  released — implying the paper's own numbers will need re-running against future models to stay
+  valid. GPT-4-as-reranker's ~40% incomplete-list failure rate is flagged as a genuine reliability
+  problem for that specific technique (not a minor caveat), suggesting embedding-based reranking
+  should be preferred in practice over the more "sophisticated"-seeming LLM-prompting approach.
+
+---
+
+### LiRA (Go et al., AAAI 2026, arXiv 2510.05138)
+- **Problem it is trying to solve:** Retrieval/screening automation for literature reviews is
+  comparatively mature; the *writing* phase — readability, factual accuracy, structural coherence —
+  remains under-explored. Existing agentic survey-writing systems (AutoSurvey, MASS-Survey) don't
+  account for output-length effects on their own evaluation metrics and give minimal treatment to
+  readability/factuality.
+- **How it works:** A multi-agent LangGraph workflow with four specialized agents. (1) *Outline
+  Drafter Agent* — drafts candidate outlines (~8 sections, ~4 subsections each) from up to 50
+  provided references, merges into one unified structure with per-section descriptions and
+  suggested supporting papers. (2) *Subsection Writer Agent* — writes each (sub)section
+  independently in parallel, conditioned on its description plus a relevant reference subset
+  retrieved via FAISS at section-level (25% of the pool per subsection, min 3/max 150), citing
+  sources by **full article title** (not placeholder numbers) for factual grounding, with the
+  title/abstract/conclusion written *after* the body to avoid premature top-down commitment.
+  (3) *Editor Agent* — refines the full assembled draft for presentation/style (transitions,
+  vocabulary repetition, abbreviation consistency, non-conclusion-like section endings) without
+  altering factual content. (4) *Reviewer Agent* — evaluates intermediate components (outline,
+  draft, edited review) against adapted SLR-guideline criteria (completeness, transparency,
+  clarity, contribution), parses a "SUFFICIENT yes/no" verdict, triggers up to 3 regeneration
+  rounds on failure.
+- **How it is evaluated:** SciReviewGen (125 sampled reviews) and a proprietary ScienceDirect set
+  (125 expert-written reviews, 23 subject areas, size-matched). Three metric families: similarity
+  (ROUGE-L, heading soft recall, heading entity recall, article entity recall), writing quality
+  (Prometheus 2 LLM-judge on coverage/structure/relevance, cross-checked against SME human ratings),
+  and citation quality (**CQF1** — an NLI-based precision/recall metric over per-claim citation
+  grounding, whose code is adapted directly from AutoSurvey's own citation-quality evaluation).
+  Baselines: Direct Prompting, MASS-Survey, AutoSurvey — all on gpt-4o-mini for fairness. Two
+  robustness checks: swapping the Reviewer Agent's LLM to gemma3:4b (self-bias-amplification
+  concern), and using retrieved (not gold) references via an internal embedding-similarity API.
+- **How it performed on those evaluations:** Highest ROUGE on both datasets (0.13/0.13), though
+  AutoSurvey scores slightly higher heading/entity recall — attributed to verbosity (AutoSurvey
+  ~50,000 tokens/article vs. LiRA's ~22,000). Highest citation-quality F1 on both datasets
+  (0.76/0.73 vs. AutoSurvey's ≤0.63). Best overall writing-quality on SciReviewGen (avg 4.13); SMEs
+  even preferred LiRA's structure/relevance over the human-written originals in some cases.
+  Swapping the reviewer LLM to gemma3:4b barely changed any metric (≤0.01 differences) — the
+  pipeline is robust to reviewer-model choice. Using retrieved (not gold) references produced
+  results not significantly different from the gold-reference baseline on all but two metrics —
+  i.e. it performs similarly in realistic deployment, not just on curated benchmarks.
+- **Relation to methods that came before it:** Positions itself directly against AutoSurvey and
+  MASS-Survey (the only other agentic framework with public code) as its two baselines; adapts
+  AutoSurvey's own citation-quality metric code rather than designing a new one; draws design
+  inspiration from MetaGPT (structured inter-agent communication) and Reflexion (per-agent
+  memory-based self-correction) from the broader agentic-workflow literature.
+- **Named limitations and directions for future work:** The paper's own §7 explicitly names:
+  (1) irreproducibility across future runs because every experiment uses the non-seedable
+  gpt-4o-mini — recommends seedable/open models going forward; (2) lack of open datasets beyond
+  SciReviewGen for this task, "hindering generalizability to other scientific fields" — echoing
+  SciReviewGen's and LitLLM's own stated bottleneck; (3) **explicitly names "integration of the
+  screening and search criteria definition steps within the pipeline" as unaddressed future work —
+  i.e. LiRA assumes references are already curated and doesn't address discovery/screening at all,
+  which is exactly LitDiscover's own core contribution**; (4) doesn't handle primary-study
+  risk-of-bias assessment (Cochrane-style tooling), naming it as a separate integration opportunity.
+
+---
+
+### ProfOlaf (Afonso et al., FSE '26 Companion, arXiv 2510.26750)
+- **Problem it is trying to solve:** Existing SLR support tools cover only isolated steps of the
+  review process (search OR screening OR extraction, rarely all), leaving the rest manual,
+  time-consuming, and error-prone; achieving a sensible manual-effort/automation balance without
+  compromising precision is an explicit design goal.
+- **How it works:** Three phases. (1) *Search*: iterative snowballing (chosen over database search
+  per prior evidence it performs as well or better) — from a user-provided initial article set,
+  retrieves backward references and/or forward citations via Google Scholar, Semantic Scholar, and
+  DBLP, compiles metadata, de-duplicates near-identical entries with human-resolved version
+  detection. (2) *Screening*: metadata filtering by optional venue-ranking (cosine-similarity-
+  assisted lookup against SCImago/CORE, human-resolved for ambiguous/unindexed venues), year, and
+  language; then two-stage progressive human screening (title, then full-text) by two-or-more
+  human raters with disagreement detection/discussion, optionally supplemented by an LLM as an
+  auxiliary rater. (3) *Data Extraction*: downloads all selected PDFs, then runs TopicGPT-based
+  hierarchical topic modeling (clusters into interpretable, human-verifiable topics) and a Task
+  Assistant (submits any article to a public-access LLM for arbitrary tasks like summarization).
+  Both CLI and web app, fully open source with a containerized reproducibility artifact.
+- **How it is evaluated:** A small illustrative SLR using a Best-Paper-Award LLM4Code-2025 paper
+  as the seed, across 7 snowballing iterations, screened by two human raters (Wohlin's SLR
+  efficiency metric = included/candidates-examined). Automated-screening evaluation adds a 5th
+  independent human rater plus gpt-5.2-configured LLM screening at title (183 articles) and
+  full-text (125 articles) levels, scored against accuracy/precision/recall/F1 vs. the two-rater
+  consensus. Topic-modeling evaluated against a 22-topic human-defined ground truth (topic-
+  generation match rate + topic-assignment precision/recall). Task Assistant summarization scored
+  by 2 human raters on a 4-criterion 1–5 Likert scale.
+- **How it performed on those evaluations:** 7-iteration snowball on 1,009 candidates → 108
+  included (11% overall efficiency, ranging 0–29% per iteration). LLM full-content screening
+  reaches F1=0.928 (precision 0.942, recall 0.915) — essentially matching human full-content
+  F1=0.927 (precision 0.931, recall 0.922), with the LLM slightly more conservative. TopicGPT
+  correctly identifies 54% of ground-truth topics on first generation, dropping to 45% after its
+  own refinement step (which discards infrequent topics); topic-assignment precision 0.645/recall
+  0.850, with "Benchmarks" the most over-assigned label (47.6% wrong) and programming-language
+  identification at only 0.590 precision/0.710 recall (Python systematically over-tagged). Task
+  Assistant summarization scores high on faithfulness (4.907/5) and conciseness (4.648/5), lower on
+  salience/coverage (4.333/5).
+- **Relation to methods that came before it:** Contrasts against Bacinger et al.'s database-search
+  system (no data extraction support), LitLLM (lacks manual curation/snowballing entirely), PaSa
+  (automated retrieval+screening via citation-network expansion, but no human curation step), and
+  ChatCite (summary-generation only, framed as complementary since it doesn't cover search-through-
+  extraction end to end).
+- **Named limitations and directions for future work:** The paper's own §3.3.4 Discussion
+  explicitly concludes that for complex analysis tasks (topic modeling), "current LLMs and
+  associated methodologies are not yet sufficiently reliable to operate autonomously," and
+  effectiveness is "maximized in a human-in-the-loop setting" — an independent team's own failure
+  analysis directly validating a staged (not fully autonomous) design philosophy. Explicitly leaves
+  "more task-aligned prompt design" for topic modeling as future work; the summarization module's
+  only weak point (coverage/salience) is attributed to some generated summaries not fully capturing
+  the most important details, described as "minor."
+
+---
+
+### Human-Centred Research Automation (Mulla et al., HCAI-EP '26, ACM DL 3777490.3777511)
+- **Problem it is trying to solve:** Agentic AI could automate literature discovery, filtering, and
+  gap identification, but the EU AI Act and Human-Centred AI (HCAI) principles require such
+  automation to preserve trust, transparency, and accountability — full automation risks
+  compromising interpretability and obscuring human accountability for the research result.
+- **How it works:** A four-stage pipeline built on three principles (human-in-the-loop, structured
+  synthesis, responsible automation). (1) *Discovery* — a Research Topic Agent (LLM-based,
+  generates topic queries) and Paper Search Agent retrieve papers from Scopus/arXiv. (2)
+  *Filtering* — a Filter Agent (Llama 3.1 8B classifies title+abstract relevance), a Description
+  Generation Agent (elaborates the topic for contextual filtering), a Download/Extract Agent
+  (PyMuPDF full-text decomposition), and a Full-Text Filter Agent (section-based relevance
+  re-rating). (3) *Analysis* — theme/method/finding dissection across included papers. (4) *Gap
+  Identification* — a Gap Generation Agent applies RAG to produce structured research-gap
+  statements, candidate directions, and candidate solutions, all reviewed by a human before
+  entering the final synthesis. Every stage logs/audits outputs for transparency; final decisions
+  remain human.
+- **How it is evaluated:** Reused Lee et al.'s (2025) existing "green/sustainable AI" systematic-
+  review dataset (1,094 Scopus results → 1,090 post-dedup → 150 final included via PRISMA-guided
+  screening) as ground truth. Head-to-head screening comparison of five methods on the same
+  abstract set — Llama 3.1 8B, Sentence-BERT+FAISS, TF-IDF, BM25, FAISS+SciBERT — scored by
+  accuracy/precision/recall/F1 against the human-annotated gold labels, with low-confidence cases
+  escalated to human review. Per-abstract processing time also measured as a speed/accuracy
+  trade-off signal.
+- **How it performed on those evaluations:** Llama 3.1 8B: best accuracy at 71.05%, ahead of
+  Sentence-BERT (68.49%), TF-IDF (63.83%), BM25 (62.83%), FAISS+SciBERT (60.20%) — but at
+  10–30s/abstract vs. near-instant for the classical/embedding methods, a real speed-accuracy
+  trade-off flagged explicitly. No controlled numeric benchmark yet exists for the Gap Generation
+  stage — described only qualitatively, not scored against a gold set.
+- **Relation to methods that came before it:** Positioned against ASReview (active-learning
+  screening) and RobotReviewer (automated bias assessment) as measurable-but-not-fully-transparent
+  predecessors, and LatteReview (a more recent multi-agent review-automation system also
+  emphasizing human oversight). Differentiates itself by actively incorporating HCAI trust/
+  transparency/accountability principles into the pipeline design itself, and by producing
+  structured gap/direction/solution outputs — framing nearly identical to LitDiscover's own
+  "discover, filter, synthesize" self-description.
+- **Named limitations and directions for future work:** Explicitly a work-in-progress/pilot paper.
+  The authors' own stated next steps: conducting qualitative researcher interviews to assess
+  perceived trust/transparency/accountability (not yet done), expanding evaluation to actually
+  measure whether structured outputs improve interpretability (asserted, not yet measured), testing
+  better/newer LLMs, refining gap generation via hybrid RAG + graph databases for cross-paper
+  relational accuracy, and scaling to larger datasets with newer embedding models — i.e. every
+  claim beyond the 71.05% screening number is asserted rather than empirically validated yet.
+
+---
+
+<!-- SUBAGENT-APPENDED ENTRIES BELOW THIS LINE -->
+
+---
+
+### System for SLR using Multiple AI Agents (Sami, Rasheed, Kemell, Waseem, Kilamo, Saari, Systä, Nguyen Duc & Abrahamsson, 2024)
+- **Problem it is trying to solve:** SLRs are foundational to evidence-based software engineering (SE) research but are "largely manual," time-consuming, labor-intensive, and error-prone. Prior automation work (text mining, ML classifiers, visual analysis tools) addressed *individual* SLR steps but left "a notable gap in the complete automation of SLRs using LLMs" — no system automated the entire pipeline end-to-end.
+- **How it works:** A four-agent pipeline, sequential and staged, triggered by a single user-entered research topic via a conversational web UI:
+  1. **Planner agent** — takes the topic, generates research questions (RQs) and a search string via LLM semantic analysis of key concepts/synonyms/terms (demo: topic "LLMs in software development" → RQs on applications and challenges/limitations → search string `"Large language models" OR "software development"`).
+  2. **Literature identification agent** — queries academic databases (Scopus, per the demo) with the search string plus a year filter, retrieves papers (title, author, URL, journal, DOI, paper type, affiliation/country), then does a first-pass **title-based** inclusion/exclusion filter ("Filter with title" button).
+  3. **Data extraction agent** — applies inclusion/exclusion criteria in three escalating passes: title analysis → **abstract** analysis (deeper text analysis of context/methodology/findings) → **full-text** analysis of the final selected set, extracting per-paper answers to each RQ into tabular form, then synthesizing across papers.
+  4. **Data compilation agent** — analyzes the synthesized data against RQs/objectives, identifies trends and gaps, drafts a summary/report (abstract, introduction summary, paper summary) via one-click "Generate Summary Abstract" / "Introduction Summary" / "Create Paper Summary" buttons.
+  Code released at github.com/GPT-Laboratory/SLR-automation.
+  **On the staging match to LitDiscover:** confirmed — the pipeline is literally search-string generation → title filter → abstract filter → full-text/per-RQ extraction → synthesis, i.e., progressively narrowing screening stages feeding a final per-question synthesis, the same coarse-to-fine shape as LitDiscover's traverse→prefilter→screen→extract→synthesize. The key structural difference: this paper's "literature identification" step is a single keyword-search-string query against one database (Scopus) rather than LitDiscover's bidirectional citation-graph traversal — so it has no citation-graph expansion step, and there is no explicit "prefilter" stage distinct from title-filter (title-filter and prefilter are conflated here).
+- **How it is evaluated:** Not a benchmark evaluation — it is a single illustrative case-study/demo run on one topic ("large language models in software development"), restricted to papers published in 2023, retrieving only 10 papers from Scopus for demonstration purposes. No held-out gold-standard corpus, no precision/recall/F1 numbers, no comparison against a human-conducted SLR or another automation tool. The paper explicitly frames this as showing the system "streamlines" the process, not as a rigorous empirical benchmark despite the title's claim of "an empirical evaluation."
+- **How it performed on those evaluations:** From the 10 retrieved 2023 papers, title-filtering narrowed the set, and abstract-filtering left only **3 papers** selected for full in-depth analysis (Figure 4). The system then produced RQ-specific answers (e.g., citing "Exploring Priority of UCD in an Agile Development Environment" and "Ethical and Quality Concerns in Academic Publishing" for the challenges RQ) and generated abstract/introduction summaries. No accuracy metrics, inter-rater agreement, or comparison baseline are reported — performance is asserted qualitatively ("substantially reduces the time and effort... while maintaining comprehensiveness and precision") rather than measured.
+- **Relation to methods that came before it:** Positioned as the successor to a lineage of partial-automation SE-SLR tools: Felizardo et al.'s visual text-mining approaches (2011/2012/2014) requiring ML/statistics background, Malheiros et al.'s unsupervised-learning visual mining, Olorisade et al.'s ML model for primary study selection, and surveys/guidelines by O'Mara-Eves et al. (2015), Marshall & Wallace (2019), Beller et al. (2018, eight ICASR guidelines), and Van Altena et al. (2019, noting low adoption of SLR tools). All prior work is characterized as automating single steps (search, screening, extraction, or updates) via text mining/ML; this paper's claimed novelty is being the first to chain LLM-based agents across the *entire* SLR workflow (search string generation through synthesis) in one system.
+- **Named limitations and directions for future work:** The paper is unusually candid, listed under an explicit "Limitation" section: (1) search strategy was "sub-optimal" — search strings lacked comprehensive Boolean operators, notably no "AND," compromising specificity/completeness of retrieval; (2) no clearly defined inclusion/exclusion criteria for primary/secondary screening, making filtering insufficiently rigorous; (3) data-extraction reliability is "questionable due to the lack of a robust analytical algorithm." Future work (Section 7) commits to: refining search strategy (adding Boolean "AND"), implementing explicit inclusion/exclusion criteria, more advanced data-extraction algorithms, a more robust analytical framework (qualitative + quantitative, statistical testing/sensitivity analysis), broadening literature scope to more databases and grey literature, and stakeholder engagement with domain experts for feedback.
+
+---
+
+### SurveyGen-I (Chen, Yang, Shen, Liu, Belloum, Papagianni & Grosso, 2025)
+- **Problem it is trying to solve:** Existing LLM-based survey-generation systems suffer from three failures: (1) literature retrieval scope/depth is limited — most rely on embedding-based similarity search over a fixed local paper database, missing papers with different terminology or at a more conceptual level; (2) lack of cross-subsection consistency — subsections are generated in parallel/isolated units against a static, once-for-all outline, causing redundancy, inconsistent terminology, and fragmented discourse; (3) indirect citations (e.g., "[23]" or "Smith et al., 2022" appearing inside retrieved passages) are left unresolved, so influential source papers referenced only indirectly are missed, breaking the linkage between ideas and their original sources.
+- **How it works:** An end-to-end, modular pipeline with three stages. (1) **LR (Literature Retrieval)**: multi-stage retrieval at both survey- and subsection-level — LLM-generated keywords query Semantic Scholar for an initial pool, an `all-mpnet-base-v2` sentence-transformer cosine-similarity filter refines topical relevance, then citation/reference expansion recovers influential papers missed by keyword search, followed by LLM-based relevance re-ranking to produce the final paper set P*. (2) **PlanEvo** — a planning-centric module: the **SDP (Structure-Driven Planner)** builds a reference-grounded initial outline and a dependency-aware writing plan via a dependency graph resolved into a DAG with topological stage ordering (subsections sharing a stage can be written in parallel); the **SAWC (Structure-Aware Writing Controller)** orchestrates the loop; the **MGSR (Memory-Guided Structure Replanner)** revises the outline/plan after each writing stage based on accumulated memory (an LLM proposes merge/delete/rename/reorder/add revisions). (3) **CaM-Writing (Citation-aware, Memory-guided Writing)** — a **citation-tracing mechanism** detects indirect citations inside retrieved passages, judges via LLM whether each is "traceworthy," and resolves traceable ones via the Semantic Scholar API to enrich context; best-of-N drafting generates N candidate drafts, an LLM judge picks the best, followed by three-stage subsection refinement and a final global-refinement pass fixing cross-section contradictions/redundancy/terminology drift.
+- **How it is evaluated:** Compared against AutoSurvey, SurveyForge, and SurveyX on a new benchmark spanning six major scientific domains (~30 subtopics each), same backbone model (GPT-4o-mini) for fair comparison. Two axes: **Content Quality** — five LLM-as-judge sub-dimensions (coverage, relevance, structure, synthesis, consistency) averaged into a Content Quality Score; **Reference Quality** — Number of References, Citation Density, and Recency Ratio (RR@k). Ablation removes citation-tracing, plan-update (MGSR), and final refinement individually.
+- **How it performed on those evaluations:** Overall content-quality score of 4.59 vs. best baseline SurveyForge's 4.23 (+0.36); largest gains in structural flow (+0.21) and synthesis (+0.41). 281 unique references per survey on average vs. SurveyX's 102 and AutoSurvey's 73 (more than 2× the strongest baseline); citation density 17.28 vs. SurveyForge's 5.52 (~3×); RR@5 of 89.1% vs. 66.7% for SurveyX/SurveyForge. Ablations: removing final refinement drops overall by −0.43 (steepest single-component drop); removing plan-update drops structure by −0.42; removing citation-tracing cuts distinct references by 61 and lowers relevance by 0.29 — each of the three named mechanisms independently contributes to quality.
+- **Relation to methods that came before it:** Positions against (1) component-oriented/hybrid approaches (rule-based citation-sentence systems, template/extractive-abstractive hybrids, RAG-based/agent-driven hybrids like RAAI, AutoSurveyGPT, COI-Agent) — critiqued as "fundamentally decomposed," planning content selection and writing in isolation; (2) end-to-end systems AutoSurvey, SurveyForge (adds memory/outline heuristics), and SurveyX (scales up with larger models). Stated differentiators: treats survey writing as a *dynamic* process — continuously refining outline/plan via memory feedback rather than a fixed once-for-all outline — grounds generation in citation-tracing for indirect-citation resolution, and coordinates subsections through a dependency-aware DAG rather than isolated parallel generation.
+- **Named limitations and directions for future work:** Own "Limitations" section: online retrieval (live Semantic Scholar queries vs. offline-indexed corpora used by prior work) introduces network sensitivity, variable latency, and reliance on third-party APIs that may restrict full-text access due to licensing constraints — a speed/coverage tradeoff. For niche/emerging topics with limited source material, achievable survey length/depth is naturally constrained. LLM-as-judge scores may reflect subjective preferences rather than universal writing standards; no specific future-work roadmap items enumerated beyond these caveats.
+
+---
+
+### SurveyGen (Bao, Nayeem, Rafiei & Zhang, EMNLP 2025)
+- **Problem it is trying to solve:** Automatic survey generation lacks a standardized, large-scale evaluation resource for benchmarking LLM-generated surveys against human-written gold standards. Prior RAG-based survey-generation pipelines also retrieve literature using pure semantic/syntactic similarity between topic and abstract, ignoring paper quality, impact, or influence — risking a survey built on low-impact or marginal studies.
+- **How it works:** Two contributions. (1) **SurveyGen dataset**: built from S2ORC (81.1M papers), filtered by title patterns + post-2010 + full text available → 8,676 candidates, then LLM-as-classifier (three LLMs majority vote) → 6,851 confirmed surveys → final 4,205 surveys with 115,376 sections, 242,143 directly-cited references, 5,062,596 second-level references. Each cited paper enriched via OpenAlex with citation count, influential-citation count, author/venue metrics. (2) **QUAL-SG framework**: extends naive RAG with quality-aware retrieval — cosine similarity retrieval, **co-citation expansion** (any paper cited by ≥2 papers in the candidate set is added, to catch foundational-but-topically-dissimilar works), then each candidate scored on topical relevance (LLM-judge), academic impact (weighted author/venue/citation score, γ=0.5/β=0.3/α=0.2), and content diversity; re-ranked by average rank across all three. Three evaluation tasks: Fully-LLM (topic only), RAG-based, Human-guided (human references + outline given).
+- **How it is evaluated:** Citation precision/recall/F1 at 0.95 title-similarity threshold; content quality via semantic similarity, ROUGE-L, Key Point Recall (KPR); structural consistency via section-overlap % and LLM-judge structural score. 120 highly-cited surveys (30 each from Biology, Medicine, Psychology, CS). Six backbone LLMs tested. Baselines: Fully-LLMGen, Naive-RAG, plus rerankers UPR and RankGPT.
+- **How it performed on those evaluations:** Task 1 (no retrieval): best citation accuracy only 35.84% (Claude-3.7-Sonnet) — ~64% of citations fabricated/unverifiable. Task 2: QUAL-SG achieved citation F1 16.73%, beating Naive-RAG (5.93%) and Fully-LLMGen (7.76%) by +10.80/+8.97 points (p<0.001); beat RankGPT (14.81%) and UPR (10.45%) as rerankers. Distributional analysis showed QUAL-SG's selected references align closest to human citation-count/year distributions; Fully-LLMGen favors outdated, low-cited papers. Human eval: even best pipelines "fail to provide sufficient information coverage and critical analysis" despite comparable topic relevance to humans.
+- **Relation to methods that came before it:** Positioned against AutoSurvey and SurveyX (offers "more reliable sources, improved retrieval, more rigorous evaluation"). Dataset-wise, positioned against SciReviewGen as the closest prior dataset — differentiates via quality indicators for all cited references, second-level reference enrichment, and multi-domain coverage vs. SciReviewGen's CS-only scope.
+- **Named limitations and directions for future work:** (1) Only abstracts/metadata used (copyright reasons) — "may hinder the LLM's ability to capture finer-grained details," causing depth gaps vs. human surveys; (2) no post-generation refinement (language polishing, citation formatting) to reduce API cost; no figures/tables generated; (3) possible training-data contamination, argued not to bias relative comparisons; (4) evaluation used only 120 of the 4,205 released surveys. Future work: citation-network analysis for influential-study identification, modeling human citation behavior, dedicated reference-selection models, full-text-based retrieval/generation, human-in-the-loop discourse control, factual-consistency verification.
+
+---
+
+### SurveyX (Liang, Yang, Wang, Tang, Zheng, Song, Lin, Yang, Niu, Wang, Tang, Xiong, Mao & Li, KDD 2025)
+- **Problem it is trying to solve:** LLM-based survey generation is blocked by two problems: internal-knowledge staleness/hallucinated citations plus context-window limits that can't hold the ~10K-token-average references a real survey cites; and a lack of tooling to retrieve large volumes of the *latest* relevant references online, with existing pre-processing feeding LLMs only partial (title/abstract) reference info and no framework generating figures/tables.
+- **How it works:** Two-phase. **Preparation**: a Keyword Expansion Algorithm iteratively grows a keyword pool by clustering retrieved abstracts, querying both an offline arXiv corpus (2.6M papers) and an online Google Scholar crawler until ~1000 docs retrieved, then a 2-step filter (embedding Top-K + LLM relevance classification) narrows candidates; **AttributeTree** distills each paper into a structured attribute tree (schema varies by paper type: Method/Benchmark/Theory/Survey), combined into an "attribute forest" RAG knowledge base — denser than raw text or abstracts alone. **Generation**: outline optimization via per-reference secondary outlines merged into a primary outline; content generation per-subsection with visibility into other subsections; post-refinement re-queries the attribute forest per-paragraph to fix citation accuracy, plus a figure/table generation module and LaTeX rendering to final PDF.
+- **How it is evaluated:** Same 20 LLM-related survey topics as AutoSurvey for head-to-head comparison. Extends AutoSurvey's Coverage/Structure/Relevance with Synthesis and Critical Analysis; citation Recall/Precision/F1; three novel reference-relevance metrics (IoU vs. human-retrieved set, semantic-embedding relevance, LLM-judged relevance). Baselines: human-written surveys, naive RAG, AutoSurvey. Full ablation of all 4 components; 6-PhD-student human evaluation.
+- **How it performed on those evaluations:** Content quality averaged 4.590 vs. AutoSurvey 4.331, naive RAG 3.872, human 4.754. Citation quality: Recall 85.23/Precision 78.12 (precision slightly *exceeding* human's 77.78)/F1 81.52 vs. AutoSurvey's 82.25/77.41/79.76. Reference relevance still trails human: IoU 0.55, LLM-judged relevance 0.7689 vs. human's 0.9485 (acknowledged gap). Ablations: removing AttributeTree hurt citation Recall/Precision/F1 most severely (85.23→60.09/78.12→56.49/81.52→58.23); removing RAG-rewriting tanked all three to ~55; removing outline-optimization hurt Structure most (4.91→3.80). Human evaluation confirmed SurveyX > AutoSurvey on all axes but human raters were stricter than the automated judge, especially on Structure.
+- **Relation to methods that came before it:** Directly targets three AutoSurvey shortcomings: offline-only retrieval (adds online Google Scholar crawling), title/abstract-only input (AttributeTree extracts full-paper structured content), and text-only output (adds figure/table generation + LaTeX). Inherits and extends AutoSurvey's own evaluation metrics.
+- **Named limitations and directions for future work:** Explicitly flags a residual reference-relevance gap vs. human experts on IoU and LLM-judged relevance. Future work: optimize retrieval further toward human-level performance, expand figure/table generation methods, refine attribute-tree-based composition. Human evaluation revealed the automated LLM judge may be lenient on structural/logical-coherence quality relative to human standards.
+
+---
+
+### IntrAgent (Ma, Rao, Li, Chen, Sun, Zhao, Chen & Xiang, 2026)
+- **Problem it is trying to solve:** Introduces a new task, IntraView: given one full piece of scientific literature and a research-driven query, extract an answer that is fine-grained, accurate, and *faithfully grounded* in that specific paper's content — explicitly flagging when information is absent rather than hallucinating. Differs from generic content-QA both because the model gets the entire literature (evidence may be anywhere or nowhere) and because it's distinguished from open-corpus scientific-QA systems (e.g. PaperQA-style) which require answers grounded strictly in the one provided paper, not external validity-checking.
+- **How it works:** "Mindset bionics" design emulating how a human reads a paper to answer a specific question. (1) **Section Ranking** — PDF converted to Markdown via MinerU, section headings extracted, LLM infers hierarchical parent-child relationships ("hierarchy preservation"), then reasons over this hierarchy to output a ranked ordering of sections by likely relevance. (2) **Iterative Reading** — walks the ranked list choosing among reordered section access, detail extraction (pulling terminology/numbers/results into short-term memory anchored to source sentences), and an information-sufficiency check (LLM judges whether accumulated details answer the query; loops on "NO," terminates and synthesizes on "YES"). Supports three confidence levels (conservative/balanced/aggressive) trading thoroughness for cost.
+- **How it is evaluated:** Built **IntraBench**, the first IntraView benchmark — 315 test instances (63 expert-authored multiple-choice questions across 25 papers, 5 STEM domains). Evaluation maps each system's free-form answer onto the closest multiple-choice option via an LLM (GPT-4.1), then scores accuracy. Baselines: vanilla RAG (3 embedding models), contextual/advanced RAG extensions (Contextual RAG, DRAGIN, R²AG, LongRAG), and literature-focused agents (LUMOS, PaperQA2, Agentic-Hybrid-RAG, SciMaster) — across seven backbone LLMs.
+- **How it performed on those evaluations:** Top cross-domain accuracy across all five domains and all seven backbones (70.0–75.9% depending on backbone), beating the strongest baseline by +7.4 to +21.0 percentage points; Wilcoxon signed-rank test shows median improvements of +10.9 to +27.3 points over every baseline (padj < 10⁻⁶). Ablations: removing hierarchy-preservation drops accuracy substantially (e.g. 65.6%→60.7% on GPT-4o); removing the sufficiency check (reading only top-1 section) causes a severe drop on physics/GPT-4o: 75.4%→32.2%, traced to incomplete cross-section retrieval and confident hallucination. Balanced confidence level beats both conservative (58.9%, worse despite reading more — consistent with known long-context degradation) and aggressive (62.7%) at 68.3%. Robust to nonstandard headings — 84.6% accuracy on a deliberately rewritten paper (beginner-style/noisy/Shakespearean headings) vs. 89.2% original.
+- **Relation to methods that came before it:** Positioned against vanilla/contextual RAG (relies on surface-level semantic similarity, ignores document structure) and literature-oriented agents (LUMOS, PaperQA2, SciMaster) built for open-corpus scientific QA, which "degenerate into static retrieval pipelines similar to RAG" when redirected to a single supplied paper because they were designed for external resource exploration rather than content-grounded single-document reading. IntrAgent's distinguishing contribution is reasoning-based (not embedding-based) section ranking exploiting document hierarchy, plus the sufficiency-check loop permitting cross-section evidence accumulation while gating hallucination.
+- **Named limitations and directions for future work:** Explicitly stated: (1) text-only — no non-textual modalities (plots, figures, tables), which often encode essential experimental trends/comparisons; left for future work. (2) Review papers specifically excluded from IntraBench's evaluation set; expansion to more paper types/queries proposed as future work. Also suggests LLMs with stronger scientific-reasoning/domain expertise could further improve the answer-mapping evaluation step itself.
+
+---
+
+### InteractiveSurvey (Wen, Cao, Wang, Guo, Yang & Liu, 2025)
+- **Problem it is trying to solve:** Existing LLM/RAG-based survey generation systems (AutoSurvey, SurveyX, LitLLM, HiReview, PROMPTHEUS) restrict users to title-only inputs and produce fixed, non-editable outputs — an "all-or-nothing dilemma" if the researcher is dissatisfied with any part, neglecting the inherently personalized, iterative nature of real survey writing.
+- **How it works:** A 7-step interactive web pipeline, most steps optional/user-triggered: automatic arXiv reference searching with iterative query relaxation (or local PDF upload); reference parsing via MinerU into vector-embedded chunks (Chroma); **personalized reference categorization** — user specifies a criterion (e.g., "Research Method"), HyDE-generated pseudo-queries retrieve relevant chunks, UMAP+HDBSCAN clusters references (user can manually drag references between clusters); a 3-level hierarchical, manually-editable outline generation; bottom-up section-by-section RAG content generation, with figures/tables pulled via caption-matching and citations inserted via adaptive-threshold sentence-to-chunk similarity. Fully editable, exportable to PDF/Markdown/LaTeX, swappable backbone LLM.
+- **How it is evaluated:** LLM-as-judge scoring (Coverage/Structure/Relevance) across 40 topics spanning 8 arXiv fields, compared against directly-prompted baselines and separately against AutoSurvey/SurveyX using their own released samples; time-efficiency measurement (40 surveys end-to-end); System Usability Scale (SUS) study with 34 participants.
+- **How it performed on those evaluations:** Highest average scores across nearly all LLM-judge/aspect combinations (e.g. avg Coverage 4.56 vs. best baseline 4.40); beat both AutoSurvey and SurveyX on all three metrics head-to-head (Coverage 4.61 vs. 4.44/4.21; Structure 4.60 vs. 4.56/4.31; Relevance 4.80 vs. 4.67/4.48). Avg. 2,077.8 seconds (~35 min) end-to-end on a single RTX 3090, with Reference Parsing (47.5%) and Reference Categorization (29.9%) dominating time. SUS score 84.4/100 ("A+" tier).
+- **Relation to methods that came before it:** Positioned against LitLLM, HiReview, AutoSurvey, PROMPTHEUS, Sami et al. 2024, and SurveyX — its explicit differentiator is that all of these "limit users to title-only inputs and fixed outputs" with no mid-process interactivity; InteractiveSurvey claims to be the first letting users refine intermediate artifacts (categorization, outline, content) rather than only accept-or-discard a final output.
+- **Named limitations and directions for future work:** Reference Parsing and Categorization dominate time cost and are GPU-constrained (expected to drop below 30 min on stronger hardware). Context-window limits cause only marginal quality differences between title-only and full-abstract inputs. Stated future work: post-deployment user-feedback collection to improve functionality/UI/evaluation methodology, and multilingual survey generation. No formal precision/recall evaluation of the arXiv-only search step, and no ablation isolating the marginal quality contribution of the interactive/refinement features themselves (reported evaluations used no user refinement).
+
+---
+
+### LLAssist (Haryanto, 2024)
+- **Problem it is trying to solve:** Manual literature screening cannot scale with exponential publication growth, and existing automation is either closed/opaque (consumer LLM chat interfaces raise reproducibility concerns) or heavyweight (multi-agent, fine-tuned models). LLAssist targets specifically the initial screening/relevance-triage bottleneck via a simple, open-source, transparent tool — not a full review-writing pipeline.
+- **How it works:** A C# console pipeline. For each article: (1) extracts "key semantics" (topics, entities, keywords) via LLM from title+abstract; (2) for each research question (RQ), estimates relevance via binary decision + 0–1 score and separately a contribution decision + score, each with textual justification (0.7 threshold, adjustable); (3) computes a "must-read" flag as logical OR across all RQ relevance/contribution thresholds. CoT-style reasoning via intermediate reasoning expansion plus self-consistency-style path filtering. Outputs JSON+CSV per article — no synthesis step, deliberately leaving downstream analysis to the researcher. Model-agnostic: local Ollama (Llama 3:8B, Gemma 2:9B) and cloud (GPT-3.5-turbo, GPT-4o).
+- **How it is evaluated:** Case study in cybersecurity/LLM domain, not a held-out ground-truth benchmark. Small-dataset test (17/37/115 articles across all 4 backends) plus a large-dataset test (2,576 Scopus articles, local models only). Four fixed RQs about LLMs in cybersecurity. Metrics: consistency, self-assessed RQ-matching "accuracy" (uncontrolled, no external gold labels), qualitative reasoning-quality review, wall-clock time, API cost.
+- **How it performed on those evaluations:** Backend behavior diverged sharply — GPT-3.5 was maximally inclusive (marked essentially everything relevant, e.g. 115/115); Gemma 2:9B gave the "most reasonable" and most discriminating distribution; Llama 3:8B's binary decisions disagreed with its own scores, so its binary relevance was excluded from analysis. On the 2,576-article set (Gemma 2), 324 (12.6%) flagged must-read but only 100 (3.9%) flagged contributing. Throughput: 17–37 articles in <10 min, 2,576 in 10–11 hours; per-article latency ~10–29s depending on backend. Cost: GPT-4o ≈ $3.16/100 articles, GPT-3.5 ≈ $0.22/100, local models free. No ground-truth precision/recall/F1 reported — evaluation explicitly "preliminary" and "uncontrolled."
+- **Relation to methods that came before it:** Positioned against LitLLM (shares modular pipeline design, but targets related-work-section generation, not screening), Joos et al. 2024 (multi-agent consensus filtering, which LLAssist deliberately avoids to cut complexity/cost), and Susnjak's PRISMA-DFLLM (resource-intensive fine-tuned models, vs. LLAssist's off-the-shelf prompting, no fine-tuning). Frames itself as a lightweight PRISMA-compatible filtering aid meant to slot into existing SLR methodology rather than replace it — deliberately stopping at screening/triage, not attempting synthesis or related-work drafting.
+- **Named limitations and directions for future work:** Authors state: depends heavily on LLM quality/input formatting; analyzes only titles/abstracts (misses full-text info); doesn't use available metadata (year, citation counts) in scoring; shows model-dependent inconsistent behavior requiring per-backend prompt tuning; risks misalignment with human judgment given the uncontrolled/preliminary evaluation. Declared future work: incorporate full-text analysis, add human feedback mechanisms, develop domain-specific models — notably the opposite of its own "simple tools" philosophy, suggesting the lightweight design is a deliberate first step, not an end state.
+
+---
+
+### PROMPTHEUS (Torres, Mulligan, Jorge & Moreira, 2024)
+- **Problem it is trying to solve:** Traditional SLRs can't keep pace with ~2.5 million papers published annually. Existing AI-assisted SLR tools automate isolated stages (search, screening, or summarization) but none integrate the full pipeline end-to-end. PROMPTHEUS aims to fully automate Selection, Extraction, and Synthesis while deliberately keeping the Planning phase (defining the research question/scope) in human hands.
+- **How it works:** Three-phase pipeline on arXiv as sole data source: (1) GPT expands the research question into a richer topic string, generates a structured arXiv API query, retrieves up to 3000 papers; Sentence-BERT cosine similarity keeps the top 200. (2) Sentence-BERT embeddings feed BERTopic clustering; GPT titles each topic cluster. (3) T5 generates a per-abstract summary; per-topic summaries aggregated; GPT post-edits for clarity/coherence while inserting in-text citations; final module compiles a full LaTeX SLR document plus auto-generated BibTeX, exportable as LaTeX/PDF.
+- **How it is evaluated:** Six experiments across five arXiv topics (XAI, VR, Blockchain, LLMs, Neural Machine Translation), comparing GPT-3.5 vs. GPT-4o at each stage: retrieval count/CPU time, topic coherence (Gensim), synthesis quality (ROUGE-1 at three pipeline stages), readability (Flesch Reading Ease), sentence similarity vs. a random-text control, and a document-count sweep to find optimal corpus size.
+- **How it performed on those evaluations:** GPT-4o retrieved more papers than GPT-3.5 on every topic but took longer. Topic coherence clustered 0.4–0.5 — "moderate," below a 0.681 benchmark reported elsewhere for BERTopic. T5 summaries: very high ROUGE-1 precision (~0.96–0.97) but low recall (~0.38–0.46); after GPT post-editing, recall collapsed further (as low as 0.028–0.075) — authors attribute this to the final document intentionally incorporating context beyond the abstracts, not failure. Readability was lowest for raw T5 summaries, improved after post-editing, never matched original-abstract readability. Query-output cosine similarity stayed consistently high (~0.5–0.75) vs. ~0.08–0.13 for random-text control. Sweep concluded 200 papers is the optimal corpus size — quality metrics plateau/decline beyond that while CPU time keeps rising.
+- **Relation to methods that came before it:** Positioned as closing a gap left by prior single-stage tools (Abstrackr, Rayyan, zero-shot classifiers, BioBERT screening, Sami et al. 2024's multi-agent SLR) — all addressing only isolated phases (mostly screening) and leaving extraction/synthesis manual. Claims to be the first fully automated, end-to-end integration of search+extraction+synthesis, keeping only Planning human-driven.
+- **Named limitations and directions for future work:** Evaluated only proprietary OpenAI models, excluding open-source alternatives that could offer better transparency/reproducibility/cost control. AI models may bias toward popular topics, under-covering niche research. Both GPT models are prone to hallucination not grounded in input data — a serious risk for SLR factual accuracy; authors suggest human review or factual-grounding mechanisms as mitigation but don't build this in. Tested only up to 3000 papers/query; topic coherence and post-editing recall both flagged as needing improvement; only tested on arXiv (single source, skews CS/physics), no validation on other databases or domains.
+  **On the "human-centered" claim specifically (relevant to comparing against ProfOlaf/HCRA):** the only human checkpoint is the upstream Planning phase (supplying the research question) — Selection, Extraction, and Synthesis run with zero human checkpoints or override mechanism. This is a fire-and-forget batch pipeline with a human-authored prompt as input, not a system with checkpointed human-in-the-loop review like ProfOlaf, HCRA, or LitDiscover's staged workflow — the paper's own limitations section effectively concedes this by naming hallucination-mitigation as future work rather than a built-in feature.
+
+---
+
+### Meow (Ma, Shan, Zhao, Xu & Wang, 2025)
+- **Problem it is trying to solve:** Outline writing is treated by existing survey pipelines (AutoSurvey, SurveyX, InteractiveSurvey, InsightAgent) as a "mere workflow step," typically template-based, producing shallow-coherence outlines. Meow reframes outline generation as its own first-class, end-to-end learning task, targeting: fine-grained domain concept organization complexity, weak factuality/structural systematicity, and the absence of high-quality datasets/evaluation metrics for outline quality specifically.
+- **How it works:** A metadata-driven, single-step (non-agentic) framework: given a topic and candidate paper set (title+abstract only, no full-text retrieval), a fine-tuned Qwen3-8B emits a complete hierarchical outline in one inference pass. Two-stage training: (1) CoT cold-start SFT — DeepSeek-R1 distills chain-of-thought traces deriving a taxonomy from references via clustering, used for supervised fine-tuning; (2) RL via GRPO — samples candidate outlines, optimizes a reward combining structural similarity (1 − normalized tree-edit-distance vs. reference outline) and binary format-compliance. Dataset: 2.82M arXiv + 252K bioRxiv + 72K medRxiv metadata, filtered to 16,201/1,945/5,683 actual survey articles via keyword/structural/reference-integrity criteria.
+- **How it is evaluated:** Two test sets — a self-constructed 100-survey set (post-2025, to reduce pretraining leakage) and SurveyX's own 13-paper example set. LLM-as-judge scoring across 5 criteria (Structure Locate, Structure Detail, Content Exclusion, Content Depth, Pragmatics Concise, summed to a 0–50 Total) plus Structural Distance (tree edit distance vs. human outline). Baselines: DeepSeek-R1/V3, GPT-5 Nano, Gemini 2.5 Flash-Lite, base Qwen3-8B, SurveyX, human-written ground truth.
+- **How it performed on those evaluations:** On the self-constructed set: human-written scores 37.23/0.00 distance; Meow-8B-SFT-GRPO reaches 36.79 total (best among non-human systems) and the lowest Structural Distance (0.39). On the SurveyX test set: SurveyX scores 29.60/0.44 distance; Meow-8B-SFT-GRPO scores 35.62/0.42 — roughly a 6-point improvement over SurveyX. GRPO (trained only on structural/format rewards) produced correlated gains on content/pragmatics metrics it wasn't directly optimizing for. Even the strongest baseline LLMs never surpass human-written outlines; Meow narrows but doesn't close the gap.
+- **Relation to methods that came before it:** Positioned against retrieval-driven pipelines (AutoSurvey, SurveyX) and interactive/agentic frameworks (InteractiveSurvey, InsightAgent) — both characterized as producing outlines as a template-filling byproduct of a general-purpose LLM call with no dedicated training signal for outline quality. **Key architectural contrast with LiRA's Outline Drafter Agent and AutoSurvey's outline phase:** those generate outlines as one pipeline stage via zero/few-shot prompting with no dedicated training signal; Meow instead collapses the task into a single end-to-end generation from raw metadata, trains a dedicated model via SFT+CoT distillation, and adds RL with a learned, quantified structural objective (tree-edit-distance vs. human references) that neither AutoSurvey's nor LiRA's prompted-agent outline steps have. Draws lineage from taxonomy-generation/ontology-learning research rather than the survey-writing-agent lineage — a genuinely different intellectual ancestry than AutoSurvey/LiRA.
+- **Named limitations and directions for future work:** No standardized benchmark exists for outline quality — the authors had to construct their own test set and rely on LLM-as-a-Judge. Even the best model doesn't match human-written outline quality on any test set. The RL reward is narrowly structural/format-based — it doesn't directly optimize for content quality, depth, or factual correctness of citations packed into the outline, flagged as a gap even while noting "complementary" side-benefits. Short conference-paper format with no explicit "Future Work" section beyond the introduction's three stated technical challenges, which are presented as only partially resolved.
+
+---
+
+### Bio-SIEVE (Robinson, Thorne, Wu, Pandor, Essat, Stevenson & Song, 2023)
+- **Problem it is trying to solve:** Title/abstract screening in medical systematic reviews is a costly bottleneck (avg. $141,194 / 1.72 years per review). Existing automation is either narrow (single-topic classifiers, active-learning models retrained per review) or relies on closed, unreproducible general-purpose LLMs (ChatGPT) whose zero-shot screening is inconsistent across topics and whose behavior drifts silently over time. Also targets a task prior work mostly ignored: generating exclusion-reason justifications so reviewers can spot-check exclusions.
+- **How it works:** A family of open-source LLMs instruction-fine-tuned specifically for abstract screening — QLoRA fine-tuning LLaMA-7B and Guanaco-7B on a new "Instruct Cochrane" dataset (7,330 Cochrane reviews, 6,963 train/367 eval), each formatted as objectives+selection criteria+abstract → Include/Exclude via the Alpaca instruction template. Four variants trained in ablation: single-task vs. multi-task (adding PICO extraction and exclusion-reason generation as auxiliary tasks), crossed with LLaMA vs. Guanaco base.
+- **How it is evaluated:** Four eval sets — Test (1,001 samples), Subset (1,711 samples from 13 reviews, enabling comparison against per-review-trained logistic regression via 5-fold CV), Safety-first (108 manually re-annotated samples correcting for abstract-looked-includable-but-full-text-excluded cases), Irrelevancy (selection criteria paired with random off-topic abstracts). Baselines: zero-shot ChatGPT, zero-shot Guanaco-7B/13B, zero-shot Bio-BERT-MSM, 5-fold CV logistic regression (TF-IDF).
+- **How it performed on those evaluations:** Best model (Guanaco7B Single) reached 0.82 accuracy on Test vs. ChatGPT's 0.6, and 0.85 precision on Subset (0.26 higher than ChatGPT's ~0.5) at only ~0.01 recall cost — beating even the per-review-specific logistic-regression baseline (0.81 vs. 0.80 accuracy) despite that baseline's data advantage. Un-tuned zero-shot Guanaco scored as low as 0.02–0.03 on the Irrelevancy set (unusable without fine-tuning), while Bio-SIEVE and ChatGPT both scored ≥0.96. Single-task training consistently beat multi-task across all metrics. Bio-SIEVE's accuracy was robust across topics regardless of training-data imbalance, whereas ChatGPT's accuracy varied wildly by topic. Exclusion-reason quality: ChatGPT averaged 3.4/5 vs. Bio-SIEVE's 2.4/2.0 — though ChatGPT itself produced subpar/incorrect reasons for 83% of samples overall.
+- **Relation to methods that came before it:** Extends the "classification" branch of SR automation (replacing per-review-retrained SVM/RF/BERT classifiers with a single generalizable instruction-tuned LLM needing no per-review retraining), positioned explicitly against zero-shot ChatGPT screening studies — arguing ChatGPT's opacity (documented behavior drift between March–June 2023), closed cost, and topic-inconsistent performance make it unsuitable as a reproducible SR tool. Builds on QLoRA/Guanaco and multi-task instruction-tuning transfer literature.
+- **Named limitations and directions for future work:** Multi-task variants underperform single-task classification (hypothesized: training-data imbalance + hallucination risk from extraction tasks); proposes exploring Mixture-of-Experts architectures. Exclusion-reason generation quality still lags ChatGPT. No few-shot prompting tried (LLaMA's 2048-token context collides with long abstract/criteria inputs). Can't match ChatGPT's leniency-driven recall on Safety-first without an explicit leniency prompt, not yet tried. Broader future direction: extend toward a full generalized SR assistant across all stages, and to non-biomedical domains including software engineering.
+
+---
+
+### GEAR-Up (Roy, Khandelwal, Surana, Vera, Sheth & Heckman, AAAI 2024 Demo Track)
+- **Problem it is trying to solve:** Systematic reviews require librarian-assisted literature surveys that are time/resource-intensive. GEAR-Up targets specifically the *early* SR stages — defining the research question, developing review protocol/terminology, and formulating a targeted search query — normally done through iterative researcher-librarian consultation before any database search happens.
+- **How it works:** Three modules. (1) Query Expansion — extracts a seed concept from the user's natural-language query, queries external knowledge graphs (e.g. PubMed KG) and pretrained masked language models to retrieve connected concepts/relations. (2) Additional Related Query Generation — feeds the expanded concept/relation set to ChatGPT with a templated prompt to generate reformulated natural-language queries. (3) Article Search and Retrieval — uses the generated queries to query PubMed directly, then a FAISS-powered dense retriever re-ranks/narrows results by title/abstract/passage similarity. Outputs go to a librarian for feedback, including a safety layer suppressing sensitive content unless contextually appropriate. **Note:** this augments/reformulates the *query* into a standard database search engine (PubMed) plus a re-ranker — no citation-graph traversal, no full-text corpus construction.
+- **How it is evaluated:** Purely qualitative — an in-house librarian compared retrieved articles against "sentinel" ground-truth articles and gave free-text feedback on which query concepts each retrieved article did/didn't capture. No quantitative benchmark (no precision/recall/F1, no gold-standard test collection).
+- **How it performed on those evaluations:** Paper states the system "shows favorable reviews... providing high-quality articles similar to a human librarian." The one detailed example shows partial concept coverage per article (rarely all query concepts captured simultaneously by one article) — no aggregate accuracy numbers reported.
+- **Relation to methods that came before it:** Builds on RAG (Lewis et al. 2020) and internet-augmented dialogue generation for the retrieval-plus-generation architecture, and knowledge-enhanced masked LMs for KG-based query expansion. Automates only the "issue identification" and "protocol-based query formulation" front-end (leaving screening/extraction/synthesis untouched). Relative to LitLLM-style retrieval: GEAR-Up upgrades the *search query* itself (KG + LLM-generated variants feeding keyword search, refined by re-ranker) rather than doing abstract/embedding-based candidate generation over a full corpus — and is restricted to one database (PubMed).
+- **Named limitations and directions for future work:** Authors state the work "currently stands at the implementation of the three modules" with only qualitative, single-librarian evaluation — no large-scale/quantitative validation. Named future work: incorporating unstructured/semi-structured knowledge sources beyond the current KG; tracing outputs back to source for explainability/attribution (not yet implemented); further development of safety/bias controls (described but not evaluated).
+
+---
+
+### ReviewGenie (*Systematic Reviews* journal, Springer Nature, 2025)
+- **Problem it is trying to solve:** SRs are bottlenecked by labor-intensive manual stages between initial search-string design and full-text synthesis — multi-database querying, deduplication, keyword filtering, title/abstract screening — consuming hundreds of person-hours for large corpora. ReviewGenie automates everything *between* keyword/database selection and full-text review, leaving only parameter setup and final full-text screening to humans.
+- **How it works:** A seven-stage linear pipeline: manual keyword/database identification → automated multi-database API search (PubMed, IEEE Xplore, Embase, PsycINFO) → automated data fetching/consolidation (Python/Pandas) → automatic abstract cleaning/normalization → automatic deduplication → automatic keyword-based title/abstract filtering → AI-driven title/abstract screening via zero-shot GPT classification (Yes/No/Maybe) using structured prompts combining task instructions, title/abstract, and inclusion/exclusion criteria. No embeddings-based retrieval, no citation-graph traversal, no active-learning loop — a linear filter-then-classify pipeline.
+- **How it is evaluated:** Case study: a real SR of speech and language disorders literature across IEEE, PubMed, Embase, PsycINFO. Evaluated per-stage against manual baselines: organize time, dedup accuracy/speed (100-record benchmark), filtering reduction, and GPT screening vs. human decisions on 1,027 articles (Cohen's Kappa, per-class precision/recall/F1, weighted metrics, plus a manual blind re-evaluation of GPT's "Yes"-mismatch exclusions).
+- **How it performed on those evaluations:** 34,325 records identified; full processing took 137.3 seconds vs. ~120 hours manual. Deduplication: 2.62% better than manual baseline, sub-second vs. 1–3hrs/100 records (~147 working days / ~$24,500 saved). Screening on 1,027 articles: 11.37 minutes vs. ~17.12 working days manual; Cohen's Kappa 0.891 ("almost perfect agreement"). Per-class: precision 0.28 (Yes)/0.91 (No), recall 0.73 (Yes)/0.59 (No) — GPT is notably weak on include-precision (over-includes relative to humans). Cost: $3.14 vs. ~$6,231 estimated manual. Of 497 discrepancies, only 24 (2.34%) were GPT wrongly excluding something a human included — a blind re-evaluation confirmed all 24 of those GPT exclusions were in fact correct, i.e. GPT's disputed exclusions were more accurate than the original human calls.
+- **Relation to methods that came before it:** Positioned against Abstrackr, DistillerSR, RobotAnalyst, EPPI-Reviewer, SWIFT-Review, Colandr, Rayyan — all relying on active-learning classifiers needing substantial upfront manual training (~50% of records) and ongoing tuning. ReviewGenie's differentiator: zero-shot LLM classification requiring no training set, plus full automation of the preprocessing pipeline these prior tools leave to the user.
+- **Named limitations and directions for future work:** Heavy dependence on keyword/criteria quality (garbage-in-garbage-out not mitigated); reliance on proprietary GPT threatens reproducibility as models update/deprecate; database coverage limited to 4 sources; full-text screening/synthesis remain entirely manual. Future work: open-source LLMs for reproducibility, more databases, extend automation into full-text screening, benchmark across multiple LLM architectures/prompts.
+  **Note on generalizability:** domain-agnostic architecture validated via one domain-specific case study (nothing clinically specialized beyond the supplied criteria/keywords) — but no citation-graph traversal or snowballing at all (pure keyword/API search, unlike bidirectional citation-graph systems like LitDiscover), so it cannot surface papers missed by the initial search string.
+
+---
+
+### Scholar Augment (Authors unconfirmed, 2026, IEEE Xplore — paywalled, abstract-level only)
+- **Problem it is trying to solve:** SLRs and large-scale qualitative document analysis are bottlenecked by time-intensive, error-prone manual data extraction. Frames a gap between reference managers (Zotero/Mendeley — citation-focused, content-blind) and Qualitative Data Analysis Software (NVivo/ATLAS.ti/MAXQDA — content-focused but manually coded); Scholar Augment positions itself as a bridge between the two.
+- **How it works:** A user-centric, end-to-end web platform built on a multi-LLM architecture, targeting the systematic data-extraction phase specifically (not discovery/search), with a stated human-in-the-loop design goal ("keeping the researcher in full control"). **Specific architectural details (which LLMs, how multi-model outputs are reconciled, UI/workflow mechanics) were not recoverable — full methodology sits behind the IEEE paywall.**
+- **How it is evaluated:** A case study on 592 academic articles, measuring data-extraction time vs. a manual baseline.
+- **How it performed on those evaluations:** Reported 99.32% reduction in data-extraction time. **No recall, precision, discovery-coverage, or extraction-accuracy metrics were surfaced in any accessible abstract/metadata** — a notable gap, since a time-reduction claim alone doesn't establish that extracted-data quality matches manual extraction.
+- **Relation to methods that came before it:** Positioned against reference managers and QDAS as two extremes it bridges. Possibly adjacent to (authorship unconfirmed as the same team) "Augmenting Systematic Literature Reviews: A Human-AI Collaborative Framework" (Brîncoveanu, Carl, Witzki, Hinz; KI 2025), which integrates LLMs into Wolfswinkel et al.'s Grounded Theory Literature Review Method and reports Type I/Type II error rates — a useful comparison point for the accuracy metrics Scholar Augment's own abstract doesn't report.
+- **Named limitations and directions for future work:** Not recoverable — full text inaccessible (IEEE Xplore paywall, no arXiv preprint or institutional-repository copy found). **Flagged directly: this entry is abstract-level only. Architecture, exact evaluation methodology, and any stated limitations require obtaining the IEEE PDF (DOI via ieeexplore.ieee.org/document/11553334/) before being treated as fully vetted in a competitive comparison against LitDiscover.**
+
+---
+
+### SocLitGen (Hu, Wei, Sun; *Information Processing & Management*, vol. 63, issue 7, 2026 — DOI 10.1016/j.ipm.2026.104885, fully paywalled, no entry possible)
+- **Status: could not be deep-dived.** Confirmed to be a real, citable paper via Crossref (authors, DOI, venue, publication date 2026-05-08), but Unpaywall confirms `oa_status: closed`, no repository copy, no preprint anywhere — and ScienceDirect blocks scraping (403). Even LitDiscover's own `automated-lit-review-methodology` project has this paper logged with 0 cites and a **blank abstract** — Semantic Scholar/OpenAlex never indexed even the abstract text for this record. Web search summarization repeatedly hallucinated fabricated details (invented author names, volume numbers, a fake "outperforms Naive RAG" claim) when probed — none of that was used or trusted.
+- **What's needed to complete this entry:** the actual PDF, obtained via institutional ScienceDirect/Elsevier access. Until then, only the bibliographic stub above is honest to report — no problem/method/evaluation/limitations content should be attributed to this paper based on guesswork.
+
+---
+
+> **Note (2026-07-11): TriSem-LLM could not be located.** The subagent dispatched to deep-dive
+> "A Tri-Level Semantic and LLM-Assisted Methodology for Systematic Literature Reviews
+> (TriSem-LLM)" searched arXiv, Semantic Scholar, and Google Scholar under the exact title, the
+> acronym, and paraphrased variants, and found no matching paper — it may be a mis-transcribed
+> title from the 366-paper CSV mining pass, or not yet indexed anywhere accessible. Correctly
+> declined to fabricate an entry. **Needs the original CSV row's authors/venue/DOI to re-attempt,
+> or should be dropped from the methods list.**
+
+---
+
+## Classical / pre-LLM cohort (one-line citations, no full deep-dive)
+
+- **ToC-RWG** — a classical topic-model + citation-network method for automatic related-work
+  generation (pre-LLM neural pipeline); cite as an early precedent for citation-informed
+  related-work synthesis, superseded by LLM-native approaches (LitLLM, AutoSurvey) that condition
+  generation directly on retrieved abstracts rather than an intermediate topic-model
+  representation.
+- **Target-aware Abstractive Related Work Generation with Contrastive Learning** — a pre-LLM
+  neural seq2seq (contrastive-learning-trained) approach to target-conditioned related-work
+  generation; cite as an intermediate step between purely extractive citation-graph methods and
+  current LLM-prompted generation.
+- **ASReview LAB v.2** — the canonical open-source active-learning screening tool (crowd-sourced
+  human screening acceleration, not LLM-native); cite as the established baseline every
+  LLM-screening paper implicitly compares itself against for "how much faster is LLM screening
+  than active-learning screening."
+- **SYMBALS** — a classical methodology blending active-learning-based screening with citation
+  snowballing; cite as a pre-LLM precedent for combining the two search strategies LitDiscover also
+  combines (traversal + adaptive screening), without any LLM component.
+- **SWIFT-Active Screener** — a classical active-learning document-screening tool with integrated
+  recall estimation; cite as an established efficiency baseline for screening-workload-reduction
+  claims.
+- **Capturing Relations between Scientific Papers (Abstractive Model for Related Work Section
+  Generation)** — a pre-LLM neural abstractive model for related-work generation conditioned on
+  citation relations; cite as an early precedent superseded by LLM-prompted approaches.
