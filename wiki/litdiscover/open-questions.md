@@ -115,6 +115,14 @@ full-text verified first (see `related-work-landscape.md`'s round-2/round-3 note
 whether #2 is even worth it) → #2 (only if #1's numbers show ungrounded claims are common) → #3
 (only if a manual ground-truth pass becomes worth the time investment separately).
 
+**Item #1 — shipped (2026-07-11).** `check_citation_grounding()` added to `synthesizer.py`,
+wired into `litdiscover synthesize` as on-by-default (`--skip-grounding-check` to opt out).
+Precision-only (batches cited claims against the `extractions` table, no new NLI model/embedding
+pass), writes `<slug>_grounding_report.md`, never rewrites the review — purely diagnostic. 7 new
+tests, 181/181 passing. **Not yet run against a real project** — next actual step is running
+`litdiscover synthesize` on a live project and reading the resulting grounding score, which is
+what decides whether #2 (plan-based generation) is worth doing at all.
+
 ---
 
 ## Submission logistics (before June 30)
