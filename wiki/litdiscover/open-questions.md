@@ -63,12 +63,57 @@ now read (`fulltext/`):
 Each item ends in a decision, not an automatic rewrite: "confirmed fine, no action" or "small
 bounded fix, scope it" — mirroring how the related-work-landscape full-text benchmark worked.
 
-**Status (2026-07-11):** All 7 of 7 Tier 1/2 papers now pulled full-text (AutoSurvey, ProfOlaf,
-LitLLMs-are-we-there-yet, SciReviewGen, LitLLM, LiRA, Human-Centred Research Automation — see
-`related-work-landscape.md`'s round-2/round-3 notes). The related-work-landscape benchmarking
-pass is complete. The extract/synthesize audit itself (reading `synthesizer.py`'s map-reduce/
-citation code in full and reaching a verdict per item) has not started yet — this is still a
-plan, not a completed audit.
+**Status (2026-07-11): audit complete — verdicts below.** All 7 of 7 Tier 1/2 papers were
+full-text verified first (see `related-work-landscape.md`'s round-2/round-3 notes), then
+`litdiscover/extract/synthesizer.py` (870 lines) was read in full end-to-end.
+
+### Verdicts
+
+1. **Citation grounding — CONFIRMED GAP, small bounded fix.** There is genuinely no post-hoc check
+   anywhere in the file. `_restore_uuids` is a pure string substitution (short ID → UUID) — it
+   never checks that a cited paper's extraction fields actually support the sentence around it.
+   Every `[ID]` the model writes is trusted at face value, in both the single-call path
+   (`_write_theme_section`'s small-cluster branch, line 698) and the map-reduce path (line 634).
+   **Fix scope:** a CQF1-style check is realistic without new infrastructure — for each generated
+   section, extract every `[UUID]` + its surrounding sentence, and for each one ask Gemini
+   "does this paper's `extractions` row (themes/contributions/methodology/key_results) support
+   this claim, yes/no" in a single batched call per section. This reuses data already paid for
+   (the `extractions` table) — no new NLI model, no new embedding pass. Rough cost: one extra
+   `_call()` per section (there are already up to 4 sections running concurrently, so this fits
+   the existing `ThreadPoolExecutor` pattern without restructuring).
+2. **Plan-based generation — CONFIRMED GAP, but lower priority than #1.** Both write paths
+   (`section_prompt` line 698, `reduce_prompt` line 669) go straight from paper summaries to full
+   600–900-word prose in one call — no intermediate claims-list or outline step, unlike LitLLMs'
+   plan-then-write or LiRA's Outline Drafter Agent. Note the clustering step (Pass 1) already acts
+   as a coarse-grained outline (theme names = section list) — the missing plan is *within* a
+   section, not across the whole document. **Fix scope:** larger than #1 — would add a second
+   `_call()` per section ("list the N claims this section should make + which paper IDs support
+   each"), roughly doubling Pass 2's call count. Worth doing only after #1 ships and its
+   grounding-check results show whether ungrounded claims are actually common enough to justify
+   the extra cost, rather than guessing upfront.
+3. **Ground-truth cluster evaluation — CONFIRMED GAP, no cheap ground truth available.** Checked
+   `citation-dynamics/data/analysis/community_labels.csv` (Zeitgeist's human-labeled APS physics
+   communities) as a candidate reusable ground truth — **not usable**, it's a different corpus and
+   subject domain entirely (physics citation communities, not any litreview project's paper set).
+   No existing human-labeled theme assignments exist for any LitDiscover project's included set.
+   **Fix scope:** would require a fresh manual pass (a human labeling ~20-30 papers into themes for
+   one project, then comparing against `_kmeans_cluster`'s output) — real cost, not a quick add.
+   Lowest priority of the four; the Gini-balance check at least catches the worst failure mode
+   (one giant cluster), even without a relevance ground truth.
+4. **Map-reduce grounding loss — CONFIRMED, but resolved by fixing #1, not a separate mechanism.**
+   The map step (line 634) does have full per-paper access and correctly tags `[ID]` citations from
+   the original slim summaries. But the reduce step (line 664) only ever sees the map step's
+   already-compressed bullets — it has no access back to the original `extractions` fields, and is
+   instructed to "preserve inline citations... exactly as they appear," i.e. it trusts whatever the
+   map step decided to cite. Any grounding error introduced at the map stage propagates silently
+   through the reduce stage. This is the same root cause as #1 (no verification step exists
+   anywhere), just visible at a different point in the pipeline — a single grounding-check pass
+   applied after the whole section is assembled (not per-stage) would catch this case too, so this
+   doesn't need its own fix.
+
+**Priority order if implementing:** #1 first (cheapest, highest leverage, unblocks measuring
+whether #2 is even worth it) → #2 (only if #1's numbers show ungrounded claims are common) → #3
+(only if a manual ground-truth pass becomes worth the time investment separately).
 
 ---
 
