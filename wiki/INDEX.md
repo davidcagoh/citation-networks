@@ -37,15 +37,14 @@ Three contributions, each with its own subdirectory:
 
 ## LitDiscover
 
+**Read background.md once for context; decisions/open-questions/related-work-landscape are the live files.**
+
 | File | Purpose |
 |---|---|
-| [litdiscover/thesis.md](litdiscover/thesis.md) | Core claim, mechanism, what the paper does NOT claim |
-| [litdiscover/argument-map.md](litdiscover/argument-map.md) | Section-by-section argument chain |
-| [litdiscover/decisions.md](litdiscover/decisions.md) | Algorithm parameters, experiment design, paper structure, venue |
-| [litdiscover/open-questions.md](litdiscover/open-questions.md) | Believed resolved; verify before submission |
-| [litdiscover/figure-roles.md](litdiscover/figure-roles.md) | Per-figure argumentative role + status |
-| [litdiscover/simulation-vs-production.md](litdiscover/simulation-vs-production.md) | APS simulation vs production system gap |
-| [litdiscover/n-rounds-extension.md](litdiscover/n-rounds-extension.md) | Empirical sweep justifying N_ROUNDS=2 |
+| [litdiscover/background.md](litdiscover/background.md) | Read-once: core thesis/claim, sim-vs-production gap, pre-rejection paper structure (argument map + figure roles) |
+| [litdiscover/decisions.md](litdiscover/decisions.md) | Live: algorithm parameters, experiment design, paper structure, venue |
+| [litdiscover/open-questions.md](litdiscover/open-questions.md) | Live: open items, engine feature requests |
+| [litdiscover/related-work-landscape.md](litdiscover/related-work-landscape.md) | Live: SOTA/close-hit competitor comparison table (motivation/scope/architecture/evaluation), driving the IP&M redo's Related Work section |
 
 ---
 
