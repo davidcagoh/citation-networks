@@ -205,3 +205,9 @@ and `/tmp/litreview_watchdog*` files are outside the repo and weren't touched).
 **Why:** Goal was "make LitDiscover available for seamless use." Considered three tiers: (1) pip-installable CLI with user-provided Supabase + API keys, (2) a hosted multi-tenant API, (3) do nothing beyond git clone. Chose (1) — the schema is single-tenant (no `user_id`/auth layer), so a hosted service would need real product-engineering (multi-tenancy, billing, rate limiting), a different project from "package the existing engine."
 **Status:** ✅ Live at `pypi.org/project/litdiscover/2.0.0/`. `v2.0.0` tagged. `robust-literature-discovery` deliberately NOT renamed or merged into this repo — it's named after the paper (correct convention for a reproducibility repo) and serves a different audience (public, frozen-at-submission, no credentials) than the engine (private, evolving, credentialed).
 **Also fixed in this pass:** `citation-dynamics` promoted to its own repo (`github.com/davidcagoh/citation-dynamics`) for the same reason — `citation-networks` should be a thin umbrella, not a mixed-tracking-model monorepo. And a genuinely broken `launchd` watchdog job (stale path, failing silently every 10 min) was caught and fixed while investigating a doc-staleness flag — see session-log session 28.
+
+---
+
+## Tier 1/2 close-hit papers: pull full PDFs, not abstracts-only (2026-07-10)
+**Why:** Full text gives an independent read to check Gemini's screening/relevance judgments against, rather than abstracts-only where the LLM's own summary is the only signal available.
+**Status:** Decided. Start with 3 of the 7 Tier 1/2 papers — enough to benchmark against before deciding whether to pull the rest.
