@@ -14,6 +14,14 @@ of them, not just the two or three most obviously similar.
 
 Tiering below is by how much a reader would expect direct comparison, not by citation count.
 
+**Longer-term goal (2026-07-10):** beyond satisfying the IP&M reviewers, the point of this table
+is to actually understand the current related-work landscape — motivation, scope, lineage,
+architecture, and eval method for each close-hit system — well enough that `rld` (the
+`robust-literature-discovery` reproducibility repo) stops being built in the dark. Previously the
+paper's related-work section was written without this grounding; this table is meant to make
+`rld` complete against what the field has actually already tried, not just against reviewer
+feedback on one submission.
+
 ---
 
 ## Tier 1 — canonical lineage (must cite, even briefly)
