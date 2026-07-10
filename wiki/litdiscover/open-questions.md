@@ -22,23 +22,28 @@ into NotebookLM or similar for the actual synthesis step. Keep this as a real fa
 last resort to feel bad about — LitDiscover's differentiated contribution is the discovery/recall
 guarantee, not prose generation.
 
-Four concrete audit questions, each traceable to a specific full-text finding from the 3 papers
-already read (`fulltext/`):
+Four concrete audit questions, each traceable to a specific full-text finding from the 6 papers
+now read (`fulltext/`):
 
 1. **Citation grounding — is any claim ever checked against its cited paper?** AutoSurvey's
    citation-quality metric (`h(c_i, Ref_i)`, an NLI check per claim) is the only reason it can
-   claim citation recall/precision numbers at all. Audit: read `_write_theme_section`, the
-   map-reduce path (`map_prompt`/`reduce_prompt`, ~`synthesizer.py` line 645–669), and
-   `number_citations.py` in full — confirm there is genuinely no post-hoc check that a `[ID]`
-   citation is supported by that paper's extracted fields, and scope what a minimal version would
-   cost (e.g. reusing extraction fields already in the `extractions` table rather than standing up
-   a new NLI model).
+   claim citation recall/precision numbers at all. **LiRA goes further and is the strongest
+   precedent found across all 6 papers:** it defines Citation Quality F1 (CQF1) — precision/recall
+   over citation grounding — and beats AutoSurvey substantially on it (0.76/0.73 vs. ≤0.63) via a
+   dedicated **Reviewer Agent** that checks intermediate outputs and triggers regeneration on
+   failure. Audit: read `_write_theme_section`, the map-reduce path (`map_prompt`/`reduce_prompt`,
+   ~`synthesizer.py` line 645–669), and `number_citations.py` in full — confirm there is genuinely
+   no post-hoc check that a `[ID]` citation is supported by that paper's extracted fields, and scope
+   a CQF1-style metric plus a lightweight reviewer pass (reusing extraction fields already in the
+   `extractions` table rather than standing up a new NLI model).
 2. **Plan-based generation — single-shot vs. plan-then-write.** Confirmed already (2026-07-10):
    `_write_theme_section`'s single-cluster path (`synthesizer.py` line 698) is one direct "write
    600–900 words, cite every claim" call, no intermediate plan. LitLLMs measured 18–26% fewer
-   hallucinated references from adding a plan step. Audit: would an intermediate step ("list N
-   claims + which paper IDs support each, then write") fit cleanly into the existing per-theme
-   call, or does it need restructuring the `ThreadPoolExecutor` fan-out in `synthesize()`
+   hallucinated references from adding a plan step, and LiRA's **Outline Drafter Agent** is a
+   second, independent precedent for planning before writing (drafts per-section structure +
+   supporting-paper assignments before any subsection is written). Audit: would an intermediate
+   step ("list N claims + which paper IDs support each, then write") fit cleanly into the existing
+   per-theme call, or does it need restructuring the `ThreadPoolExecutor` fan-out in `synthesize()`
    (line 589)?
 3. **Ground-truth evaluation of theme/cluster assignment.** ProfOlaf directly measures
    TopicGPT-style assignment against human labels (precision 0.645/recall 0.850) — a real number
@@ -57,6 +62,13 @@ already read (`fulltext/`):
 
 Each item ends in a decision, not an automatic rewrite: "confirmed fine, no action" or "small
 bounded fix, scope it" — mirroring how the related-work-landscape full-text benchmark worked.
+
+**Status (2026-07-11):** All 7 of 7 Tier 1/2 papers now pulled full-text (AutoSurvey, ProfOlaf,
+LitLLMs-are-we-there-yet, SciReviewGen, LitLLM, LiRA, Human-Centred Research Automation — see
+`related-work-landscape.md`'s round-2/round-3 notes). The related-work-landscape benchmarking
+pass is complete. The extract/synthesize audit itself (reading `synthesizer.py`'s map-reduce/
+citation code in full and reaching a verdict per item) has not started yet — this is still a
+plan, not a completed audit.
 
 ---
 
