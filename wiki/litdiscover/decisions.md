@@ -211,3 +211,24 @@ and `/tmp/litreview_watchdog*` files are outside the repo and weren't touched).
 ## Tier 1/2 close-hit papers: pull full PDFs, not abstracts-only (2026-07-10)
 **Why:** Full text gives an independent read to check Gemini's screening/relevance judgments against, rather than abstracts-only where the LLM's own summary is the only signal available.
 **Status:** Decided. Start with 3 of the 7 Tier 1/2 papers — enough to benchmark against before deciding whether to pull the rest.
+
+---
+
+## Staged workflow discipline: never `screen` a large pending queue without `prefilter` first (2026-07-10)
+**Why:** Ran `litdiscover screen automated-lit-review-methodology` directly on a 147-paper pending
+queue without running the free `prefilter` step first. Result: 24 included / 123 excluded — a 16%
+yield, meaning ~84% of that Gemini `screen` call was spent on candidates a zero-cost keyword pass
+could plausibly have caught. This wasn't a missing feature — `litdiscover/CLAUDE.md`'s "Recommended
+Vetting Workflow" already documents `traverse → prefilter → mark → screen → verify → forward-cites
+→ extract → synthesize` as the intended order — it was just not followed.
+
+The very next `traverse` cycle (on the enlarged 390-included set) added **4,534 new candidates** in
+one shot, with no live progress indicator during the run (see the `traverse.py` progress-counter fix
+logged separately) — a concrete reminder of how fast an unfiltered pending queue can balloon.
+
+**Rule going forward:** never run `screen` on a pending queue above ~50 papers without running
+`litdiscover prefilter` immediately before it, and always skim the resulting `<slug>_candidates.md`
+before deciding between `--exclude-nonmatching` and a full `screen` pass. This rule supplements
+`litdiscover/CLAUDE.md`'s existing documented order — it doesn't replace it; the lapse was
+discipline, not documentation.
+**Status:** ✅ Adopted 2026-07-10, applies to all staged-workflow projects going forward.

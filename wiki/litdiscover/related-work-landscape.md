@@ -22,6 +22,17 @@ paper's related-work section was written without this grounding; this table is m
 `rld` complete against what the field has actually already tried, not just against reviewer
 feedback on one submission.
 
+**Full-text benchmark verdict (2026-07-10):** pulled full PDFs for 3 of 7 Tier 1/2 papers
+(AutoSurvey, ProfOlaf, LitLLMs-are-we-there-yet — archived in `fulltext/`) to check Gemini's
+abstract-only extraction against ground truth. **Verdict: worth pulling the remaining 4.**
+AutoSurvey's cells were accurate, but ProfOlaf's Evaluation cell was flatly wrong (abstract-only
+extraction said "no quantitative benchmark" when the paper has a full LLM-vs-human screening
+comparison — see corrected row below), and LitLLMs' architecture cell missed a real nuance
+(embedding-based re-ranking beats LLM-prompting re-ranking in their own results). One clear miss
+and one partial miss out of three is a high enough error rate to justify full-text passes on
+SciReviewGen, LitLLM, LiRA, and Human-Centred Research Automation before finalizing the redo's
+Related Work section.
+
 ---
 
 ## Tier 1 — canonical lineage (must cite, even briefly)
@@ -33,9 +44,9 @@ LitLLM/LitLLMs is the same team's two-paper arc; LiRA explicitly benchmarks agai
 | Paper | Year / cites | Motivation | Scope | Architecture | Evaluation |
 |---|---|---|---|---|---|
 | **SciReviewGen** (ACL) | 2023 / 26 | No large dataset existed for training/evaluating automatic review generation | Dataset + baseline eval, not a live tool | 10k literature reviews + 690k cited papers; Fusion-in-Decoder summarization baseline | Human eval: some machine summaries comparable to human-written; documents hallucination + missing-detail failure modes |
-| **AutoSurvey** (NeurIPS) | 2024 / 123 | Survey-writing doesn't scale with publication volume; context-window and parametric-knowledge limits block naive LLM use | Full survey generation, arbitrary AI subfields | Retrieval → outline generation → specialized-LLM subsection drafting → integration/refinement → iterate | Own eval benchmark + iterative refinement loop; open-sourced |
+| **AutoSurvey** (NeurIPS) | 2024 / 123 | Survey-writing doesn't scale with publication volume; context-window and parametric-knowledge limits block naive LLM use | Full survey generation, arbitrary AI subfields | Retrieval → outline generation → specialized-LLM subsection drafting → integration/refinement → iterate | **Confirmed from full-text read (2026-07-10), table entry was accurate.** Ablation shows the retrieval step is the load-bearing piece (removing it drops citation recall 83.48%→60.11%), and citation quality stays stable as survey length grows while naive RAG degrades — the closest existing precedent for LitDiscover's own "retrieval structure explains why the algorithm works" argument (§5 of `background.md`). Multi-LLM-as-judge eval, Spearman ρ=0.54 vs. human rankings at best. |
 | **LitLLM** (arXiv) | 2024 / 71 | Related-work writing is tedious; existing LLM approaches hallucinate and miss recent work | Related-work section generation from a query abstract | Web search → LLM keyword extraction → re-rank by abstract similarity → single-pass RAG generation | No formal benchmark reported in abstract; positioned as toolkit/demo |
-| **LitLLMs, are we there yet?** (TMLR) | 2024 / 21 | Same team as LitLLM, deeper: is LLM-assisted review writing actually viable? | Retrieval + generation, decomposed and separately measured | Two-step keyword-extraction retrieval + prompting-based re-ranking (doubles recall vs. naive search) + plan-then-write generation | Introduces a **rolling, contamination-free eval protocol** using new arXiv papers — directly relevant if LitDiscover's APS-simulation validation faces a similar staleness critique |
+| **LitLLMs, are we there yet?** (TMLR) | 2024 / 21 | Same team as LitLLM, deeper: is LLM-assisted review writing actually viable? | Retrieval + generation, decomposed and separately measured | Two-step keyword-extraction retrieval + prompting-based re-ranking (doubles recall vs. naive search) + plan-then-write generation | **Confirmed from full-text read (2026-07-10), with one correction:** the "prompting-based re-ranking" architecture cell is only half the picture — their own Fig 2 shows **embedding-based (SPECTER2) re-ranking outperforms LLM-prompting re-ranking**, and GPT-4-as-reranker is fragile in practice (produces an incomplete ranked list 40%+ of the time, Table 2). Introduces a **rolling, contamination-free eval protocol** using new arXiv papers — directly relevant if LitDiscover's APS-simulation validation faces a similar staleness critique. |
 | **LiRA** (AAAI) | 2025 / 5 | Retrieval/screening automation is mature; the *writing* phase (readability, factual accuracy) is under-explored | Full review article writing, not just related-work sections | Multi-agent: outliner, subsection writer, editor, reviewer | Benchmarked directly against **AutoSurvey** and MASS-Survey on SciReviewGen + a proprietary dataset; also tests robustness to reviewer-model variation |
 
 ## Tier 2 — nearest architectural neighbors (deserve a real compare/contrast paragraph)
@@ -44,7 +55,7 @@ These two overlap LitDiscover's actual design decisions, not just its problem st
 
 | Paper | Year / cites | Motivation | Scope | Architecture | Evaluation |
 |---|---|---|---|---|---|
-| **ProfOlaf** (arXiv) | 2025 / 0 | Existing tools support only isolated SLR steps, leaving the rest manual and error-prone | Article collection + selection + topic extraction + Q&A over corpus | **Iterative snowballing with human-in-the-loop filtering** (closest match to LitDiscover's staged mode), LLM-assisted selection; CLI + web app | No quantitative benchmark reported; positioned on rigor/reproducibility, demo video only |
+| **ProfOlaf** (arXiv) | 2025 / 0 | Existing tools support only isolated SLR steps, leaving the rest manual and error-prone | Article collection + selection + topic extraction + Q&A over corpus | **Iterative snowballing with human-in-the-loop filtering** (closest match to LitDiscover's staged mode), LLM-assisted selection; CLI + web app | **Correction from full-text read (2026-07-10): has a real quantitative benchmark, abstract undersold it.** 7-iteration snowball on 1009 retrieved → 108 included (11% overall efficiency). LLM-vs-human screening compared directly: LLM full-content screening F1=0.928 vs. human F1=0.927 — essentially on par, LLM slightly higher precision (0.942 vs 0.931), lower recall (0.915 vs 0.922), i.e. more conservative. Also evaluates topic-modeling (TopicGPT: 45–54% ground-truth topic match) and summarization quality (Likert, faithfulness 4.9/5). **Directly reusable as an external LLM-screening-accuracy benchmark for LitDiscover's own `screen` stage.** |
 | **Human-Centred Research Automation** (HCAIep) | 2026 / 1 | Agentic automation must preserve trust/transparency per EU AI Act + HCAI principles | Literature **discovery, filtering, and gap identification** — nearly LitDiscover's own three-verb framing | Agentic AI pipeline, human oversight retained at later stages, structured outputs (gaps, directions, candidate solutions) | Pilot only: Llama 3.1 8b, 71.05% accuracy vs. human-led SLR baseline on abstract filtering |
 
 ## Tier 3 — same subfield, one-line mention sufficient

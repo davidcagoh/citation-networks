@@ -5,6 +5,61 @@ Remaining items are logistics / camera-ready only.
 
 ---
 
+## Extract/Synthesize Technique Audit (2026-07-10)
+
+**Context:** `extract`/`synthesize` were built before the related-work-landscape research existed
+(see `related-work-landscape.md`). The traversal/discovery core is not behind SOTA — nothing in
+the landscape table replicates LitDiscover's closed-corpus ground-truth recall validation — but
+extract/synthesize plausibly are, since they were built naively without that grounding. This is a
+scoped audit plan, not a rewrite and not a replication of any competitor's repo — LitDiscover's
+scope (find the literature, with proof) is different from AutoSurvey/LitLLM's scope (write a
+survey), so the fix is targeted technique-borrowing, not adopting their whole architecture.
+
+**Resigned fallback (2026-07-10):** if extract/synthesize turn out too hard to fix well, or still
+underperform after the fixes below, the personal-workflow fallback is to stop trying to make
+LitDiscover write the review itself and instead feed the curated/extracted paper set (~50 docs)
+into NotebookLM or similar for the actual synthesis step. Keep this as a real fallback, not a
+last resort to feel bad about — LitDiscover's differentiated contribution is the discovery/recall
+guarantee, not prose generation.
+
+Four concrete audit questions, each traceable to a specific full-text finding from the 3 papers
+already read (`fulltext/`):
+
+1. **Citation grounding — is any claim ever checked against its cited paper?** AutoSurvey's
+   citation-quality metric (`h(c_i, Ref_i)`, an NLI check per claim) is the only reason it can
+   claim citation recall/precision numbers at all. Audit: read `_write_theme_section`, the
+   map-reduce path (`map_prompt`/`reduce_prompt`, ~`synthesizer.py` line 645–669), and
+   `number_citations.py` in full — confirm there is genuinely no post-hoc check that a `[ID]`
+   citation is supported by that paper's extracted fields, and scope what a minimal version would
+   cost (e.g. reusing extraction fields already in the `extractions` table rather than standing up
+   a new NLI model).
+2. **Plan-based generation — single-shot vs. plan-then-write.** Confirmed already (2026-07-10):
+   `_write_theme_section`'s single-cluster path (`synthesizer.py` line 698) is one direct "write
+   600–900 words, cite every claim" call, no intermediate plan. LitLLMs measured 18–26% fewer
+   hallucinated references from adding a plan step. Audit: would an intermediate step ("list N
+   claims + which paper IDs support each, then write") fit cleanly into the existing per-theme
+   call, or does it need restructuring the `ThreadPoolExecutor` fan-out in `synthesize()`
+   (line 589)?
+3. **Ground-truth evaluation of theme/cluster assignment.** ProfOlaf directly measures
+   TopicGPT-style assignment against human labels (precision 0.645/recall 0.850) — a real number
+   for "is the model's topic grouping trustworthy?" LitDiscover's `_kmeans_cluster`/`_elbow_k`
+   (`synthesizer.py` lines 357, 396) have no such check — clustering quality is only ever
+   validated by the elbow heuristic, never against human judgment. Audit: is there an existing set
+   of included papers with human-assigned themes anywhere (e.g. from `synthesis/` work or
+   Zeitgeist's community labels) that could serve as cheap ground truth, or would this need a
+   fresh manual pass?
+4. **Retrieval structure at scale — does map-reduce lose grounding on large clusters?**
+   AutoSurvey's ablation shows retrieval quality (not just "the papers are in context") is what
+   makes generation good; large LitDiscover clusters use map-reduce (map: bullet-point synthesis
+   per 80-paper chunk, reduce: final write from chunk syntheses) — audit whether the reduce step
+   still has access to per-paper source IDs for citation, or only the map step's already-compressed
+   bullets (i.e., does compression happen before or after citation attribution is fixed).
+
+Each item ends in a decision, not an automatic rewrite: "confirmed fine, no action" or "small
+bounded fix, scope it" — mirroring how the related-work-landscape full-text benchmark worked.
+
+---
+
 ## Submission logistics (before June 30)
 
 | Item | Issue | Status |
