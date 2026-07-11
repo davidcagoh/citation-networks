@@ -45,6 +45,8 @@ Three contributions, each with its own subdirectory:
 | [litdiscover/decisions.md](litdiscover/decisions.md) | Live: algorithm parameters, experiment design, paper structure, venue |
 | [litdiscover/open-questions.md](litdiscover/open-questions.md) | Live: open items, engine feature requests |
 | [litdiscover/related-work-landscape.md](litdiscover/related-work-landscape.md) | Live: SOTA/close-hit competitor comparison table (motivation/scope/architecture/evaluation), driving the IP&M redo's Related Work section |
+| [litdiscover/lineage-deep-dives.md](litdiscover/lineage-deep-dives.md) | Live: 22 full 6-field method deep-dives + Methods/Evaluation-Methods tables, mined from the 366-paper corpus beyond the original 7 |
+| [litdiscover/related-work-lineage.md](litdiscover/related-work-lineage.md) | Live: narrative lineage connecting the 22 deep-dives into who-answers-whom chains, ending in the field's meta-gap + Related Work section scaffold |
 
 ---
 
