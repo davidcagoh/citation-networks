@@ -91,14 +91,14 @@ These two overlap LitDiscover's actual design decisions, not just its problem st
 
 ## Tier 3 — same subfield, one-line mention sufficient
 
-| Paper | Year / cites | One-line differentiator |
-|---|---|---|
-| **SurveyGen** (EMNLP) | 2025 / 8 | New 4,200-survey dataset + quality-aware retrieval (QUAL-SG); honest about fully-automatic generation still being weak on citation quality/critical analysis — useful contrast point if LitDiscover claims stronger discovery precision |
-| **SurveyGen-I** (IJCNLP-AACL) | 2025 / 2 | Coarse-to-fine retrieval + memory-guided writing, targets long-survey coherence specifically |
-| **SGSimEval** | 2025 / 4 | Not a generator — an **evaluation benchmark** for ASG systems with human-preference metrics; potential citation for LitDiscover's own eval methodology, not a competing system |
-| **System for SLR using multiple AI agents** (arXiv) | 2024 / 41 | Full pipeline (search string → title filter → abstract filter → per-RQ analysis), open-sourced; closest architectural shape to LitDiscover's traverse→prefilter→screen→extract staging among the 2024 cohort |
-| **Scholar Augment** | 2026 / 0 | End-to-end multi-LLM platform, headline metric is 99.32% extraction-time reduction on 592 articles — scope overlaps broadly but optimizes for a different outcome (speed, not discovery recall) |
-| **IntrAgent** | 2026 / 1 | Different task (content-grounded retrieval via two-stage Section Ranking + Iterative Reading, own IntraBench benchmark) — cite only if framing "reading behavior mimicry" as a design lineage |
+| Paper                                               | Year / cites | One-line differentiator                                                                                                                                                                                                                 |
+| --------------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **SurveyGen** (EMNLP)                               | 2025 / 8     | New 4,200-survey dataset + quality-aware retrieval (QUAL-SG); honest about fully-automatic generation still being weak on citation quality/critical analysis — useful contrast point if LitDiscover claims stronger discovery precision |
+| **SurveyGen-I** (IJCNLP-AACL)                       | 2025 / 2     | Coarse-to-fine retrieval + memory-guided writing, targets long-survey coherence specifically                                                                                                                                            |
+| **SGSimEval**                                       | 2025 / 4     | Not a generator — an **evaluation benchmark** for ASG systems with human-preference metrics; potential citation for LitDiscover's own eval methodology, not a competing system                                                          |
+| **System for SLR using multiple AI agents** (arXiv) | 2024 / 41    | Full pipeline (search string → title filter → abstract filter → per-RQ analysis), open-sourced; closest architectural shape to LitDiscover's traverse→prefilter→screen→extract staging among the 2024 cohort                            |
+| **Scholar Augment**                                 | 2026 / 0     | End-to-end multi-LLM platform, headline metric is 99.32% extraction-time reduction on 592 articles — scope overlaps broadly but optimizes for a different outcome (speed, not discovery recall)                                         |
+| **IntrAgent**                                       | 2026 / 1     | Different task (content-grounded retrieval via two-stage Section Ranking + Iterative Reading, own IntraBench benchmark) — cite only if framing "reading behavior mimicry" as a design lineage                                           |
 
 ## Excluded from comparison (false positives from keyword match)
 
