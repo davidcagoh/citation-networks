@@ -15,6 +15,90 @@ in this review sit in Stage 3 or later.
 
 ---
 
+## Diagram
+
+```mermaid
+graph TD
+    SciReviewGen["SciReviewGen<br/>2023 — QFiD baseline"]
+    AutoSurvey["AutoSurvey<br/>2024 — retrieval→outline→draft→refine→judge"]
+    SurveyGen["SurveyGen<br/>2025 — quality-aware retrieval (QUAL-SG)"]
+    SurveyX["SurveyX<br/>2025 — AttributeTree + online retrieval"]
+    SurveyGenI["SurveyGen-I<br/>2025 — dynamic re-planning + citation-tracing"]
+    Meow["Meow<br/>2025 — trained outline generation"]
+    InteractiveSurvey["InteractiveSurvey<br/>2025 — mid-process human refinement"]
+    SGSimEval["SGSimEval<br/>2025 — unified eval benchmark"]
+
+    LitLLM["LitLLM<br/>2024 — retrieval+rerank+RAG"]
+    LitLLMs2["LitLLMs, are we there yet?<br/>2024/25 — rolling contamination-free eval"]
+
+    LiRA["LiRA<br/>2026 — CQF1 + Reviewer Agent"]
+
+    ProfOlaf["ProfOlaf<br/>2025 — 2-rater + LLM-aux screening"]
+    HCRA["Human-Centred Research Automation<br/>2026 — HCAI governance"]
+    PROMPTHEUS["PROMPTHEUS<br/>2024 — 'human-centered' (thin: 1 checkpoint)"]
+
+    SLRAgents["System for SLR w/ Multiple AI Agents<br/>2024 — closest staging shape, no traversal"]
+    GEARUp["GEAR-Up<br/>2024 — query-expansion front-end only"]
+    BioSIEVE["Bio-SIEVE<br/>2023 — fine-tuned screening LLM"]
+    ReviewGenie["ReviewGenie<br/>2025 — linear keyword pipeline"]
+    ScholarAugment["Scholar Augment<br/>2026 — extraction platform, no accuracy eval"]
+    TriSemLLM["TriSem-LLM<br/>2026 — trilingual, no-early-exclusion, PRISMA"]
+    LLAssist["LLAssist<br/>2024 — minimalist single-call triage"]
+
+    SocLitGen["SocLitGen<br/>2026 — social-science branch"]
+
+    IntrAgent["IntrAgent<br/>2026 — single-paper QA (different task)"]
+
+    LitDiscover["LitDiscover<br/>bidirectional traversal + validated recall"]
+
+    %% Lineage A — survey-writing pipelines
+    SciReviewGen -->|"abstracts-only bottleneck"| AutoSurvey
+    AutoSurvey -->|"retrieval ignores quality/impact"| SurveyGen
+    AutoSurvey -->|"abstract-only, offline-only"| SurveyX
+    AutoSurvey -->|"fixed outline, isolated drafting"| SurveyGenI
+    AutoSurvey -->|"outline = template byproduct"| Meow
+    AutoSurvey -.->|"title-only, fixed output"| InteractiveSurvey
+    SurveyX -.->|"title-only, fixed output"| InteractiveSurvey
+    AutoSurvey -.->|"judge metric fragmentation"| SGSimEval
+    SurveyX -.-> SGSimEval
+    SurveyGenI -.-> SGSimEval
+
+    %% Lineage B — LitLLM team arc
+    LitLLM ==>|"same team, rigorous re-eval"| LitLLMs2
+    LitLLM -.->|"title-only, fixed output"| InteractiveSurvey
+
+    %% Lineage C — citation-quality + reviewer-agent
+    AutoSurvey -->|"CQF1 reused verbatim (code-level)"| LiRA
+
+    %% Lineage D — human-in-the-loop convergence
+    ProfOlaf -.->|"same conclusion, independent"| HCRA
+    PROMPTHEUS -.->|"claims same label, thinner"| ProfOlaf
+
+    %% Lineage E — discovery-only tools (no synthesis)
+    SLRAgents --- GEARUp --- BioSIEVE --- ReviewGenie --- ScholarAugment --- TriSemLLM --- LLAssist
+
+    %% Lineage F — domain branch
+    AutoSurvey -.->|"CS-only assumption challenged"| SocLitGen
+
+    %% Meta-gap: nobody validates discovery recall against a real bibliography
+    LiRA -.->|"named gap: screening unaddressed"| LitDiscover
+    SLRAgents -.->|"no citation-graph traversal"| LitDiscover
+    ScholarAugment -.->|"no citation-graph traversal"| LitDiscover
+    ReviewGenie -.->|"no citation-graph traversal"| LitDiscover
+    TriSemLLM -.->|"no standardized benchmark"| LitDiscover
+
+    classDef gap fill:#ffe0e0,stroke:#c00,stroke-width:2px;
+    class LitDiscover gap;
+```
+
+*Solid arrows = explicit "answers a named gap in" relationship stated in the source paper. Dashed
+arrows = shared critique/convergence without direct citation. The double arrow (LitLLM⇒LitLLMs) is
+the same team's own follow-up. Lineage E's tools are connected by plain lines (`---`) since they
+don't cite each other — they're grouped only because none does citation-graph traversal, the
+single fact that differentiates all of them from LitDiscover.*
+
+---
+
 ## Lineage A — Survey-writing pipelines (the "write the whole survey" arc)
 
 **SciReviewGen (2023)** supplies the dataset and the first serious baseline (QFiD) — and, load-
