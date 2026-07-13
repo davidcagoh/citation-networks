@@ -209,8 +209,16 @@ and `/tmp/litreview_watchdog*` files are outside the repo and weren't touched).
 ---
 
 ## Tier 1/2 close-hit papers: pull full PDFs, not abstracts-only (2026-07-10)
-**Why:** Full text gives an independent read to check Gemini's screening/relevance judgments against, rather than abstracts-only where the LLM's own summary is the only signal available.
-**Status:** Decided. Start with 3 of the 7 Tier 1/2 papers — enough to benchmark against before deciding whether to pull the rest.
+**Why:** Full text gives an independent read to check Gemini's screening/relevance judgments against, rather than abstracts-only where the LLM's own summary is the only signal available. Abstracts pulled via Supabase (`papers.abstract`) are verbatim from Semantic Scholar, not written by us — treated as untrusted external data, quote-checked before any reuse in the paper.
+**Status:** ✅ Complete — all 7 of 7 Tier 1/2 papers full-text verified as of 2026-07-11.
+
+**Round 1 (2026-07-10):** pulled 3 of 7 (AutoSurvey, ProfOlaf, LitLLMs-are-we-there-yet) to check Gemini's abstract-only extraction against ground truth. **Verdict: worth pulling the rest.** AutoSurvey's cells were accurate, but ProfOlaf's Evaluation cell was flatly wrong (abstract-only extraction said "no quantitative benchmark" when the paper has a full LLM-vs-human screening comparison), and LitLLMs' architecture cell missed a real nuance (embedding-based re-ranking beats LLM-prompting re-ranking in their own results). One clear miss and one partial miss out of three justified full-text passes on the remaining four.
+
+**Round 2 (2026-07-10):** pulled 3 more (SciReviewGen, LitLLM, LiRA). All three entries confirmed accurate on re-read. Surfaced two things beyond correctness-checking: (1) SciReviewGen and LitLLM independently name the same bottleneck — abstracts-only input causes hallucination/factuality failure — directly relevant to whether LitDiscover's synthesis (fed only structured extraction fields) has the same problem in a different shape; (2) LiRA has a working, benchmarked citation-grounding metric (CQF1) and Reviewer Agent, the single most directly reusable precedent found (see the Extract/Synthesize Technique Audit in `open-questions.md`).
+
+**Code-level ground-truth check (2026-07-11):** cloned `sr-lab/ProfOlaf` and `lira-workflow/auto-review-writing` into `lit-review/` (gitignored, reference-only) to verify the CQF1/Reviewer-Agent claims against actual code, not just the paper's description. **Correction:** CQF1 is not a live in-loop check — it's an **offline eval metric** (`utils/eval_metrics/citation_quality.py`, explicitly commented `# Code adapted from https://github.com/AutoSurveys/AutoSurvey`, reusing AutoSurvey's NLI-entailment-per-claim code near-verbatim) computed after generation for benchmarking, not something the pipeline runs during writing. `src/reviewer.py`'s actual `ReviewerAgent` is a general-purpose completeness/clarity/transparency quality gate (parses a `SUFFICIENT yes/no` verdict, up to 3 regeneration rounds) — not citation-specific. The real anti-hallucination mechanism during generation is citing full article titles while writing (grounds the model on real strings, not placeholder numbers), not a live grounding check. **Implication:** LitDiscover's `check_citation_grounding()` (shipped 2026-07-11) is actually more advanced than either precedent on this specific axis — wired into the pipeline as a live diagnostic on every synthesis run, not an offline benchmarking-only metric.
+
+**Round 3 (2026-07-11):** Human-Centred Research Automation obtained (user supplied the PDF directly — ACM DL is paywalled, no open-access mirror was findable) and read. Table entry confirmed accurate, with one new nuance: their own classical-vs-LLM filter comparison (60–68% for cheap methods vs. 71% for Llama 3.1) is a real data point supporting the economics of `prefilter`-before-`screen`. Closes the verification pass — all 7 of 7 Tier 1/2 papers now full-text confirmed.
 
 ---
 
@@ -232,3 +240,35 @@ before deciding between `--exclude-nonmatching` and a full `screen` pass. This r
 `litdiscover/CLAUDE.md`'s existing documented order — it doesn't replace it; the lapse was
 discipline, not documentation.
 **Status:** ✅ Adopted 2026-07-10, applies to all staged-workflow projects going forward.
+
+---
+
+## Related-work lineage: three construction methods built, thematic clustering deprecated (2026-07-13)
+**Why:** `related-work-lineage.md`'s thematic-bucket lineage (Lineages A–F) was audited against
+the source deep-dive entries and found to represent only 12 of 32 real citation edges, with 3
+fabricated edges (including the load-bearing SciReviewGen→AutoSurvey anchor) — thematic clustering
+was silently dropping cross-lineage citations and inventing plausible-sounding but unsupported
+ones. Two more rigorous methods were built to replace it: `lineages/explicit-citation-graph.md`
+(O(n) extraction of only what papers explicitly state about each other, 32 confirmed edges) and
+`lineages/implicit-pairwise-analysis.md` (O(n²)-ish content-matching for uncited-but-real
+mechanism-to-gap relationships, 10 more edges). Union of both revealed the field's real structure:
+one 19–21-paper connected component, not six separate lineages.
+
+**Decision: `similarity-cluster.md` (renamed from `related-work-lineage.md`) is deprecated, not
+rebuilt.** Considered and rejected rebuilding it "correctly" — doing so would either duplicate
+`explicit-citation-graph.md`'s content or keep forcing a mutually-exclusive-bucket shape now twice
+shown to be wrong for this corpus. Kept unedited as the control condition in
+`lineages/lineage-comparison.md`'s three-method comparison. Paper prose now drafts directly from
+the two rigorous methods — `related-work.tex`'s "Automated systematic review" paragraph was
+rewritten from `implicit-pairwise-analysis.md` the same day, ProfOlaf-centered instead of the
+prior flat 3-cohort framing.
+
+**Also fixed in this pass:** two real citation errors caught auditing tools cited in
+`related-work.tex`'s other paragraph (SWIFT-Review, RobotSearch, ASReview, Elicit, ResearchRabbit
+— none of which had gone through the same verification rigor as the 22 core lineage papers).
+SWIFT-Review's DOI resolved to an unrelated influenza-aerosol paper (fabricated citation);
+RobotSearch was cited to the wrong Marshall/Wallace paper entirely. Both fixed in `refs.bib`,
+which was also consolidated from two independently-diverged copies (`drafts/refs.bib` and
+`drafts/ipm-submission/refs.bib`) into one canonical file with a symlink.
+
+**Status:** ✅ Adopted 2026-07-13. All five new artifacts live in `wiki/litdiscover/lineages/`.

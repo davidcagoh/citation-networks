@@ -1,8 +1,36 @@
-# Automated Literature Review — Narrative Lineage
+# Automated Literature Review — Similarity-Cluster Lineage (DEPRECATED — reference artifact only)
 
-Traces *who answers whom* across the 22 method papers in `lineage-deep-dives.md` — connected
-chains where System B exists because System A left a named gap, not just a flat comparison
-table (`related-work-landscape.md`) or a list of isolated deep-dives (`lineage-deep-dives.md`).
+**Status (2026-07-13): deprecated, not being rebuilt.** This document is no longer a source for
+drafting paper prose — that job moved to `explicit-citation-graph.md` (ground truth) and
+`implicit-pairwise-analysis.md` (richest signal); `../../lit-review/robust-literature-discovery/
+drafts/ipm-submission/related-work.tex`'s current paragraph was drafted directly from those two,
+not from this file. Kept intact, unedited, as the **control condition** in
+`lineage-comparison.md`'s three-method comparison — concrete evidence of what naive thematic
+clustering produces and why it isn't trusted, not a document anyone should read for its edges.
+Rebuilding it "correctly" was considered and rejected: doing so would either duplicate
+`explicit-citation-graph.md`'s content, or keep forcing a mutually-exclusive-bucket shape that's
+now been shown twice (the 19-node giant component in `explicit-citation-graph.md`, the 6-edge
+ProfOlaf case in `lineage-comparison.md`) to be the wrong shape for this corpus. More effort here
+buys nothing the other two documents don't already deliver.
+
+**Method: thematic clustering.** Papers grouped into 6 lineages (A–F) by subject-matter/approach
+similarity, written as narrative prose. One of three lineage-construction methods run over the
+same corpus — see `lineages/` siblings `explicit-citation-graph.md` (O(n) bottom-up extraction of
+only what papers explicitly say about each other) and `implicit-pairwise-analysis.md` (O(n²)
+content-matching for uncited-but-real relationships), plus `lineage-comparison.md` for a worked
+example showing how the three disagree on the same paper.
+
+**Known limitation (audited 2026-07-13, see `explicit-citation-graph.md`):** this document's
+bucket structure was checked against what the papers actually cite, and only 12 of 32 real
+citation edges are represented here — 20 were silently dropped because they crossed a lineage
+boundary, and 3 edges drawn below (including the opening SciReviewGen→AutoSurvey edge) have no
+textual support at all. Do not use the content or edges below for anything beyond understanding
+what thematic clustering got wrong — cross-check any claim against `explicit-citation-graph.md`
+or `implicit-pairwise-analysis.md` before reusing it.
+
+Traces *who answers whom* across the 22 method papers in `../deep-dives.md` — connected
+chains where System B exists because System A left a named gap, not just a list of isolated
+deep-dives.
 Modeled on `260708 literature-review.pdf`'s structure: named lineages, an evaluation-methods
 lineage, a Discussion section naming the field's actual meta-gap, and Next Steps that puts the
 lineage to use rather than leaving it as an observation.
@@ -15,91 +43,128 @@ in this review sit in Stage 3 or later.
 
 ---
 
-## Diagram
+## Diagrams
+
+A flat 22-node diagram was unreadable — Mermaid's default layout has no sense of clustering, so it
+optimizes edge-crossing across all 22 nodes as one blob. Fixed two ways: the big-picture view below
+uses `subgraph` blocks to keep each lineage spatially grouped (same information, but legible), and
+each lineage section further down also has its own small standalone diagram right where it's
+discussed, for reading section-by-section rather than parsing the whole field at once. Legend,
+shared across all of them: **solid arrow** = explicit "answers a named gap in" relationship stated
+in the source paper; **dashed arrow** = shared critique/convergence without direct citation;
+**plain line (`---`)** = grouped by shared trait, not citation.
+
+### Big picture — all six lineages clustered
 
 ```mermaid
 graph TD
-    SciReviewGen["SciReviewGen<br/>2023 — QFiD baseline"]
-    AutoSurvey["AutoSurvey<br/>2024 — retrieval→outline→draft→refine→judge"]
-    SurveyGen["SurveyGen<br/>2025 — quality-aware retrieval (QUAL-SG)"]
-    SurveyX["SurveyX<br/>2025 — AttributeTree + online retrieval"]
-    SurveyGenI["SurveyGen-I<br/>2025 — dynamic re-planning + citation-tracing"]
-    Meow["Meow<br/>2025 — trained outline generation"]
-    InteractiveSurvey["InteractiveSurvey<br/>2025 — mid-process human refinement"]
-    SGSimEval["SGSimEval<br/>2025 — unified eval benchmark"]
+    subgraph A["Lineage A — survey-writing pipelines"]
+        SciReviewGen["SciReviewGen<br/>2023"]
+        AutoSurveyA["AutoSurvey<br/>2024"]
+        SurveyGen["SurveyGen<br/>2025"]
+        SurveyX["SurveyX<br/>2025"]
+        SurveyGenI["SurveyGen-I<br/>2025"]
+        Meow["Meow<br/>2025"]
+        InteractiveSurvey["InteractiveSurvey<br/>2025"]
+        SGSimEval["SGSimEval<br/>2025"]
+        SciReviewGen --> AutoSurveyA
+        AutoSurveyA --> SurveyGen
+        AutoSurveyA --> SurveyX
+        AutoSurveyA --> SurveyGenI
+        AutoSurveyA --> Meow
+        AutoSurveyA -.-> InteractiveSurvey
+        SurveyX -.-> InteractiveSurvey
+        AutoSurveyA -.-> SGSimEval
+        SurveyX -.-> SGSimEval
+        SurveyGenI -.-> SGSimEval
+    end
 
-    LitLLM["LitLLM<br/>2024 — retrieval+rerank+RAG"]
-    LitLLMs2["LitLLMs, are we there yet?<br/>2024/25 — rolling contamination-free eval"]
+    subgraph B["Lineage B — LitLLM arc"]
+        LitLLM["LitLLM<br/>2024"]
+        LitLLMs2["LitLLMs, are we<br/>there yet? 2024/25"]
+        LitLLM ==> LitLLMs2
+    end
 
-    LiRA["LiRA<br/>2026 — CQF1 + Reviewer Agent"]
+    subgraph C["Lineage C — citation-quality + reviewer-agent"]
+        AutoSurveyC["AutoSurvey<br/>2024"]
+        LiRA["LiRA<br/>2026"]
+        AutoSurveyC --> LiRA
+    end
 
-    ProfOlaf["ProfOlaf<br/>2025 — 2-rater + LLM-aux screening"]
-    HCRA["Human-Centred Research Automation<br/>2026 — HCAI governance"]
-    PROMPTHEUS["PROMPTHEUS<br/>2024 — 'human-centered' (thin: 1 checkpoint)"]
+    subgraph D["Lineage D — human-in-the-loop"]
+        PROMPTHEUS["PROMPTHEUS<br/>2024"]
+        ProfOlaf["ProfOlaf<br/>2025"]
+        HCRA["Human-Centred<br/>Research Automation<br/>2026"]
+        PROMPTHEUS -.-> ProfOlaf
+        ProfOlaf -.-> HCRA
+    end
 
-    SLRAgents["System for SLR w/ Multiple AI Agents<br/>2024 — closest staging shape, no traversal"]
-    GEARUp["GEAR-Up<br/>2024 — query-expansion front-end only"]
-    BioSIEVE["Bio-SIEVE<br/>2023 — fine-tuned screening LLM"]
-    ReviewGenie["ReviewGenie<br/>2025 — linear keyword pipeline"]
-    ScholarAugment["Scholar Augment<br/>2026 — extraction platform, no accuracy eval"]
-    TriSemLLM["TriSem-LLM<br/>2026 — trilingual, no-early-exclusion, PRISMA"]
-    LLAssist["LLAssist<br/>2024 — minimalist single-call triage"]
+    subgraph E["Lineage E — discovery-only tools"]
+        SLRAgents["System for SLR<br/>2024"]
+        GEARUp["GEAR-Up<br/>2024"]
+        BioSIEVE["Bio-SIEVE<br/>2023"]
+        ReviewGenie["ReviewGenie<br/>2025"]
+        ScholarAugment["Scholar Augment<br/>2026"]
+        TriSemLLM["TriSem-LLM<br/>2026"]
+        LLAssist["LLAssist<br/>2024"]
+        SLRAgents --- GEARUp --- BioSIEVE --- ReviewGenie --- ScholarAugment --- TriSemLLM --- LLAssist
+    end
 
-    SocLitGen["SocLitGen<br/>2026 — social-science branch"]
+    subgraph F["Lineage F — domain-specific"]
+        SocLitGen["SocLitGen<br/>2026"]
+    end
 
-    IntrAgent["IntrAgent<br/>2026 — single-paper QA (different task)"]
+    IntrAgent["IntrAgent<br/>2026<br/>(standing apart)"]
 
-    LitDiscover["LitDiscover<br/>bidirectional traversal + validated recall"]
+    LitDiscover["LitDiscover"]
 
-    %% Lineage A — survey-writing pipelines
-    SciReviewGen -->|"abstracts-only bottleneck"| AutoSurvey
-    AutoSurvey -->|"retrieval ignores quality/impact"| SurveyGen
-    AutoSurvey -->|"abstract-only, offline-only"| SurveyX
-    AutoSurvey -->|"fixed outline, isolated drafting"| SurveyGenI
-    AutoSurvey -->|"outline = template byproduct"| Meow
-    AutoSurvey -.->|"title-only, fixed output"| InteractiveSurvey
-    SurveyX -.->|"title-only, fixed output"| InteractiveSurvey
-    AutoSurvey -.->|"judge metric fragmentation"| SGSimEval
-    SurveyX -.-> SGSimEval
-    SurveyGenI -.-> SGSimEval
+    %% cross-lineage links
+    LitLLM -.-> InteractiveSurvey
+    AutoSurveyC -.->|"CS-only assumption challenged"| SocLitGen
 
-    %% Lineage B — LitLLM team arc
-    LitLLM ==>|"same team, rigorous re-eval"| LitLLMs2
-    LitLLM -.->|"title-only, fixed output"| InteractiveSurvey
-
-    %% Lineage C — citation-quality + reviewer-agent
-    AutoSurvey -->|"CQF1 reused verbatim (code-level)"| LiRA
-
-    %% Lineage D — human-in-the-loop convergence
-    ProfOlaf -.->|"same conclusion, independent"| HCRA
-    PROMPTHEUS -.->|"claims same label, thinner"| ProfOlaf
-
-    %% Lineage E — discovery-only tools (no synthesis)
-    SLRAgents --- GEARUp --- BioSIEVE --- ReviewGenie --- ScholarAugment --- TriSemLLM --- LLAssist
-
-    %% Lineage F — domain branch
-    AutoSurvey -.->|"CS-only assumption challenged"| SocLitGen
-
-    %% Meta-gap: nobody validates discovery recall against a real bibliography
-    LiRA -.->|"named gap: screening unaddressed"| LitDiscover
-    SLRAgents -.->|"no citation-graph traversal"| LitDiscover
-    ScholarAugment -.->|"no citation-graph traversal"| LitDiscover
-    ReviewGenie -.->|"no citation-graph traversal"| LitDiscover
+    %% meta-gap funnel
+    LiRA -.->|"screening unaddressed"| LitDiscover
+    SLRAgents -.->|"no traversal"| LitDiscover
+    ScholarAugment -.->|"no traversal"| LitDiscover
+    ReviewGenie -.->|"no traversal"| LitDiscover
     TriSemLLM -.->|"no standardized benchmark"| LitDiscover
 
     classDef gap fill:#ffe0e0,stroke:#c00,stroke-width:2px;
     class LitDiscover gap;
 ```
 
-*Solid arrows = explicit "answers a named gap in" relationship stated in the source paper. Dashed
-arrows = shared critique/convergence without direct citation. The double arrow (LitLLM⇒LitLLMs) is
-the same team's own follow-up. Lineage E's tools are connected by plain lines (`---`) since they
-don't cite each other — they're grouped only because none does citation-graph traversal, the
-single fact that differentiates all of them from LitDiscover.*
+*`AutoSurvey` appears twice (once per lineage it participates in — A and C) since Mermaid subgraphs
+require each node to belong to exactly one cluster; treat `AutoSurveyA`/`AutoSurveyC` as the same
+paper. IntrAgent sits outside every subgraph — it belongs to no lineage (different task entirely).*
 
 ---
 
 ## Lineage A — Survey-writing pipelines (the "write the whole survey" arc)
+
+```mermaid
+graph LR
+    SciReviewGen["SciReviewGen<br/>2023 — QFiD baseline"]
+    AutoSurvey["AutoSurvey<br/>2024 — retrieval→outline→draft→refine→judge"]
+    SurveyGen["SurveyGen<br/>2025 — quality-aware retrieval"]
+    SurveyX["SurveyX<br/>2025 — AttributeTree + online retrieval"]
+    SurveyGenI["SurveyGen-I<br/>2025 — dynamic re-planning"]
+    Meow["Meow<br/>2025 — trained outline generation"]
+    InteractiveSurvey["InteractiveSurvey<br/>2025 — mid-process human refinement"]
+    SGSimEval["SGSimEval<br/>2025 — unified eval benchmark"]
+    LitLLM["LitLLM<br/>(Lineage B)"]
+
+    SciReviewGen -->|"abstracts-only bottleneck"| AutoSurvey
+    AutoSurvey -->|"retrieval ignores quality"| SurveyGen
+    AutoSurvey -->|"abstract-only, offline-only"| SurveyX
+    AutoSurvey -->|"fixed outline, isolated drafting"| SurveyGenI
+    AutoSurvey -->|"outline = template byproduct"| Meow
+    AutoSurvey -.->|"title-only, fixed output"| InteractiveSurvey
+    SurveyX -.-> InteractiveSurvey
+    LitLLM -.-> InteractiveSurvey
+    AutoSurvey -.->|"judge metric fragmentation"| SGSimEval
+    SurveyX -.-> SGSimEval
+    SurveyGenI -.-> SGSimEval
+```
 
 **SciReviewGen (2023)** supplies the dataset and the first serious baseline (QFiD) — and, load-
 bearing for everything downstream, its own §5.3 root-causes hallucination/factuality failure to
@@ -146,6 +211,13 @@ score outline+content+references together. See the Evaluation-Methods Lineage be
 
 ## Lineage B — The LitLLM team's two-paper arc (related-work sections, not full surveys)
 
+```mermaid
+graph LR
+    LitLLM["LitLLM<br/>2024 — retrieval+rerank+RAG"]
+    LitLLMs2["LitLLMs, are we there yet?<br/>2024/25 — rolling contamination-free eval"]
+    LitLLM ==>|"same team, rigorous re-eval"| LitLLMs2
+```
+
 **LitLLM (2024)**: keyword+embedding retrieval → LLM re-ranking (permutation or debate-with-
 attribution) → single-pass RAG generation of a related-work section (narrower scope than a full
 survey). Its own Future Work section names the abstracts-only bottleneck independently of
@@ -162,17 +234,24 @@ its own earlier work's methodology rather than a competitor doing it.
 
 ## Lineage C — The citation-quality-metric-and-reviewer-agent arc
 
+```mermaid
+graph LR
+    AutoSurvey["AutoSurvey<br/>2024 — h(c_i,Ref_i) NLI metric"]
+    LiRA["LiRA<br/>2026 — CQF1 (reused verbatim) + Reviewer Agent"]
+    AutoSurvey -->|"CQF1 reused verbatim (code-level)"| LiRA
+```
+
 **AutoSurvey (2024)** introduces the `h(c_i, Ref_i)` NLI-based per-claim citation-quality metric
 (recall/precision over whether a claim is actually entailed by its cited source) — this is the
 foundational eval-methodology contribution of the whole corpus.
 
 **LiRA (2026)** reuses that metric **verbatim, adapted from AutoSurvey's own released code**
-(confirmed at the code level, not just the paper — see `related-work-landscape.md`'s code-level
+(confirmed at the code level, not just the paper — see `../decisions.md`'s code-level
 correction), rebrands it CQF1, and beats AutoSurvey substantially on it (0.76/0.73 vs. ≤0.63).
 LiRA adds a genuinely new mechanism on top: a Reviewer Agent that evaluates intermediate outputs
 (outline, draft) against a completeness/clarity rubric and triggers up to 3 regeneration rounds —
-though code-level inspection confirmed this Reviewer Agent is a *general* quality gate, not
-citation-specific, and CQF1 itself is computed offline for benchmarking, not live during
+though code-level inspection (`../decisions.md`) confirmed this Reviewer Agent is a *general* quality
+gate, not citation-specific, and CQF1 itself is computed offline for benchmarking, not live during
 generation. **LiRA's own stated future work explicitly names "integration of the screening and
 search criteria definition steps within the pipeline" as unaddressed** — LiRA assumes references
 are already curated. This is the single most direct acknowledgment, from a competitor's own paper,
@@ -181,6 +260,15 @@ of the exact gap LitDiscover's discovery/traversal work fills.
 ---
 
 ## Lineage D — Human-in-the-loop governance arc
+
+```mermaid
+graph LR
+    PROMPTHEUS["PROMPTHEUS<br/>2024 — thin: 1 checkpoint"]
+    ProfOlaf["ProfOlaf<br/>2025 — 2-rater + LLM-aux screening"]
+    HCRA["Human-Centred Research Automation<br/>2026 — HCAI governance"]
+    PROMPTHEUS -.->|"claims same label, thinner"| ProfOlaf
+    ProfOlaf -.->|"same conclusion, independent"| HCRA
+```
 
 Three papers converge on the same claim independently, from different angles:
 
@@ -204,6 +292,27 @@ philosophy, only two actually implement checkpointed human oversight throughout 
 ---
 
 ## Lineage E — Discovery/extraction-only tools (no full-review synthesis)
+
+```mermaid
+graph LR
+    SLRAgents["System for SLR w/<br/>Multiple AI Agents<br/>2024"]
+    GEARUp["GEAR-Up<br/>2024"]
+    BioSIEVE["Bio-SIEVE<br/>2023"]
+    ReviewGenie["ReviewGenie<br/>2025"]
+    ScholarAugment["Scholar Augment<br/>2026"]
+    TriSemLLM["TriSem-LLM<br/>2026"]
+    LLAssist["LLAssist<br/>2024"]
+    ResearchRabbit["ResearchRabbit<br/>(product, not a paper)"]
+    SLRAgents --- GEARUp --- BioSIEVE --- ReviewGenie --- ScholarAugment --- TriSemLLM --- LLAssist
+    ResearchRabbit -.->|"does traverse, but no<br/>stopping rule/validation"| SLRAgents
+
+    classDef productNode fill:#fff3cd,stroke:#b8860b,stroke-width:1.5px,stroke-dasharray: 4 2;
+    class ResearchRabbit productNode;
+```
+
+*Grouped by shared trait, not citation — plain lines, no arrowheads. Six of the seven share "no
+citation-graph traversal at all." **ResearchRabbit is the exception, not a confirmation** — see
+below.*
 
 These don't write surveys at all — they automate search, screening, or extraction as standalone
 tools, closer in scope to LitDiscover's own traversal/screening stages than to Lineage A's
@@ -238,10 +347,32 @@ generation-focused systems:
   no synthesis step at all. Its own future work (full-text analysis, human feedback, domain-
   specific models) is explicitly the opposite of its stated "simple tools" philosophy — a
   deliberate first step, not an end state, by the authors' own framing.
+- **ResearchRabbit** (product, not a peer-reviewed paper — full deep-dive in
+  `../deep-dives.md`'s verification cohort) is the one case in this lineage that genuinely
+  **does** do citation-graph traversal — co-citation and bibliographic-coupling signals from
+  user-supplied seed papers, mechanically closer to LitDiscover's own bidirectional traversal than
+  any of the six papers above. This matters for how this lineage's claim is stated: "no
+  citation-graph traversal at all" is not the universal differentiator it was written as — it's
+  true of six of the seven tools here, not all of them. ResearchRabbit's actual gap is sharper and
+  arguably stronger evidence for LitDiscover's contribution, not weaker: even a tool that *does*
+  traverse the citation graph has no formal stopping/convergence rule and no published validation
+  against a real bibliography (an independent comparative test found only 3/50 overlaps between
+  ResearchRabbit's own output and an architecturally similar tool, Connected Papers, on the same
+  seed — evidence the method isn't even reproducible across runs of "the same kind of tool," let
+  alone validated against ground truth). LitDiscover's edge isn't "we traverse and others don't" —
+  it's "we traverse *with* a validated stopping rule and closed-corpus recall guarantee," and that
+  claim survives even the closest non-paper case in the field.
 
 ---
 
 ## Lineage F — The domain-specific branch
+
+```mermaid
+graph LR
+    AutoSurvey["AutoSurvey<br/>(Lineage A)"]
+    SocLitGen["SocLitGen<br/>2026 — social-science branch"]
+    AutoSurvey -.->|"CS-only assumption challenged"| SocLitGen
+```
 
 **SocLitGen (2026)** stands genuinely apart from every CS-focused system above: the first
 framework in *any* domain purpose-built for social science, with a different review-organization
@@ -292,6 +423,25 @@ Three separate lineages hide inside "how do you know it worked":
 
 ## Discussion — the field's actual meta-gap
 
+```mermaid
+graph LR
+    LiRA["LiRA<br/>screening unaddressed"]
+    SLRAgents["System for SLR<br/>no citation-graph traversal"]
+    ScholarAugment["Scholar Augment<br/>no citation-graph traversal"]
+    ReviewGenie["ReviewGenie<br/>no citation-graph traversal"]
+    TriSemLLM["TriSem-LLM<br/>no standardized benchmark"]
+    LitDiscover["LitDiscover<br/>bidirectional traversal +<br/>validated recall"]
+
+    LiRA -.-> LitDiscover
+    SLRAgents -.-> LitDiscover
+    ScholarAugment -.-> LitDiscover
+    ReviewGenie -.-> LitDiscover
+    TriSemLLM -.-> LitDiscover
+
+    classDef gap fill:#ffe0e0,stroke:#c00,stroke-width:2px;
+    class LitDiscover gap;
+```
+
 Reading all 22 papers together, not one of them makes LitDiscover's specific claim: **recall
 against a real published survey's full bibliography, in a large closed corpus, with structural
 explanation of what's missed.** Three near-misses, each falling short in a different way:
@@ -331,7 +481,11 @@ The IP&M redo's Related Work section should be structured by lineage, not as 22 
    validation, not just an internal design choice.
 4. **Lineage E** (discovery-only tools) is the most direct comparison set — this is where the
    "no citation-graph traversal at all" observation (true of System-for-SLR, GEAR-Up, ReviewGenie,
-   Scholar Augment, TriSem-LLM) does the real differentiating work.
+   Scholar Augment, TriSem-LLM) does the real differentiating work. **Worth using ResearchRabbit
+   here too, as the stronger version of the argument**: even the one close comparator that *does*
+   traverse the citation graph has no stopping rule and no published validation — showing
+   LitDiscover's edge is the validated stopping rule and closed-corpus recall guarantee, not merely
+   "we traverse and others don't."
 5. **Close with the Discussion section's meta-gap paragraph** verbatim-adapted — the claim nobody
    else makes, stated plainly as the paper's contribution relative to everything surveyed above.
 

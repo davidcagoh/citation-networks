@@ -5,11 +5,53 @@ Remaining items are logistics / camera-ready only.
 
 ---
 
+## IP&M resubmission checklist (2026-07-13)
+
+**Next session, first item:** re-read `related-work.tex` in full against IP&M's actual
+desk-rejection wording ("leverage SOTA baselines, especially LLMs... reference the most updated
+articles from the current year, which you have not done") and confirm it's thoroughly addressed,
+not just improved. The Automated Systematic Review paragraph was rewritten 2026-07-13 to be
+ProfOlaf-centered using `lineages/implicit-pairwise-analysis.md` as source — read it fresh as a
+reviewer would, not just diff it against the old version. Also re-verify the two citation-graph
+audit fixes (SWIFT-Review DOI, RobotSearch's correct paper) actually resolve cleanly in the
+compiled PDF, and check the `Haryanto2024LLAssist`/`Lau2025Elicit` bib entries — both flagged
+inline with "not independently verified, confirm before submission" notes that still need closing
+out.
+
+## Extract/synthesize redesign, informed by the lineage-construction comparison (2026-07-13)
+
+**Context:** the three-method lineage comparison (`lineages/`) found that citation-tracing alone
+misses real structure, and that structured extraction fields (`deep-dives.md`'s 6-field template)
+made every later analysis pass — the audit, the pairwise pass, the union finding — possible.
+Two concrete directions for the engine itself, proposed by the user, not yet scoped:
+
+1. **`extract` should produce something closer to `deep-dives.md`'s structure** — Problem /
+   How it works / How evaluated / How performed / Relation to prior work / Limitations — instead
+   of whatever the current extraction schema captures. Low-risk: the template is already validated
+   by real use this session. Needs a scoping pass against the current `extractions` table schema
+   (themes/contributions/methodology/key_results) to see how much is a prompt change vs. a
+   migration.
+2. **`synthesize` should incorporate an implicit-pairwise-style enrichment pass** — check each
+   paper's own named limitations against other included papers' mechanisms, the way
+   `implicit-pairwise-analysis.md` did for this 27-paper corpus — plus lean on the already-shipped
+   `litdiscover related-work-mine` (fetches a close competitor's own Related Work section) more
+   directly inside `synthesize` rather than as a separate manual step. **Scaling caveat, don't
+   skip this:** the pairwise method was O(n²)-ish even at 27 papers and needed real judgment calls;
+   a production project can have 50–300+ included papers, so this needs the embedding-prefilter
+   design already discussed this session (rank candidate pairs by embedding similarity first,
+   only spend LLM judgment on top-k candidates) — not brute-force all-pairs comparison.
+
+**Sequencing suggestion:** run `check_citation_grounding()` against a real project first (item
+#1 of the original Extract/Synthesize Technique Audit below, shipped 2026-07-11, still **not yet
+run against a real project**) before scoping either direction above — its whole stated purpose is
+to gate whether the next-tier engine work is worth the investment, and it's already built and
+free to run.
+
 ## Extract/Synthesize Technique Audit (2026-07-10)
 
-**Context:** `extract`/`synthesize` were built before the related-work-landscape research existed
-(see `related-work-landscape.md`). The traversal/discovery core is not behind SOTA — nothing in
-the landscape table replicates LitDiscover's closed-corpus ground-truth recall validation — but
+**Context:** `extract`/`synthesize` were built before the related-work research existed
+(see `lineages/similarity-cluster.md`). The traversal/discovery core is not behind SOTA — nothing in
+the lineage doc replicates LitDiscover's closed-corpus ground-truth recall validation — but
 extract/synthesize plausibly are, since they were built naively without that grounding. This is a
 scoped audit plan, not a rewrite and not a replication of any competitor's repo — LitDiscover's
 scope (find the literature, with proof) is different from AutoSurvey/LitLLM's scope (write a
@@ -31,7 +73,7 @@ now read (`fulltext/`):
    CQF1 (0.76/0.73 vs. ≤0.63) — **but code-level check (2026-07-11, cloned
    `lira-workflow/auto-review-writing`) found CQF1 is an offline eval metric copied near-verbatim
    from AutoSurvey's own code, not a live in-loop check, and `ReviewerAgent` is a general
-   completeness/clarity gate, not citation-specific** (see `related-work-landscape.md`'s
+   completeness/clarity gate, not citation-specific** (see `decisions.md`'s
    code-level correction). Neither precedent actually runs a live per-claim grounding check during
    generation. Audit: read `_write_theme_section`, the map-reduce path (`map_prompt`/`reduce_prompt`,
    ~`synthesizer.py` line 645–669), and `number_citations.py` in full — confirm there is genuinely
@@ -63,10 +105,10 @@ now read (`fulltext/`):
    bullets (i.e., does compression happen before or after citation attribution is fixed).
 
 Each item ends in a decision, not an automatic rewrite: "confirmed fine, no action" or "small
-bounded fix, scope it" — mirroring how the related-work-landscape full-text benchmark worked.
+bounded fix, scope it" — mirroring how the related-work full-text benchmark (`decisions.md`) worked.
 
 **Status (2026-07-11): audit complete — verdicts below.** All 7 of 7 Tier 1/2 papers were
-full-text verified first (see `related-work-landscape.md`'s round-2/round-3 notes), then
+full-text verified first (see `decisions.md`'s full-text-verification entry), then
 `litdiscover/extract/synthesizer.py` (870 lines) was read in full end-to-end.
 
 ### Verdicts
@@ -125,7 +167,7 @@ tests, 181/181 passing. **Not yet run against a real project** — next actual s
 `litdiscover synthesize` on a live project and reading the resulting grounding score, which is
 what decides whether #2 (plan-based generation) is worth doing at all.
 
-Post-ship code-level check (2026-07-11, see `related-work-landscape.md`) found this fix is
+Post-ship code-level check (2026-07-11, see `decisions.md`) found this fix is
 actually ahead of both precedents on this specific axis: LiRA's CQF1 and AutoSurvey's
 `h(c_i,Ref_i)` are both offline benchmarking metrics computed after generation, not live checks
 during synthesis. `check_citation_grounding()` runs on every `synthesize` call — no competitor

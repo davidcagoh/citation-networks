@@ -35,6 +35,29 @@ scancel <jobid>                     # cancel
 
 ---
 
+## 2026-07-13 (session 35, LitDiscover) — Related-work lineage audited and found unreliable; two rigorous alternative methods built; paper's Related Work paragraph rewritten from the richer of the two
+
+**2-tier exp:** Caught that `related-work-lineage.md`'s thematic-bucket lineage was constructed by clustering, not citation-tracing — audited it against the source deep-dives and found only 12 of 32 real citation edges represented, plus 3 fabricated edges (including the load-bearing SciReviewGen→AutoSurvey anchor); built two independent, more rigorous lineage-construction methods (O(n) explicit-citation extraction, O(n²) implicit pairwise content-matching) to replace it, discovered the field's real structure is one 19–21-paper connected component rather than six lineages, rewrote `related-work.tex`'s Related Work paragraph directly from the richest method, and fixed two real citation errors (a fabricated DOI, a wrong paper) caught along the way.
+
+<details>
+
+- **Diagram readability fix, first.** The session opened with `related-work-lineage.md`'s single 22-node Mermaid diagram being unreadable; split it into per-lineage diagrams plus a `subgraph`-clustered big-picture view — a real UX fix, but this is what led to noticing Lineage E's chain notation implied false adjacency between papers that don't actually cite each other.
+- **User's suspicion confirmed with hard evidence:** dispatched a subagent to extract every explicit in-set citation from all 27 deep-dive entries' own text (`lineages/explicit-citation-graph.md`, formerly `citation-graph-audit-2026-07-13.md`) — found 32 real edges, only 12 represented in the clustered lineage doc, 20 missing (disproportionately cross-lineage, exactly matching the user's suspected pattern: LLAssist→LitLLM, GEAR-Up→LitLLM, ReviewGenie→SWIFT-Review, TriSem-LLM→ASReview, InteractiveSurvey→SLRAgents, plus an unsuspected HCRA→ASReview), and 3 edges drawn with no textual support at all.
+- **Built a second method, implicit pairwise content-matching** (`lineages/implicit-pairwise-analysis.md`): date-ordered all 27 papers, checked each against every earlier paper's named limitations for uncited-but-real mechanism-to-gap matches. Found 10 more real edges under a conservative, non-exhaustive pass — ProfOlaf alone implicitly answers named gaps in three separate papers (SLRAgents, ResearchRabbit, LLAssist) without citing any of them.
+- **Corrected my own mistake mid-session**, twice: first, reused the disputed A–F lineage buckets as `subgraph` scaffolding in the two new "rigorous" diagrams, smuggling the discredited structure back in as if neutral (caught by the user asking directly); rebuilt both diagrams around actual graph structure (connected components via union-find) instead. This revealed the real finding: the explicit citation graph is essentially **one 19-paper giant component**, not six lineages, with LitLLM and AutoSurvey as its actual hubs (7 incoming edges each) — completely hidden by the bucket split. Second, miscounted isolated papers (said 5, was 6 — forgot ResearchRabbit); fixed after the union-diagram computation caught it.
+- **Union of both rigorous methods computed via union-find** (not eyeballed): adding the 10 implicit edges on top of the 32 explicit ones pulls two previously **fully isolated** papers — ResearchRabbit and Scholar Augment — into the giant component (19→21 papers). Only 4 papers remain isolated under both methods combined. This became the strongest evidence in the whole comparison: citation-tracing alone is trustworthy but structurally incapable of recovering these two papers' real relationship to the field, since the information was never in either paper's citation list.
+- **Built `lineages/lineage-comparison.md`**, a worked example (ProfOlaf drawn all three ways) plus two derived insights: (1) the three methods' divergence tracks directly to what task each gave its LLM (open synthesis loses/fabricates signal, constrained extraction caps it, constrained comparison amplifies hidden signal — same failure mode `check_citation_grounding()` exists to catch elsewhere in this project); (2) the corpus-scale union finding. Trimmed from 182→110 lines after the user flagged it had become three essays stapled together.
+- **Deprecated `similarity-cluster.md` rather than rebuilding it**, after weighing the option directly with the user — rebuilding would either duplicate `explicit-citation-graph.md` or keep forcing a bucket shape now twice shown wrong for this corpus. Kept unedited as the comparison's control condition.
+- **Rewrote `related-work.tex`'s "Automated systematic review" paragraph** directly from `implicit-pairwise-analysis.md` (per explicit user instruction, not `similarity-cluster.md`) — ProfOlaf is now the paragraph's centerpiece, implicitly answering three named gaps while still lacking citation-graph traversal and validated recall; compiles clean, 21 pages. Built a new ProfOlaf-centered diagram mockup for Obsidian review before it becomes a real TikZ figure.
+- **Citation-accuracy fixes, separate audit:** dispatched 5 parallel subagents to deep-dive tools cited in `related-work.tex`'s *other* paragraph (SWIFT-Review, RobotSearch, ASReview, Elicit, ResearchRabbit) that had never gone through the same verification rigor as the 22 core lineage papers. Found SWIFT-Review's DOI resolved to an unrelated influenza paper (fabricated/mismatched citation) and RobotSearch was cited to the wrong Marshall/Wallace paper entirely — both fixed in `refs.bib`, which was also consolidated from two independently-diverged copies into one canonical file with a symlink. All 5 deep-dives appended to `deep-dives.md` (renamed from `lineage-deep-dives.md`) as a new "verification cohort" section.
+- **Housekeeping:** deleted `related-work-figure-mockup.md` (stale) and `included_366_2026-07-09.csv` (superseded); consolidated `related-work-landscape.md`'s audit trail into `decisions.md` before deleting it too.
+
+</details>
+
+**Next:** re-read `related-work.tex` fresh against IP&M's actual desk-rejection wording to confirm it's thoroughly addressed, not just improved (see `open-questions.md`'s new checklist). Then run `check_citation_grounding()` against a real project — still unmeasured, and now also gates whether the proposed extract/synthesize redesign (structured `deep-dives.md`-style extraction fields; `synthesize` incorporating implicit-pairwise-style enrichment, pruned via embedding prefilter, not brute-force O(n²)) is worth the investment.
+
+---
+
 ## 2026-07-11 (session 34, LitDiscover) — All 22 related-work papers deep-dived + narrative lineage built; citation-grounding check shipped; traversal-explosion workflow lesson learned live
 
 **2-tier exp:** Full-text-verified all 7 original Tier 1/2 papers (catching one flat error and one nuance error vs. Gemini's abstract-only extraction), mined the 366-paper CSV for 15 more genuine LLM-native method papers, ran 16 parallel subagents to deep-dive all of them (3 initially blocked by paywalls, all 3 resolved once the user supplied PDFs directly), then built a narrative "who-answers-whom" lineage doc with a Mermaid diagram and shipped a diagnostic citation-grounding check for `synthesize` based on what the audit found.
@@ -117,21 +140,4 @@ scancel <jobid>                     # cancel
 
 ---
 
-## 2026-07-08 (session 30) — Wiki: next-step brainstorm captured, new research-program overview written
-
-**2-tier exp:** Explored strengtheners for LitDiscover (traversal visualization) and Zeitgeist (Hierarchical Dirichlet Process for soft community resolution) plus two speculative future directions (4th citation motif: coupled fields; HDP as its detection method); wrote `wiki/concepts.md` entries for all three and a new `wiki/research-program.md` narrative overview for sharing with a potential collaborator.
-
-<details>
-
-- **Reviewed current wiki state** for the user (project status recap): LitDiscover desk-rejected by IP&M, needs SOTA/LLM-era lit review redo; Zeitgeist first draft compiled, under review; Synthesis on hold, unimplemented.
-- **Brainstormed next-step directions**, prompted by the user citing the new LitDiscover graph export (`<slug>_graph.h5` + `<slug>_papers.json`, full visited-node scope + `included` vector) and referencing the Hierarchical Dirichlet Process paper (Teh, Jordan, Beal & Blei 2006) as a way to resolve the "what is a field" problem that hard partitions (Leiden/BlueRed) can't answer.
-- **Ran a real analysis on request:** pulled the 25 per-community γ_c values from `citation-dynamics/data/analysis/zeitgeist_community_fits.csv` and ran Shapiro-Wilk — W=0.919, p=0.047 (borderline reject normality at n=25), skew=1.18 (right-skewed), excess kurtosis=1.78. Not currently reflected in the paper; flagged as a possible small addition, not committed.
-- **Updated `wiki/concepts.md`:** added motif #4 (coupled fields — e.g. AI-agent memory systems ↔ benchmarks like LoCoMo) to the existing Citation Motifs entry; added new "Hierarchical Dirichlet Process for Field Resolution" entry; added new "Traversal-Native Visualization" entry covering round-by-round animation and reuse of the already-specced (but archived-as-out-of-scope) Time Curves pipeline at Synthesis scale instead of full-corpus scale.
-- **Wrote `wiki/research-program.md`** (new file, linked from `INDEX.md`): a plain-language, collaborator-facing narrative of the three pipeline stages (LitDiscover → Zeitgeist → Synthesis) with status + strengthener for each, plus the two speculative extensions and how they connect. Rewrote once already after user feedback — first draft used self-referential meta-language ("one-paragraph pitch") inappropriate for something that might be sent externally; second draft is plainer and adds ASCII pipeline schematics.
-- **Clarified with user:** Synthesis (not previously named by the user) is the connective tissue where the LitDiscover and Zeitgeist strengtheners actually combine, not a fourth separate idea.
-
-</details>
-
----
-
-> Archived: sessions 29 and earlier (2026-07-07 and before) moved to session-log-archive.md
+> Archived: sessions 30 and earlier (2026-07-08 and before) moved to session-log-archive.md

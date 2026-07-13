@@ -9,7 +9,7 @@ what LitDiscover *is* and how the (pre-rejection) paper was shaped. For active w
 draft as of the JCDL/TOIS/JASIST submission cycle (last synced ~2026-04-21), before IP&M's
 desk-rejection (2026-07-07) and the ongoing redo. The core algorithmic claim (Thesis, Sim vs
 Production) is unaffected by the redo — only the related-work/SOTA-baseline framing is changing.
-See `related-work-landscape.md` for what's new.
+See `lineages/similarity-cluster.md` for the narrative lineage and `decisions.md`'s full-text-verification entry for what's new.
 
 ---
 
@@ -121,7 +121,7 @@ Each step is a section of the paper. The "without this" column shows what breaks
 
 **§1 Introduction** — Claim: comprehensive literature discovery is expensive and current tools are incomplete. Evidence: prose, cited prior work. Without this: reader has no reason to care.
 
-**§2 Related Work** — Claim: existing approaches (keyword search, forward/backward citation chasing, manual-heavy systematic review tools) each fail in isolation. Evidence: citations to existing tools. Without this: paper looks like it ignores prior art. Moved up front (was §6 in the original draft) — the argument depends on knowing what's already been tried. **This section is exactly what the redo (see `related-work-landscape.md`) is rebuilding.**
+**§2 Related Work** — Claim: existing approaches (keyword search, forward/backward citation chasing, manual-heavy systematic review tools) each fail in isolation. Evidence: citations to existing tools. Without this: paper looks like it ignores prior art. Moved up front (was §6 in the original draft) — the argument depends on knowing what's already been tried. **This section is exactly what the redo (see `lineages/similarity-cluster.md`) is rebuilding.**
 
 **§3 Architecture** — Claim: LitDiscover implements a specific state machine: SEED → SEARCH → SCREEN → TRAVERSE → ESCAPE HATCH → STABLE. Evidence: system diagram, pseudocode, parameter table. Without this: figures 3–8 are uninterpretable.
 
