@@ -1,6 +1,6 @@
 # Lineage Comparison — one paper, three methods
 
-Three methods were run over the same 27-paper corpus (`../deep-dives.md`): `similarity-cluster.md`
+Three methods were run over the same 27-paper corpus (`../../../litdiscover/deep-dives.md`): `similarity-cluster.md`
 (thematic clustering), `explicit-citation-graph.md` (O(n) extraction of only what papers state
 about each other, 32 edges), and `implicit-pairwise-analysis.md` (O(n²)-ish content-matching for
 uncited-but-real relationships, 10 more edges). They disagree more than expected — only 12 of the
@@ -65,7 +65,7 @@ each one was given:
   of 32 real edges and fabricated 3 that no source text supports (including the load-bearing
   SciReviewGen→AutoSurvey edge in `similarity-cluster.md`). Unconstrained generation both drops
   real signal and invents fake signal — the same two failure modes
-  `check_citation_grounding()` (`../decisions.md`) exists to catch elsewhere in this project.
+  `check_citation_grounding()` (`../../../litdiscover/decisions.md`) exists to catch elsewhere in this project.
 - **Explicit extraction** asked a narrow, verifiable question ("does this paper's own text name
   that paper?"). Precision-maximizing, recall-limited: zero fabrication risk, but structurally
   blind to anything an author didn't say themselves — not a failure, a boundary.

@@ -248,9 +248,9 @@ discipline, not documentation.
 the source deep-dive entries and found to represent only 12 of 32 real citation edges, with 3
 fabricated edges (including the load-bearing SciReviewGen→AutoSurvey anchor) — thematic clustering
 was silently dropping cross-lineage citations and inventing plausible-sounding but unsupported
-ones. Two more rigorous methods were built to replace it: `lineages/explicit-citation-graph.md`
+ones. Two more rigorous methods were built to replace it: `../synthesis/background/lineages/explicit-citation-graph.md`
 (O(n) extraction of only what papers explicitly state about each other, 32 confirmed edges) and
-`lineages/implicit-pairwise-analysis.md` (O(n²)-ish content-matching for uncited-but-real
+`../synthesis/background/lineages/implicit-pairwise-analysis.md` (O(n²)-ish content-matching for uncited-but-real
 mechanism-to-gap relationships, 10 more edges). Union of both revealed the field's real structure:
 one 19–21-paper connected component, not six separate lineages.
 
@@ -258,7 +258,7 @@ one 19–21-paper connected component, not six separate lineages.
 rebuilt.** Considered and rejected rebuilding it "correctly" — doing so would either duplicate
 `explicit-citation-graph.md`'s content or keep forcing a mutually-exclusive-bucket shape now twice
 shown to be wrong for this corpus. Kept unedited as the control condition in
-`lineages/lineage-comparison.md`'s three-method comparison. Paper prose now drafts directly from
+`../synthesis/background/lineages/lineage-comparison.md`'s three-method comparison. Paper prose now drafts directly from
 the two rigorous methods — `related-work.tex`'s "Automated systematic review" paragraph was
 rewritten from `implicit-pairwise-analysis.md` the same day, ProfOlaf-centered instead of the
 prior flat 3-cohort framing.
@@ -271,7 +271,13 @@ RobotSearch was cited to the wrong Marshall/Wallace paper entirely. Both fixed i
 which was also consolidated from two independently-diverged copies (`drafts/refs.bib` and
 `drafts/ipm-submission/refs.bib`) into one canonical file with a symlink.
 
-**Status:** ✅ Adopted 2026-07-13. All five new artifacts live in `wiki/litdiscover/lineages/`.
+**Status:** ✅ Adopted 2026-07-13. All five new artifacts originally lived in
+`wiki/litdiscover/lineages/`; moved 2026-07-14 to `wiki/synthesis/background/lineages/` (nested
+under `background/` in the same day's later refactor, alongside the representation-learning track
+and a new `roadmap.md` entry point) — grouped there as an LLM-text-native alternative to Q-SYNTH's
+graph-native corpus-structuring protocol, not because this stopped being LitDiscover's own
+related-work-drafting source (it still is; see `../synthesis/background/lineages/lineage-comparison.md`
+and the paths above, updated accordingly).
 
 ---
 
@@ -298,7 +304,7 @@ RobotSearch/Lau2025Elicit all verified rendering correctly in the compiled `.bbl
 ---
 
 ## Discovery phase: operators-not-pipelines reframe, S2 Recommendations over a custom embedding index, gold-standard expansion deferred (2026-07-14)
-**Why:** the discovery-phase roadmap (`phase-discovery-roadmap.md`) had been treating "the
+**Why:** the discovery-phase roadmap (`../discovery/roadmap.md`) had been treating "the
 algorithm" as citation traversal alone, with one secondary keyword-search mechanism as an escape
 hatch — never benchmarked against untested alternatives (embedding/author/venue/recency search),
 and never measuring precision or cost, only recall. The user supplied a detailed IR-methodology
@@ -328,7 +334,7 @@ significance-testing step needs ~15-20. Expanding now would also sit idle, since
 trigger for when to actually expand: once the operator set is complete and the cheap-set
 experiments have run once, immediately before the significance-testing step — not before.
 
-**Status:** ✅ All three decisions acted on 2026-07-14 — see `phase-discovery-roadmap.md` §4/§7 for
+**Status:** ✅ All three decisions acted on 2026-07-14 — see `../discovery/roadmap.md` §4/§7 for
 the full experimental design and sequencing, and `litdiscover/discovery/operators.py` +
 `litdiscover/discovery/budget.py` for the resulting code. 227 tests passing.
 
@@ -336,7 +342,7 @@ the full experimental design and sequencing, and `litdiscover/discovery/operator
 
 ## Discovery Experiment 1: run live, real findings, paused rather than continued patching (2026-07-14)
 
-**Status:** committed — Experiment 1 marked ⏸ paused in `phase-discovery-roadmap.md` §4, not
+**Status:** committed — Experiment 1 marked ⏸ paused in `../discovery/roadmap.md` §4, not
 abandoned or deleted.
 
 **Why:** Baselines/marginal-contribution/ablation ran live against all 3 surveys for the first
@@ -366,11 +372,11 @@ resuming with a clear head in a future session rather than continuing mid-fatigu
 
 A real mid-session incident is also recorded here for completeness: a concurrent session (also
 active in this repo, fixing gold-set data-quality issues) clobbered part of
-`phase-discovery-roadmap.md` §4.5/§4.6 via a lost-update race — git showed only insertions versus
+`../discovery/roadmap.md` §4.5/§4.6 via a lost-update race — git showed only insertions versus
 the last commit, but content added earlier in the same session had reverted. Reconstructed from
 conversation history rather than re-derived. No data was permanently lost, but this is worth
 remembering as a real risk when multiple sessions edit the same wiki file concurrently without
 coordination.
 
-**See:** `phase-discovery-roadmap.md` §4 (⏸ box + full §4.5/§4.6 writeup) and `wiki/session-log.md`
+**See:** `../discovery/roadmap.md` §4 (⏸ box + full §4.5/§4.6 writeup) and `wiki/session-log.md`
 session 38 for the complete account.

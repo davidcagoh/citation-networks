@@ -56,7 +56,7 @@ Methodological and theoretical ideas relevant to the project — not tied to a s
 
 **Relevance to the Coupled fields motif above:** A field pair like memory-systems/LoCoMo would show up under HDP as two topics with unusually high shared mass across papers, rather than as two adjacent hard clusters with a dense cut between them — closer to a topic-correlation structure than a partition. That might be the right level of abstraction for detecting motif #4 specifically, since hard partitioning by construction erases the thing that makes coupled fields interesting.
 
-**Where it could plug in:** Downstream of the LitDiscover graph export (`<slug>_graph.h5` / `<slug>_papers.json`) or the Synthesis subgraph — as an alternative to Leiden in `synthesis/methods-comparison.md`'s clustering comparison, not a replacement for Zeitgeist's Leiden-based power-law analysis (which needs a graph partition, not a soft mixture).
+**Where it could plug in:** Downstream of the LitDiscover graph export (`<slug>_graph.h5` / `<slug>_papers.json`) or the Synthesis subgraph — as an alternative to Leiden in `synthesis/q-synth-plan.md`'s clustering comparison, not a replacement for Zeitgeist's Leiden-based power-law analysis (which needs a graph partition, not a soft mixture).
 
 **Status:** Speculative. Separate future project — revisit after current thesis papers are in submission.
 
@@ -70,8 +70,8 @@ Methodological and theoretical ideas relevant to the project — not tied to a s
 
 **What this unlocks:**
 - **Round-by-round animation:** with a per-round inclusion vector, animate which nodes entered the graph at each traversal round — makes visible what the algorithm considered and rejected, not just the final gold-adjacent set. This is a diagnostic LitDiscover never had.
-- **Reusing the Time Curves pipeline (already specced in `citation-dynamics/nst-timecurves-comparison.md` for the full 709K-node Zeitgeist corpus, archived as out-of-scope there) on a single LitDiscover project's subgraph.** NST → SG-t-SNE → Time Curves was built and proxy-verified (`phase4_timecurves.py`) for full-corpus phase detection; the new h5 export makes it trivial to point the same pipeline at one traversal's output instead, without the special-cased DOI extraction `synthesis/experiment-spec.md` currently requires for K17-RGC.
-- **Directly composes with the Synthesis pipeline:** the h5 export is already in the format `synthesis/methods-comparison.md`'s Leiden/BlueRed and NST/SG-t-SNE/UMAP comparisons expect, so any LitDiscover project's output becomes a synthesis test case for free, not just the manually-extracted K17-RGC case.
+- **Reusing the Time Curves pipeline (already specced in `citation-dynamics/nst-timecurves-comparison.md` for the full 709K-node Zeitgeist corpus, archived as out-of-scope there) on a single LitDiscover project's subgraph.** NST → SG-t-SNE → Time Curves was built and proxy-verified (`phase4_timecurves.py`) for full-corpus phase detection; the new h5 export makes it trivial to point the same pipeline at one traversal's output instead, without the special-cased DOI extraction `synthesis/q-synth-plan.md` currently requires for K17-RGC.
+- **Directly composes with the Synthesis pipeline:** the h5 export is already in the format `synthesis/q-synth-plan.md`'s Leiden/BlueRed and NST/SG-t-SNE/UMAP comparisons expect, so any LitDiscover project's output becomes a synthesis test case for free, not just the manually-extracted K17-RGC case.
 
 **Status:** Speculative. Separate future project — revisit after current thesis papers are in submission.
 

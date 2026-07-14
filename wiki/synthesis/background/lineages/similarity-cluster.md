@@ -2,7 +2,7 @@
 
 **Status (2026-07-13): deprecated, not being rebuilt.** This document is no longer a source for
 drafting paper prose — that job moved to `explicit-citation-graph.md` (ground truth) and
-`implicit-pairwise-analysis.md` (richest signal); `../../lit-review/robust-literature-discovery/
+`implicit-pairwise-analysis.md` (richest signal); `../../../../lit-review/robust-literature-discovery/
 drafts/ipm-submission/related-work.tex`'s current paragraph was drafted directly from those two,
 not from this file. Kept intact, unedited, as the **control condition** in
 `lineage-comparison.md`'s three-method comparison — concrete evidence of what naive thematic
@@ -28,7 +28,7 @@ textual support at all. Do not use the content or edges below for anything beyon
 what thematic clustering got wrong — cross-check any claim against `explicit-citation-graph.md`
 or `implicit-pairwise-analysis.md` before reusing it.
 
-Traces *who answers whom* across the 22 method papers in `../deep-dives.md` — connected
+Traces *who answers whom* across the 22 method papers in `../../../litdiscover/deep-dives.md` — connected
 chains where System B exists because System A left a named gap, not just a list of isolated
 deep-dives.
 Modeled on `260708 literature-review.pdf`'s structure: named lineages, an evaluation-methods
@@ -246,11 +246,11 @@ graph LR
 foundational eval-methodology contribution of the whole corpus.
 
 **LiRA (2026)** reuses that metric **verbatim, adapted from AutoSurvey's own released code**
-(confirmed at the code level, not just the paper — see `../decisions.md`'s code-level
+(confirmed at the code level, not just the paper — see `../../../litdiscover/decisions.md`'s code-level
 correction), rebrands it CQF1, and beats AutoSurvey substantially on it (0.76/0.73 vs. ≤0.63).
 LiRA adds a genuinely new mechanism on top: a Reviewer Agent that evaluates intermediate outputs
 (outline, draft) against a completeness/clarity rubric and triggers up to 3 regeneration rounds —
-though code-level inspection (`../decisions.md`) confirmed this Reviewer Agent is a *general* quality
+though code-level inspection (`../../../litdiscover/decisions.md`) confirmed this Reviewer Agent is a *general* quality
 gate, not citation-specific, and CQF1 itself is computed offline for benchmarking, not live during
 generation. **LiRA's own stated future work explicitly names "integration of the screening and
 search criteria definition steps within the pipeline" as unaddressed** — LiRA assumes references
@@ -348,7 +348,7 @@ generation-focused systems:
   specific models) is explicitly the opposite of its stated "simple tools" philosophy — a
   deliberate first step, not an end state, by the authors' own framing.
 - **ResearchRabbit** (product, not a peer-reviewed paper — full deep-dive in
-  `../deep-dives.md`'s verification cohort) is the one case in this lineage that genuinely
+  `../../../litdiscover/deep-dives.md`'s verification cohort) is the one case in this lineage that genuinely
   **does** do citation-graph traversal — co-citation and bibliographic-coupling signals from
   user-supplied seed papers, mechanically closer to LitDiscover's own bidirectional traversal than
   any of the six papers above. This matters for how this lineage's claim is stated: "no

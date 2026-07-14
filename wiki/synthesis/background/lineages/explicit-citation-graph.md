@@ -1,6 +1,6 @@
 # Explicit Citation Graph — O(n) bottom-up extraction
 
-Built 2026-07-13 by reading all 27 entries in `../deep-dives.md` (22 original + 5
+Built 2026-07-13 by reading all 27 entries in `../../../litdiscover/deep-dives.md` (22 original + 5
 verification cohort) and extracting every explicitly-named in-set citation from each entry's
 "Relation to methods that came before it" and "Named limitations" fields — O(n) extraction, not
 inference: only edges where one paper's own text names another paper from this set count.

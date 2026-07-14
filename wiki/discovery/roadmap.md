@@ -1,8 +1,16 @@
-# Discovery — phase roadmap
+# Discovery — a study in its own right
 
-**Split out from `research-roadmap.md`** (2026-07-14) — discovery had grown to five subsections
-and was crowding out Extraction/Synthesis in the parent doc. This file owns everything about the
-discovery phase specifically; `research-roadmap.md` keeps the cross-stage overview and links here.
+**Promoted out of `litdiscover/` to `wiki/discovery/` (2026-07-14, same day as the §4.0
+restructuring below)** — mirrors the earlier promotion of Synthesis to `wiki/synthesis/`
+(see `INDEX.md`). Originally split out of `litdiscover/research-roadmap.md` (2026-07-14) when
+discovery had grown to five subsections and was crowding out Extraction/Synthesis in that doc;
+now promoted a second time, to a full sibling study alongside LitDiscover/citation-dynamics/
+Synthesis, once §4.0 turned this from "one implementation detail of the LitDiscover engine" into
+its own rigorous, defensible investigation (end-to-end recall/precision of the actual curated
+corpus, not isolated discovery-only or screening-only numbers — see §4.0).
+`litdiscover/research-roadmap.md` keeps the cross-stage pipeline overview and links here;
+`wiki/discovery/open-questions.md` and `wiki/discovery/background/` hold this study's own live
+open items and prior-art research, pulled out of `litdiscover/open-questions.md` the same day.
 
 **§4 rewritten 2026-07-14** as a full IR-methodology experimental design (Cranfield gold standard,
 operator-based ablation, ordering, budget-normalized Pareto curves, paired significance testing) —
@@ -19,6 +27,21 @@ closed-corpus track (11 scripts) is zero-integration by design (an online/offlin
 an oversight); `live-survey-eval/09` is zero-integration because it predates the operator
 decomposition (a bounded refactor); `live-survey-eval/10` is genuinely production-integrated,
 and 11/12 build on it correctly but through a non-standard sibling-script-loading mechanism.
+
+**§4 restructured 2026-07-14 (later the same day, session 40) — a methodological correction, not
+a status update.** Everything in §4 up to this point (§4.1-§4.11, the operator-ablation
+benchmark) measures discovery recall/precision *in isolation from screening*. That's no longer
+treated as defensible on its own: precision's denominator (the candidate pool) is produced by
+discovery, so a screening number measured against someone else's pre-assembled record set (e.g.
+a CLEF TAR/SYNERGY dataset) doesn't validate *this* pipeline, and a discovery recall number
+measured with no screening in the loop is exactly what produced this project's own worst
+methodological miss — the original traversal system's headline 73-100% recall turned out to
+imply 0.03-0.45% precision once anyone checked (§4's pause box, item 1). New §4.0 states the
+principle and defines a new **primary, headline experiment — end-to-end recall/precision of the
+actual `included` set against real survey bibliographies** — with the existing operator-ablation
+work (§4.1-§4.11) demoted to *diagnostic decomposition*: still real, still useful, but never
+citable alone as evidence of system quality. No section renumbering below §4.0 — every existing
+`§4.x` cross-reference elsewhere in the wiki still resolves to the same content.
 
 ---
 
@@ -358,7 +381,7 @@ doesn't have to re-derive why each one stopped where it did.
 
 ## 2. Who else touches the discovery problem, and how
 
-Drawn from `deep-dives.md`'s 27 method entries + `lineages/` — every discovery *mechanism* another
+Drawn from `../litdiscover/deep-dives.md`'s 27 method entries + `../synthesis/background/lineages/` — every discovery *mechanism* another
 tool actually uses, grouped by family, not repeating each paper's full deep-dive. This is what
 grounds §4's untested-method list in prior art instead of inventing from scratch.
 
@@ -411,7 +434,7 @@ module with a common interface — because that's what makes the rest of the exp
 
 ---
 
-## 4. Experiment 1 — Multi-Operator Retrieval Benchmark
+## 4. Discovery evaluation — end-to-end primary experiment (§4.0) + operator-level diagnostics (§4.1-§4.11, "Experiment 1 — Multi-Operator Retrieval Benchmark")
 
 > **⏸ PAUSED 2026-07-14 — read this box before reading further, and before resuming this thread.**
 > Everything below (§4.1-§4.11) was built and run in a single session on 2026-07-14. Real findings
@@ -453,12 +476,118 @@ module with a common interface — because that's what makes the rest of the exp
 > untouched by this pause — they predate 2026-07-14 and aren't in question. Scripts
 > (`10_operator_benchmark.py`, `11_redundancy_check.py`, `12_chained_composition.py`) and data
 > stay in the repo, reusable if this resumes.
+>
+> **Resuming this thread starts at §4.0, not at fixing §4.6's composition experiment.** The
+> budget-normalized redesign named in point 5 above is still correct as far as it goes, but it's
+> a fix *within* the isolated-operator-recall paradigm — §4.0 (added session 40, same day)
+> argues that paradigm itself isn't the right headline experiment, for the same reason point 1
+> above is the most important finding in this box: a discovery-only or screening-only number
+> can't be defended on its own when precision's denominator is discovery-dependent. Everything
+> below in §4.1-§4.11 remains real, reusable diagnostic work — it's just no longer the thing a
+> reviewer should be pointed at as *the* discovery result.
+
+### 4.0 Methodological principle — end-to-end evaluation is the headline metric
+
+**The problem, stated precisely.** Recall's denominator is the gold standard — fixed, independent
+of which system produced the candidate pool. Precision's denominator is the candidate pool
+itself — and that pool is *produced by discovery*. A screening precision/recall number is
+therefore only meaningful relative to whichever pool the discovery mechanism handed it; a
+discovery recall number says nothing about whether the papers it found actually survive
+screening into the final corpus. Reporting either one in isolation, as every experiment in
+§4.1-§4.11 does, answers a real but narrower question than "does this system produce a good
+curated corpus" — and this project has direct, load-bearing proof that the gap between those two
+questions is not hypothetical: the *already-published* traversal system's headline recall
+(89-98% closed-corpus, 73-100% live-survey, §1) implies **0.03%-0.45% precision** once anyone
+checked it against candidates actually visited (§4's pause box, item 1) — because that
+validation, like every experiment in §4.3-§4.6 below, measures pure discovery reachability with
+no screening in the loop. A 73-100% recall headline sitting on top of a <0.5%-precision candidate
+pool is not a small caveat; it's a different claim than "this system finds the right papers."
+
+This mirrors a real, established methodology gap named directly in
+`background/corpus-curation-prior-art.md`: systematic-review search-strategy validation has a decades-old
+standard for this — **relative recall against a completed review's known-item gold set**
+(Greenhalgh & Peacock 2005 and similar citation-chasing validation studies; the same Cranfield
+logic CLEF TAR/SYNERGY apply to *screening*). CLEF TAR/SYNERGY's own WSS@95 numbers are valid
+precisely *because* they hold the candidate pool fixed (a pre-assembled, high-recall-by-design
+multi-database search) and vary only the screening step — that's a legitimate isolated-stage
+measurement exactly because the stage being held constant is controlled for, known, and
+near-ceiling. None of the systems surveyed in `background/corpus-curation-prior-art.md`'s 32-method corpus
+report a screening precision/recall number against a *citation-traversal-fed* queue — a queue
+whose composition and quality varies by construction, unlike a CLEF TAR review's fixed search
+set. That absence is the gap §4.0 closes, and it's also exactly why running `screen_batch()`
+against an external CLEF TAR/SYNERGY dataset (raised as an idea earlier in this project's
+scoping) would not validate this system: it would measure the classifier's competence on
+somebody else's pool, telling you nothing about whether *LitDiscover's own* discovery-fed queue
+produces a good final corpus.
+
+**The primary experiment this section defines: End-to-End Corpus Curation Evaluation.**
+
+- **What's measured.** For each of the 3 live surveys with a full staged pipeline
+  (K17-RGC, Ge21-HSS, Le25-GLLM — the closed-corpus track has no LLM screening layer attached at
+  all per §1/§5, so it stays a discovery-only, budget/scale sanity check, not part of this
+  headline number), run the actual pipeline a real user would run: `traverse` (one or more
+  cycles, budget-capped — see below) → `prefilter` (zero-cost, already deterministic) → `screen`
+  (real `screen_batch()` calls, Gemini 2.5 Flash, the survey's own inclusion criteria — not a
+  synthetic stand-in). Take the resulting `status=included` set — **not** the raw candidate
+  pool §4.3-§4.6 measure — and score it against the survey's real, corrected gold bibliography
+  (the same K17-RGC/Ge21-HSS/Le25-GLLM gold-sets already built and fixed in session 37).
+- **Metrics.** End-to-end recall = `|included ∩ gold| / |gold|`; end-to-end precision =
+  `|included ∩ gold| / |included|`; F1 combining both. Report the full funnel alongside the
+  headline ratio — seeds → raw discovered candidates → screened-included — so a reader can see
+  *where* loss happens without needing to separately trust §4.1-§4.11's own methodology; that
+  funnel is exactly where the existing operator-ablation/marginal-contribution work plugs back in
+  as an explanatory decomposition of the discovery→candidates step specifically.
+- **Budget control (required, not optional).** Fix and document a hard budget per run — an S2-call
+  cap via `budget.run_with_cost`, or a traversal-cycle cap — before running any survey. Without
+  this, "recall" is partly an artifact of how long the run was allowed to continue, which is
+  exactly the failure mode that made raw-recall comparisons in §4.3-§4.6 not apples-to-apples
+  (§4.6's fairness note: single-hop operators vs. the original system's unbounded multi-round
+  loop). A budget-normalized number is the only version of this experiment worth reporting.
+- **Screening-variant robustness check (secondary, not the headline).** Once the primary number
+  exists, optionally re-screen the *same* discovered candidate pool with a second classifier
+  (e.g. an active-learning re-ranker in the ASReview/SWIFT-Active-Screener style, or a
+  CLEF-TAR/SYNERGY-trained baseline) to isolate whether screening or discovery is the larger
+  bottleneck on a given survey. This is the only condition under which a CLEF-TAR-lineage
+  comparison number is actually valid here — same pool, same gold standard, different
+  classifier — never a cross-corpus comparison against published WSS@95 numbers from a different
+  domain's fixed record set.
+- **Statistical testing.** Same paired design already scoped in §4.9 (Wilcoxon signed-rank,
+  n=3 surveys today — directional only, same honest caveat §4.2/§4.9 already state), just applied
+  to the end-to-end number as the thing being compared across conditions, not to isolated-operator
+  recall.
+
+**What "ironclad and defensible" requires — checklist for anything claiming to validate discovery
+or screening from this point forward:**
+
+1. Primary metric is end-to-end recall/precision/F1 of the actual `included` set against a real
+   survey's gold bibliography — never raw discovery-candidate recall or screening-only precision
+   reported as if it were a standalone system-quality claim.
+2. Every isolated-stage number (operator ablation, an external screening-benchmark WSS@95) is
+   explicitly labeled **diagnostic** in any write-up — used to explain the primary number's
+   funnel, never cited on its own as "LitDiscover achieves X% recall/precision."
+3. Every run has a fixed, stated budget (S2-call cap or cycle cap) — no "ran until it looked
+   converged" numbers.
+4. Paired statistical testing across surveys, honestly caveated as directional while n stays at 3
+   (§4.2's expansion-to-15-20 prerequisite for real power is unchanged by this restructuring).
+5. Domain-honest comparison: CLEF TAR/SYNERGY numbers are never cited as LitDiscover "beating" or
+   "losing to" them outright — different corpus, different domain, different candidate-pool
+   construction. They're valid only as a same-pool, same-gold-standard, different-classifier
+   check (the robustness variant above), never as a cross-corpus leaderboard entry.
+6. The funnel (seeds → discovered → included) is reported alongside every headline number, not
+   just the final ratio.
+
+**Status: not yet built.** This is a design, not a result — §7's open-decisions list is updated
+below to put building this ahead of any further work on §4.1-§4.11's diagnostic track.
+
+---
 
 The IR community has spent decades building evaluation methodology for exactly this class of
-problem. This experiment adapts that methodology (the Cranfield paradigm, ablation studies,
-Pareto-frontier cost/quality tradeoffs, paired significance testing) to citation-graph discovery,
-rather than inventing new evaluation from scratch. The research question is not *"which pipeline
-works?"* — it's **"which retrieval operators contribute the most, in what order, at what cost?"**
+problem. §4.1-§4.11 below adapt that methodology (the Cranfield paradigm, ablation studies,
+Pareto-frontier cost/quality tradeoffs, paired significance testing) to citation-graph discovery
+— but, per §4.0 above, as **diagnostic decomposition of the primary end-to-end experiment's
+discovery→candidates funnel step, not as an independently defensible headline result.** The
+original framing below ("which retrieval operators contribute the most, in what order, at what
+cost") is still the right question for that narrower, diagnostic purpose.
 
 ### 4.1 The reframe: operators, not pipelines
 
@@ -788,7 +917,7 @@ existing 89-98%/73-100% headline results.
 
 ### 4.10 What's actually novel about this framing
 
-Most prior work in `deep-dives.md`'s 27-method survey (§2) compares whole *algorithms* against
+Most prior work in `../litdiscover/deep-dives.md`'s 27-method survey (§2) compares whole *algorithms* against
 each other (AutoSurvey vs. SurveyX vs. LitLLM). This experiment compares retrieval *operators* —
 a subtler, more useful question: not "which existing tool wins" but "what primitive operations are
 necessary to recover a research field, and in what combination." That's closer to systems-design
@@ -863,13 +992,32 @@ to anything else in the corpus" as a meaningful test case, since its own escape 
 
 The 6 surveys (S1-MIT, S2-UCG, S3-TOPO, K17-RGC, Ge21-HSS, Le25-GLLM) currently ground-truth
 discovery only (recall against each survey's own reference list) — this is the one stage of the
-three-stage pipeline (see `research-roadmap.md` §4) that already has this. §4's Experiment 1
+three-stage pipeline (see `../litdiscover/research-roadmap.md` §4) that already has this. §4's Experiment 1
 reuses the same 6 as its Cranfield-style gold standard rather than requiring new ground truth,
 modulo the expansion needed for §4.9's significance testing.
 
+**Updated per §4.0:** the cross-stage benchmark's actual headline number should be the *combined*
+discovery+screening figure (§4.0's end-to-end recall/precision of the `included` set), not
+discovery-only recall — the same reasoning that makes a screening-only WSS@95 number
+non-portable applies symmetrically to a discovery-only recall number: neither one alone answers
+whether the pipeline that actually ships a curated corpus works. Only the 3 live surveys
+(K17-RGC, Ge21-HSS, Le25-GLLM) can currently produce this combined number, since the
+closed-corpus track has no screening layer attached (§1/§5) — S1-MIT/S2-UCG/S3-TOPO stay
+discovery-only ground truth until (if ever) a closed-corpus screening layer is built.
+
 ## 7. Open decisions before building any of this
 
-**Sequencing, in order — each step below is a prerequisite for the next, not a menu:**
+**Sequencing, in order — each step below is a prerequisite for the next, not a menu.**
+
+0. **⭐ Build the §4.0 end-to-end harness — the actual next step, ahead of any further §4.1-§4.11
+   work.** Concretely: a script that, per live survey, runs `traverse` (budget-capped) →
+   `prefilter` → `screen` against that survey's real seeds/criteria via the existing staged-CLI
+   code paths (`core/stages.py::traverse_once`/`screen_pending`, not a reimplementation — same
+   "reuse production code" discipline that made §4.3-§4.6's operator benchmark trustworthy),
+   scores the resulting `included` set against the corrected K17-RGC/Ge21-HSS/Le25-GLLM gold-sets,
+   and reports the full seeds→discovered→included funnel plus end-to-end recall/precision/F1.
+   Nothing else in this section is worth doing until this exists — every step below documents
+   *diagnostic* work on the discovery-only funnel step, per §4.0's demotion of §4.1-§4.11's status.
 
 1. ✅ **Decompose `traverse.py` into the operator interface (§4.1) — done 2026-07-14.**
    `backward_traversal_operator()`, `forward_traversal_operator()`, and
