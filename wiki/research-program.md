@@ -37,9 +37,24 @@ Two further ideas — citation motifs and a different way of resolving communiti
 
 Recovers the full paper set behind a research topic by following citations outward from one or a few seed papers, instead of relying on keyword search. Tested against real published surveys — recovers 85–98%+ of their bibliographies depending on how many seeds you start from.
 
-**Where it stands:** Shipped and installable (`pip install litdiscover`). The paper has been through four venues — most recently desk-rejected by an IR journal, because the literature review behind it needs more recent, LLM-era baselines. The core method isn't in question; the survey work supporting it needs redoing.
+**Where it stands:** Shipped and installable (`pip install litdiscover`, though the published
+package trails a local bugfix). The paper has been through four venues — most recently
+desk-rejected by an IR journal, because the literature review behind it needed more recent,
+LLM-era baselines (since fixed — a 27-method prior-art survey now grounds the related work).
+A deeper methodological correction followed from that survey work: the paper's own headline
+recall number (73–100% across live surveys) turns out to imply well under 1% precision once
+anyone checks it against the papers actually screened — because that number measures discovery
+reachability with no screening in the loop. The corrected framing is that discovery and
+screening have to be validated *together*, as one end-to-end recall/precision figure against the
+papers a system actually keeps, not as two separate claims that don't compose. That's the
+current core investigation, not a settled result yet.
 
-**What could strengthen it:** the traversal now exports the full graph it explored — every paper it looked at, not just the ones it kept, plus which round each one was found in. That makes it possible to actually show the algorithm working: which papers it pulled in, which it rejected, and when — instead of just reporting a final recall number.
+**What could strengthen it:** the traversal now exports the full graph it explored — every paper
+it looked at, not just the ones it kept, plus which round each one was found in. That makes it
+possible to actually show the algorithm working: which papers it pulled in, which it rejected,
+and when — instead of just reporting a final recall number. Combined with the end-to-end
+correction above, the next real result is that same graph export scored against real screening
+decisions, not just graph reachability.
 
 ## 2. Zeitgeist
 
@@ -53,9 +68,20 @@ The original project with Xiaobai. The idea: a citation network's overall power-
 
 The connecting piece: take a paper set LitDiscover recovered, run Zeitgeist's methods on it, and check whether the resulting groups look like real research threads to someone who knows the area.
 
-**Where it stands:** Fully specified (test case: 56 papers on random geometric complexes, 100% recovered), but not yet built. Deliberately on hold until Zeitgeist's paper is submitted, so the two results don't validate each other.
+**Where it stands:** No longer just specified — three parallel tracks are now active, each testing
+a different way of turning a curated paper set into interpretable structure: a graph-native track
+(Leiden community detection + power-law fitting on real citation data, first blocking prerequisite
+now cleared), an embedding-native track (does a structured paper summary organize a field better
+than raw text?), and a text-native control condition (three LLM-based citation-lineage
+reconstruction methods, run to completion over a 27-paper test corpus — the cleanest of the three
+so far, and the one that already found a real methodological trap: naive thematic clustering
+recovers barely a third of a corpus's real citation structure and fabricates edges that aren't
+there). A field-wide finding came out of surveying how comparable systems evaluate synthesis
+quality: no mature, validated evaluation standard exists for it anywhere in this literature — the
+widely-reused citation-quality metric only reaches moderate agreement with human judgment, and
+nothing validates the deeper "does this read as real critical analysis" question at all. Deliberately still light on Zeitgeist-specific integration until that paper is submitted, so the two results don't validate each other.
 
-This is where the LitDiscover and Zeitgeist improvements above actually meet — the new traversal export is already in the format Synthesis needs, and a smaller, single-topic paper set is exactly where soft community membership should matter most, since that's where a paper genuinely bridging two threads is most likely to show up.
+This is where the LitDiscover and Zeitgeist improvements above actually meet — the new traversal export is already in the format Synthesis's graph-native track needs, and a smaller, single-topic paper set is exactly where soft community membership should matter most, since that's where a paper genuinely bridging two threads is most likely to show up.
 
 ---
 

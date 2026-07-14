@@ -22,7 +22,7 @@ LitDiscover (recover papers) → citation-dynamics (understand their structure)
 **Not** an automated survey-writing tool — it does not generate narrative text. It structures a
 curated paper set for human consumption (cluster map, temporal emergence curves, influence-hub
 table), and separately tests two methodological claims about *how* to do that structuring. This is
-the **graph-native** protocol for corpus structuring — see `background/lineages/` for the
+the **graph-native** protocol for corpus structuring — see `example-comparison/` for the
 LLM-text-native alternative (citation-graph extraction + implicit mechanism-matching over paper
 text) and `representation-learning-plan.md` for the embedding-native alternative (clustering over
 different text representations). All three answer the same question — given a curated corpus,

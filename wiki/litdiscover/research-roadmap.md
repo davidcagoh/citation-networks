@@ -29,7 +29,7 @@ and Synthesis have never been evaluated against ground truth — see §2 and §3
 
 ## 1. Discovery
 
-**Moved to its own file: [`../discovery/roadmap.md`](../discovery/roadmap.md)** (2026-07-14)
+**Moved to its own file: [`discovery-roadmap.md`](discovery-roadmap.md)** (2026-07-14)
 — discovery had grown to 5 subsections (current implementation, a 27-method prior-art survey, the
 untested-method table, the proposed ablation benchmark, and the simulation-vs-production gap) and
 was crowding out Extraction/Synthesis here. Read that file for all discovery planning; this doc
@@ -80,7 +80,7 @@ conclusion. Citation-grounding diagnostic shipped (`check_citation_grounding()`,
 **Representation question moved to its own file, now in Synthesis: [`../synthesis/representation-learning-plan.md`](../synthesis/representation-learning-plan.md)**
 (2026-07-14) — what text gets embedded before k-means (`_paper_embed_text()` in
 `synthesizer.py`) was never compared against alternatives (abstract, full-text, structured-summary
-embeddings). Motivated by `../synthesis/background/lineages/similarity-cluster.md`'s corpus-scale failure (12/32 real
+embeddings). Motivated by `../synthesis/example-comparison/similarity-cluster.md`'s corpus-scale failure (12/32 real
 edges survived, 3 fabricated) — Experiment 2 there tests whether that failure is fixable by
 changing the representation or is inherent to clustering's bucket-forcing shape.
 
@@ -107,7 +107,7 @@ The 6 surveys (S1-MIT, S2-UCG, S3-TOPO, K17-RGC, Ge21-HSS, Le25-GLLM) currently 
 as an end-to-end benchmark corpus instead of a discovery-only one:
 
 - **Discovery:** existing recall/precision-per-method benchmark — see
-  `../discovery/roadmap.md` §4.
+  `discovery-roadmap.md` §4.
 - **Extraction:** no natural per-survey ground truth here (extraction is per-paper, not
   per-survey) — the 22-paper deep-dives corpus (§2) is the right ground truth instead. Keep these
   as two separate benchmark sets rather than forcing one corpus to do everything.
@@ -124,7 +124,7 @@ as an end-to-end benchmark corpus instead of a discovery-only one:
 ## 5. Open decisions before building any of this
 
 - Discovery-specific open decisions (which new method to scope first, precision-per-method
-  design) live in `../discovery/roadmap.md` §7.
+  design) live in `discovery-roadmap.md` §7.
 - Extraction schema migration: confirm scope (prompt-only vs. `extractions` table migration)
   before committing to the 22-paper diff benchmark.
 - Confirmed, not open: `check_citation_grounding()` must run against a real project before any

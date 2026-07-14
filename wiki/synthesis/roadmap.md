@@ -15,7 +15,7 @@ line of work — see `background/`, cited as prior art, not a competitor).
 
 Three genuinely different subroutines attempt this, each with its own plan file. They're disjoint
 mechanisms answering the same question — worth running independently rather than picking one
-prematurely, since `background/lineages/lineage-comparison.md` already showed that no single method
+prematurely, since `example-comparison/lineage-comparison.md` already showed that no single method
 in its own family recovered more than half of a corpus's real structure.
 
 ---
@@ -26,7 +26,7 @@ in its own family recovered more than half of a corpus's real structure.
 |---|---|---|---|---|
 | **Q-SYNTH** | Graph-native: Leiden community detection + power-law fitting + NST/UMAP/SG-t-SNE embedding, on real citation-graph data (APS `C` matrix) | [`q-synth-plan.md`](q-synth-plan.md) | **Not started, but first blocker cleared 2026-07-14.** Gold set verified (52 papers, `live-survey-eval/data/gold-sets/K17-RGC_gold.json` — not the path originally guessed). Zero code written, zero results. | Build the 1-hop subgraph from the verified gold set and run Leiden once — cheaper than waiting on planner/architect sprint-planning first |
 | **Representation learning** | Embedding-native: does a structured 6-field paper summary embed better for clustering than raw/lightly-processed text? 4-condition design (baseline / abstract / full-text / structured summary) | [`representation-learning-plan.md`](representation-learning-plan.md) | **Partially prepped.** Section-level ground truth built for 3 live surveys (2026-07-14); a real gold-set data-quality bug found and fixed along the way. Pipeline itself not yet run. | Resolve 3 open design decisions before running: full-text pooling strategy, k-fixed-vs-elbow, flat-vs-hierarchical scoring (see `representation-learning-plan.md` §9) |
-| **LLM-text-native (background/lineages/)** | Explicit citation-graph extraction + implicit mechanism-to-gap matching, both operating on paper *text*, not graph data | [`background/lineages/`](background/lineages/) | **Complete, as a control condition** — this track's own thematic-clustering variant (`similarity-cluster.md`) was run, audited, and deprecated; the two surviving methods (explicit + implicit) already draft LitDiscover's own related-work section. Not an open investigation — it's evidence motivating the other two. | None — this track is done and archived, not blocked |
+| **LLM-text-native (example-comparison/)** | Explicit citation-graph extraction + implicit mechanism-to-gap matching, both operating on paper *text*, not graph data | [`example-comparison/`](example-comparison/) | **Complete, as a control condition** — this track's own thematic-clustering variant (`similarity-cluster.md`) was run, audited, and deprecated; the two surviving methods (explicit + implicit) already draft LitDiscover's own related-work section. Not an open investigation — it's evidence motivating the other two. | None — this track is done and archived, not blocked |
 
 **Why three, not one:** each targets a different failure mode. Q-SYNTH asks whether respecting
 citation *direction* preserves lineage structure that direction-blind methods lose. Representation
@@ -61,7 +61,7 @@ better prompt or a better embedding model fixes clustering on its own.
 
 ## Background (motivation and prior-art evidence, not open investigation)
 
-- [`background/lineages/`](background/lineages/) — the three LLM-text-native methods (explicit
+- [`example-comparison/`](example-comparison/) — the three LLM-text-native methods (explicit
   citation graph, implicit pairwise matching, deprecated thematic clustering), the worked
   ProfOlaf comparison, and `reference-implementation-survey.md`'s code-grounded audit of 14 cloned
   reference systems (embedding/clustering choices, synthesis mechanisms, paper-vs-code fidelity

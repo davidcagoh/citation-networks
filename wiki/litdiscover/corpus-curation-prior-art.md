@@ -1,17 +1,17 @@
 # How Similar Systems Obtain Their Curated Corpus (Discovery + Screening)
 
-Companion to `../../litdiscover/deep-dives.md`, same source material (the 27-method + 5-entry verification-cohort
+Companion to `deep-dives.md`, same source material (the 27-method + 5-entry verification-cohort
 corpus already fully read and deep-dived this project), but narrowly re-cut around one question
 that document's per-method template doesn't isolate on its own: **how does each system actually
 get from "nothing" to "a curated set of papers," and does it screen that set at all?**
-`../roadmap.md` §2 already surveys the *discovery* half of this (grouped by
+`discovery-roadmap.md` §2 already surveys the *discovery* half of this (grouped by
 mechanism family); this document adds the *screening* half plus a combined table, since several
 of the most informative comparisons for LitDiscover's own staged workflow
 (`traverse → prefilter → screen → mark`) live specifically in how a system's screening step is
 validated (or isn't).
 
 **Everything below is re-derived from already-read full texts, not new research.** Where a
-method entry in `../../litdiscover/deep-dives.md` doesn't describe a discovery or screening step at all (e.g. it
+method entry in `deep-dives.md` doesn't describe a discovery or screening step at all (e.g. it
 assumes a pre-curated corpus, or only does extraction/synthesis), that's noted explicitly —
 absence of a corpus-curation step is itself informative for positioning LitDiscover.
 
@@ -52,7 +52,7 @@ absence of a corpus-curation step is itself informative for positioning LitDisco
 - **Citation-graph traversal** (closest family to LitDiscover's own core mechanism): ResearchRabbit
   (bidirectional, co-citation + bibliographic coupling), ProfOlaf (snowballing, backward+forward).
   Both are the two systems in the whole corpus that actually walk a citation graph rather than
-  querying a fixed or live keyword index — see `../roadmap.md` §2 for the fuller
+  querying a fixed or live keyword index — see `discovery-roadmap.md` §2 for the fuller
   family breakdown (no other method in the 27-entry corpus does citation-graph traversal at all).
 - **LLM-generated keyword query → external search API**: LitLLM/LitLLMs, Human-Centred Research
   Automation, SurveyGen-I, ReviewGenie, Sami et al., GEAR-Up, PROMPTHEUS. The dominant family by
@@ -116,7 +116,7 @@ comparable tools have none.
 
 ## What this means for LitDiscover
 
-- **The two-mechanism bet** (`../roadmap.md` §3: citation traversal + an LLM-query
+- **The two-mechanism bet** (`discovery-roadmap.md` §3: citation traversal + an LLM-query
   escape hatch) sits in good company on the discovery side — it's the traversal family plus the
   single most common family in the corpus (LLM-generated keyword query → search API) — but no
   other system combines the two the way LitDiscover does (traversal as primary, keyword search
@@ -133,7 +133,7 @@ comparable tools have none.
   progressive metadata filtering, not a graph-traversal queue like LitDiscover's). LitDiscover's
   own `synthesize`'s citation-grounding check and the `verify` command's title-drift detection are
   adjacent but don't close this gap — running `screen_batch()`'s actual precision/recall against
-  a held-out gold set (the way `../roadmap.md` §4 does for discovery operators) has
+  a held-out gold set (the way `discovery-roadmap.md` §4 does for discovery operators) has
   no direct prior-art template to follow, since nobody else in this survey validates LLM screening
   specifically on a citation-graph-sourced candidate pool.
 - **LitDiscover is one of very few systems with a measured, adaptive stopping rule** at all
@@ -144,9 +144,9 @@ comparable tools have none.
 
 ## Related
 
-- `../../litdiscover/deep-dives.md` — full 6-field method entries this document re-cuts (read that for the complete
+- `deep-dives.md` — full 6-field method entries this document re-cuts (read that for the complete
   problem/approach/evaluation/limitations picture per method)
-- `../roadmap.md` §2 — the discovery-mechanism-only prior-art survey (this document's
+- `discovery-roadmap.md` §2 — the discovery-mechanism-only prior-art survey (this document's
   screening/stopping-criterion analysis is the piece §2 doesn't cover)
 - `CLAUDE.md` "Loop Behavior & Gating Logic" — LitDiscover's own staged vs. autopilot screening
   design, referenced throughout the "What this means for LitDiscover" section above

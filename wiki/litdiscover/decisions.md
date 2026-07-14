@@ -248,9 +248,9 @@ discipline, not documentation.
 the source deep-dive entries and found to represent only 12 of 32 real citation edges, with 3
 fabricated edges (including the load-bearing SciReviewGen→AutoSurvey anchor) — thematic clustering
 was silently dropping cross-lineage citations and inventing plausible-sounding but unsupported
-ones. Two more rigorous methods were built to replace it: `../synthesis/background/lineages/explicit-citation-graph.md`
+ones. Two more rigorous methods were built to replace it: `../synthesis/example-comparison/explicit-citation-graph.md`
 (O(n) extraction of only what papers explicitly state about each other, 32 confirmed edges) and
-`../synthesis/background/lineages/implicit-pairwise-analysis.md` (O(n²)-ish content-matching for uncited-but-real
+`../synthesis/example-comparison/implicit-pairwise-analysis.md` (O(n²)-ish content-matching for uncited-but-real
 mechanism-to-gap relationships, 10 more edges). Union of both revealed the field's real structure:
 one 19–21-paper connected component, not six separate lineages.
 
@@ -258,7 +258,7 @@ one 19–21-paper connected component, not six separate lineages.
 rebuilt.** Considered and rejected rebuilding it "correctly" — doing so would either duplicate
 `explicit-citation-graph.md`'s content or keep forcing a mutually-exclusive-bucket shape now twice
 shown to be wrong for this corpus. Kept unedited as the control condition in
-`../synthesis/background/lineages/lineage-comparison.md`'s three-method comparison. Paper prose now drafts directly from
+`../synthesis/example-comparison/lineage-comparison.md`'s three-method comparison. Paper prose now drafts directly from
 the two rigorous methods — `related-work.tex`'s "Automated systematic review" paragraph was
 rewritten from `implicit-pairwise-analysis.md` the same day, ProfOlaf-centered instead of the
 prior flat 3-cohort framing.
@@ -276,7 +276,7 @@ which was also consolidated from two independently-diverged copies (`drafts/refs
 under `background/` in the same day's later refactor, alongside the representation-learning track
 and a new `roadmap.md` entry point) — grouped there as an LLM-text-native alternative to Q-SYNTH's
 graph-native corpus-structuring protocol, not because this stopped being LitDiscover's own
-related-work-drafting source (it still is; see `../synthesis/background/lineages/lineage-comparison.md`
+related-work-drafting source (it still is; see `../synthesis/example-comparison/lineage-comparison.md`
 and the paths above, updated accordingly).
 
 ---
@@ -304,7 +304,7 @@ RobotSearch/Lau2025Elicit all verified rendering correctly in the compiled `.bbl
 ---
 
 ## Discovery phase: operators-not-pipelines reframe, S2 Recommendations over a custom embedding index, gold-standard expansion deferred (2026-07-14)
-**Why:** the discovery-phase roadmap (`../discovery/roadmap.md`) had been treating "the
+**Why:** the discovery-phase roadmap (`discovery-roadmap.md`) had been treating "the
 algorithm" as citation traversal alone, with one secondary keyword-search mechanism as an escape
 hatch — never benchmarked against untested alternatives (embedding/author/venue/recency search),
 and never measuring precision or cost, only recall. The user supplied a detailed IR-methodology
@@ -334,7 +334,7 @@ significance-testing step needs ~15-20. Expanding now would also sit idle, since
 trigger for when to actually expand: once the operator set is complete and the cheap-set
 experiments have run once, immediately before the significance-testing step — not before.
 
-**Status:** ✅ All three decisions acted on 2026-07-14 — see `../discovery/roadmap.md` §4/§7 for
+**Status:** ✅ All three decisions acted on 2026-07-14 — see `discovery-roadmap.md` §4/§7 for
 the full experimental design and sequencing, and `litdiscover/discovery/operators.py` +
 `litdiscover/discovery/budget.py` for the resulting code. 227 tests passing.
 
@@ -342,7 +342,7 @@ the full experimental design and sequencing, and `litdiscover/discovery/operator
 
 ## Discovery Experiment 1: run live, real findings, paused rather than continued patching (2026-07-14)
 
-**Status:** committed — Experiment 1 marked ⏸ paused in `../discovery/roadmap.md` §4, not
+**Status:** committed — Experiment 1 marked ⏸ paused in `discovery-roadmap.md` §4, not
 abandoned or deleted.
 
 **Why:** Baselines/marginal-contribution/ablation ran live against all 3 surveys for the first
@@ -372,13 +372,13 @@ resuming with a clear head in a future session rather than continuing mid-fatigu
 
 A real mid-session incident is also recorded here for completeness: a concurrent session (also
 active in this repo, fixing gold-set data-quality issues) clobbered part of
-`../discovery/roadmap.md` §4.5/§4.6 via a lost-update race — git showed only insertions versus
+`discovery-roadmap.md` §4.5/§4.6 via a lost-update race — git showed only insertions versus
 the last commit, but content added earlier in the same session had reverted. Reconstructed from
 conversation history rather than re-derived. No data was permanently lost, but this is worth
 remembering as a real risk when multiple sessions edit the same wiki file concurrently without
 coordination.
 
-**See:** `../discovery/roadmap.md` §4 (⏸ box + full §4.5/§4.6 writeup) and `wiki/session-log.md`
+**See:** `discovery-roadmap.md` §4 (⏸ box + full §4.5/§4.6 writeup) and `wiki/session-log.md`
 session 38 for the complete account.
 
 ---
@@ -386,7 +386,7 @@ session 38 for the complete account.
 ## Discovery: end-to-end evaluation adopted as the primary metric, isolated-stage recall/precision demoted to diagnostic (2026-07-14)
 
 **Why:** researching whether the field has a mature evaluation standard for discovery/screening
-(`../discovery/background/corpus-curation-prior-art.md`) surfaced a decades-old systematic-review
+(`corpus-curation-prior-art.md`) surfaced a decades-old systematic-review
 methodology — relative recall against a completed review's known-item gold set — that none of the
 27+5 surveyed methods apply to their own discovery mechanism, and confirmed CLEF TAR/SYNERGY is
 the field's genuine mature standard, but for *screening in isolation against an already-fixed
@@ -398,7 +398,7 @@ This wasn't a new problem invented in the abstract — it's the exact same failu
 already found in the original traversal system's own headline: 73-100% recall implied 0.03-0.45%
 precision once anyone checked, because that validation never screens.
 
-**Decision:** `../discovery/roadmap.md` §4.0 (new) states the principle and defines the corrected
+**Decision:** `discovery-roadmap.md` §4.0 (new) states the principle and defines the corrected
 primary experiment — **end-to-end recall/precision/F1 of the real `status=included` set** (not
 raw discovery candidates) against a survey's true bibliography, run through the actual staged
 pipeline (`traverse → prefilter → screen`), budget-capped per run, with the full
@@ -413,10 +413,45 @@ classifier check, never a cross-corpus comparison; the funnel always reported al
 
 **Status:** ✅ Design committed 2026-07-14 (session 41) — no section renumbering, so every
 existing `§4.x` cross-reference elsewhere in the wiki still resolves. Not yet built: the actual
-end-to-end harness is `../discovery/roadmap.md` §7 step 0, the next concrete piece of work, ahead
+end-to-end harness is `discovery-roadmap.md` §7 step 0, the next concrete piece of work, ahead
 of anything else in §4.1-§4.11's diagnostic track. Discovery was also promoted to its own
 top-level wiki study (`wiki/discovery/`) the same session, mirroring the earlier Synthesis
 promotion — see `wiki/INDEX.md`'s Discovery section.
 
-**See:** `../discovery/roadmap.md` §4.0 and §7 step 0; `../discovery/background/corpus-curation-prior-art.md`
+**See:** `discovery-roadmap.md` §4.0 and §7 step 0; `corpus-curation-prior-art.md`
 for the mature-eval-standard research that prompted this; `wiki/session-log.md` session 41.
+
+---
+
+## Discovery folded back into `litdiscover/` from its brief `wiki/discovery/` promotion (2026-07-14)
+
+**Why:** session 41 promoted discovery/screening research to a top-level `wiki/discovery/` study,
+mirroring Synthesis, on the reasoning that §4.0's redesign turned it into a rigorous investigation
+in its own right. User pushed back the same day: LitDiscover fundamentally *is* a discovery-and-
+screening engine — pulling that research out implied it was a separable phase the way Synthesis
+is, when it's actually the project's core identity. Synthesis's promotion holds up under this
+same test (it draws on Zeitgeist's own graph-analysis machinery — Leiden, power-law fitting,
+NST/UMAP/SG-t-SNE — and is a genuinely disjoint corpus-structuring add-on that could in principle
+work on any curated corpus, not just LitDiscover's); Discovery's promotion doesn't.
+
+**Decision:** `wiki/discovery/roadmap.md` → `litdiscover/discovery-roadmap.md` and
+`wiki/discovery/background/corpus-curation-prior-art.md` → `litdiscover/corpus-curation-prior-art.md`,
+both flat siblings of `research-roadmap.md`/`decisions.md`/`open-questions.md` in this directory,
+not a subfolder. `discovery/open-questions.md`'s content merged back into `open-questions.md` in
+place. §4.0's actual content and status are unchanged by this move — only its location and the
+"is this separable" framing changed.
+
+**Status:** ✅ Done 2026-07-14 (session 42), same day as the promotion it reverses. Every
+cross-reference across the wiki fixed to the flat paths (verified via repeated grep sweeps, not
+assumed clean after one pass — two rounds of leftover stale references were caught and fixed:
+`synthesis/representation-learning-plan.md`'s pre-existing `background/lineages/` staleness, and
+one leftover "appears deleted" sentence in `INDEX.md`). Also reconciled the wiki against a larger
+concurrent repo reorg the user ran independently the same day (`citation-dynamics/`→`zeitgeist/`,
+`synthesis/background/lineages/`→`synthesis/example-comparison/`, the `litdiscover` codebase +
+reference-systems corpus + paper consolidated under a new `lit-review-bot/` shell folder) —
+confirmed `deep-dives.md` and its source PDFs were relocated to
+`lit-review-bot/reference-systems/`, not deleted, via direct directory listing before resolving
+the flags raised about them.
+
+**See:** `discovery-roadmap.md`'s own header (narrates the round-trip); `wiki/INDEX.md`'s repo-layout
+note; `wiki/session-log.md` session 42.

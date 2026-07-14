@@ -1,16 +1,15 @@
-# Discovery — a study in its own right
+# Discovery — LitDiscover's core: traversal + screening evaluation
 
-**Promoted out of `litdiscover/` to `wiki/discovery/` (2026-07-14, same day as the §4.0
-restructuring below)** — mirrors the earlier promotion of Synthesis to `wiki/synthesis/`
-(see `INDEX.md`). Originally split out of `litdiscover/research-roadmap.md` (2026-07-14) when
-discovery had grown to five subsections and was crowding out Extraction/Synthesis in that doc;
-now promoted a second time, to a full sibling study alongside LitDiscover/citation-dynamics/
-Synthesis, once §4.0 turned this from "one implementation detail of the LitDiscover engine" into
-its own rigorous, defensible investigation (end-to-end recall/precision of the actual curated
-corpus, not isolated discovery-only or screening-only numbers — see §4.0).
-`litdiscover/research-roadmap.md` keeps the cross-stage pipeline overview and links here;
-`wiki/discovery/open-questions.md` and `wiki/discovery/background/` hold this study's own live
-open items and prior-art research, pulled out of `litdiscover/open-questions.md` the same day.
+**Round-tripped 2026-07-14: split out of `research-roadmap.md` → briefly promoted to a
+top-level `wiki/discovery/` study (mirroring Synthesis) → folded back into `litdiscover/` the
+same day, on reflection.** The promotion was reasonable in the moment (§4.0's redesign genuinely
+turned this into a rigorous investigation, not just an implementation detail), but the fold-back
+is the more accurate call: discovery + screening *is* LitDiscover's core identity, not a
+separable phase the way Synthesis is (Synthesis draws on Zeitgeist's own graph-analysis
+machinery and is a genuinely disjoint corpus-structuring add-on, which is why it stayed
+promoted). This file (`discovery-roadmap.md`) and `corpus-curation-prior-art.md` are flat
+siblings of `research-roadmap.md`/`open-questions.md`/`decisions.md` in this directory now, not
+a subfolder — `open-questions.md`'s discovery/screening items were folded back in the same way.
 
 **§4 rewritten 2026-07-14** as a full IR-methodology experimental design (Cranfield gold standard,
 operator-based ablation, ordering, budget-normalized Pareto curves, paired significance testing) —
@@ -381,7 +380,7 @@ doesn't have to re-derive why each one stopped where it did.
 
 ## 2. Who else touches the discovery problem, and how
 
-Drawn from `../litdiscover/deep-dives.md`'s 27 method entries + `../synthesis/background/lineages/` — every discovery *mechanism* another
+Drawn from `deep-dives.md`'s 27 method entries + `../synthesis/example-comparison/` — every discovery *mechanism* another
 tool actually uses, grouped by family, not repeating each paper's full deep-dive. This is what
 grounds §4's untested-method list in prior art instead of inventing from scratch.
 
@@ -504,14 +503,14 @@ no screening in the loop. A 73-100% recall headline sitting on top of a <0.5%-pr
 pool is not a small caveat; it's a different claim than "this system finds the right papers."
 
 This mirrors a real, established methodology gap named directly in
-`background/corpus-curation-prior-art.md`: systematic-review search-strategy validation has a decades-old
+`corpus-curation-prior-art.md`: systematic-review search-strategy validation has a decades-old
 standard for this — **relative recall against a completed review's known-item gold set**
 (Greenhalgh & Peacock 2005 and similar citation-chasing validation studies; the same Cranfield
 logic CLEF TAR/SYNERGY apply to *screening*). CLEF TAR/SYNERGY's own WSS@95 numbers are valid
 precisely *because* they hold the candidate pool fixed (a pre-assembled, high-recall-by-design
 multi-database search) and vary only the screening step — that's a legitimate isolated-stage
 measurement exactly because the stage being held constant is controlled for, known, and
-near-ceiling. None of the systems surveyed in `background/corpus-curation-prior-art.md`'s 32-method corpus
+near-ceiling. None of the systems surveyed in `corpus-curation-prior-art.md`'s 32-method corpus
 report a screening precision/recall number against a *citation-traversal-fed* queue — a queue
 whose composition and quality varies by construction, unlike a CLEF TAR review's fixed search
 set. That absence is the gap §4.0 closes, and it's also exactly why running `screen_batch()`
@@ -917,7 +916,7 @@ existing 89-98%/73-100% headline results.
 
 ### 4.10 What's actually novel about this framing
 
-Most prior work in `../litdiscover/deep-dives.md`'s 27-method survey (§2) compares whole *algorithms* against
+Most prior work in `deep-dives.md`'s 27-method survey (§2) compares whole *algorithms* against
 each other (AutoSurvey vs. SurveyX vs. LitLLM). This experiment compares retrieval *operators* —
 a subtler, more useful question: not "which existing tool wins" but "what primitive operations are
 necessary to recover a research field, and in what combination." That's closer to systems-design
@@ -992,7 +991,7 @@ to anything else in the corpus" as a meaningful test case, since its own escape 
 
 The 6 surveys (S1-MIT, S2-UCG, S3-TOPO, K17-RGC, Ge21-HSS, Le25-GLLM) currently ground-truth
 discovery only (recall against each survey's own reference list) — this is the one stage of the
-three-stage pipeline (see `../litdiscover/research-roadmap.md` §4) that already has this. §4's Experiment 1
+three-stage pipeline (see `research-roadmap.md` §4) that already has this. §4's Experiment 1
 reuses the same 6 as its Cranfield-style gold standard rather than requiring new ground truth,
 modulo the expansion needed for §4.9's significance testing.
 

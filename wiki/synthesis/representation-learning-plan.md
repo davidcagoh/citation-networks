@@ -1,12 +1,12 @@
 # Representation Learning for Paper Organization — phase roadmap
 
 **Split out from `../litdiscover/research-roadmap.md` §3 (Synthesis)** (2026-07-14) — same pattern as
-`../discovery/roadmap.md`: a bet buried in one implementation choice (what text gets embedded
+`../litdiscover/discovery-roadmap.md`: a bet buried in one implementation choice (what text gets embedded
 before clustering) deserves its own experimental design rather than staying an unexamined default
 inside the Synthesis section.
 
 **Origin:** during the lineage-construction work (2026-07-13), raw thematic-clustering embeddings
-proved noisy enough at corpus scale to get deprecated outright (`background/lineages/similarity-cluster.md`)
+proved noisy enough at corpus scale to get deprecated outright (`example-comparison/similarity-cluster.md`)
 — only 12 of 32 real citation edges survived its buckets, plus 3 fabricated edges with no textual
 support. That failure is the concrete motivating case for this experiment: is the problem
 embeddings *in general*, or specifically what gets embedded?
@@ -27,16 +27,16 @@ embeddings *in general*, or specifically what gets embedded?
   (`_name_all_clusters`) — a downstream labeling step, not part of the representation question
   this experiment asks.
 
-**Known failure mode, already documented at corpus scale:** `background/lineages/similarity-cluster.md`
+**Known failure mode, already documented at corpus scale:** `example-comparison/similarity-cluster.md`
 (deprecated 2026-07-13) ran a close cousin of this pipeline — thematic clustering into 6 buckets —
-over the 22-paper `../litdiscover/deep-dives.md` corpus. `background/lineages/lineage-comparison.md` audited it against what those
+over the 22-paper `../lit-review-bot/reference-systems/deep-dives.md` corpus. `example-comparison/lineage-comparison.md` audited it against what those
 papers actually cite: only 12/32 real citation edges survived being forced into mutually-exclusive
 buckets, 20 were silently dropped for crossing a bucket boundary, and 3 edges (including the
 load-bearing SciReviewGen→AutoSurvey edge) had no textual support at all — the clustering
 fabricated a relationship. This is the field-scale evidence that raw-signal clustering loses and
 invents structure; this experiment asks whether *what's embedded* is the fixable part of that
 failure, or whether clustering itself is the wrong shape regardless of representation (a question
-`background/lineages/lineage-comparison.md` already answered "no" for citation-lineage reconstruction specifically —
+`example-comparison/lineage-comparison.md` already answered "no" for citation-lineage reconstruction specifically —
 worth keeping in mind as a possible negative result here too).
 
 ---
@@ -51,9 +51,9 @@ One representation, never compared against alternatives: a short LLM-generated d
 | **Current baseline** (title+themes+contributions[0]) | Implemented | Cheap, already in production. Themes/contributions are single free-text LLM outputs from `extractor.py`'s 11-field schema — no structural guarantee they capture the axes that actually distinguish papers (method vs. motivation vs. evaluation). |
 | **Abstract embedding** | Not implemented | The obvious cheap alternative — author-written, no LLM-summarization step to introduce drift, but conflates motivation/method/results into one paragraph the embedding model has to disentangle unsupervised. |
 | **Full-text embedding** | Not implemented | Richest signal, but also the noisiest — boilerplate (related work, acknowledgments, references) dilutes the topic signal, and most embedding models truncate or need chunking+pooling for full papers, adding its own methodology question. |
-| **Structured-summary embedding** | Not implemented | Embed the 6-field deep-dive template (Problem / How it works / How evaluated / How performed / Relation to prior work / Limitations) — same template already validated in `../litdiscover/deep-dives.md` for all 22 corpus papers, and rich enough to support the citation-audit and implicit-pairwise work `../litdiscover/research-roadmap.md` §2 credits it for. Hypothesis: forcing the LLM to separate motivation from method from evaluation *before* embedding gives the embedding model axes that actually align with how papers are conceptually organized, rather than asking embedding-space geometry to discover that separation from unstructured text alone. |
+| **Structured-summary embedding** | Not implemented | Embed the 6-field deep-dive template (Problem / How it works / How evaluated / How performed / Relation to prior work / Limitations) — same template already validated in `../lit-review-bot/reference-systems/deep-dives.md` for all 22 corpus papers, and rich enough to support the citation-audit and implicit-pairwise work `../litdiscover/research-roadmap.md` §2 credits it for. Hypothesis: forcing the LLM to separate motivation from method from evaluation *before* embedding gives the embedding model axes that actually align with how papers are conceptually organized, rather than asking embedding-space geometry to discover that separation from unstructured text alone. |
 
-This is the same shape of question `../discovery/roadmap.md` asks about discovery operators —
+This is the same shape of question `../litdiscover/discovery-roadmap.md` asks about discovery operators —
 not "does clustering work" but "which input representation does the actual organizing work, and by
 how much."
 
@@ -123,14 +123,14 @@ result even if only conditions 1-4 above ship first:
   work, not just whether structure helps in aggregate.
 - **Pairwise LLM reasoning** — the upper-bound baseline: skip embeddings entirely, ask an LLM
   directly "does paper A belong in the same group as paper B" for pairwise or listwise judgments.
-  Expensive (this is exactly `background/lineages/implicit-pairwise-analysis.md`'s O(n²)-ish approach, `background/lineages/`),
+  Expensive (this is exactly `example-comparison/implicit-pairwise-analysis.md`'s O(n²)-ish approach, `example-comparison/`),
   but useful as a ceiling to measure how much of the gap between conditions 1 and 4 is recoverable
   at all before assuming embeddings are the right tool for this job in the first place.
 
 ### 3.2 Gold standard — reuse the 6 surveys, new ground truth needed
 
 **Decision (per discussion, 2026-07-14): ground truth is the 6 existing surveys** (S1-MIT, S2-UCG,
-S3-TOPO, K17-RGC, Ge21-HSS, Le25-GLLM — the same corpus `../discovery/roadmap.md` §4.2 uses),
+S3-TOPO, K17-RGC, Ge21-HSS, Le25-GLLM — the same corpus `../litdiscover/discovery-roadmap.md` §4.2 uses),
 not the 22-paper deep-dives corpus. Reasoning: these are real published surveys with their own
 authorial section structure, a stronger and more generalizable "conceptual organization" signal
 than the 22-paper corpus's own lineage tags (which were themselves LLM-assisted output, not
@@ -182,7 +182,7 @@ it needs the kind of manual, read-the-actual-source-and-check pass this annotati
 does, not a content heuristic.** The section-ground-truth JSONs in this repo already excluded all
 unresolved entries from their `resolved` lists, so they don't need re-annotating; only the
 upstream `gold-sets/*.json` files and any recall number computed from them
-(`../discovery/roadmap.md` §4) needed correcting, and now have been / still need a recall
+(`../litdiscover/discovery-roadmap.md` §4) needed correcting, and now have been / still need a recall
 recompute respectively.
 
 ### 3.3 Metrics
@@ -217,7 +217,7 @@ For each survey in the gold standard:
 
 ### 3.5 Statistical power — same open question as discovery, not yet decided
 
-`../discovery/roadmap.md` §4.2/§4.9 already flagged that 6 surveys is thin for paired
+`../litdiscover/discovery-roadmap.md` §4.2/§4.9 already flagged that 6 surveys is thin for paired
 significance testing (Wilcoxon signed-rank wants ~15-20 paired observations for real power) and
 left expanding the gold-standard corpus as an open, undecided step. **Same applies here** — if
 this experiment's results look like they're worth a significance claim rather than a descriptive
@@ -272,4 +272,4 @@ per §1) rather than representation quality, which would redirect Synthesis's ac
    would test the two effects (representation choice, k-selection quality) jointly instead of in
    isolation — deferred, not in scope for the first pass.
 4. **Statistical power / corpus expansion (§3.5)** — shared open question with
-   `../discovery/roadmap.md` §4.2/§4.9, not decided in either place yet.
+   `../litdiscover/discovery-roadmap.md` §4.2/§4.9, not decided in either place yet.
