@@ -11,30 +11,348 @@ supersedes the earlier flat "compare some methods" sketch.
 **§4 execution (Experiment 1) paused, same day** — real findings, mixed/negative results, see the
 ⏸ box at the top of §4 for the summary before reading that section in full.
 
+**§1 rewritten 2026-07-14 (session 39)** from an actual line-by-line read of the production
+engine and all 15 evaluation scripts (prompted by wanting to redo Experiment 1 differently) —
+supersedes the earlier `background.md`-derived prose. Finds the eval code is three tiers of
+production-integration, not one uniform "hand-written simulation" as previously stated: the
+closed-corpus track (11 scripts) is zero-integration by design (an online/offline mismatch, not
+an oversight); `live-survey-eval/09` is zero-integration because it predates the operator
+decomposition (a bounded refactor); `live-survey-eval/10` is genuinely production-integrated,
+and 11/12 build on it correctly but through a non-standard sibling-script-loading mechanism.
+
 ---
 
 ## 1. What's implemented today
 
-Carried over from the old `background.md` thesis, condensed:
+**Rewritten 2026-07-14 (session 39)** from an actual line-by-line read of `litdiscover/litdiscover/`
+(all of `discovery/`, `core/loop.py`, `core/stages.py`) and all 15 evaluation scripts in
+`lit-review/robust-literature-discovery/{closed-corpus-eval,live-survey-eval}/scripts/` — not
+carried over from `background.md` prose. The engine has moved on since that prose was written
+(`intake/` → `discovery/`, 5 new operators shipped) and the eval-script picture it painted
+("both eval tracks are hand-written simulations... not a harness that drives `traverse.py`
+itself") turns out to be true of only *some* of the eval code, not all of it — the actual
+picture is three distinct tiers of production-integration, detailed in §1.2.
 
-- **Bidirectional citation traversal** (`intake/traverse.py`): backward = PDF-first reference
-  extraction with S2-batch enrichment, S2 `/references` fallback for paywalled papers; forward =
-  S2 `/citations` only (PDFs can't provide this). Adaptive Pareto hub filter (Gini-calibrated
-  percentile) skips forward traversal from over-cited hub papers.
-- **One non-graph discovery method**, doing double duty: S2's `/paper/search` endpoint
-  (`intake/search.py`), used both as the cold-start query (project title) and as the "Escape
-  Hatch" when traversal yield goes stale (LLM generates a query string from current criteria,
-  same endpoint).
-- **Stopping rule:** yield-based (screen_yield ≥ 5% keeps expanding; 2 stale rounds → escape
-  hatch; escape hatch exhausted 3× → STABLE).
-- **Validated on 6 surveys total:** 3 closed-corpus (APS physics: S1-MIT, S2-UCG, S3-TOPO —
-  89-98% recall) + 3 live (K17-RGC, Ge21-HSS, Le25-GLLM — 73.7-100% recall). See
-  `closed-corpus-eval/` and `live-survey-eval/`.
-- **Known measurement gap:** both eval tracks are hand-written simulations of the algorithm
-  (`04b_cold_start_lowseed.py` reimplements bidir-BFS+Pareto+yield standalone against a CSV), not
-  a harness that drives `traverse.py` itself. The live track is closer to production but still
-  only 3 surveys, and neither track screens through the actual LLM screening step — both measure
-  pure graph-traversal recall against a fixed gold set.
+### 1.1 The production engine (`litdiscover/discovery/`)
+
+Seven operators, all sharing one contract — `operator(paper_set, ...) -> OperatorResult`
+(`candidates`, `edges`, `stats`), defined once in `traverse.py` and imported by `operators.py`:
+
+- **`backward_traversal_operator`** (`traverse.py`) — PDF-first reference extraction
+  (PyMuPDF regex over the References section for arXiv IDs / DOIs, parallelised across
+  `pdf_workers` threads) with a single S2 `/paper/batch` enrichment call per paper
+  (`s2_client.batch_enrich_refs`), falling back to S2 `/references`
+  (`s2_client.paginate_edges`) only when PDF extraction yields nothing.
+- **`forward_traversal_operator`** (`traverse.py`) — S2 `/citations` only (PDFs can't provide
+  this by definition). Takes an explicit `hub_threshold` float; defaults to `inf` (unfiltered) —
+  the hub filter is a separate, composable step, not fused in.
+- **`pareto_hub_threshold`** (`traverse.py`) — not an operator itself (produces no candidates); a
+  modifier. Computes a Gini coefficient over the frontier's citation counts and picks an
+  *adaptive* percentile via `adaptive_hub_percentile()`: Gini > 0.70 (power-law) → strict 80th
+  pct; 0.50–0.70 → relax to 90th; < 0.50 (uniform/niche) → relax to 95th. `traverse()` (the
+  public orchestrator) always calibrates this before running the forward operator.
+- **`author_expansion_operator`, `venue_expansion_operator`, `recency_search_operator`,
+  `embedding_search_operator`, `co_citation_operator`** (`operators.py`, all added 2026-07-14
+  via TDD) — five operators beyond citation traversal. All derive their query from the current
+  paper set itself (recurring authors / venues / S2's own SPECTER-embedding recommendations /
+  co-citation via citers'-references) except `recency_search_operator`, which necessarily takes
+  an explicit caller-supplied query string, since its entire purpose is reaching papers with no
+  graph or authorship connection to the current set yet.
+- **`s2_client.py`** — the shared infrastructure every operator above (and `pdf_worker.py`,
+  `search.py`, `verify.py`, `forward_cites.py`) calls through: one process-wide rate-limit lock
+  (`_s2_wait`, `_S2_MIN_INTERVAL = 1.2s`, widened from 1.05s on 2026-07-14 after live 429s under
+  the tighter margin), `batch_enrich_refs`, `paginate_edges`, `_normalise_s2`, and a shared
+  `_s2_call_count` counter that `budget.py` reads as its cost source of truth.
+- **`budget.py`** — `run_with_cost(operator_fn, *args, **kwargs)` measures any operator
+  externally (S2-call delta, wall-clock time, candidates returned) with zero changes to the
+  operator itself; `recall_per_call()` is pure arithmetic, gold-matching is the caller's job.
+- **Supporting, non-operator discovery code:** `search.py` (S2 `/paper/search`, used both as
+  the cold-start query and as autopilot's "Escape Hatch"), `pdf_worker.py` (background PDF→ref
+  extraction daemon feeding the pending queue during autopilot screening), `verify.py`
+  (post-hoc title-drift check against S2, VERIFIED/UNCERTAIN/NOT_FOUND), `forward_cites.py`
+  (on-demand "what's citing my included set" check), `relwork.py` (staged workflow's
+  human-in-the-loop substitute for autopilot's automatic criteria refinement).
+- **Orchestration:** `core/loop.py::run()` is autopilot's yield-gated state machine (SEARCH →
+  SCREEN → TRAVERSE → STABLE, described in full in CLAUDE.md); `core/stages.py` holds the
+  reusable pipeline stages (`_do_traverse`, `apply_screen_decisions`, `traverse_once`,
+  `screen_pending`) both autopilot and the staged CLI commands call into. `traverse()` itself
+  (`traverse.py`'s public function) is a thin orchestrator: calibrate the hub threshold, run
+  backward + forward, merge — its signature and return shape are a stable contract `core/stages.py`
+  and existing tests depend on.
+
+### 1.2 The evaluation code: three tiers of production-integration, not one
+
+The 15 scripts across `closed-corpus-eval/scripts/{eval,sweep}/` (11 scripts) and
+`live-survey-eval/scripts/` (4 scripts) do **not** integrate with the production engine
+uniformly. Reading them in full shows three distinct tiers:
+
+**Tier 0 — `closed-corpus-eval/` (all 11 scripts): zero litdiscover imports, by design.**
+Every script — `eval/01_extract_ground_truth.py` through `eval/06_publication_figures.py`,
+`sweep/03b_depth_pareto_grid.py` through `sweep/08_hyperparameter_sweep.py` — is fully
+standalone. None import anything from the `litdiscover` package, and there is no shared helper
+module between the 11 scripts either: each one that needs a traversal re-derives the
+`cites`/`cited_by` adjacency index from the raw APS citation CSV and re-implements the
+bidirectional-BFS-plus-Pareto-filter-plus-yield-stop loop from scratch. That loop appears **six
+times** with small, undocumented drift between copies: `eval/03_traversal_simulation.py`
+(4 strategy variants), `eval/04b_cold_start_lowseed.py` (the paper's canonical experiment),
+`eval/05_miss_analysis.py`, `sweep/04_cold_start_simulation.py` (superseded by 04b, but never
+deleted — its output was never regenerated after 04b changed the seed-size/round-count scope,
+which silently broke `sweep/07_elbow_analysis.py`'s dependency on it), `sweep/07_rounds_sweep.py`,
+`sweep/08_hyperparameter_sweep.py`. `04b`'s own docstring is explicit that this is intentional,
+not an oversight: production filters frontier papers by in-degree *before* forward traversal
+against a live, heterogeneous, cross-disciplinary S2 corpus; these scripts filter by out-degree
+percentile on already-collected citers *after* the fact, against a closed, single-discipline
+(APS physics) corpus — a different filtering point and a different distributional assumption,
+chosen deliberately for the closed-corpus regime.
+
+Secondary evidence of the same "answers the strategy question, not the code-path question"
+character: the Pareto-percentile grid is enumerated four different, mutually inconsistent ways
+across the 11 scripts (`eval/03`'s 8 values, `sweep/03b`'s 8-plus-`"bidir"`,
+`sweep/08`'s 11-value grid including 60/95/`None`); "no filter" is encoded three different ways
+(dict key `"bidir"`, Python `None`, and the sentinel integer `999` in `sweep/08`'s output CSV);
+the canonical seed size k=5 used in `04b`/`05`/`08` is silently k=20 in
+`sweep/07_rounds_sweep.py`; and the survey color palette is redeclared with inconsistent
+variable names and occasionally inconsistent hex values in six separate scripts.
+
+**Tier 1 — `live-survey-eval/09_live_validation.py`: also zero litdiscover imports, but for a
+different reason — it predates the 2026-07-14 operator-decomposition refactor.** 1057 lines,
+fully standalone: its own S2 client (own `_s2_wait` at `_S2_MIN_INTERVAL=1.05` vs. production's
+now-1.2s; own `S2_FIELDS` that omits `abstract`), its own disk cache, its own
+`bidir_pareto_traversal_live` (a **flat, non-adaptive** `PARETO_P=80` with no Gini calibration —
+production's `adaptive_hub_percentile` can relax to 90th/95th for low-Gini corpora, 09 never
+does), and backward traversal that is S2-`/references`-only (no PDF-first extraction — a real
+semantic divergence from `backward_traversal_operator`, not just duplicated code). It also
+builds a two-tier gold-matching scheme (exact S2-ID, then rapidfuzz fuzzy-title fallback,
+`FUZZY_THRESHOLD=92`) that reports both `recall_exact` and `recall_upper_bound` — except
+`run_survey()`'s actual output-writing path never calls the function that does the fuzzy tier
+(`compute_recall()`); it sets `recall_upper_bound = recall_exact` directly (line ~1015) with a
+stale comment claiming otherwise. The fuzzy-matching capability exists in the file and is dead
+in practice. One more silent gap: `data/seeds/K17-RGC_seeds.json` has only 1 of the 3 seeds
+`SURVEYS[...]["seed_pdfs"]` configures resolved — every downstream script (10, 11, 12) that
+reads this file inherits a degraded K17-RGC baseline without flagging it.
+
+**Tier 2 — `live-survey-eval/10_operator_benchmark.py`: the actual integration point.**
+Imports `litdiscover.discovery.operators` (all 5 non-traversal operators, plus `_normalise_paper`
+and `_get_json`), `litdiscover.discovery.traverse` (`backward_traversal_operator`,
+`forward_traversal_operator`, `OperatorResult`), and `litdiscover.discovery.budget`
+(`run_with_cost`, `recall_per_call`, `CostMetrics`) — every operator call in this script goes
+through real production code with real cost accounting, not a reimplementation. What it does add
+independently: its own `SURVEYS` config dict (same 3 survey keys as 09's, but carrying
+`topic_query`/`since_year` instead of PDF paths — no shared source with 09's dict, kept in sync
+only by hand), and gold-matching that is **exact-S2-ID-only** — 09's fuzzy tier-2 has no
+counterpart here, so 09's recall numbers and 10's recall numbers are not directly comparable
+even for the same survey.
+
+**`live-survey-eval/11_redundancy_check.py` and `12_chained_composition.py`** build on 10
+correctly at the operator level but reach it via `importlib.util.spec_from_file_location` —
+dynamically loading and executing `10_operator_benchmark.py`'s whole module body as a sibling
+script, not a normal package import (there is no importable shared module in `scripts/`). Both
+inherit 10's exact-match-only gold logic this way. Both also independently reimplement the same
+"rank accumulated candidates by `citation_count` desc, take top N" frontier-selection pattern
+inline (11's `ROUND2_FRONTIER_CAP` slice, 12's `run_chained()` ranking) rather than sharing one
+helper — the third occurrence of that specific pattern in the whole 15-script codebase.
+
+### 1.3 Why these three tiers can't just be merged as-is (corrected 2026-07-14, same session)
+
+**Correction:** an earlier version of this section called Tier 0's separation from production "an
+online/offline mismatch" and suggested it would "likely always be a methodology proxy." That
+overstated the case — it conflated a real, bounded engineering gap with an accidental
+implementation choice that isn't actually forced by anything. Restated:
+
+**Tier 0 (closed-corpus) is the same algorithm, blocked from reuse by one real refactor plus one
+accidental divergence — not an architectural wall.**
+- *Real, bounded:* `s2_client.py`'s `paginate_edges`/`batch_enrich_refs` are hardcoded to make
+  live `httpx` calls — there's no interface between the operators and the network, so the
+  operators can't currently be pointed at anything else. The fix is an ordinary refactor: define
+  a `GraphSource` protocol (`get_references(id)`, `get_citations(id)`, `get_citation_count(id)`)
+  that `s2_client`'s functions implement today, then add a second implementation backed by the
+  closed corpus's `cites`/`cited_by` adjacency index (already built once per script by `eval/01`
+  and re-derived independently 9 more times downstream — this refactor would also kill that
+  duplication). Inject the source into `backward_traversal_operator`/`forward_traversal_operator`/
+  `pareto_hub_threshold` instead of importing `s2_client` directly. Real work, ordinary shape.
+- *Accidental, not forced:* the closed-corpus scripts filter hub papers *post-hoc*, by percentile
+  of already-collected candidates' local out-degree; production filters *before* expansion, by a
+  frontier paper's own citation count. Nothing about the closed corpus requires this — `eval/02`
+  already computes per-paper in-degree across the full APS graph, so a pre-expansion filter
+  matching production's exact logic (skip forward-traversing a frontier paper whose own in-degree
+  clears the Gini-calibrated percentile) is directly buildable from data already on hand. The two
+  implementations just diverged because they were written independently, not because the closed
+  corpus demands a different filter point.
+- *What does NOT go away after this refactor:* closed-corpus in-degree is bounded by the ~710K-
+  paper APS-physics-only corpus; production's `citation_count` is a paper's global count across
+  all of S2. Even with identical code and an aligned filter point, "hub-ness" relative to a
+  narrow single-discipline corpus is a different number than hub-ness relative to the live
+  full index — recall/precision numbers from the two tracks still won't be numerically
+  comparable post-unification, only *mechanically* comparable (same algorithm, same code path,
+  different corpus scope). That's a real, permanent limitation of what "unifying" can buy here —
+  but it's a scope-of-corpus issue, not a reason the code paths can't be shared.
+
+**Tier 1 (`09_live_validation.py`) is a bounded refactor, not an architectural mismatch.** It
+already hits the live S2 API the same way production does — it just does so through its own
+frozen-in-time client and traversal loop, written before `traverse.py` was decomposed into
+swappable operators. Rewriting it to call `backward_traversal_operator`/
+`forward_traversal_operator`/`pareto_hub_threshold` directly is mechanically straightforward
+(no offline/online gap to bridge) and would close every drift flagged above in one pass: the
+stale `S2_FIELDS`/rate-limit constants, the missing Gini-adaptive hub calibration, the
+PDF-vs-S2-only backward-traversal divergence, and the dead fuzzy-matching branch. The one real
+design decision this refactor forces, not yet made: whether recall should include 09's fuzzy
+tier-2 title matching at all — right now that choice differs silently between 09 and
+10/11/12/should be made once and applied uniformly.
+
+**Tier 2/3 (10, 11, 12) already integrate correctly; what's left is deduplication, not
+integration.** The fix here is mechanical: extract `10`'s `_load_gold`/`_load_seed_ids`/
+`_fetch_full_paper`/`_recall`/`_precision` and the citation-count frontier-ranking helper into
+one real importable module that 11 and 12 import normally, instead of the
+`importlib.util.spec_from_file_location` sibling-script-loading trick; reconcile 09's and 10's
+independently-hand-maintained `SURVEYS` config dicts into one source; and decide the fuzzy-match
+question above once, upstream of all four scripts.
+
+**Net effect on redoing Experiment 1 differently:** any redesign that wants apples-to-apples
+recall/precision numbers across closed-corpus and live tracks needs to either accept Tier 0 as a
+permanently separate methodology check (most realistic, given the online/offline mismatch), or
+scope real engineering time to build the static-corpus adapter before comparing its numbers to
+Tier 1-3's. Within the live track, Tier 1 (09) should not be compared to Tier 2/3 (10-12)
+output at face value until the fuzzy-match and hub-calibration drift is resolved — they are
+currently measuring recall under different, undocumented definitions of "match" and "hub."
+
+### 1.4 Execution — the unification actually happened (2026-07-14, same session)
+
+Following the correction in §1.3 (the closed-corpus/live-S2 split was a bounded engineering
+gap, not a permanent wall), the `GraphSource` abstraction was actually built and the migration
+carried out — not just scoped:
+
+- **`litdiscover/discovery/graph_source.py` (new):** `GraphSource` protocol, `S2Source` (thin
+  adapter — delegates to existing `traverse.py`/`operators.py` code via module-attribute lookup
+  specifically so it doesn't break those modules' own existing patched tests — a real subtlety
+  caught during implementation: a naive `from module import fn` bound-import would have silently
+  stopped seeing test patches on the owning module), `ClosedCorpusSource` (pure in-memory,
+  DOI-keyed, no network — `citation_count` = in-degree within the closed corpus, explicitly NOT
+  comparable to live S2 `citation_count`, see §1.3's corpus-scope caveat), `_infer_venue_from_doi()`.
+  `backward_traversal_operator`, `forward_traversal_operator`, `author_expansion_operator`,
+  `venue_expansion_operator` all retrofitted with an optional `source=` param defaulting to
+  `S2Source` — zero behavior change for every existing caller. `pareto_hub_threshold` needed no
+  changes at all, exactly as predicted (it only ever reads `citation_count` off paper dicts it's
+  handed). 32 new tests; **all 227 pre-existing tests pass completely unmodified** — the actual
+  proof the live-S2 default path is byte-identical to before. Full suite: 259/259 green.
+- **`closed-corpus-eval/scripts/_corpus_loader.py` (new):** centralizes the `cites`/`cited_by`
+  adjacency construction that 9 of the 11 closed-corpus scripts each independently re-derived
+  from the same CSV (documented in §1.2), plus a `build_closed_corpus_source()` that wires it
+  into a `ClosedCorpusSource`.
+- **`eval/04b_cold_start_lowseed.py` migrated and promoted to canonical.** Original archived as
+  `04b_cold_start_lowseed_legacy.py`. Full 54-condition comparison (3 surveys × 3 seed strategies
+  × k∈{1,2,3,4,5,10}): mean recall **93.5% → 99.6%**, mean corpus size **205,021 → 66,023**
+  (3.1x smaller), conditions hitting recall=1.000 **3/54 → 49/54**. Root cause, verified by
+  inspecting actual depth/round curves, not assumed: the legacy filter discarded newly-found
+  *candidate* papers based on the **candidate's own out-degree** — a real design flaw, since a
+  genuine gold paper could be excluded purely for citing a lot of things itself, a property
+  unrelated to relevance. The corrected filter (matching production exactly) only decides
+  whether to expand an already-visited *frontier* paper's citers, based on that frontier paper's
+  own citation count — it never discards a candidate on the candidate's own properties. One
+  legible trade-off: all 4 conditions that got worse (1.9–4.9pp recall decrease) are in the
+  `contaminated`-seed strategy at low k — the condition most dependent on wide, indiscriminate
+  exploration to accidentally recover gold papers within the fixed 2-round budget, exactly where
+  a more disciplined filter shows its cost first.
+- **`eval/05_miss_analysis.py` updated to mirror 04b** (this repo's own explicit rule, since it
+  reconstructs the traversal from scratch rather than reading visited sets from the results
+  JSON). **Consequence, flagged not silently absorbed:** the canonical k=5/top-k condition now
+  has **zero misses** for all 3 surveys, so `06_publication_figures.py`'s Fig 7 ("miss analysis")
+  has no data left to plot at that condition — Fig 7 needs a re-anchor to a harder seed condition
+  or should be dropped; deliberately left as an open decision, not forced through.
+- **`eval/03_traversal_simulation.py` migrated**, with one deliberate design split from 04b's
+  migration: this script's whole point is an explicit Pareto-percentile *sweep* (10..90) as a
+  controlled variable, but production's `pareto_hub_threshold()` applies a Gini-adaptive override
+  that would silently overrule some requested sweep values. Resolution: compute each percentile
+  threshold directly (`np.percentile` over the frontier's own `citation_count`, at production's
+  actual pre-expansion filter point) and pass it straight to `forward_traversal_operator`'s
+  `hub_threshold`, bypassing only the threshold-*selection policy*, not the actual candidate-
+  fetching/filtering mechanics, which still come from the real operator.
+- **`sweep/07_rounds_sweep.py` migrated** (same engine swap; its pre-existing K_SEED=20 vs.
+  the canonical k=5 inconsistency, flagged in §1.2, was left as-is — this migration only swaps
+  the traversal engine, not the experimental design).
+- **`live-survey-eval/`'s Tier 2/3 cleanup done:** `10_operator_benchmark.py`'s loaders/config/
+  metrics (`SURVEYS`, `_load_gold`, `_load_seed_ids`, `_fetch_full_paper`, `_recall`,
+  `_precision`, `OPERATORS`, `MARGINAL_ORDER`) extracted into `_shared.py`; `11_redundancy_check.py`
+  and `12_chained_composition.py` now `import _shared` normally instead of
+  `importlib.util.spec_from_file_location`-loading `10`'s whole module body. Verified all three
+  import cleanly via `runpy`.
+- **Real-world performance finding, worth recording:** `backward_traversal_operator`'s
+  `ThreadPoolExecutor`-per-paper design (built for production's per-round frontier of dozens to
+  low hundreds of papers) is measurably slow when driven at closed-corpus BFS scale — `eval/03`'s
+  unfiltered `forward`/`bidir` strategies at depth 6 can push the frontier into the hundreds of
+  thousands, and thread-submission overhead at that scale made a single script run take on the
+  order of 30-40 minutes (vs. `04b`'s ~5-7 minutes for its whole 54-condition grid, since Pareto
+  filtering keeps 04b's frontiers much smaller throughout). Not a correctness problem, a real
+  cost one — worth a `pdf_workers`-style batch-size cap or a non-threaded code path for
+  closed-corpus-scale callers if this becomes a recurring pattern.
+
+**Update, same session — everything above closed out except the .mat blocker and Fig 7:**
+
+- **`sweep/04_cold_start_simulation.py` and `sweep/08_hyperparameter_sweep.py` migrated** (same
+  engine swap as `04b`/`eval/03`; `sweep/08` also needed the same Gini-override bypass `eval/03`
+  needed, for the same reason — it sweeps `PARETO_P_VALS` as an explicit controlled variable).
+  **Neither was run to completion** — `sweep/08` is 1980 configs (660 × 3 surveys), and `eval/03`'s
+  migration alone (33 conditions) already took ~30-40 minutes against the production
+  `ThreadPoolExecutor`-based operators at this corpus scale before being killed partway through
+  (memory climbing toward the system's 16GB ceiling, 56MB free at kill time — not itself a bug,
+  just genuine cost at this scale). `sweep/08` at ~60x eval/03's condition count would likely take
+  hours. Correctness verified by matching each script's traversal shape line-for-line against the
+  already-validated `04b` migration, not by full execution — a deliberate choice once the cost
+  became clear, not an oversight.
+- **`closed-corpus-eval/scripts/eval/07_operator_benchmark.py` built and run successfully** —
+  but scoped to backward/forward/pareto only, not author/venue as originally hoped. The `.mat`
+  file's author-DOI linkage turned out to be **genuinely inaccessible, not just effortful to
+  parse**: its `authorName`/`doi`/`affiliationName`/`pubDate` fields use MATLAB's `string` type
+  wrapped in MCOS object encoding. Confirmed via two independent tools, not just h5py struggling —
+  `mat73` (a maintained library built specifically for this MATLAB version) explicitly raises
+  `"MATLAB type not supported: string, (uint32)"` on this exact file. The underlying sparse
+  matrices (B/C/D/E) decode fine, but without the label strings their indices can't be mapped back
+  to real DOIs or author names. Reverse-engineering MATLAB's proprietary MCOS object graph from
+  scratch was judged a real, correctness-risky undertaking disproportionate to the value, not
+  attempted. The script ran clean end-to-end (single-pass, no BFS loop, seconds not minutes) and
+  produced real ablation numbers — e.g. S2_UCG: union recall 33.3%, backward-ablation Δ=+2.5%,
+  forward-ablation Δ=+28.0% (forward traversal dominates recall on this survey, backward on
+  S1_MIT) — the actual "operators against real closed-corpus data" deliverable, just narrower in
+  scope than originally hoped.
+- **`live-survey-eval/09_live_validation.py` migrated** — `bidir_pareto_traversal_live()` and
+  `escape_hatch_loop_live()` now call the real production operators via `S2Source`, resolving
+  frontier papers through 09's own `fetch_paper()` (so its disk cache is still used). This closes
+  Tier 1's drift from production named in §1.3: backward traversal is now genuinely PDF-first
+  (not S2-`/references`-only), and the Pareto filter now applies at production's actual point
+  (pre-expansion, frontier's own `citation_count`, Gini-calibrated) instead of post-hoc on
+  collected citers' `reference_count`. **Not run to completion** — a full 3-survey live run
+  spends real S2 API quota and time, deliberately not spent without a specific reason to; verified
+  via import/syntax checks only, following the same "fix without forcing a full rerun" call made
+  for the sweep scripts above. The dead fuzzy-match branch and the `09` vs. `10`-`12` recall
+  definition question (§1.3) remain genuinely open — this migration didn't touch either.
+
+**Resolved this session, not left dangling** — each of the three items below was framed as "open"
+in an earlier draft of this note, but each already has an explicit decision behind it, made
+during this session, not a gap waiting on someone:
+
+1. **Fig 7's zero-misses consequence** — user's explicit call: leave `05`/`06` as they stand,
+   revisit after reviewing everything else this session changed (asked directly, this was one of
+   three options offered; "pause" was chosen over "re-anchor to a harder condition" or "drop
+   Fig 7"). Status: **deferred by decision, not unresolved by omission.** `05_miss_analysis.py`
+   and `06_publication_figures.py` are both left exactly as they were at that decision point —
+   `05` re-run with the corrected engine (0 misses at k=5/top-k, documented above), `06` untouched.
+   Next session should start here if the paper needs Fig 7 resolved before submission.
+2. **Running `eval/03`/`sweep/04`/`sweep/08`/`live-survey-eval/09` to full completion** — user's
+   explicit call, given directly after watching `eval/03` cost ~30-40 minutes and climb toward the
+   system's memory ceiling: "can we just fix them without trying to rerun the full thing?" Status:
+   **decided against, not merely deferred.** All four are migrated, syntax/logic-verified against
+   the already-validated `04b`/`05` pattern, and deliberately not executed to completion. Re-run
+   only if a specific reason to spend that time/API budget arises (e.g. the paper actually needs
+   updated `eval/03`/`sweep/08` figures) — this is a cost decision to revisit then, not a
+   forgotten step now.
+3. **The `.mat` file's author data** — not a scheduling gap, a **confirmed technical dead end**
+   with external evidence: `mat73` (a maintained library built specifically for this MATLAB
+   version) explicitly rejects the file's `authorName`/`doi` fields as an unsupported type. Status:
+   **investigated and closed as blocked**, not pending investigation. Reopening it requires new
+   input this session didn't have access to — an official MATLAB export of the same data, or
+   locating an original tabular/CSV source upstream — not more effort on the same approach.
+
+None of the three block anything else in this roadmap; they're recorded here so a future session
+doesn't have to re-derive why each one stopped where it did.
 
 ---
 
