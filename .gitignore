@@ -1,12 +1,29 @@
 # Ignore nested git repos (tracked separately)
-lit-review/robust-literature-discovery/
-/litdiscover/
-lit-review/automated-lit-reviews/
-citation-dynamics/
+/lit-review-bot/litdiscover/
+/lit-review-bot/paper/
+/zeitgeist/
+
+# Deprecated repo, archived on GitHub — kept locally for now
+/deprecated-bot/
 
 # External reference clones (competitor codebases, not our own repo content)
-lit-review/ProfOlaf/
-lit-review/auto-review-writing/
+/lit-review-bot/reference-systems/InteractiveSurvey/
+/lit-review-bot/reference-systems/LitLLM/
+/lit-review-bot/reference-systems/PROMPTHEUS/
+/lit-review-bot/reference-systems/ProfOlaf/
+/lit-review-bot/reference-systems/SLR-automation/
+/lit-review-bot/reference-systems/SciReviewGen/
+/lit-review-bot/reference-systems/SurveyGen/
+/lit-review-bot/reference-systems/SurveyGen-I/
+/lit-review-bot/reference-systems/SurveyX/
+/lit-review-bot/reference-systems/asreview/
+/lit-review-bot/reference-systems/auto-review-writing/
+/lit-review-bot/reference-systems/litllms-for-literature-review-tmlr/
+/lit-review-bot/reference-systems/llassist/
+/lit-review-bot/reference-systems/robotsearch/
+
+# Obsidian vault config (personal, not project content)
+.obsidian/
 
 # Python
 .venv/
@@ -24,5 +41,6 @@ __pycache__/
 
 # Large binary / generated files
 wiki/*.pdf
+/lit-review-bot/reference-systems/reference-pdfs/
 *.log
 texput.log
