@@ -77,6 +77,13 @@ k selection) → per-theme narrative generation (map-reduce for clusters >80 pap
 conclusion. Citation-grounding diagnostic shipped (`check_citation_grounding()`, 2026-07-11) but
 **never run against a real project** — the actual grounding precision number is still unmeasured.
 
+**Representation question moved to its own file: [`phase-representation-roadmap.md`](phase-representation-roadmap.md)**
+(2026-07-14) — what text gets embedded before k-means (`_paper_embed_text()` in
+`synthesizer.py`) was never compared against alternatives (abstract, full-text, structured-summary
+embeddings). Motivated by `lineages/similarity-cluster.md`'s corpus-scale failure (12/32 real
+edges survived, 3 fabricated) — Experiment 2 there tests whether that failure is fixable by
+changing the representation or is inherent to clustering's bucket-forcing shape.
+
 **Full audit already done, ranked** (`open-questions.md`, 2026-07-10/11 — not repeated here in
 full):
 1. Citation grounding — confirmed gap, cheap fix, **shipped, unmeasured**.

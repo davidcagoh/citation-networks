@@ -245,3 +245,60 @@ Surfaced real gaps worth fixing before the next external use:
   worth a `litdiscover related-work-mine <paper_id>` mode that fetches full text (arXiv/OA
   where available) and extracts just the related-work section for a human to read, as a
   complement to graph traversal rather than a replacement.
+- **Gold-set data-quality bug found 2026-07-14, during `phase-representation-roadmap.md`'s
+  section-annotation pass on Ge21-HSS:** 2 of 202 entries in
+  `live-survey-eval/data/gold-sets/Ge21-HSS_gold.json` carry DOIs pointing to completely
+  unrelated papers ("A Meta-analysis: Effect of Stem Cells Transplantation on Rehabilitation
+  of Diabetes Mellitus with Limb Ischemia" and "A Review of the Scientific Literature as it
+  Pertains to Gulf War Illnesses" — neither has anything to do with human social sensing).
+  Not caused by this task; looks like a bad reference-to-DOI resolution somewhere upstream in
+  how that gold-set was originally built. Worth checking whether the same resolution step
+  produced similar bad entries in the other 5 gold-sets, and whether this affects any
+  previously reported discovery-recall numbers (`phase-discovery-roadmap.md` §4) that used
+  this gold-set as-is.
+  **Update 2026-07-14, after finishing all 3 live-survey annotation passes:** this isn't a
+  one-off — K17-RGC's gold set has 4 unresolved entries too (3 near-duplicate/garbled records of
+  the same textbook citations — e.g. three separate "Random graphs" entries — plus a bare
+  "CAMBRIDGE STUDIES IN ADVANCED MATHEMATICS" series-name fragment with no paper title at all),
+  and Le25-GLLM (the one gold-set that resolved 57/57 cleanly) is the exception, not the rule.
+  **Root cause found (2026-07-14, audit) — corrected same day after checking which code path
+  actually ran:** all 3 live surveys have a `survey_doi`/`survey_s2_id` configured in the
+  `SURVEYS` dict (`09_live_validation.py` lines 80-114), so `build_gold_set()` (line 502) always
+  calls `build_gold_set_from_s2()` (line 452) first, which succeeded for all 3 — meaning gold
+  sets came from **S2's own `/references` endpoint** (`fetch_neighbors(..., "references")`,
+  line 483), not from PDF text parsing. The malformed titles ("CAMBRIDGE STUDIES IN ADVANCED
+  MATHEMATICS", etc.) are records **S2's own citation graph links as references** of these
+  survey papers — an S2-side data artifact.
+  **Two automated filters were tried and both reverted, same day, after measuring real
+  false-positive cost:** first an all-caps/<3-words rejection, then a narrower
+  series-name-phrase substring match. Both sounded plausible but were empirically wrong — a
+  live re-fetch showed each one rejecting far more *real, correctly-cited* references than
+  actual garbage: short titles (Goodman's "Snowball sampling", Rahwan et al.'s "Machine
+  behaviour"), all-caps journal-rendered titles (Munkres' "ELEMENTS OF ALGEBRAIC TOPOLOGY",
+  Gershkovich & Rubinstein's "MORSE THEORY FOR MIN-TYPE FUNCTIONS*"), and real book titles
+  that legitimately carry their series name in parentheses (Epstein's "Agent_Zero... (Princeton
+  Studies in Complexity)") are indistinguishable by title shape from the one genuine garbage
+  record found. **No automated filter ships** — `09_live_validation.py` only got a `FUZZY_THRESHOLD`
+  tightening (88→92, a generic match-quality improvement unrelated to this specific noise) and
+  honest comments on both functions explaining why a content filter was rejected. The actual fix
+  was manual, surgical removal of the specific confirmed-bad entries directly from each
+  gold-set JSON (Ge21-HSS: 202→200, removed the 2 unrelated-topic mislinks; K17-RGC: 56→52,
+  removed the 1 pure series-name record plus 3 entries confirmed absent from the survey's own
+  51-item bibliography, fully transcribed during the section-annotation pass). This is
+  consistent with `build_gold_set`'s own existing design ("manual corrections... survive
+  re-runs") — the fix works *with* that contract, not around it.
+  **This is confined to the 3 live surveys, structurally — the 3 APS closed-corpus gold sets
+  (`closed-corpus-eval/data/outputs/ground_truth.json`) are built by
+  `01_extract_ground_truth.py` directly from the APS citation-edge CSV (a DOI→DOI join on
+  structured data), with no S2 API or title-matching step at all — this failure mode cannot
+  occur there.** No further audit needed on the APS side.
+  **Direction of the effect on already-reported numbers:** these spurious gold entries were
+  papers the surveys never actually cite, so traversal could structurally never find them
+  correctly — counting them in the denominator made every reported live-survey recall number
+  (`phase-discovery-roadmap.md` §1's 73.7-100% headline, §4.3's per-operator table) a slight
+  *underestimate*, not an overestimate. **Now that the 6 confirmed-bad entries are removed from
+  the gold-set JSONs (Ge21-HSS 202→200, K17-RGC 56→52), those recall numbers are stale and
+  should be recomputed** — the true denominator is smaller, so recall will tick up slightly.
+  Not urgent (the direction of the fix is known and small — 6 entries across 258 total), but
+  worth doing before the next time these numbers are cited as precise. Full per-survey
+  counts in `phase-representation-roadmap.md` §3.2.
