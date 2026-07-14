@@ -272,3 +272,62 @@ which was also consolidated from two independently-diverged copies (`drafts/refs
 `drafts/ipm-submission/refs.bib`) into one canonical file with a symlink.
 
 **Status:** ✅ Adopted 2026-07-13. All five new artifacts live in `wiki/litdiscover/lineages/`.
+
+---
+
+## IP&M resubmission checklist item 1: SWIFT-Review/RobotSearch fixes re-verified, two remaining bib flags closed (2026-07-14)
+**Why:** re-read `related-work.tex` fresh as a reviewer would, against IP&M's actual
+desk-rejection wording, rather than just diffing against the pre-rejection draft — confirmed the
+2026-07-13 ProfOlaf-centered rewrite genuinely addresses the "missing SOTA/LLM baselines, missing
+current-year articles" complaint (6 papers from 2025-2026 now cited). The two bib entries still
+carrying "not independently verified, confirm before submission" notes (`Haryanto2024LLAssist`,
+`Lau2025Elicit`) had never actually been closed out.
+
+**`Haryanto2024LLAssist`:** confirmed correct as-is via arXiv (sole author, correct ID) — note
+removed, no fix needed.
+
+**`Lau2025Elicit`:** found a real error. Bib listed "Lau, A. and others" — actual authors, verified
+via PMC full text, are **Lau, O. and Golder, S.** Also added missing volume/issue/pages/DOI
+(`10.1002/cesm.70050`). Separately double-checked the paper's own stated statistic ("39.5% average
+sensitivity vs. 94.5% for original searches") against the full-text abstract directly — confirmed
+accurate, not a precision/sensitivity mixup as an initial web-search summary had suggested.
+
+**Status:** ✅ Both entries closed 2026-07-14. Recompiled clean, 21 pages, 0 errors; SWIFT-Review/
+RobotSearch/Lau2025Elicit all verified rendering correctly in the compiled `.bbl`.
+
+---
+
+## Discovery phase: operators-not-pipelines reframe, S2 Recommendations over a custom embedding index, gold-standard expansion deferred (2026-07-14)
+**Why:** the discovery-phase roadmap (`phase-discovery-roadmap.md`) had been treating "the
+algorithm" as citation traversal alone, with one secondary keyword-search mechanism as an escape
+hatch — never benchmarked against untested alternatives (embedding/author/venue/recency search),
+and never measuring precision or cost, only recall. The user supplied a detailed IR-methodology
+critique (Cranfield paradigm, operator ablation, ordering, budget normalization, Pareto curves,
+paired significance testing) that reframed the whole problem: compare retrieval *operators*, not
+whole pipelines.
+
+**Decision 1 — operators, not pipelines.** `traverse.py` was decomposed into independently callable
+functions (`backward_traversal_operator`, `forward_traversal_operator`, `pareto_hub_threshold`)
+sharing one `OperatorResult` contract, with `traverse()` reduced to a thin orchestrator. This is
+what makes ablation/ordering/budget experiments on individual mechanisms possible instead of only
+on the fused whole — the Pareto filter, in particular, used to be baked into forward traversal
+with no way to run an unfiltered-forward-traversal ablation arm without a code fork.
+
+**Decision 2 — semantic embedding search implemented via S2's own Recommendations API
+(`/recommendations/v1/papers/forpaper/{id}`), not a self-hosted embedding index.** Building our own
+index over an arbitrary open corpus would mean indexing all of Semantic Scholar ourselves —
+infeasible. S2 already runs SPECTER-embedding similarity server-side; verified the endpoint live
+before implementing (its response key, `recommendedPapers`, differs from every other S2 endpoint
+used elsewhere in the codebase, `data` — would have been an easy silent bug to ship unverified).
+
+**Decision 3 — gold-standard expansion beyond the existing 6 surveys is deferred**, not front-loaded.
+Baselines/marginal-contribution/ablation/ordering/budget-normalized Pareto curves (the bulk of the
+planned experiment) don't need statistical power and run meaningfully on 6; only the final paired
+significance-testing step needs ~15-20. Expanding now would also sit idle, since the new operators
+(author/venue/recency/embedding/co-citation) didn't exist yet to exercise it against. Concrete
+trigger for when to actually expand: once the operator set is complete and the cheap-set
+experiments have run once, immediately before the significance-testing step — not before.
+
+**Status:** ✅ All three decisions acted on 2026-07-14 — see `phase-discovery-roadmap.md` §4/§7 for
+the full experimental design and sequencing, and `litdiscover/discovery/operators.py` +
+`litdiscover/discovery/budget.py` for the resulting code. 227 tests passing.

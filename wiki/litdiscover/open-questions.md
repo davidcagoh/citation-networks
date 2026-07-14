@@ -5,18 +5,15 @@ Remaining items are logistics / camera-ready only.
 
 ---
 
-## IP&M resubmission checklist (2026-07-13)
+## IP&M resubmission checklist (2026-07-13) — ✅ item 1 resolved 2026-07-14
 
-**Next session, first item:** re-read `related-work.tex` in full against IP&M's actual
-desk-rejection wording ("leverage SOTA baselines, especially LLMs... reference the most updated
-articles from the current year, which you have not done") and confirm it's thoroughly addressed,
-not just improved. The Automated Systematic Review paragraph was rewritten 2026-07-13 to be
-ProfOlaf-centered using `lineages/implicit-pairwise-analysis.md` as source — read it fresh as a
-reviewer would, not just diff it against the old version. Also re-verify the two citation-graph
-audit fixes (SWIFT-Review DOI, RobotSearch's correct paper) actually resolve cleanly in the
-compiled PDF, and check the `Haryanto2024LLAssist`/`Lau2025Elicit` bib entries — both flagged
-inline with "not independently verified, confirm before submission" notes that still need closing
-out.
+`related-work.tex` re-read fresh against IP&M's actual desk-rejection wording ("leverage SOTA
+baselines, especially LLMs... reference the most updated articles from the current year") —
+confirmed the ProfOlaf-centered rewrite genuinely addresses it (6 papers from 2025-2026 cited).
+SWIFT-Review/RobotSearch fixes verified rendering correctly in the compiled `.bbl`.
+`Haryanto2024LLAssist` confirmed correct as-is; `Lau2025Elicit` had a real error (wrong author
+initial, missing DOI/volume/pages) — fixed via PMC full-text verification. See `decisions.md`'s
+2026-07-14 entry for detail. Recompiled clean, 21 pages, 0 errors.
 
 ## Extract/synthesize redesign, informed by the lineage-construction comparison (2026-07-13)
 

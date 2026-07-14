@@ -1,6 +1,6 @@
 # Ignore nested git repos (tracked separately)
 lit-review/robust-literature-discovery/
-lit-review/litdiscover/
+/litdiscover/
 lit-review/automated-lit-reviews/
 citation-dynamics/
 
