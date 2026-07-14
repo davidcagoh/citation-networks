@@ -8,6 +8,9 @@ discovery phase specifically; `research-roadmap.md` keeps the cross-stage overvi
 operator-based ablation, ordering, budget-normalized Pareto curves, paired significance testing) —
 supersedes the earlier flat "compare some methods" sketch.
 
+**§4 execution (Experiment 1) paused, same day** — real findings, mixed/negative results, see the
+⏸ box at the top of §4 for the summary before reading that section in full.
+
 ---
 
 ## 1. What's implemented today
@@ -92,6 +95,47 @@ module with a common interface — because that's what makes the rest of the exp
 
 ## 4. Experiment 1 — Multi-Operator Retrieval Benchmark
 
+> **⏸ PAUSED 2026-07-14 — read this box before reading further, and before resuming this thread.**
+> Everything below (§4.1-§4.11) was built and run in a single session on 2026-07-14. Real findings
+> came out of it, but so did enough compounding methodological gaps that continuing to patch the
+> same experimental design stopped being a good use of live-API budget. Summary, most important
+> finding first:
+>
+> 1. **The most important thing this session found has nothing to do with the new operators**: the
+>    *original, already-validated* traversal system's headline recall (89-98% closed-corpus,
+>    73-100% live-survey — §1) has never had its precision checked. Checked for the first time
+>    2026-07-14: implied precision is **0.03%-0.45%** (56/31,168, 202/44,577, 42/150,197 papers
+>    visited to reach that recall) — because that eval explicitly measures pure graph reachability
+>    with no LLM screening in the loop (a gap named in §1 since this file was first split out, but
+>    never quantified until today). **This likely matters for how the IP&M submission frames its
+>    own headline claim** and should be raised there independent of anything else in this section.
+> 2. **3 of 7 candidate operators (embedding search, venue expansion, recency search) found ~0% new
+>    gold and ~0% precision on all 3 surveys, in every experiment run** — reproducible, not noise.
+>    Don't invest more engineering time in these three without first checking whether that's a
+>    genuine absence of value or an implementation gap (S2 API call correctness, query
+>    construction) — this was never disambiguated.
+> 3. **Co-citation is the one new operator with consistent, real signal** — best precision of
+>    anything that fired (10-29%), present in the ablation drop on every survey, and confirmed
+>    (§4.6's redundancy check) not to be redundant with cheaper alternatives.
+> 4. **Naive chained composition made both recall and precision *worse*** than independent-union,
+>    and the failure mode was diagnosed precisely (unfiltered forward traversal explodes the
+>    corpus; ranking it by raw citation count for frontier selection then hands downstream
+>    operators generic hub papers, not relevant ones) — a real, actionable lesson even though the
+>    experiment itself didn't complete cleanly.
+> 5. **Why paused, not fixed-and-continued:** every fix attempted here revealed a deeper fairness
+>    problem underneath it (single-hop operators vs. the original system's multi-round loop; raw
+>    recall vs. budget-normalized recall; naive frontier selection). The right redesign is a
+>    budget-normalized comparison (§4.7, scoped from the start, never built) rather than another
+>    patch on raw-recall comparisons — worth doing with a clear head in a future session, not by
+>    continuing to spend live S2 API budget on the same design mid-fatigue.
+> 6. **n=3 surveys throughout** — nothing in §4 was ever at statistical power regardless of any of
+>    the above; treat every number here as directional.
+>
+> §1-3 above (what's implemented today, prior-art survey, the original two-mechanism bet) are
+> untouched by this pause — they predate 2026-07-14 and aren't in question. Scripts
+> (`10_operator_benchmark.py`, `11_redundancy_check.py`, `12_chained_composition.py`) and data
+> stay in the repo, reusable if this resumes.
+
 The IR community has spent decades building evaluation methodology for exactly this class of
 problem. This experiment adapts that methodology (the Cranfield paradigm, ablation studies,
 Pareto-frontier cost/quality tradeoffs, paired significance testing) to citation-graph discovery,
@@ -150,6 +194,58 @@ Before any combination or ablation, establish the floor: recall from seeds alone
 fired), and recall from each operator run in isolation from the same seed set. Every later number
 in this experiment is measured relative to these baselines, not in the abstract.
 
+**✅ Run — done 2026-07-14** (`live-survey-eval/scripts/10_operator_benchmark.py`), against all
+three live surveys (per §5, non-graph operators can only be validated against live-survey
+semantics, not the APS simulation). Reuses the existing gold-sets/seeds JSON from
+`09_live_validation.py` unchanged; calls the real production operators
+(`litdiscover.discovery.operators` + `traverse.py`'s decomposed operators) via
+`budget.run_with_cost()`, not a reimplementation. Results:
+`live-survey-eval/data/outputs/operator_benchmark_results.json`.
+
+| Operator | K17-RGC (n=56 gold) | Ge21-HSS (n=202 gold) | Le25-GLLM (n=57 gold) |
+|---|---|---|---|
+| backward_traversal | +5 gold (5.0/call) | +2 gold (0.67/call) | +0 gold |
+| forward_traversal | +0 gold | +1 gold (0.33/call) | +0 gold |
+| embedding_search | +0 gold | +0 gold | +0 gold |
+| co_citation | +4 gold (0.19/call) | **+19 gold (0.76/call)** | +2 gold (0.06/call) |
+| author_expansion | +0 gold | +7 gold (0.39/call) | +0 gold |
+| venue_expansion | +0 gold | +0 gold | +0 gold |
+| recency_search | +1 gold (1.0/call) | +0 gold | +0 gold |
+
+**Headline finding: co-citation is the only non-traversal operator that adds gold on every single
+survey**, and by a wide margin on Ge21-HSS (+19, more than backward+forward traversal combined).
+This is a real, reproducible signal that ResearchRabbit's actual mechanism (§2) is legitimately
+load-bearing, not just a plausible-sounding untested idea. **Embedding search and venue expansion
+found zero new gold on all three surveys** — worth treating as a genuine early negative result
+(not proof of no value — see caveats below), not silence.
+
+**Caveats, read before citing these numbers anywhere:**
+- This measures single-pass, single-round, isolated-operator recall — not the multi-round
+  adaptive escape-hatch loop production actually runs (that's what `09_live_validation.py`'s
+  73–100% headline numbers already measure). These numbers answer "does operator X find gold
+  traversal alone doesn't," not "what's achievable end-to-end."
+- The S2 author-search and recommendations endpoints threw intermittent 429s during this run —
+  e.g. `author_expansion` on Le25-GLLM lost a paper's-worth of results to a 429 mid-run. **Root
+  cause, verified against S2's own docs (2026-07-14), not the "separate stricter sub-API bucket"
+  theory first written here:** a standard S2 API key gets a flat 1 request/second cap *across all
+  endpoints* (semanticscholar.org/product/api/tutorial: "using an individual API key automatically
+  gives a user a 1 request per second rate across all endpoints") — there's no evidence of a
+  distinct, stricter budget for author/recommendations specifically. `s2_client.py`'s shared
+  `_s2_wait()` enforces only a 1.05s minimum interval — barely above the 1.0s cap, with no margin
+  for network jitter or S2-side window-edge effects, and S2 documents no `Retry-After` header or
+  official backoff schedule (only "you've hit the limit, slow down"). That tight margin plus no
+  client-side retry-on-429 is the actual cause. Author/embedding recall-per-call numbers above are
+  a **lower bound**, not the operator's true ceiling.
+- Le25-GLLM ran on 2 resolved seeds, not the configured 3 — one seed's full-record fetch also hit
+  a 429 and was silently dropped (`_fetch_full_paper` has no retry). Same root cause as above.
+- Seed counts are small (1–3) and survey count is 3 — not yet the §4.9 statistical-testing regime.
+  Treat this as a first real signal to act on (build §7 step 6 backoff/retry, prioritize
+  co-citation), not a publishable result.
+- **✅ Fixed 2026-07-14:** `s2_client._s2_wait()` now retries on 429 with exponential backoff
+  (mirrors the pattern `live-survey-eval/scripts/09_live_validation.py` already used successfully
+  for its own standalone S2 client), and the shared minimum interval was widened from 1.05s to
+  1.2s for a small safety margin. See `litdiscover/discovery/s2_client.py`.
+
 ### 4.4 Marginal contribution
 
 Not "which pipeline is best" but "how much recall does each operator add, on top of what's already
@@ -167,6 +263,16 @@ seeds only            → recall = 18%
 the direct answer to "does adding operator X actually help, or is it redundant with what's already
 there" — the same question §3's untested-method table raised without a way to measure it.
 
+**✅ Run — done 2026-07-14**, same script/data as §4.3. Sequence used: backward → forward →
+embedding → co-citation → author → venue → recency (graph operators first, then non-graph in
+roughly ascending cost order — this ordering choice is itself an input to §4.6, not a claimed-best
+sequence). Final cumulative recall: K17-RGC 14.3%, Ge21-HSS 11.9%, Le25-GLLM 3.5% — **on every
+survey, co-citation is where the curve visibly bends** (K17: 8.9%→14.3%; Ge21: 1.5%→9.9%, the
+single largest jump in any survey's curve; Le25: 0.0%→3.5%, its only jump at all). Author expansion
+adds a second, smaller bend only on Ge21-HSS (11.9%→9.9%... i.e. +4 after co-citation's +17).
+Venue and recency contributed nothing in the marginal sequence on any survey (recency's isolated
+K17-RGC hit doesn't survive being added after traversal+co-citation already found the same paper).
+
 ### 4.5 Ablation study
 
 Standard leave-one-out: run the full operator set, then each variant with one operator removed
@@ -175,6 +281,48 @@ removing an operator is a cleaner signal than that operator's standalone recall 
 have low standalone recall but cause a large drop when removed, if it's finding papers nothing
 else reaches (this is the same "marginal recall" concept from the earlier draft, formalized here
 as leave-one-out rather than eyeballed).
+
+**✅ Run — done 2026-07-14**, same script as §4.3/§4.4 (`10_operator_benchmark.py`, consolidated —
+see note below), derived from the same per-operator candidate sets as a set-difference against the
+full union, at zero extra API cost.
+
+| Operator removed | K17-RGC (Δ) | Ge21-HSS (Δ) | Le25-GLLM (Δ) |
+|---|---|---|---|
+| backward_traversal | **−7.1%** | 0.0% | 0.0% |
+| forward_traversal | 0.0% | 0.0% | 0.0% |
+| embedding_search | 0.0% | 0.0% | 0.0% |
+| co_citation | **−5.4%** | **−7.9%** | **−3.5%** |
+| author_expansion | 0.0% | −2.0% | 0.0% |
+| venue_expansion | 0.0% | 0.0% | 0.0% |
+| recency_search | 0.0% | 0.0% | 0.0% |
+
+**Confirms §4.3/§4.4's finding from a different angle: co-citation is the only non-traversal
+operator with a nonzero recall drop on every survey**, the largest drop of any operator on two of
+three (Ge21-HSS, Le25-GLLM), and second only to backward traversal on K17-RGC (where a single seed
+makes backward traversal structurally load-bearing). Embedding, venue, and recency contributed a
+literal zero-recall-impact ablation result on all three surveys in this run — the strongest
+negative signal yet for those three, though still only n=3 surveys.
+
+**Script consolidation, done alongside this run:** the previous version of `10_operator_benchmark.py`
+re-invoked every operator a second time inside the §4.4 marginal-contribution loop, since none of
+these operators actually take the accumulated/expanding corpus as input (all depend only on the
+fixed seed set) — that made the second invocation both wasteful (2x API cost) and inconsistent
+(S2 search results vary slightly call-to-call, observed directly: K17-RGC's `recency_search` found
++1 gold on one run and +0 on an immediate rerun with an unchanged query). Now every operator runs
+exactly once per survey; §4.3, §4.4, and §4.5 are all derived from that single set of candidate
+sets via union/difference. This also confirmed the 429-retry-with-backoff fix (§7 step 6) is
+working live — `[s2-retry]` traces fired and recovered successfully three times during this run
+(on `_get_json` and `_fetch_edges`), not just inferred from before/after call counts as in the
+prior write-up.
+
+**⚠ Precision added after this run, and it changes the picture — see the ⏸ box at the top of §4.**
+`10_operator_benchmark.py` was later extended to track precision (`new_gold / candidates`), not
+just recall, for every number above. Full-set precision (all 7 operators unioned) turned out to be
+**0.3%-4.7%** across the three surveys — i.e. 95-99.7% of the union's candidates are not gold. The
+ablation deltas above are still real (co-citation's drop holds), but "the union recalls 12-13.5%"
+reads very differently once you know it costs 700-1700+ candidates to get there. Per-operator
+precision (added same pass): co-citation is also the best-precision operator wherever it fires
+(10-29%) — recall and precision agree here, co-citation is the standout on both axes.
 
 ### 4.6 Ordering experiment
 
@@ -189,6 +337,99 @@ Pipeline B:  embedding → citation-traversal → keyword
 Same operators, different order, likely different recall/precision/cost even though the operator
 *set* is identical. This is a genuinely open question the current architecture has never tested —
 it committed to one order (traversal-first, search-as-fallback) without comparing it to anything.
+
+**Still not run as originally scoped, and now scoped precisely, per the §4.5 consolidation above:**
+the current `10_operator_benchmark.py` operators all take the *fixed seed set* as input, never
+each other's output — meaning reordering `MARGINAL_ORDER` cannot change final cumulative recall
+today, only which step gets "credit" for an overlapping find. A genuine ordering experiment
+requires a new execution mode where operator N's input is `seeds ∪ (all prior operators'
+candidates)`, so later operators see an expanding corpus.
+
+**Redundancy pre-check run before committing to that build — done 2026-07-14**
+(`11_redundancy_check.py`). Before scoping a bigger chained-execution experiment around
+co-citation (§4.5's standout operator), checked whether it's actually redundant with something
+cheaper: both co-citation and a 2-round forward traversal hop through the same intermediate set
+(seeds' citers), but pull different signal out of it (co-citation looks backward from citers —
+their own references, kept if shared by ≥2; multi-round forward traversal looks forward again —
+who cites the citers). Ran both from the same seeds on all 3 surveys:
+
+| Survey | Candidate Jaccard | New-gold Jaccard | Multi-round fwd (candidates / new gold) | Co-citation (candidates / new gold) |
+|---|---|---|---|---|
+| Ge21-HSS | 0.02 | 0.10 | 307 / 3 | 66 / 19 |
+| K17-RGC | 0.00 | 0.00 | 203 / 0 | 40 / 4 |
+| Le25-GLLM | 0.00 | 0.00 | 1712 / 1 | 143 / 2 |
+
+**Finding: not redundant — the intuition was reasonable to check but wrong.** Candidate and
+new-gold overlap are both near-zero on every survey; these two mechanisms are finding almost
+entirely disjoint papers, not the same ones via different paths. **Bonus finding, unprompted:**
+naive multi-round (depth-2) forward traversal looks like a bad-ROI operator in its own right,
+independent of the ordering question — it pulled in 5-12x more candidates than co-citation for
+*less* new gold on every survey (worst case Le25-GLLM: 1712 candidates for 1 new gold vs.
+co-citation's 143 for 2). This was uncontrolled by the Pareto hub filter in this quick check — see
+below, this turned out to matter a great deal once actually built into the chained experiment.
+
+#### §4.6 reframed as four orthogonal questions (2026-07-14) — only the first was scoped to build
+
+An outside review of this plan pushed back usefully: the interesting question isn't "does chained
+execution work" (a systems question) but **"how should heterogeneous retrieval operators be
+composed?"** — and that decomposes into four genuinely separate questions, most of which don't
+need building yet:
+
+1. **Composition** — does chaining operators on the accumulated corpus beat independently running
+   each operator from seeds and taking the union? **Attempted — see below; result was negative,
+   with a diagnosed cause, not inconclusive.**
+2. **Ordering** — given chaining helps, which operator sequence works best? **Still gated on #1** —
+   moot given #1's result below.
+3. **Frontier selection** — given an accumulated corpus, which papers should feed the next
+   operator? **Turned out to be the actual root cause of #1's negative result — see below.**
+4. **Stopping criterion** — when should retrieval terminate? Already partially answered by
+   production's yield-based stopping and the multi-round live-survey validation
+   (`09_live_validation.py`) — a genuinely separate research question, named here as future work.
+
+**Experiment 1 — Composition, formal hypotheses, as actually run:**
+- **H0 (null):** running operators sequentially on the accumulated corpus produces no meaningful
+  recall increase over independently running each operator from seeds and taking the union.
+- **H1 (alternative):** sequential composition lets downstream operators exploit newly-discovered
+  papers, finding additional relevant papers the independent-union approach would miss.
+- **Design as built** (`12_chained_composition.py`): one growing `accumulated_papers` list; each
+  operator in `MARGINAL_ORDER` receives it (not the fixed `seeds`) as input. Frontier-selection
+  default used: rank `accumulated_papers` by `citation_count` descending before each operator's own
+  `list[:max_N]` cap. Compared against §4.5's `full_recall`/`full_precision` (the independent-union
+  arm, already computed, no new run needed for that side).
+
+**Result (Ge21-HSS, the one survey completed before the run was stopped — see below):**
+
+| | Independent union (§4.5) | Chained |
+|---|---|---|
+| Recall | 12.0% | 7.5% (**−4.5pp**) |
+| Precision | 4.7% | 1.1% (**−3.7pp**) |
+
+**Chaining made both metrics worse, and the mechanism is fully diagnosed, not a mystery:**
+unfiltered `forward_traversal` (no Pareto hub filter applied in the chain, unlike production)
+exploded the corpus past 1,000 papers within two steps. Ranking that noisy corpus by raw
+`citation_count` then handed `venue_expansion` a top-10 list dominated by generic mega-cited
+papers — its actual queried venues included *Science*, *Physical Review Letters*, *American
+Journal of Epidemiology*, *Demography* — completely off-topic for a human-social-sensing survey.
+That single step added 407 candidates and **0 new gold**. The run was killed before K17-RGC/
+Le25-GLLM completed once this pattern was clear (co-citation, later in the same chain, was about
+to spend enormous cost expanding from the same handful of hub papers).
+
+**This also exposed a fairness problem in the whole §4 design, not just the composition
+experiment:** every operator-benchmark run in §4.3-§4.6 gives citation traversal exactly **one
+hop** (that's what makes it a composable "operator"), but the *original, already-validated*
+traversal system (§1) is a **multi-round loop** that earns its 73-100% recall over several rounds
+plus an escape hatch. Checking `09_live_validation.py`'s own saved output for the first time
+against precision (never done before, for the original system either) found that multi-round
+loop's implied precision is **0.03%-0.45%** (56/31,168, 202/44,577, 42/150,197 papers visited to
+reach that recall) — because that eval explicitly measures pure graph reachability with **no LLM
+screening in the loop** (named as a gap in §1 since this file was split out, but never quantified
+until this check). So neither "single-hop operator" nor "unscreened multi-round traversal" is a
+fair baseline on its own — comparing raw recall numbers between them (as every experiment in this
+file has done) mixes up two different things. The right fix, per both this fairness problem and
+the composition failure above, is a **budget-normalized comparison** (§4.7 below, scoped since this
+file's creation, never built) rather than another raw-recall patch.
+
+**Status: paused, not abandoned — see the ⏸ box at the top of §4 for the full stopping rationale.**
 
 ### 4.7 Retrieval budget (this is where "efficiency" lives)
 
@@ -345,3 +586,40 @@ modulo the expansion needed for §4.9's significance testing.
    recall-under-equal-budget comparison (§4.5/§4.6) needs the expanded gold standard (§4.2,
    deferred per step 2) and real operator runs against included-paper sets, not just the unit
    tests' mocked S2 responses.
+5. ✅ **Baselines + marginal contribution (§4.3/§4.4) run against all 3 live surveys — done
+   2026-07-14** (`live-survey-eval/scripts/10_operator_benchmark.py`). Headline finding:
+   **co-citation is the only non-traversal operator that adds gold on every survey**, and by a
+   wide margin on Ge21-HSS; embedding search and venue expansion found zero new gold anywhere in
+   this run. See §4.3 for the full table and caveats (single-pass isolated-operator numbers, not
+   multi-round production recall; intermittent 429s on the author/recommendations sub-APIs
+   undercount those operators' true yield — a real gap, not just noise).
+6. ✅ **429 retry/backoff added to `s2_client._s2_wait()` and `operators.py`'s raw calls — done
+   2026-07-14**, after checking S2's own docs rather than guessing at backoff parameters. A
+   standard S2 API key gets a flat 1 req/sec cap *across all endpoints*
+   (semanticscholar.org/product/api/tutorial), not a stricter separate budget for
+   author/recommendations specifically — the real cause of observed 429s was `_s2_wait()`'s 1.05s
+   minimum interval leaving no jitter margin, combined with zero retry-on-429 in `operators.py`'s
+   four raw calls (which don't route through `s2_client`'s already-protected `_fetch_edges`). Fix:
+   `_get_json()` in `operators.py` now shares `s2_client._fetch_edges()`'s exact tenacity retry
+   pattern; minimum interval widened 1.05s→1.2s. Also added a shared `log_retry_attempt()`
+   before-sleep callback (in `s2_client.py`, reused by `operators.py` and `search.py`) so retries
+   are visible in script output as `[s2-retry] ...` traces instead of silent until success/failure.
+7. ✅ **§4.5 ablation (leave-one-out) run — done 2026-07-14**, confirmed retry fix live via real
+   `[s2-retry]` traces during the run, and consolidated `10_operator_benchmark.py` to derive
+   §4.3/§4.4/§4.5 from one pass per operator instead of re-invoking operators per measurement (see
+   §4.5 for the full table). Co-citation is the only operator with a nonzero ablation drop on
+   every survey.
+8. ✅ **Precision tracking added — done 2026-07-14.** Neither this file's operator work nor the
+   *original* multi-round traversal validation (§1) had ever measured precision, only recall.
+   Added `_precision()` to `10_operator_benchmark.py`/`12_chained_composition.py` and retroactively
+   checked `09_live_validation.py`'s own saved output — see the ⏸ box at the top of §4 and the end
+   of §4.6 for what this revealed (full-union precision 0.3-4.7%; original system's multi-round
+   recall implies 0.03-0.45% precision, since that eval never screens).
+9. ⏸ **§4.6 Composition experiment attempted, then paused — done/stopped 2026-07-14.** Chained
+   execution made both recall and precision worse on the one survey completed, root cause
+   diagnosed (unfiltered forward traversal + citation-count frontier selection compounding into a
+   noisy corpus) — see §4.6's end-of-section writeup. This also surfaced a fairness problem in
+   every §4.3-§4.6 comparison (single-hop operators vs. the original system's multi-round loop).
+   **Next, if this resumes:** a budget-normalized comparison (§4.7, never built) rather than
+   another raw-recall patch — see the ⏸ box at the top of §4 for the full rationale on why this
+   is paused rather than continued immediately.

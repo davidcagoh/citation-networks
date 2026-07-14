@@ -331,3 +331,46 @@ experiments have run once, immediately before the significance-testing step — 
 **Status:** ✅ All three decisions acted on 2026-07-14 — see `phase-discovery-roadmap.md` §4/§7 for
 the full experimental design and sequencing, and `litdiscover/discovery/operators.py` +
 `litdiscover/discovery/budget.py` for the resulting code. 227 tests passing.
+
+---
+
+## Discovery Experiment 1: run live, real findings, paused rather than continued patching (2026-07-14)
+
+**Status:** committed — Experiment 1 marked ⏸ paused in `phase-discovery-roadmap.md` §4, not
+abandoned or deleted.
+
+**Why:** Baselines/marginal-contribution/ablation ran live against all 3 surveys for the first
+time (`live-survey-eval/scripts/10_operator_benchmark.py`, `11_redundancy_check.py`,
+`12_chained_composition.py`). Real findings came out: co-citation is the standout non-traversal
+operator (best precision of anything that fires, only nonzero ablation drop everywhere); embedding
+search, venue expansion, and recency search show ~0% recall/precision on every survey and every
+experiment; a composition/chaining attempt made both recall and precision *worse*, with the cause
+fully diagnosed (unfiltered forward traversal + citation-count frontier selection compounding into
+a noisy corpus that hands downstream operators generic hub papers instead of relevant ones).
+
+Precision was added as a tracked metric mid-session (previously only recall was ever measured, for
+these new operators or for the *original* system) — and checking it retroactively against the
+original system's own 73-100%-recall multi-round validation (`09_live_validation.py`) found that
+result implies **0.03-0.45% precision**, since that eval explicitly never screens. This is
+independently significant for how the IP&M submission frames its headline claim, separate from
+anything about the new operators.
+
+Every fix attempted for the composition experiment revealed a deeper methodological problem
+underneath it: single-hop operators vs. the original system's multi-round loop is not a fair
+comparison; raw recall vs. budget-normalized recall is not a fair comparison; naive
+citation-count-based frontier selection actively selects for irrelevant hub papers. Rather than
+keep patching the same raw-recall-based design (and spending more live S2 API budget doing so),
+the decision was to pause with findings preserved and a clear redesign path named
+(budget-normalized comparison, §4.7, scoped since this file's creation but never built) —
+resuming with a clear head in a future session rather than continuing mid-fatigue.
+
+A real mid-session incident is also recorded here for completeness: a concurrent session (also
+active in this repo, fixing gold-set data-quality issues) clobbered part of
+`phase-discovery-roadmap.md` §4.5/§4.6 via a lost-update race — git showed only insertions versus
+the last commit, but content added earlier in the same session had reverted. Reconstructed from
+conversation history rather than re-derived. No data was permanently lost, but this is worth
+remembering as a real risk when multiple sessions edit the same wiki file concurrently without
+coordination.
+
+**See:** `phase-discovery-roadmap.md` §4 (⏸ box + full §4.5/§4.6 writeup) and `wiki/session-log.md`
+session 38 for the complete account.
