@@ -380,3 +380,43 @@ coordination.
 
 **See:** `../discovery/roadmap.md` §4 (⏸ box + full §4.5/§4.6 writeup) and `wiki/session-log.md`
 session 38 for the complete account.
+
+---
+
+## Discovery: end-to-end evaluation adopted as the primary metric, isolated-stage recall/precision demoted to diagnostic (2026-07-14)
+
+**Why:** researching whether the field has a mature evaluation standard for discovery/screening
+(`../discovery/background/corpus-curation-prior-art.md`) surfaced a decades-old systematic-review
+methodology — relative recall against a completed review's known-item gold set — that none of the
+27+5 surveyed methods apply to their own discovery mechanism, and confirmed CLEF TAR/SYNERGY is
+the field's genuine mature standard, but for *screening in isolation against an already-fixed
+candidate pool*. User's own observation, correct and load-bearing: discovery and screening "go
+hand in hand... precision and recall are two sides of the same coin" — recall's denominator (the
+gold set) is fixed, but precision's denominator (the candidate pool) is produced by discovery, so
+a screening-only or discovery-only number can't be defended as a standalone system-quality claim.
+This wasn't a new problem invented in the abstract — it's the exact same failure mode session 38
+already found in the original traversal system's own headline: 73-100% recall implied 0.03-0.45%
+precision once anyone checked, because that validation never screens.
+
+**Decision:** `../discovery/roadmap.md` §4.0 (new) states the principle and defines the corrected
+primary experiment — **end-to-end recall/precision/F1 of the real `status=included` set** (not
+raw discovery candidates) against a survey's true bibliography, run through the actual staged
+pipeline (`traverse → prefilter → screen`), budget-capped per run, with the full
+seeds→discovered→included funnel reported alongside the headline ratio. The existing
+operator-ablation/marginal-contribution/ordering work (§4.1-§4.11) is **not deleted** — it's
+demoted to diagnostic decomposition of the funnel's discovery→candidates step, still real and
+reusable, just never citable alone as evidence of system quality going forward. A 6-item
+"ironclad/defensible" checklist was added to make this concrete: primary metric = end-to-end;
+every isolated-stage number labeled diagnostic; every run budget-capped and documented; paired
+stats honestly caveated at n=3; CLEF TAR/SYNERGY only ever used as a same-pool/same-gold-standard
+classifier check, never a cross-corpus comparison; the funnel always reported alongside the ratio.
+
+**Status:** ✅ Design committed 2026-07-14 (session 41) — no section renumbering, so every
+existing `§4.x` cross-reference elsewhere in the wiki still resolves. Not yet built: the actual
+end-to-end harness is `../discovery/roadmap.md` §7 step 0, the next concrete piece of work, ahead
+of anything else in §4.1-§4.11's diagnostic track. Discovery was also promoted to its own
+top-level wiki study (`wiki/discovery/`) the same session, mirroring the earlier Synthesis
+promotion — see `wiki/INDEX.md`'s Discovery section.
+
+**See:** `../discovery/roadmap.md` §4.0 and §7 step 0; `../discovery/background/corpus-curation-prior-art.md`
+for the mature-eval-standard research that prompted this; `wiki/session-log.md` session 41.
