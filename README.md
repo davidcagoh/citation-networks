@@ -1,14 +1,9 @@
 # citation-networks
 
-Research workspace for "Recognizing Signature Patterns and Phases of Time-Varying Networks"
-Supervisor: Xiaobai Sun | Started: Sept 2024
-
-Three thesis contributions, each its own project:
-1. Temporal embedding of citation networks
-2. Backward influence mapping
-3. Quantitative phase characterization
-
-See [`wiki/research-program.md`](wiki/research-program.md) for the full narrative overview — the guide below is quick orientation only.
+PhD research workspace: three connected projects studying citation networks — LitDiscover
+(literature discovery), Zeitgeist (temporal/community structure), Synthesis (applying the two
+together). See [`wiki/research-program.md`](wiki/research-program.md) for the full narrative
+overview; this file is repo navigation only.
 
 ## The pipeline
 
