@@ -12,6 +12,15 @@ systems, `deep-dives.md`, and the source PDFs (`fulltext/` → `reference-pdfs/`
 LitDiscover engine, the reference-systems corpus, and the RLD paper together; the wiki keeps its
 own research/decisions docs separately in `wiki/litdiscover/` as before.
 
+**Repo admin (2026-07-14, session 43):** `citation-dynamics` GitHub repo renamed to `zeitgeist`
+(local clone's remote repointed); `automated-lit-reviews` deleted from GitHub (`deprecated-bot/`
+keeps a local-only copy, its own `origin` now points at a dead URL); June-24 (Mohammed Junaid
+Anwar) invited as a Write collaborator on `citation-networks`. Root and per-project READMEs
+(`citation-networks`, `lit-review-bot/`, `litdiscover`, `paper`, `zeitgeist`) audited against
+actual code/wiki state and fixed where stale — see session 43 below for the full list, including
+a real broken symlink the rename caused. `forward_cites.py`/`verify_refs.py` moved from repo root
+into `utils/` (see `utils/README.md`).
+
 ---
 
 ## Thesis: Recognizing Signature Patterns and Phases of Time-Varying Networks

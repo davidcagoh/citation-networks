@@ -26,6 +26,13 @@ Pipeline per entry:
          - else  → GET /paper/search?query=<title>   (top hit)
     2. Paginate GET /paper/{s2_id}/citations (1000/page).
     3. Sort citing papers by citationCount desc, take top --limit.
+
+Standalone scratch utility — operates on any .bib file with its own from-scratch S2 client.
+A project-integrated port of this exists at
+lit-review-bot/litdiscover/litdiscover/discovery/forward_cites.py (the `forward-cites` CLI command),
+which runs against a project's own papers/edges tables and reuses the shared S2 client/rate-limit
+code instead of re-implementing it. Use this root-level version for one-off .bib files outside
+that project's database.
 """
 
 from __future__ import annotations

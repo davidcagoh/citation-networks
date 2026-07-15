@@ -19,6 +19,13 @@ Statuses:
     LIKELY          — found via title search with high confidence (≥ 0.85)
     UNCERTAIN       — found something but title similarity is low; check manually
     NOT_FOUND       — S2 returned nothing for this entry
+
+Standalone scratch utility — operates on any .bib file with its own from-scratch S2 client.
+A project-integrated port of this exists at
+lit-review-bot/litdiscover/litdiscover/discovery/verify.py (the `verify` CLI command), which
+re-resolves a project's own included papers against S2 using the shared S2 client/rate-limit
+code instead of re-implementing it. Use this root-level version for one-off .bib files outside
+that project's database.
 """
 
 from __future__ import annotations
