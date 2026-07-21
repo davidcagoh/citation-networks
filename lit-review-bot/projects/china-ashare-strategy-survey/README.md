@@ -26,10 +26,13 @@ it produced are a real, literature-cross-checked seed list worth re-testing agai
 more general dataset before this survey does any fresh keyword searching of its own.
 
 ### Ruled out
-- **Price-only intermediate-horizon momentum (3/6/12-month).** "Dissecting Momentum in China"
-  (Liu, Tan, Xu, Yuan, Zhu 2025) found classic momentum is absent in China — high past-news-day
-  returns are offset by non-news-day reversal (retail-driven "tug-of-war"), net momentum ≈ 0.22%/mo,
-  t=0.40. Structural, not a data artifact — don't re-test plain momentum on new data.
+- **Price-only intermediate-horizon (weekly/monthly, 3/6/12-month) momentum only** — scope this
+  precisely. "Dissecting Momentum in China" (Liu, Tan, Xu, Yuan, Zhu 2025) found classic
+  intermediate-horizon momentum is absent — high past-news-day returns are offset by non-news-day
+  reversal (retail-driven "tug-of-war"), net momentum ≈ 0.22%/mo, t=0.40. Structural, not a data
+  artifact — don't re-test plain intermediate-horizon momentum on new data. **This does NOT rule
+  out daily-horizon momentum** — see "Daily momentum (distinct from ruled-out momentum)" below,
+  found in a broader thrust-search pass and easy to miss if "momentum" is treated as one bucket.
 - **Raw IC as sufficient portfolio-performance proxy.** The prior effort's own empirical finding
   (IC=+0.034 → CAGR=−54%) is independently confirmed by "Do Better Volatility Forecasts Lead to
   Better Portfolios?" (Wade 2026): even rank-correlation of the forecast target still fails to
@@ -68,6 +71,44 @@ claims.
 - **Clustering-constrained stock selection** (Jiao & Zheng): explicitly targets the concentration
   risk in a low-vol N=20 book (prior effort's own selected stocks had mean pairwise r=0.33, ~7
   effective bets) — real diversification improvement, not cosmetic.
+
+### Second pass (2026-07-21) — broad thrust re-search, not just gap-filling
+
+The first curation pass ran gap-directed searches (execution/VWAP mechanics, turnover+low-vol
+combos) and came up empty on those specific gaps. Re-running broad searches on the RQ's actual
+core thrust (not just its edges) surfaced real misses the original weekly job's own search terms
+apparently didn't catch:
+
+- **Daily momentum (distinct from ruled-out momentum).** "Daily Momentum and New Investors in
+  Emerging Stock Markets" (Gao, Jiang, W.A. Xiong, W. Xiong 2025): medium-term momentum is absent
+  (confirms the ruled-out finding above), but a *daily* momentum exists — continues 1 day, reverses
+  within a week — driven specifically by new/inexperienced-investor attention-chasing (directly
+  evidenced via account-level trading data, not inferred). Asymmetric: stronger in bull markets.
+  A systematic emerging-market phenomenon (14/21 emerging markets vs. 3/21 developed), not
+  China-specific, which strengthens the causal story. **Open risk, not yet resolved:** this is the
+  shortest-horizon signal in the collection — whether it survives next-day execution lag and
+  realistic costs, given the effect itself reverses within days, is unaddressed by what's been read
+  so far. Must be checked against the overnight-MAX and turnover-crowding candidates above for
+  double-counting — plausibly the same underlying retail-attention mechanism seen from three angles.
+- **Direct, quantified evidence for the RQ's "IC-based execution-gap" mechanism.** "Machine Learning
+  Enhanced Multi-Factor Quantitative Trading... with Bias Correction" (Du 2025/2026, arXiv:2507.07107)
+  — initially mis-triaged out of this collection as "general ML," re-added on discovery. Documents
+  "upstream contamination": rolling-window factor pipelines that ingest non-executable
+  limit-up/limit-down closing prices before row-filtering inflate apparent IC by 18% while cutting
+  realised Sharpe by 0.44 points — a "phantom alpha" from mechanically-inflated but untradeable
+  limit-move returns. Fixed via a "mask-first" design threading a Boolean tradability mask through
+  every rolling-window operator. **This is the single strongest piece of evidence in the collection
+  for the RQ's execution-gap concern** — it's quantified, root-caused, and the paper applies its own
+  DSR check (0.978 real / 0.994 synthetic, correcting for ~50 configurations explored). Directly
+  actionable: the same masking fix applies to the prior effort's own `low_vol.py` rolling-std
+  computation (limit-move days currently included in the vol window, biasing rankings) — concrete
+  fix given in the paper's own note.
+- **Weak-evidence candidate, not to overweight**: "Sharpe-Driven Stock Selection and
+  Liquidity-Constrained Portfolio Optimization" (Nguyen 2025, arXiv:2511.13251) — price/volume-only,
+  on-thrust (25% CAGR/1.71 Sharpe/8.2% MDD vs. 21%/1.62/7.6% benchmark), but no train/test split
+  described, no overfitting correction, no significance test, single author. Exactly the kind of
+  result the eval survey's own papers (PBO, DSR) warn is unreliable without a trial-count-adjusted
+  check — keep as a weak data point, not a validated candidate.
 
 ### Open methodological flag (from the eval survey, see `trading-eval-survey/`)
 This flag is about the prior effort's *own parameter tuning*, not the literature theses above.
