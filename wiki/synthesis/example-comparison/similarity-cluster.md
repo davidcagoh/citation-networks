@@ -246,11 +246,11 @@ graph LR
 foundational eval-methodology contribution of the whole corpus.
 
 **LiRA (2026)** reuses that metric **verbatim, adapted from AutoSurvey's own released code**
-(confirmed at the code level, not just the paper — see `../../../litdiscover/decisions.md`'s code-level
+(confirmed at the code level, not just the paper — see `../../litdiscover/litdiscover.md`'s code-level
 correction), rebrands it CQF1, and beats AutoSurvey substantially on it (0.76/0.73 vs. ≤0.63).
 LiRA adds a genuinely new mechanism on top: a Reviewer Agent that evaluates intermediate outputs
 (outline, draft) against a completeness/clarity rubric and triggers up to 3 regeneration rounds —
-though code-level inspection (`../../../litdiscover/decisions.md`) confirmed this Reviewer Agent is a *general* quality
+though code-level inspection (`../../litdiscover/litdiscover.md`) confirmed this Reviewer Agent is a *general* quality
 gate, not citation-specific, and CQF1 itself is computed offline for benchmarking, not live during
 generation. **LiRA's own stated future work explicitly names "integration of the screening and
 search criteria definition steps within the pipeline" as unaddressed** — LiRA assumes references

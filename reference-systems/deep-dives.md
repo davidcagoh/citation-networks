@@ -555,7 +555,7 @@ each entry.
 
 ---
 
-*This entry wasn't from the original 366-paper CSV mining pass — it was found 2026-07-14 while researching whether a mature evaluation standard exists for discovery/retrieval and survey-generation quality across this corpus (see `../discovery/background/corpus-curation-prior-art.md`).*
+*This entry wasn't from the original 366-paper CSV mining pass — it was found 2026-07-14 while researching whether a mature evaluation standard exists for discovery/retrieval and survey-generation quality across this corpus (see `../wiki/litdiscover/litdiscover.md`, Prior Art section).*
 
 ### SurveyLens (Guo, Wen, Gu, Shi, Wang, Wang, Li, Yang & Liu — Hong Kong Polytechnic University, Sichuan University, Central South University, Alibaba Cloud, 2026)
 - **Problem it is trying to solve:** Prior Automatic Survey Generation (ASG) benchmarks are narrow on three axes at once: discipline (SciReviewGen, SurveyForge's own benchmark, and SurveyBench are all CS-only), evaluation surface (each covers only a subset of Outline/Content/Reference and only reference-free *or* reference-based scoring, never both), and system coverage (3-6 baselines). None combine discipline-aware evaluation with a human-validated rubric across all three survey components, and none test whether findings about ASG quality generalize outside computer science. SurveyLens is positioned as the first benchmark to close all three gaps simultaneously.

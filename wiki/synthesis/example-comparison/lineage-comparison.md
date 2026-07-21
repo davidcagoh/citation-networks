@@ -65,7 +65,7 @@ each one was given:
   of 32 real edges and fabricated 3 that no source text supports (including the load-bearing
   SciReviewGen→AutoSurvey edge in `similarity-cluster.md`). Unconstrained generation both drops
   real signal and invents fake signal — the same two failure modes
-  `check_citation_grounding()` (`../../../litdiscover/decisions.md`) exists to catch elsewhere in this project.
+  `check_citation_grounding()` (`../../litdiscover/litdiscover.md`) exists to catch elsewhere in this project.
 - **Explicit extraction** asked a narrow, verifiable question ("does this paper's own text name
   that paper?"). Precision-maximizing, recall-limited: zero fabrication risk, but structurally
   blind to anything an author didn't say themselves — not a failure, a boundary.

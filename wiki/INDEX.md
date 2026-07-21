@@ -44,7 +44,7 @@ Three contributions, each with its own subdirectory:
 
 | Contribution | Status | Target |
 |---|---|---|
-| [LitDiscover](litdiscover/) | Paper **desk-rejected by IP&M** (2026-07-07) — redo planned; engine on PyPI but **out of date**. Discovery/screening evaluation redesigned 2026-07-14 around an end-to-end recall/precision metric (§4.0 of `discovery-roadmap.md`), after isolated-stage numbers proved indefensible on their own. **2026-07-21:** a manual candidate-replacement pipeline is being dogfooded in parallel (see `manual-pipeline-retrospective.md`) — not yet a decision to replace the engine, still gathering evidence | Information Processing & Management (redo) |
+| [LitDiscover](litdiscover/) | Paper **desk-rejected by IP&M** (2026-07-07) — redo planned; engine on PyPI but **out of date**. Discovery/screening evaluation redesigned 2026-07-14 around an end-to-end recall/precision metric, after isolated-stage numbers proved indefensible on their own. **2026-07-21:** a manual candidate-replacement pipeline is being dogfooded in parallel — not yet a decision to replace the engine, still gathering evidence; wiki consolidated to one file (`litdiscover/litdiscover.md`), see there for full status | Information Processing & Management (redo) |
 | [Zeitgeist](zeitgeist/) | Active — §§1–4 figures done, §§1+8 rewrite next; **its own repo** (`github.com/davidcagoh/citation-dynamics`, local clone renamed `zeitgeist/`) | COMPLEX NETWORKS 2026 (~Aug) |
 | [Synthesis](synthesis/) | Refactored 2026-07-14 into 3 tracks (see `synthesis/roadmap.md`); K17-RGC gold set verified, pipeline not yet run | Post-Zeitgeist thesis chapter |
 
@@ -62,25 +62,17 @@ Three contributions, each with its own subdirectory:
 
 ## LitDiscover
 
-**Read `research-roadmap.md` for the standing cross-stage plan; `decisions.md`/`open-questions.md`
-are the live files.** Discovery + screening research (`discovery-roadmap.md`,
-`corpus-curation-prior-art.md`) lives flat in this directory, not a subfolder — it was briefly
-promoted to a top-level `wiki/discovery/` study on 2026-07-14, then folded back the same day: the
-promotion made sense in isolation (§4.0's redesign genuinely turned it into a rigorous
-investigation), but discovery + screening *is* LitDiscover's core identity, unlike Synthesis
-(which draws on Zeitgeist's own graph-analysis machinery and is a genuinely separable
-corpus-structuring add-on — that's why Synthesis stayed promoted, see below).
+**Consolidated 2026-07-21 (session 45)** — `research-roadmap.md`, `discovery-roadmap.md`,
+`corpus-curation-prior-art.md`, `decisions.md`, and `open-questions.md` (2,261 lines across 5
+files) merged into one flat file, most-important-first, after the previous split-by-concern
+structure grew unreadable. Full prior detail is in git history if ever needed.
 
 | File | Purpose |
 |---|---|
-| [litdiscover/research-roadmap.md](litdiscover/research-roadmap.md) | **Supersedes `background.md` (2026-07-14).** Cross-stage roadmap (Discovery/Extraction/Synthesis) — current bets, benchmark design |
-| [litdiscover/discovery-roadmap.md](litdiscover/discovery-roadmap.md) | **Start here for discovery/screening.** §1 implementation audit (current engine, the eval-code's three tiers of production-integration), §2 prior-art survey (27 methods, by discovery mechanism family), §3 the two-mechanism bet, **§4.0 — the methodological principle (isolated-stage recall/precision isn't defensible) + primary end-to-end experiment design + "ironclad/defensible" checklist**, §4.1-§4.11 — operator-level ablation/ordering/budget work (diagnostic-only, not the headline), §5 simulation-vs-production gap, §7 open decisions (step 0 = build the §4.0 harness, ahead of anything else) |
-| [litdiscover/corpus-curation-prior-art.md](litdiscover/corpus-curation-prior-art.md) | Companion to `deep-dives.md` (see below for its actual location), re-cut around one question: how does each surveyed system discover *and screen* its corpus? Comparison table (discovery mechanism / screening mechanism / stopping criterion / screening validated?) across all 27+5 methods, grouped analysis, and a "what this means for LitDiscover" section — also where the mature-eval-standard finding lives (CLEF TAR/SYNERGY is mature for screening-in-isolation, decades-old relative-recall methodology exists for discovery-in-isolation, but nobody validates the two *together* against a citation-traversal-fed queue — the exact gap §4.0 closes) |
+| [litdiscover/litdiscover.md](litdiscover/litdiscover.md) | **Start here for everything LitDiscover** — current status (incl. the manual-pipeline-vs-engine open question), Discovery/Extraction/Synthesis state, prior-art findings, decisions log, open questions, all in one file |
 | [../lit-review-bot/litdiscover/litdiscover/discovery/README.md](../lit-review-bot/litdiscover/litdiscover/discovery/README.md) | Lives next to the code it documents rather than in the wiki. Reference doc (not research framing) for how `litdiscover/discovery/` actually works: module map, the `OperatorResult` contract, all 7 operators, the `GraphSource` protocol/`S2Source`/`ClosedCorpusSource`, rate limiting + budget accounting, and what the CLI actually calls vs. what's research-only |
-| [litdiscover/decisions.md](litdiscover/decisions.md) | Live: algorithm parameters, experiment design, paper structure, venue, full-text-verification audit trail, the §4.0 methodological-principle decision entry |
-| [litdiscover/open-questions.md](litdiscover/open-questions.md) | Live: open items, including discovery/screening-specific ones (pre-submission recall figures, Groq screening-backend gap, gold-set data-quality bug) folded back in alongside the general-engine ones |
 | [litdiscover/manual-pipeline-retrospective.md](litdiscover/manual-pipeline-retrospective.md) | 2026-07-21: retrospective on a manual candidate-replacement pipeline (keyword search → curate/extract → refine → forward/co-citation) run end-to-end on two real surveys (`lit-review-bot/projects/china-ashare-strategy-survey/`, `trading-eval-survey/`) — 8 concrete findings for a LitDiscover redesign, incl. a missing "reconcile for redundancy" stage, forward-citation age-targeting rule, and independent convergence on LitDiscover's own cycle-yield stopping logic |
-| [../lit-review-bot/reference-systems/deep-dives.md](../lit-review-bot/reference-systems/deep-dives.md) | Lives with the reference-systems corpus it documents, not in the wiki. Source doc — 22 full 6-field method deep-dives + Methods/Evaluation-Methods tables, mined from the 366-paper corpus, plus a 5-entry verification cohort and SurveyLens. Source PDFs at `../lit-review-bot/reference-systems/reference-pdfs/` |
+| [../reference-systems/deep-dives.md](../reference-systems/deep-dives.md) | Lives with the reference-systems corpus it documents, not in the wiki. Source doc — 22 full 6-field method deep-dives + Methods/Evaluation-Methods tables, mined from the 366-paper corpus, plus a 5-entry verification cohort and SurveyLens. Source PDFs at `../reference-systems/reference-pdfs/`. **Promoted from `lit-review-bot/reference-systems/` to the repo root 2026-07-21** — important enough on its own (directly answers "how does each system claim to be better than the others," see session 45) to stop being a lit-review-bot subfolder. |
 
 ---
 

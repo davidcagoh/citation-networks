@@ -30,10 +30,11 @@ Each stage's output feeds the next. LitDiscover finds the papers; Zeitgeist's me
 citation-networks/
 ├── wiki/                          # Shared project wiki (session logs, decisions, open questions)
 ├── zeitgeist/                     # Zeitgeist: temporal embedding, phase characterization (own repo: github.com/davidcagoh/zeitgeist)
+├── reference-systems/             # 14 cloned reference literature-review-automation systems + deep-dives.md (promoted to root 2026-07-21 — important enough to stop being a lit-review-bot subfolder)
 ├── lit-review-bot/
 │   ├── litdiscover/                   # LitDiscover engine (own repo: github.com/davidcagoh/litdiscover), pip installable
-│   ├── paper/                         # RLD paper (own repo: github.com/davidcagoh/robust-literature-discovery)
-│   └── reference-systems/             # 14 cloned reference literature-review-automation systems + deep-dives.md
+│   ├── projects/                      # Research-run project folders (Zotero-backed manual pipeline surveys + LitDiscover-engine-driven runs); projects/_archive/ holds retired ones
+│   └── paper/                         # RLD paper (own repo: github.com/davidcagoh/robust-literature-discovery)
 └── deprecated-bot/                # Older, inactive literature-review variant (own repo: automated-lit-reviews — deleted from GitHub)
 ```
 

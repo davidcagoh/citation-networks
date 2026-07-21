@@ -1,7 +1,7 @@
 # Representation Learning for Paper Organization — phase roadmap
 
-**Split out from `../litdiscover/research-roadmap.md` §3 (Synthesis)** (2026-07-14) — same pattern as
-`../litdiscover/discovery-roadmap.md`: a bet buried in one implementation choice (what text gets embedded
+**Split out from `../litdiscover/litdiscover.md` (Synthesis section)** (2026-07-14) — same pattern
+as its Discovery section: a bet buried in one implementation choice (what text gets embedded
 before clustering) deserves its own experimental design rather than staying an unexamined default
 inside the Synthesis section.
 
@@ -29,7 +29,7 @@ embeddings *in general*, or specifically what gets embedded?
 
 **Known failure mode, already documented at corpus scale:** `example-comparison/similarity-cluster.md`
 (deprecated 2026-07-13) ran a close cousin of this pipeline — thematic clustering into 6 buckets —
-over the 22-paper `../lit-review-bot/reference-systems/deep-dives.md` corpus. `example-comparison/lineage-comparison.md` audited it against what those
+over the 22-paper `../../reference-systems/deep-dives.md` corpus. `example-comparison/lineage-comparison.md` audited it against what those
 papers actually cite: only 12/32 real citation edges survived being forced into mutually-exclusive
 buckets, 20 were silently dropped for crossing a bucket boundary, and 3 edges (including the
 load-bearing SciReviewGen→AutoSurvey edge) had no textual support at all — the clustering
@@ -51,9 +51,9 @@ One representation, never compared against alternatives: a short LLM-generated d
 | **Current baseline** (title+themes+contributions[0]) | Implemented | Cheap, already in production. Themes/contributions are single free-text LLM outputs from `extractor.py`'s 11-field schema — no structural guarantee they capture the axes that actually distinguish papers (method vs. motivation vs. evaluation). |
 | **Abstract embedding** | Not implemented | The obvious cheap alternative — author-written, no LLM-summarization step to introduce drift, but conflates motivation/method/results into one paragraph the embedding model has to disentangle unsupervised. |
 | **Full-text embedding** | Not implemented | Richest signal, but also the noisiest — boilerplate (related work, acknowledgments, references) dilutes the topic signal, and most embedding models truncate or need chunking+pooling for full papers, adding its own methodology question. |
-| **Structured-summary embedding** | Not implemented | Embed the 6-field deep-dive template (Problem / How it works / How evaluated / How performed / Relation to prior work / Limitations) — same template already validated in `../lit-review-bot/reference-systems/deep-dives.md` for all 22 corpus papers, and rich enough to support the citation-audit and implicit-pairwise work `../litdiscover/research-roadmap.md` §2 credits it for. Hypothesis: forcing the LLM to separate motivation from method from evaluation *before* embedding gives the embedding model axes that actually align with how papers are conceptually organized, rather than asking embedding-space geometry to discover that separation from unstructured text alone. |
+| **Structured-summary embedding** | Not implemented | Embed the 6-field deep-dive template (Problem / How it works / How evaluated / How performed / Relation to prior work / Limitations) — same template already validated in `../../reference-systems/deep-dives.md` for all 22 corpus papers, and rich enough to support the citation-audit and implicit-pairwise work `../litdiscover/litdiscover.md` (Prior Art section) credits it for. Hypothesis: forcing the LLM to separate motivation from method from evaluation *before* embedding gives the embedding model axes that actually align with how papers are conceptually organized, rather than asking embedding-space geometry to discover that separation from unstructured text alone. |
 
-This is the same shape of question `../litdiscover/discovery-roadmap.md` asks about discovery operators —
+This is the same shape of question `../litdiscover/litdiscover.md (Discovery)` asks about discovery operators —
 not "does clustering work" but "which input representation does the actual organizing work, and by
 how much."
 
@@ -78,7 +78,7 @@ each answering a different question about what the representation should preserv
 | **1. Retrieval** | Does the representation retrieve related work? | Recall@k / Precision@k / MAP / nDCG against a gold neighbor set (e.g. citation-adjacency, survey co-membership) | Not this experiment's design, but the cheapest sanity check — worth running first as a smoke test before committing to §3's fuller design, since it needs no section-level ground truth, just the existing flat gold-reference lists. |
 | **2. Clustering** | Does the representation group papers into meaningful flat sets? | k-means + ARI/NMI/purity/V-measure against known labels | §3 below, as originally scoped — flat k-means against section labels. |
 | **3. Taxonomy/structure recovery** | Does the representation recover a *hierarchical* organization (an existing survey's, a handbook's, a classification tree's)? | Hierarchical clustering/dendrogram induction, scored by tree edit distance, dendrogram purity, ancestor precision, hierarchical F-score, against a real authorial hierarchy | **Arguably the better fit for this project's actual ground truth** — a survey's structure is section→subsection, not a flat partition, and forcing it into flat k-means for §3 discards that hierarchy the same way `similarity-cluster.md`'s mutually-exclusive buckets discarded cross-lineage edges (§1). Flagged as an open decision in §5 rather than silently committing to flat clustering by default. |
-| **4. Downstream utility** | Does a better representation make the actual downstream task (writing a literature review) easier? | Expert/LLM-judged review quality (organization, redundancy, missing themes, narrative flow, correctness) comparing full synthesis runs on each representation | The evaluation reviewers will care about most, and the one with the most existing infrastructure to reuse — `check_citation_grounding()` (`../litdiscover/research-roadmap.md` §3) already measures one axis of generated-review quality. Natural Phase 2 of this experiment once §3's cheaper clustering-level result narrows the representation field to 1-2 real contenders — not worth running full synthesis end-to-end on all four conditions before that narrowing happens. |
+| **4. Downstream utility** | Does a better representation make the actual downstream task (writing a literature review) easier? | Expert/LLM-judged review quality (organization, redundancy, missing themes, narrative flow, correctness) comparing full synthesis runs on each representation | The evaluation reviewers will care about most, and the one with the most existing infrastructure to reuse — `check_citation_grounding()` (`../litdiscover/litdiscover.md`, Synthesis section) already measures one axis of generated-review quality. Natural Phase 2 of this experiment once §3's cheaper clustering-level result narrows the representation field to 1-2 real contenders — not worth running full synthesis end-to-end on all four conditions before that narrowing happens. |
 
 **Sequencing implication:** run paradigm 1 (retrieval, cheap, no new annotation needed) as an
 early smoke test, decide between paradigm 2 vs. 3 for the main experiment (§5 open decision),
@@ -130,7 +130,7 @@ result even if only conditions 1-4 above ship first:
 ### 3.2 Gold standard — reuse the 6 surveys, new ground truth needed
 
 **Decision (per discussion, 2026-07-14): ground truth is the 6 existing surveys** (S1-MIT, S2-UCG,
-S3-TOPO, K17-RGC, Ge21-HSS, Le25-GLLM — the same corpus `../litdiscover/discovery-roadmap.md` §4.2 uses),
+S3-TOPO, K17-RGC, Ge21-HSS, Le25-GLLM — the same corpus `../litdiscover/litdiscover.md` (Discovery section) uses),
 not the 22-paper deep-dives corpus. Reasoning: these are real published surveys with their own
 authorial section structure, a stronger and more generalizable "conceptual organization" signal
 than the 22-paper corpus's own lineage tags (which were themselves LLM-assisted output, not
@@ -170,7 +170,7 @@ Box 1's tail-numbered refs were folded back into the section they're physically 
 
 **Recurring finding, not anticipated going in: 2 of 3 gold-set JSONs contained entries that don't
 correspond to any reference the survey actually cites** — confirmed, fixed 2026-07-14, see
-`../litdiscover/open-questions.md` for the full audit trail. **Gold-set files have since been corrected by hand:
+`../litdiscover/litdiscover.md` (Open questions section) for the full audit trail. **Gold-set files have since been corrected by hand:
 Ge21-HSS 202→200 (removed 2 unrelated-topic mislinks), K17-RGC 56→52 (removed 1 pure
 book-series-name record + 3 entries confirmed absent from the survey's own 51-item bibliography,
 transcribed in full during this annotation pass).** Two automated content filters were tried and
@@ -182,7 +182,7 @@ it needs the kind of manual, read-the-actual-source-and-check pass this annotati
 does, not a content heuristic.** The section-ground-truth JSONs in this repo already excluded all
 unresolved entries from their `resolved` lists, so they don't need re-annotating; only the
 upstream `gold-sets/*.json` files and any recall number computed from them
-(`../litdiscover/discovery-roadmap.md` §4) needed correcting, and now have been / still need a recall
+(`../litdiscover/litdiscover.md`, Discovery section) needed correcting, and now have been / still need a recall
 recompute respectively.
 
 ### 3.3 Metrics
@@ -217,7 +217,7 @@ For each survey in the gold standard:
 
 ### 3.5 Statistical power — same open question as discovery, not yet decided
 
-`../litdiscover/discovery-roadmap.md` §4.2/§4.9 already flagged that 6 surveys is thin for paired
+`../litdiscover/litdiscover.md` (Discovery section) already flagged that 6 surveys is thin for paired
 significance testing (Wilcoxon signed-rank wants ~15-20 paired observations for real power) and
 left expanding the gold-standard corpus as an open, undecided step. **Same applies here** — if
 this experiment's results look like they're worth a significance claim rather than a descriptive
@@ -235,7 +235,7 @@ representation wins clearly. **If structured-summary embeddings outperform the b
 - `_paper_embed_text()` swaps from `title+themes+contributions[0]` to the 6-field structured
   summary — a representation change, not a clustering-algorithm change (`_kmeans_cluster`,
   `_elbow_k`, `_name_all_clusters` stay as-is).
-- This is gated on `../litdiscover/research-roadmap.md` §2's open extraction-schema question (prompt-only change
+- This is gated on `../litdiscover/litdiscover.md`'s (Extraction section) open extraction-schema question (prompt-only change
   vs. an `extractions` table migration) — the 6-field template isn't currently a schema
   `extractor.py` produces at all, so winning this experiment creates, not resolves, that scoping
   decision. Read §2 before starting the migration, not after.
@@ -246,7 +246,7 @@ representation wins clearly. **If structured-summary embeddings outperform the b
 **If nothing beats the baseline clearly:** that's still a real result — evidence the
 `similarity-cluster.md` failure mode is about clustering’s bucket-forcing shape (already suspected,
 per §1) rather than representation quality, which would redirect Synthesis's actual fix toward
-`../litdiscover/research-roadmap.md` §3's item #2 (plan-before-write) instead of a representation swap.
+`../litdiscover/litdiscover.md`'s (Synthesis section) item #2 (plan-before-write) instead of a representation swap.
 
 ---
 
@@ -272,4 +272,4 @@ per §1) rather than representation quality, which would redirect Synthesis's ac
    would test the two effects (representation choice, k-selection quality) jointly instead of in
    isolation — deferred, not in scope for the first pass.
 4. **Statistical power / corpus expansion (§3.5)** — shared open question with
-   `../litdiscover/discovery-roadmap.md` §4.2/§4.9, not decided in either place yet.
+   `../litdiscover/litdiscover.md` (Discovery section), not decided in either place yet.

@@ -1,7 +1,8 @@
 # Reference-Implementation Survey — what these systems actually run, not what they say
 
 Built 2026-07-14, code-level (not paper-text) audit of the reference systems cloned into
-`../../../lit-review/reference-systems/` (14 repos total as of this revision). Exists to ground
+`../../../reference-systems/` (14 repos total as of this revision; promoted from
+`lit-review-bot/reference-systems/` to the repo root 2026-07-21). Exists to ground
 two decisions in real code rather than paper prose: (1) the embedding/clustering choice for a real
 rebuild of `similarity-cluster.md`, and (2) — this revision's addition — **what mechanism actually
 turns an already-curated/retrieved paper set into synthesized text** across every system in the

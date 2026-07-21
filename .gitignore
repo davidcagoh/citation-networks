@@ -7,20 +7,21 @@
 /deprecated-bot/
 
 # External reference clones (competitor codebases, not our own repo content)
-/lit-review-bot/reference-systems/InteractiveSurvey/
-/lit-review-bot/reference-systems/LitLLM/
-/lit-review-bot/reference-systems/PROMPTHEUS/
-/lit-review-bot/reference-systems/ProfOlaf/
-/lit-review-bot/reference-systems/SLR-automation/
-/lit-review-bot/reference-systems/SciReviewGen/
-/lit-review-bot/reference-systems/SurveyGen/
-/lit-review-bot/reference-systems/SurveyGen-I/
-/lit-review-bot/reference-systems/SurveyX/
-/lit-review-bot/reference-systems/asreview/
-/lit-review-bot/reference-systems/auto-review-writing/
-/lit-review-bot/reference-systems/litllms-for-literature-review-tmlr/
-/lit-review-bot/reference-systems/llassist/
-/lit-review-bot/reference-systems/robotsearch/
+# Promoted to repo root 2026-07-21 — important enough to stop being a lit-review-bot subfolder.
+/reference-systems/InteractiveSurvey/
+/reference-systems/LitLLM/
+/reference-systems/PROMPTHEUS/
+/reference-systems/ProfOlaf/
+/reference-systems/SLR-automation/
+/reference-systems/SciReviewGen/
+/reference-systems/SurveyGen/
+/reference-systems/SurveyGen-I/
+/reference-systems/SurveyX/
+/reference-systems/asreview/
+/reference-systems/auto-review-writing/
+/reference-systems/litllms-for-literature-review-tmlr/
+/reference-systems/llassist/
+/reference-systems/robotsearch/
 
 # Obsidian vault config (personal, not project content)
 .obsidian/
@@ -41,6 +42,6 @@ __pycache__/
 
 # Large binary / generated files
 wiki/*.pdf
-/lit-review-bot/reference-systems/reference-pdfs/
+/reference-systems/reference-pdfs/
 *.log
 texput.log
