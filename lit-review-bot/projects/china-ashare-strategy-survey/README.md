@@ -110,6 +110,51 @@ apparently didn't catch:
   result the eval survey's own papers (PBO, DSR) warn is unreliable without a trial-count-adjusted
   check — keep as a weak data point, not a validated candidate.
 
+### Third pass (2026-07-21) — forward citation from seminal/central papers, not the newest ones
+
+A third keyword-search round showed dropping yield (mostly repeats/corroboration) — see git
+history for that assessment. Switched to forward citation instead, deliberately targeting
+**older, central papers likely to have an accumulated citation trail**, not the newest preprints
+(a 2026 paper has had no time to be cited yet, regardless of relevance). Used the Semantic
+Scholar API directly rather than generic web search. High yield — stronger hit rate than the
+third keyword round:
+
+- **"Luck 'duels' among factors in China" (Wang/Shi/Wan/Wang 2026)**, citing Blitz et al. — a
+  rigorous multiple-testing framework (bootstrap panel regression) applied directly to 169
+  candidate A-share factors (139 characteristics + 30 PCA-derived). Only a few survive genuine
+  incremental explanatory power (IPC9 = retail noise-trader-risk proxy, RPPC1 = flight-to-quality,
+  CAPEX/debt-growth/earnings-consistency characteristics) — and even those are confined to
+  specific market segments accessible to arbitrage capital. This is the eval-methodology rigor
+  this survey's own candidates should eventually be checked against, applied natively to China.
+- **"Conditional Multifactor Volatility-Managed Portfolios" (Yang/Liu/Chen 2025)**, citing Blitz et
+  al. — extends the regime-conditioning thesis (Wang & Li) to 41 countries; finds performance
+  improves further when conditioning on **US market volatility jointly with domestic**, not
+  domestic alone. Directly testable against the prior effort's `regime.py` (currently
+  domestic-only) — though adopting it means deliberately breaking the "price-only, single-market"
+  framing, not an oversight if done.
+- **"Calm Stocks, Wild Hopes" (Su 2025, NYU Shanghai honors thesis — not peer-reviewed, weight
+  accordingly)**, citing Gu/Hu/Xiong — directly synthesizes two of this survey's core threads:
+  low-vol anomaly is *amplified* by lottery preference but not fully explained by it (both remain
+  significant after controlling for MAX/skewness/kurtosis). Concrete refinements: use predictive
+  IVOL, not contemporaneous Beta or naive same-period IVOL (the latter is mechanically inflated by
+  extreme events unless double-sorted); the anomaly is stronger in equal-weighted/small-cap-
+  inclusive portfolios than the large-cap-only universe Blitz et al. studied; and — cutting against
+  general factor-decay concerns raised elsewhere in this survey — the IVOL anomaly has
+  *strengthened*, not decayed, over its 1995–2024 sample.
+- **"Lottery Preference and Skewness Risk Premium" (Zhou/Roh/Xu 2025)**, citing the lottery
+  anomaly paper — decomposing total implied skewness into upper/lower components resolves a null
+  result: upper (lottery-driven) carries a significant *negative* price, lower is weakly positive,
+  and they cancel in the aggregate. Methodological lesson directly transferable to this survey's
+  own skewness/lottery-based candidates: **decompose, don't aggregate** higher-moment measures, or
+  risk averaging away a real, sign-asymmetric effect.
+
+Lower priority (found via the same forward-citation pass, not pursued further): China elderly
+household long-term-care asset allocation, Sina Weibo COVID-sentiment sensitivity, IPO-sentiment
+lottery demand, oil-futures lottery gambling — all tangential to this RQ.
+
+Note: "Dissecting Momentum in China" isn't yet well-indexed in Semantic Scholar (too new/preprint),
+so no forward-citation trail was available for the survey's key ruled-out-momentum finding.
+
 ### Open methodological flag (from the eval survey, see `trading-eval-survey/`)
 This flag is about the prior effort's *own parameter tuning*, not the literature theses above.
 Its parameter choices (60d vol window, N=20/30 stock count, −0.025 trend threshold, regime-detector
