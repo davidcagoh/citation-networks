@@ -1,0 +1,72 @@
+[project]
+slug        = "adaptive-mastery-priorart"
+title       = "Prior art for Bayesian cold-start mastery learning (WAILS 2026)"
+description = """
+Related-work discovery for a WAILS 2026 submission on a Bayesian adaptive mastery-learning
+system: a graph-Laplacian-prior Kalman update for cold-start knowledge-state estimation over
+a prerequisite DAG, a frontier stopping rule, and an asymmetric credential-assignment rule.
+Two lineages matter: (1) knowledge tracing (BKT/DKT/graph-based KT/cold-start KT), the modern
+line our method sits in; (2) knowledge space theory (Doignon & Falmagne), the older structural
+framework for adaptive knowledge assessment that a psychometrics-literate reviewer would expect
+us to position against.
+"""
+criteria = """
+Include if the paper is primarily concerned with any of:
+- Knowledge tracing methods (BKT, DKT, deep/attention-based KT, graph-based KT) that model
+  latent student knowledge state from a response sequence.
+- Knowledge space theory / competence-based knowledge structures: formal frameworks for
+  representing prerequisite or knowledge structure and adaptive assessment within them
+  (including the ALEKS lineage).
+- Cold-start problems in student modeling: few-shot, meta-learning, or prior-based approaches
+  to initializing a knowledge-state estimate for a new learner with no response history.
+- Computerized adaptive testing: item-selection strategies, stopping rules, or
+  uncertainty-based termination criteria.
+- Bayesian or probabilistic latent-trait estimation for education (IRT extensions,
+  Kalman-filter or particle-filter student models).
+- Graph-Laplacian or network-regularized approaches to latent-state estimation, even when
+  not education-specific — theoretical grounding papers count.
+- Prerequisite-graph-driven mastery learning, skill-tree systems, or curriculum sequencing
+  that encodes and exploits a DAG of skill dependencies.
+- Uncertainty communication / open learner models: how a system represents and communicates
+  confidence in an inferred student knowledge state to learners or teachers.
+
+Exclude:
+- LLM-tutoring-dialogue papers with no explicit student-knowledge-state model (unless
+  specifically about uncertainty communication).
+- Classroom/teacher analytics, affect, engagement, or fairness papers without a
+  knowledge-state-estimation component.
+- General educational data mining (dropout/grade prediction) unless it uses a KT/KST-style
+  latent knowledge model.
+- Content-generation-only papers (question generation, essay scoring) unless they also
+  address cold-start or diagnostic placement.
+"""
+
+# Seeds: real citation-graph anchors — deliberately NOT the AIED 2026 shortlist (too new
+# for S2 to have indexed yet; that stays on the manual Springer-abstract-fetch track).
+[[seeds]]
+doi = "10.1007/BF01099821"   # Corbett & Anderson 1995 — BKT anchor (already in our refs.bib)
+
+[[seeds]]
+arxiv_id = "1506.05908"      # Piech et al. 2015 — Deep Knowledge Tracing (NeurIPS), foundational DKT
+
+[[seeds]]
+doi = "10.1145/3350546.3352513"   # Nakagawa, Iwasawa, Matsuo 2019 — graph-based KT (already in refs.bib)
+
+[[seeds]]
+doi = "10.1017/9781139245913.006"   # Doignon & Falmagne 2015 — "Knowledge Spaces and Learning Spaces" (verified via S2; same record as arXiv:1511.06757). The 1999 book DOI (978-3-642-58625-5) 404s on S2 — no book-level entry indexed.
+
+[[seeds]]
+doi = "10.1007/978-3-540-45167-9_12"   # Smola & Kondor 2003 — graph-Laplacian theory (already in refs.bib, our own theoretical grounding)
+
+[[seeds]]
+doi = "10.1145/3569576"      # Abdelrahman et al. 2022/23 — KT survey (already in refs.bib; surveys are the best backward-traversal hubs)
+
+[[seeds]]
+doi = "10.1007/978-0-387-85461-8"   # van der Linden & Glas (eds.) 2010 — adaptive testing (already in refs.bib)
+
+[loop]
+yield_threshold  = 0.05
+escape_attempts  = 2
+hub_percentile   = 80
+screen_batch     = 20
+max_rounds       = 40

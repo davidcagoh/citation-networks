@@ -1,0 +1,40 @@
+[project]
+slug        = "lightroom-pal"
+title       = "AI-assisted photo editing and creative tool design"
+description = """
+LightroomPal is an AI co-pilot for Adobe Lightroom that suggests edits based on
+the photographer's style. This review covers: AI/ML for photo editing and
+enhancement, creative tool design and HCI for photographers, style transfer and
+personalised recommendation in image editing workflows.
+"""
+criteria = """
+Include a paper if it meets ALL of the following:
+1. Directly addresses AI/ML applied to photo editing, image enhancement, or
+   colour/tone adjustment (not generic image segmentation or object detection).
+2. OR addresses human-computer interaction, workflow design, or creativity support
+   tools specifically for photographers or visual artists.
+3. OR addresses personalisation, style learning, or recommendation systems in
+   a visual/creative domain.
+4. The paper presents original research (not a tutorial or product announcement).
+5. Published 2015 or later.
+
+Exclude if:
+- Purely about medical imaging, satellite imagery, or industrial inspection.
+- Purely about video compression or streaming without creative editing relevance.
+- A survey/review paper (unless it is the definitive survey for the sub-topic).
+"""
+
+[[seeds]]
+arxiv_id = "2310.12953"   # InstructPix2Pix
+
+[[seeds]]
+arxiv_id = "2401.07312"   # PhotoMaker / style-consistent generation
+
+[loop]
+yield_threshold   = 0.05
+stale_rounds      = 2
+escape_attempts   = 2
+hub_percentile    = 80
+traverse_min_new  = 5
+screen_batch      = 20
+max_rounds        = 60

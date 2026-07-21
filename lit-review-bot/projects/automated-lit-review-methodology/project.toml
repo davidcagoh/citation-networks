@@ -1,0 +1,89 @@
+[project]
+slug        = "automated-lit-review-methodology"
+title       = "Automated Literature Review Methodology"
+description = """
+The intersection of automated literature review generation, citation graph
+traversal methodologies, and stopping criteria for abstract screening. We are
+specifically interested in systems that use LLMs or active learning to automate
+systematic reviews, the structural properties of citation networks (such as
+scale-free distributions and hub suppression) that affect traversal, and
+statistical or heuristic stopping rules used to bound the screening process.
+"""
+criteria = """
+Include a paper if it meets ANY of the following:
+1. Proposes or evaluates an automated system for literature reviews, systematic
+   reviews, or scientific surveys (especially LLM-based or RAG-based systems).
+2. Addresses citation snowballing, graph traversal for information retrieval, or
+   handling heavy-tailed/scale-free degree distributions in citation networks.
+3. Defines or evaluates stopping criteria, yield thresholds, or continuous active
+   learning heuristics for abstract screening.
+4. Must be peer-reviewed, a preprint from arXiv/medRxiv, or a canonical
+   foundational paper.
+Exclude if:
+- The paper merely conducts a systematic review using standard manual methods
+  without proposing or evaluating automation tools.
+- General graph theory paper with no application to information retrieval,
+  citation networks, or document clustering.
+- General LLM benchmark paper that does not specifically address scientific
+  literature synthesis or RAG over academic corpora.
+"""
+
+# Wohlin 2014 — snowballing methodology (ACM EASE 2014)
+[[seeds]]
+doi = "10.1145/2601248.2601268"
+
+# Callaghan & Müller-Hansen 2020 — statistical stopping criteria
+[[seeds]]
+doi = "10.1186/s13643-020-01521-4"
+
+# Barabási & Albert 1999 — emergence of scaling in random networks
+[[seeds]]
+doi = "10.1126/science.286.5439.509"
+
+# Wu et al. 2024/2025 — automated review generation method based on LLMs
+[[seeds]]
+arxiv_id = "2407.20906"
+
+# Boetje & van de Schoot 2024 — SAFE procedure for active learning stopping
+[[seeds]]
+doi = "10.1186/s13643-024-02502-7"
+
+# Added 2026-07-09 — IP&M rejection flagged missing SOTA/LLM baselines and current-year refs.
+
+# Sami et al. 2025 — "The emergence of LLMs as tools in literature reviews" (JAMIA)
+[[seeds]]
+arxiv_id = "2409.04600"
+
+# 2025 — AISysRev: LLM-based tool for title-abstract screening
+[[seeds]]
+arxiv_id = "2510.06708"
+
+# 2025 — Completing a systematic review in hours instead of months with interactive AI agents
+[[seeds]]
+arxiv_id = "2504.14822"
+
+# 2026 — DeepSurvey-Bench: evaluating academic value of automatically generated scientific surveys
+[[seeds]]
+arxiv_id = "2601.15307"
+
+# 2025 — LLM4SCREENLIT: recommendations on assessing LLM performance for screening literature
+[[seeds]]
+arxiv_id = "2511.12635"
+
+# Surfaced via related-work-mine on arxiv_id=2504.14822 (2026-07-09) — direct
+# SOTA competitors the IP&M reviewer said we were missing.
+
+# AutoSurvey (Wang et al. 2024) — LLM-driven survey generation via outline + RAG
+[[seeds]]
+arxiv_id = "2406.10252"
+
+# ChatCite (Li et al. 2024) — LLM agent, human-workflow-guided comparative literature summary
+[[seeds]]
+arxiv_id = "2403.02574"
+
+# LitLLM (Agarwal et al. 2024) — RAG toolkit for scientific literature review
+[[seeds]]
+arxiv_id = "2402.01788"
+
+[loop]
+max_rounds = 100

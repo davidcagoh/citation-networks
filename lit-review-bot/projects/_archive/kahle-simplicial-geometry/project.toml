@@ -1,0 +1,58 @@
+[project]
+slug        = "kahle-simplicial-geometry"
+title       = "Random geometric complexes and stochastic topology"
+description = """
+A systematic review of the mathematics of random simplicial complexes and topological
+data analysis, centred on random geometric complexes in the style of Kahle (2011, 2014).
+Covers topological phase transitions, Betti numbers of random complexes, persistent
+homology as a statistical tool, and connections to geometric probability and
+combinatorial topology.
+"""
+criteria = """
+Include if the paper is primarily concerned with any of:
+- Random simplicial complexes: Vietoris-Rips, Čech, clique, or random geometric complexes.
+  Theoretical analysis of topology (Betti numbers, homology groups, connectivity,
+  phase transitions) as a function of graph/geometric parameters.
+- Stochastic topology: topology of random spaces, random manifolds, or probabilistic
+  models of topological objects. Includes random flag complexes, random clique complexes,
+  and random hypergraphs studied for topological properties.
+- Persistent homology theory and algorithms: stability theorems, barcode/diagram
+  representations, distance measures (bottleneck, Wasserstein) on diagram spaces,
+  algebraic foundations (zigzag persistence, levelset persistence).
+- Topological data analysis (TDA) as a methodology: applying persistent homology or
+  related tools to data; statistical inference on persistence diagrams; confidence sets
+  for barcodes; hypothesis testing with TDA.
+- Geometric probability foundations relevant to random complexes: coverage processes,
+  random geometric graphs, continuum percolation, Poisson point processes on manifolds.
+- Combinatorial topology relevant to random models: shellability, Cohen-Macaulay
+  complexes, discrete Morse theory, Euler characteristic computations.
+
+Exclude:
+- Applied TDA papers where the methodology (persistent homology) is used as a black-box
+  tool for a specific application domain (neuroscience, materials science, biology,
+  finance) without contributing to the theory of random complexes or TDA itself.
+- Graph theory papers not concerned with simplicial or topological structure.
+- Pure combinatorics or extremal graph theory without topological content.
+- Computational geometry papers focused on mesh generation, triangulation algorithms,
+  or computational topology without a probabilistic or data-analytic angle.
+- Machine learning papers that use topology (e.g., topological loss functions, TDA
+  features in neural networks) without theoretical contribution to random topology or TDA.
+"""
+
+# Seeds: author-selected salient papers from the RGC literature
+[[seeds]]
+arxiv_id = "1411.5713"    # RGC1: Bobrowski & Weinberger (2015) random Čech complexes
+
+[[seeds]]
+arxiv_id = "2103.05796"   # RGC2: Edelsbrunner et al. (2021) frontiers in AI/TDA
+
+[[seeds]]
+arxiv_id = "2111.11316"   # RGC3: STOC 2022 paper
+
+[loop]
+yield_threshold   = 0.05
+stale_rounds      = 2
+escape_attempts   = 2
+hub_percentile    = 80
+screen_batch      = 20
+max_rounds        = 60

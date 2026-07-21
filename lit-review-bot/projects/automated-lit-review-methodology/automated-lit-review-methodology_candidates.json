@@ -1,0 +1,4190 @@
+{
+  "C1": {
+    "paper_uuid": "bf203719-a1c4-43ec-a1e5-c431c28ee9de",
+    "s2_id": "f4de50b3dc5d1d850d281ef0cfefb80be2af34f2",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-021-01626-4"
+  },
+  "C2": {
+    "paper_uuid": "d09a445c-9e4b-416f-a8e7-d2c41fb3439e",
+    "s2_id": "90abbc2cf38462b954ae1b772fac9532e2ccd8b0",
+    "arxiv_id": "2005.14165",
+    "doi": null
+  },
+  "C3": {
+    "paper_uuid": "6086b968-5ec7-4f9d-ad88-5d662c0cb051",
+    "s2_id": "40e8af970329135ec95057d73e239dab805ad128",
+    "arxiv_id": "2407.21783",
+    "doi": null
+  },
+  "C4": {
+    "paper_uuid": "9971dda5-675f-44f7-bae3-91b75dccc66f",
+    "s2_id": "659bf9ce7175e1ec266ff54359e2bd76e0b7ff31",
+    "arxiv_id": "2005.11401",
+    "doi": null
+  },
+  "C5": {
+    "paper_uuid": "c5e7008e-6ae4-43d2-815b-4355d9005f6e",
+    "s2_id": "7470a1702c8c86e6f28d32cfa315381150102f5b",
+    "arxiv_id": "2304.02643",
+    "doi": "10.1109/ICCV51070.2023.00371"
+  },
+  "C6": {
+    "paper_uuid": "bccffef3-7299-4068-9daf-b62420e18d19",
+    "s2_id": "3a15c1b8f79039ea17fd151e7457f7199af25259",
+    "arxiv_id": null,
+    "doi": "10.1186/s12874-018-0611-x"
+  },
+  "C7": {
+    "paper_uuid": "e4351715-f45c-4de3-890f-28316e2ce21c",
+    "s2_id": "96fc8f2c854db8e907c1f2d5581bfb0d5e20ddda",
+    "arxiv_id": null,
+    "doi": "10.2307/4132319"
+  },
+  "C8": {
+    "paper_uuid": "55bc5a22-df22-4889-962e-3a2400a0fa64",
+    "s2_id": "814a4f680b9ba6baba23b93499f4b48af1a27678",
+    "arxiv_id": "2009.03300",
+    "doi": null
+  },
+  "C9": {
+    "paper_uuid": "cabdf83f-38b8-461d-bc0c-af459fbec6a5",
+    "s2_id": "55bdaa9d27ed595e2ccf34b3a7847020cc9c946c",
+    "arxiv_id": null,
+    "doi": "10.1145/1134285.1134500"
+  },
+  "C10": {
+    "paper_uuid": "397282a3-87d6-4bcf-913d-84d85a2a2af0",
+    "s2_id": "e7ad08848d5d7c5c47673ffe0da06af443643bda",
+    "arxiv_id": "2205.11916",
+    "doi": "10.52202/068431-1613"
+  },
+  "C11": {
+    "paper_uuid": "f227c843-14d6-480d-9aac-7a19d5f5d5a5",
+    "s2_id": "c52f657964a8014e72d925768e2dcab23819abc5",
+    "arxiv_id": null,
+    "doi": "10.1177/0038038588022001007"
+  },
+  "C12": {
+    "paper_uuid": "d633d359-8209-4124-9a1e-1f867e047e5d",
+    "s2_id": "53d8b356551a2361020a948f64454a6d599af69f",
+    "arxiv_id": "2101.00190",
+    "doi": "10.18653/v1/2021.acl-long.353"
+  },
+  "C13": {
+    "paper_uuid": "f409d100-8101-4cc5-8c7f-451f3719c11c",
+    "s2_id": "28692beece311a90f5fa1ca2ec9d0c2ce293d069",
+    "arxiv_id": "2107.13586",
+    "doi": "10.1145/3560815"
+  },
+  "C14": {
+    "paper_uuid": "67ec74f2-6128-4d4f-9fb5-430542511e97",
+    "s2_id": "8d8e9d75a92cc57a638ccb283bafcd6b4ea0de49",
+    "arxiv_id": null,
+    "doi": "10.1017/CBO9780511814068"
+  },
+  "C15": {
+    "paper_uuid": "3f05021d-e4df-4301-8bc0-6e2a2cc3a8da",
+    "s2_id": "3def68bd0f856886d34272840a7f81588f2bc082",
+    "arxiv_id": "2202.03629",
+    "doi": "10.1145/3571730"
+  },
+  "C16": {
+    "paper_uuid": "f24bf8d2-5fd5-401e-bdb3-cc19e3e7288b",
+    "s2_id": "36709000a9272e941338244ef80ff5ab1dd2bba1",
+    "arxiv_id": "2303.18223",
+    "doi": "10.1007/s11704-026-60308-3"
+  },
+  "C17": {
+    "paper_uuid": "3f2938af-4436-425a-b918-8c6711a5ff1f",
+    "s2_id": "7943ec4a67151a559b25cd34369e661c9a7924c8",
+    "arxiv_id": "2410.21276",
+    "doi": null
+  },
+  "C18": {
+    "paper_uuid": "07066ef8-5599-4fb3-be19-7ec568062884",
+    "s2_id": "a963d05b9d4acd347ad528e7d098eb53d8f555a2",
+    "arxiv_id": null,
+    "doi": "10.1016/J.INFSOF.2008.09.009"
+  },
+  "C19": {
+    "paper_uuid": "d6f97ac3-0e9f-43ad-9259-0853fbad877c",
+    "s2_id": "1733eb7792f7a43dd21f51f4d1017a1bffd217b5",
+    "arxiv_id": "2307.03172",
+    "doi": "10.1162/tacl_a_00638"
+  },
+  "C20": {
+    "paper_uuid": "2e304bfd-f551-43db-96cf-b7a8aac81093",
+    "s2_id": "45d9a0db23906842f4c3385e4f231ede34d32db0",
+    "arxiv_id": "cond-mat/9907038",
+    "doi": "10.1038/43601"
+  },
+  "C21": {
+    "paper_uuid": "68632eca-28a7-41b3-b053-c668c335608d",
+    "s2_id": "46f9f7b8f88f72e12cbdb21e3311f995eb6e65c5",
+    "arxiv_id": "2312.10997",
+    "doi": null
+  },
+  "C22": {
+    "paper_uuid": "01c47941-3490-4687-a489-9e41a2f01c10",
+    "s2_id": "1e909e2a8cdacdcdff125ebcc566f37cb869a1c8",
+    "arxiv_id": "2311.05232",
+    "doi": "10.1145/3703155"
+  },
+  "C23": {
+    "paper_uuid": "9ccaf77e-754e-40a8-9f8d-76b74de53d35",
+    "s2_id": "e28bdc373de80d7ec0e64631a89e64fbdcdae230",
+    "arxiv_id": null,
+    "doi": "10.14236/EWIC/EASE2008.8"
+  },
+  "C24": {
+    "paper_uuid": "dcde54a3-58ec-49c4-8c3b-41689a14513d",
+    "s2_id": "e816f788767eec6a8ef0ea9eddd0e902435d4271",
+    "arxiv_id": "2004.10964",
+    "doi": "10.18653/v1/2020.acl-main.740"
+  },
+  "C25": {
+    "paper_uuid": "33711363-fc7d-4c83-a8cb-29761f3da136",
+    "s2_id": "210b0a3d76e93079cc51b03c4115fde545eea966",
+    "arxiv_id": "2311.12022",
+    "doi": null
+  },
+  "C26": {
+    "paper_uuid": "d98dfd86-1b8f-4fe9-8e3b-82d52b2a181e",
+    "s2_id": "c8efcc854d97dfc2a42b83316a2109f9d166e43f",
+    "arxiv_id": "1803.02155",
+    "doi": "10.18653/v1/N18-2074"
+  },
+  "C27": {
+    "paper_uuid": "94e56d95-6017-4f5c-ada6-bbfe16894109",
+    "s2_id": "381ab7a640f5b46b62f7e08d1af4a8e0d3eadd55",
+    "arxiv_id": "2303.16634",
+    "doi": "10.18653/v1/2023.emnlp-main.153"
+  },
+  "C28": {
+    "paper_uuid": "deff2f2e-e4e6-491d-a200-71f29254ff69",
+    "s2_id": "dfdf7ff01aa6f691831e663fd29bc71890be39e2",
+    "arxiv_id": null,
+    "doi": "10.3390/healthcare11060887"
+  },
+  "C29": {
+    "paper_uuid": "974f03cb-5379-452c-9ec1-730d0cbd0de9",
+    "s2_id": "8d64caec6f955c496ccbe361342e8682b7f7a06b",
+    "arxiv_id": "cond-mat/9907068",
+    "doi": "10.1016/S0378-4371(99)00291-5"
+  },
+  "C30": {
+    "paper_uuid": "82eb367b-5163-4bbe-805a-527562d54175",
+    "s2_id": "29de7c0fb3c09eaf55b20619bceaeafe72fd87a6",
+    "arxiv_id": "1805.04833",
+    "doi": "10.18653/v1/P18-1082"
+  },
+  "C31": {
+    "paper_uuid": "a1a7fd39-59db-4365-83da-31fe27fa007c",
+    "s2_id": "233e702fa7ccfd55061680e3af9bd2f7efe5e08f",
+    "arxiv_id": null,
+    "doi": "10.1126/science.aao0185"
+  },
+  "C32": {
+    "paper_uuid": "8c8ab4bd-eb51-4f01-8cd0-193b7f78b32c",
+    "s2_id": "45cd85a4c05c0c295e4569e08f20a6f3268e6390",
+    "arxiv_id": null,
+    "doi": "10.1136/BMJ.38636.593461.68"
+  },
+  "C33": {
+    "paper_uuid": "b8a311ba-3b2a-4410-9d6e-e5af84f8d0d2",
+    "s2_id": "ca31b8584b6c022ef15ddfe994fe361e002b7729",
+    "arxiv_id": "2307.06435",
+    "doi": "10.1145/3744746"
+  },
+  "C34": {
+    "paper_uuid": "e12b3375-10d9-49d1-b56b-9be6a0f9c85f",
+    "s2_id": "ac8105955e37102e93ba461e469c5539c305baa5",
+    "arxiv_id": null,
+    "doi": "10.1038/21987"
+  },
+  "C35": {
+    "paper_uuid": "a0d7609d-a615-4f8c-8c60-c0b42d2285e5",
+    "s2_id": "c52044dcf1b985c1373de672d89c354e85463575",
+    "arxiv_id": "1708.05148",
+    "doi": "10.1007/s11042-022-13428-4"
+  },
+  "C36": {
+    "paper_uuid": "7b20e909-3fe0-4d07-bcf1-af741b03e670",
+    "s2_id": "fc5707bf4485254c49e74ab3190fc9533c5d8691",
+    "arxiv_id": "cond-mat/9804163",
+    "doi": "10.1007/s100510050359"
+  },
+  "C37": {
+    "paper_uuid": "8331e358-c305-4d66-9a83-e9df932d632f",
+    "s2_id": "b31a5884a8ebe96b6300839b28608b97f8f8ef76",
+    "arxiv_id": "2308.14508",
+    "doi": "10.48550/arXiv.2308.14508"
+  },
+  "C38": {
+    "paper_uuid": "d45e09e8-5c73-492d-a32d-591e2af6b86a",
+    "s2_id": "c3910095b25a674e7154acd9c38d0af220026e31",
+    "arxiv_id": null,
+    "doi": "10.1016/J.INFSOF.2010.03.006"
+  },
+  "C39": {
+    "paper_uuid": "b7e42af3-ca51-45ad-9a50-ea725900aa8d",
+    "s2_id": "38d64919ba526868a850a0e5f6239d4c474b7e7e",
+    "arxiv_id": "2305.17926",
+    "doi": "10.48550/arXiv.2305.17926"
+  },
+  "C40": {
+    "paper_uuid": "49492749-89ec-4896-a3af-db0734247515",
+    "s2_id": "3d68522abfadfc8ee6b7ec9edaaf91f1b2f38e5e",
+    "arxiv_id": "2302.00093",
+    "doi": "10.48550/arXiv.2302.00093"
+  },
+  "C41": {
+    "paper_uuid": "ad38241e-f043-4d3e-99c4-e3b141813152",
+    "s2_id": "7d645a3fd276918374fd9483fd675c28e46506d1",
+    "arxiv_id": "2211.09085",
+    "doi": null
+  },
+  "C42": {
+    "paper_uuid": "b39f9a46-67f5-466e-9ed1-02746729a1b9",
+    "s2_id": "223846b7b56e250e1b6f521997b4c1b809cc0da7",
+    "arxiv_id": "2006.12166",
+    "doi": "10.1038/s42256-020-00287-7"
+  },
+  "C43": {
+    "paper_uuid": "acaf1fc8-9489-4f79-877b-5b2fa3a38eb6",
+    "s2_id": "d1ae29467ce3e63c1b2c4c485db6ec81786b66d9",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jclinepi.2020.10.007"
+  },
+  "C44": {
+    "paper_uuid": "942e7a34-8785-42a1-b127-a7a7a37b3582",
+    "s2_id": "f84fc762a3229f436f2a472bd90ef5070b5d31fb",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jbi.2017.11.011"
+  },
+  "C45": {
+    "paper_uuid": "b69a668e-0d56-444c-87f2-0f4c129b1ec9",
+    "s2_id": "bbc468e704ff4af72ca9de9ceb8203f7bf930d49",
+    "arxiv_id": null,
+    "doi": "10.1136/amiajnl-2011-000089"
+  },
+  "C46": {
+    "paper_uuid": "30953cb9-9c19-4672-93b7-675036e2df9d",
+    "s2_id": "10531ff3245d722ac4dd8304a70580b3189c5007",
+    "arxiv_id": null,
+    "doi": "10.1038/35079151"
+  },
+  "C47": {
+    "paper_uuid": "f739a23b-2916-49f1-8e72-bbbfc3551e16",
+    "s2_id": "f5afaccfe90268485a9961c5771ec5e71e9b806c",
+    "arxiv_id": "2306.15595",
+    "doi": "10.48550/arXiv.2306.15595"
+  },
+  "C48": {
+    "paper_uuid": "56ba70b8-aeb7-47e7-9f36-ed3312fb233f",
+    "s2_id": "5c5751d45e298cea054f32b392c12c61027d2fe7",
+    "arxiv_id": null,
+    "doi": "10.18653/V1/2020.ACL-MAIN.447"
+  },
+  "C49": {
+    "paper_uuid": "cdde8123-7d4f-48a7-9a62-d5321b43d1b1",
+    "s2_id": "bcdaf6c98ddbd6809cf6241aa77200d7394db163",
+    "arxiv_id": "2305.11738",
+    "doi": "10.48550/arXiv.2305.11738"
+  },
+  "C50": {
+    "paper_uuid": "e9d56713-1b81-416c-936f-3e1d0e829192",
+    "s2_id": "d5094bfeff961a09318c9506395e1f877686b85a",
+    "arxiv_id": null,
+    "doi": "10.1145/2372251.2372257"
+  },
+  "C51": {
+    "paper_uuid": "0609f9b4-f7be-4b0f-a09d-2493a7dcd2d2",
+    "s2_id": "32622973ea102abb5f0dea32e2944b7656cd4798",
+    "arxiv_id": null,
+    "doi": "10.1017/S1351324997001502"
+  },
+  "C52": {
+    "paper_uuid": "2a6b14a6-45b8-4a0e-81df-772a3043bf05",
+    "s2_id": "51a0bba0c5fb4257e843040615bb23f712fed4e6",
+    "arxiv_id": "2304.01852",
+    "doi": "10.1016/j.metrad.2023.100017"
+  },
+  "C53": {
+    "paper_uuid": "e1ff2333-0e68-44ef-9aad-671aeb31829b",
+    "s2_id": "88884b8806262a4095036041e3567d450dba39f7",
+    "arxiv_id": "2305.06983",
+    "doi": "10.48550/arXiv.2305.06983"
+  },
+  "C54": {
+    "paper_uuid": "48413cce-e2f5-4207-8072-c6565cce2a0d",
+    "s2_id": "3bf4293957bc475818d39c3fbec16db330d3e08a",
+    "arxiv_id": null,
+    "doi": "10.1186/2046-4053-4-5"
+  },
+  "C55": {
+    "paper_uuid": "dbc8997a-a67c-4597-90b9-caaa9d77b47c",
+    "s2_id": "e7c97e953849f1a8e5d85ceb4cfcc0a5d54d2365",
+    "arxiv_id": "2305.14627",
+    "doi": "10.48550/arXiv.2305.14627"
+  },
+  "C56": {
+    "paper_uuid": "65d8d266-e137-4924-b4ff-c6f8285ee050",
+    "s2_id": "1f17f349981312caa8ed89bb52491c4ecbc1ced5",
+    "arxiv_id": null,
+    "doi": "10.1016/J.INFSOF.2010.12.011"
+  },
+  "C57": {
+    "paper_uuid": "d3e82151-cbf5-4770-b286-4615ec955a28",
+    "s2_id": "209f9bde2dee7cf1677801586562ffe56d435d38",
+    "arxiv_id": "2104.06599",
+    "doi": "10.18653/v1/2021.naacl-main.410"
+  },
+  "C58": {
+    "paper_uuid": "3828cb30-119c-467f-84f4-23551244d63f",
+    "s2_id": "0b220041eb83c23b7b10d32a5d08c0309d528071",
+    "arxiv_id": "2308.07107",
+    "doi": "10.1145/3748304"
+  },
+  "C59": {
+    "paper_uuid": "9d42ccfc-3437-41fd-8d35-8199cfc2dfea",
+    "s2_id": "88b8569f4c5ea548e8eac6cb68896251e85ca879",
+    "arxiv_id": "2205.01833",
+    "doi": null
+  },
+  "C60": {
+    "paper_uuid": "7e1bdf42-1c8a-46e7-be3a-193f02ec5337",
+    "s2_id": "f4e723958a93762befb4d4a039b44a7d752f9917",
+    "arxiv_id": "2305.08845",
+    "doi": "10.48550/arXiv.2305.08845"
+  },
+  "C61": {
+    "paper_uuid": "b26c627d-19d9-4fe1-8355-3f796071ca88",
+    "s2_id": "7436a5e7f611a632203db5a50e883a29007ddcd7",
+    "arxiv_id": null,
+    "doi": "10.1098/RSPA.1925.0061"
+  },
+  "C62": {
+    "paper_uuid": "906e5518-bf8d-435e-b269-604c732852a4",
+    "s2_id": "459c82205d2a27a8542bba7a4d478a8a23be2f5d",
+    "arxiv_id": "2304.09542",
+    "doi": "10.48550/arXiv.2304.09542"
+  },
+  "C63": {
+    "paper_uuid": "5147fc44-0908-4e12-aecb-988d458c4ebb",
+    "s2_id": "d255350bc3e6bcda2b24148b55b267a6d2a0569f",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjopen-2016-012545"
+  },
+  "C64": {
+    "paper_uuid": "e333ac96-1736-450b-b4f7-c507547599e1",
+    "s2_id": "83851f1a32d41975582ca62355858ab5e34738f7",
+    "arxiv_id": "2209.12356",
+    "doi": "10.48550/arXiv.2209.12356"
+  },
+  "C65": {
+    "paper_uuid": "66303ba5-1d6a-48aa-8f8b-a23d799b7652",
+    "s2_id": "e01ab53663e5df5961a021506a9cb09f4efc3788",
+    "arxiv_id": "2307.10169",
+    "doi": "10.48550/arXiv.2307.10169"
+  },
+  "C66": {
+    "paper_uuid": "cd043e0f-9891-4f6b-bb9d-47423ef9b97b",
+    "s2_id": "7bbc1c1351981075379c34bc4fd16f922c48201c",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-019-1074-9"
+  },
+  "C67": {
+    "paper_uuid": "7355247d-21dd-4562-a957-b498b48b3088",
+    "s2_id": "23b8dd1978dd2d27e5ab4dc4a8fe11ea6dd57064",
+    "arxiv_id": null,
+    "doi": "10.1101/2023.04.22.23288967"
+  },
+  "C68": {
+    "paper_uuid": "6e6bfc3c-2d26-4888-90d6-9af7228cb646",
+    "s2_id": "3706f1fe6b49167e5a88fe9c72348972bbbcdcfd",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jclinepi.2020.01.008"
+  },
+  "C69": {
+    "paper_uuid": "fccd3e82-8e2d-4034-936a-0c92575f73aa",
+    "s2_id": "98e565fa06f6c7bf7c46833b5106b26dc45130c4",
+    "arxiv_id": "2103.01913",
+    "doi": "10.1145/3404835.3463257"
+  },
+  "C70": {
+    "paper_uuid": "4b40479d-0b07-4efc-ba83-f8df43c69e43",
+    "s2_id": "e69c18f7e5c424e57adb0d93445997d348ae2cc9",
+    "arxiv_id": null,
+    "doi": "10.1021/ACS.CHEMMATER.7B03500"
+  },
+  "C71": {
+    "paper_uuid": "6023c0ab-ea16-43fb-9e24-a2aa0c12b78c",
+    "s2_id": "ffee5cf6b88f24a1bc583d308035058d1fee7eb1",
+    "arxiv_id": null,
+    "doi": "10.1186/s12874-019-0782-0"
+  },
+  "C72": {
+    "paper_uuid": "e74bee8d-eb39-4b0c-be6b-fbb4d20cce25",
+    "s2_id": "77179e5ff669452b9bea479a4236a6e2009ee422",
+    "arxiv_id": "2401.14887",
+    "doi": "10.1145/3626772.3657834"
+  },
+  "C73": {
+    "paper_uuid": "83f9f8e4-488c-4744-8bb5-e91f8c901642",
+    "s2_id": "403c69991bcfd4d37e77da69d264023d25456d5c",
+    "arxiv_id": "1910.04855",
+    "doi": null
+  },
+  "C74": {
+    "paper_uuid": "6c02d586-fdb6-43e5-867b-f893f43c238a",
+    "s2_id": "ccd94602e3acecf999d0c9ba62b1a8bc02e9f696",
+    "arxiv_id": "2306.05087",
+    "doi": "10.48550/arXiv.2306.05087"
+  },
+  "C75": {
+    "paper_uuid": "e13d584c-682f-423e-a7e2-4e28b314c98c",
+    "s2_id": "5d24ad9e1222085740d3cd12c48ff6ac171b814b",
+    "arxiv_id": null,
+    "doi": "10.1186/1471-2105-11-55"
+  },
+  "C76": {
+    "paper_uuid": "7c365fb4-743c-4ce7-8186-f89f176462d4",
+    "s2_id": "2717e5c7384ec12cfd6cf9c34897c6adad3230ed",
+    "arxiv_id": "2404.02060",
+    "doi": "10.48550/arXiv.2404.02060"
+  },
+  "C77": {
+    "paper_uuid": "53958b29-280a-42d1-b091-97b5f3bb6d65",
+    "s2_id": "a6fdb277d0a4b09899f802bda3359f5c2021a156",
+    "arxiv_id": "2109.10862",
+    "doi": null
+  },
+  "C78": {
+    "paper_uuid": "5e6f7dff-af19-4408-8c7f-7e81833ca264",
+    "s2_id": "f6b73fcffc9b69aa3ddc235a958a35cba54f8cc7",
+    "arxiv_id": null,
+    "doi": "10.5195/jmla.2018.513"
+  },
+  "C79": {
+    "paper_uuid": "be69a19e-c810-40c4-8cb8-0e9c8ad4a2de",
+    "s2_id": "9a1a1d6f0ab114d14fc69a91f1981cf8e0848c84",
+    "arxiv_id": null,
+    "doi": "10.1197/JAMIA.M1929"
+  },
+  "C80": {
+    "paper_uuid": "5b397ce8-862d-40ca-b318-ecd42c36f99c",
+    "s2_id": "535c8840cc00d83e3448bffa0f0dd8d05da1bc79",
+    "arxiv_id": null,
+    "doi": "10.2139/ssrn.4308687"
+  },
+  "C81": {
+    "paper_uuid": "ae85d277-36cb-48de-a7fe-4b6650d619c8",
+    "s2_id": "383bac5bcc129ae62a1bc927e501530012f78d8c",
+    "arxiv_id": "1906.02569",
+    "doi": null
+  },
+  "C82": {
+    "paper_uuid": "abeaca1c-8fc1-4bbe-8776-8b6e4cd9bdca",
+    "s2_id": "8666f9f379389a5dff31e72fb0f992a37763ba41",
+    "arxiv_id": "2203.11147",
+    "doi": "10.48550/arXiv.2203.11147"
+  },
+  "C83": {
+    "paper_uuid": "5965d95c-9707-4f91-ac8a-904b27c96da6",
+    "s2_id": "9a0e8c101b72e9094ea554194698daa3aeb3bc6f",
+    "arxiv_id": null,
+    "doi": "10.2196/53164"
+  },
+  "C84": {
+    "paper_uuid": "795e07af-f723-4fb6-a620-eb74a02a9169",
+    "s2_id": "f3542470da73d444f3f63030517ec918553caadc",
+    "arxiv_id": null,
+    "doi": "10.1038/s41578-020-00255-y"
+  },
+  "C85": {
+    "paper_uuid": "fb0cf9ad-4eab-4506-aea6-d3a841d13927",
+    "s2_id": "def4eb6ef357d2f125e20eeeffad108164dc4799",
+    "arxiv_id": "2403.14473",
+    "doi": "10.1038/s41746-024-01157-x"
+  },
+  "C86": {
+    "paper_uuid": "c80b104b-ee68-482a-8682-923571d90067",
+    "s2_id": "7a5b44ea10a51708e18786595c8d70b18950da11",
+    "arxiv_id": "2307.13528",
+    "doi": "10.48550/arXiv.2307.13528"
+  },
+  "C87": {
+    "paper_uuid": "a40c82df-6ce7-4d17-b891-7c61d83540da",
+    "s2_id": "03fab98a9be74a253688840dba9144737a8ca92d",
+    "arxiv_id": "2310.07521",
+    "doi": "10.48550/arXiv.2310.07521"
+  },
+  "C88": {
+    "paper_uuid": "208d2be6-1e7c-43d0-97ac-5c02210bd7cc",
+    "s2_id": "0578dfb2a28b77abde19b32de777e0365df3020e",
+    "arxiv_id": null,
+    "doi": "10.1063/5.0021106"
+  },
+  "C89": {
+    "paper_uuid": "32e517b8-d5b1-402e-90ae-bb26a675c443",
+    "s2_id": "f39a05625f500f6cea90681825680d063e28489f",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jclinepi.2017.08.011"
+  },
+  "C90": {
+    "paper_uuid": "6ee8a15d-2250-48a9-b4bd-35ad120fcdab",
+    "s2_id": "c56aced0f0c5cfebefadb530cb08d736c3ac5c05",
+    "arxiv_id": "2108.11601",
+    "doi": "10.18653/v1/2021.findings-emnlp.232"
+  },
+  "C91": {
+    "paper_uuid": "6541e759-c9fb-4e29-ae66-f112559b1b2a",
+    "s2_id": "3efa84d6f4caf5ada3c9729061f266127f791b2f",
+    "arxiv_id": null,
+    "doi": "10.1093/jamia/ocv044"
+  },
+  "C92": {
+    "paper_uuid": "3fae7746-3579-4136-a2e0-68dca3d5e64f",
+    "s2_id": "0484f05b6b3c11a9344cb623649ae867f172046f",
+    "arxiv_id": "2311.04939",
+    "doi": "10.48550/arXiv.2311.04939"
+  },
+  "C93": {
+    "paper_uuid": "ad6604da-94a7-4123-aea6-f59b169f0610",
+    "s2_id": "cf8d63a55d4cbd18debd1f23cd40d85f8a4fc0aa",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-015-0066-7"
+  },
+  "C94": {
+    "paper_uuid": "33d7d596-148a-40df-90c6-b7d2cea321e2",
+    "s2_id": "c4d877c9f609c638335777a7fac38cd437c4114c",
+    "arxiv_id": null,
+    "doi": "10.1080/07294360.2012.702735"
+  },
+  "C95": {
+    "paper_uuid": "8db83ec5-a5c7-4edf-8ae7-6bee780d78fe",
+    "s2_id": "d91bd7bdea31775302a8a0b997b6d67bf20ac297",
+    "arxiv_id": "2302.03495",
+    "doi": "10.1145/3539618.3591703"
+  },
+  "C96": {
+    "paper_uuid": "3b6406ee-2a9d-47d9-8e29-61952ac23744",
+    "s2_id": "378a545c3a1cf6c4aada8f9ee8820c0d8008220a",
+    "arxiv_id": "2306.04181",
+    "doi": "10.48550/arXiv.2306.04181"
+  },
+  "C97": {
+    "paper_uuid": "dbf8200f-814c-4c88-a832-3f4a30ff2c41",
+    "s2_id": "a4e996a6a3df1ac76a28b1e0513bbcb5449e4227",
+    "arxiv_id": "2403.02901",
+    "doi": "10.48550/arXiv.2403.02901"
+  },
+  "C98": {
+    "paper_uuid": "7bc43a1d-9403-4877-a907-72cfa05f8e60",
+    "s2_id": "22187abacbee57490c8999d70e9420caafbe43e2",
+    "arxiv_id": null,
+    "doi": "10.1145/3404835.3462829"
+  },
+  "C99": {
+    "paper_uuid": "ff01c421-39c8-4869-a429-c68926c63d4a",
+    "s2_id": "be779149798a217e81a4d9deb46a68db218a22c2",
+    "arxiv_id": null,
+    "doi": "10.1016/j.infsof.2013.02.002"
+  },
+  "C100": {
+    "paper_uuid": "51e4a28b-9454-4158-a174-05c33a392033",
+    "s2_id": "5605e5bbe71a6d52be0930865f1635ed8644dea8",
+    "arxiv_id": "2312.02724",
+    "doi": "10.48550/arXiv.2312.02724"
+  },
+  "C101": {
+    "paper_uuid": "92ad1da7-5c12-415e-a8b7-3048fa53230b",
+    "s2_id": "70813142dcee9fd455b0f587153e21deaf7b8005",
+    "arxiv_id": "2310.17526",
+    "doi": "10.1002/jrsm.1715"
+  },
+  "C102": {
+    "paper_uuid": "d446e9dd-1eff-486d-b5be-ca724b94a3e0",
+    "s2_id": "80980cd10d19f021c14a6b7eee871b6a5d328024",
+    "arxiv_id": "2306.07174",
+    "doi": "10.48550/arXiv.2306.07174"
+  },
+  "C103": {
+    "paper_uuid": "ff6df170-dfc2-4446-beb2-0cd0b7f87ca8",
+    "s2_id": "6134fcf2e8f6c23d8fc1dd3186df6bfb091fa45c",
+    "arxiv_id": null,
+    "doi": "10.1016/J.WORLDDEV.2017.04.012"
+  },
+  "C104": {
+    "paper_uuid": "593a8da3-8d8a-4209-9c6d-e0c794f515f7",
+    "s2_id": "f853c96db0d724d7e7885e1c988dd9563871ed3b",
+    "arxiv_id": "2204.13240",
+    "doi": "10.1038/s41586-022-04501-x"
+  },
+  "C105": {
+    "paper_uuid": "5707b53e-b57d-466a-bf79-a50cad59d3be",
+    "s2_id": "0d140d405916137cf5d91fbc8174f3aedc8239e9",
+    "arxiv_id": null,
+    "doi": "10.1177/17470161231180449"
+  },
+  "C106": {
+    "paper_uuid": "bf6d7c71-f931-4675-a669-aa396c38b89d",
+    "s2_id": "7c0b558bf433c5aaaf774cd5d3c767bfd3dbe123",
+    "arxiv_id": "2006.05405",
+    "doi": null
+  },
+  "C107": {
+    "paper_uuid": "b3307f6c-c10d-4c0e-a0f9-e086dc9a1809",
+    "s2_id": "cf20d6130160843e5cd8ef8f5553d66a920bc6f3",
+    "arxiv_id": null,
+    "doi": "10.1002/smr.561"
+  },
+  "C108": {
+    "paper_uuid": "a2645a53-77c6-44eb-90a4-2fc2a833014c",
+    "s2_id": "7e55d8701785818776323b4147cb13354c820469",
+    "arxiv_id": "2312.07559",
+    "doi": "10.48550/arXiv.2312.07559"
+  },
+  "C109": {
+    "paper_uuid": "6fc383c1-9c7f-40b1-812d-0ebc9f04cd3d",
+    "s2_id": "65fe385a665480b41fafc56d76a3bd72e92e8886",
+    "arxiv_id": "2310.00785",
+    "doi": "10.48550/arXiv.2310.00785"
+  },
+  "C110": {
+    "paper_uuid": "cbf25f29-21e7-417a-86ef-74f4c89efbe9",
+    "s2_id": "fd83bfb69b874509a964d9984061fdd6c1634fe6",
+    "arxiv_id": null,
+    "doi": "10.1038/s41467-020-17266-6"
+  },
+  "C111": {
+    "paper_uuid": "fcb0cdb8-42db-4c44-82e1-d707cd63906e",
+    "s2_id": "cb92a7f9d9dbcf9145e32fdfa0e70e2a6b828eb1",
+    "arxiv_id": "2301.10140",
+    "doi": "10.48550/arXiv.2301.10140"
+  },
+  "C112": {
+    "paper_uuid": "a0a96883-d47e-4075-a3e4-4551ea883fe2",
+    "s2_id": "cccb129527fbe900c6f94dd8a6ad4b408c403152",
+    "arxiv_id": "2305.00844",
+    "doi": "10.2196/48996"
+  },
+  "C113": {
+    "paper_uuid": "3ef3bd45-a484-4f5f-adfd-f80daba19e23",
+    "s2_id": "df996bda58d52ac90048b83473caed6e5f9e4c36",
+    "arxiv_id": null,
+    "doi": "10.2196/47049"
+  },
+  "C114": {
+    "paper_uuid": "24841676-432f-4849-8618-405032d702a9",
+    "s2_id": "1460d33f547ee40c560174dc0f6898f4802f4cf8",
+    "arxiv_id": "2311.14648",
+    "doi": "10.1145/3618260.3649777"
+  },
+  "C115": {
+    "paper_uuid": "fba71e8f-6643-4c2b-a60e-1cbcf285c65f",
+    "s2_id": "b20de7da9635dbe3fe3831b759383cf3a9581616",
+    "arxiv_id": null,
+    "doi": "10.7759/cureus.37281"
+  },
+  "C116": {
+    "paper_uuid": "fb26c0ca-c733-4b49-9b98-6d9b190b6e25",
+    "s2_id": "d46b60993f4a192ba1a6621592f777f0e156f13d",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-023-02243-z"
+  },
+  "C117": {
+    "paper_uuid": "b8bf2a45-e53b-4a58-8c1b-fe443fa42d02",
+    "s2_id": "2c356b7706509b381137f8eb38869c52df32f1cc",
+    "arxiv_id": null,
+    "doi": "10.1016/S0950-5849(98)00101-3"
+  },
+  "C118": {
+    "paper_uuid": "0cfd4a31-b956-4c37-8b8e-932b01b7b4f3",
+    "s2_id": "36d6ca6d47fa3a74d7698f0aa39605c29c594a3b",
+    "arxiv_id": null,
+    "doi": "10.3115/1218955.1218966"
+  },
+  "C119": {
+    "paper_uuid": "a83e7ad9-f0c2-4ea3-8e51-323031487a96",
+    "s2_id": "26d230d3f405fd0046dfacb826563e5e58daf73f",
+    "arxiv_id": null,
+    "doi": "10.1002/jrsm.1093"
+  },
+  "C120": {
+    "paper_uuid": "e2ebd5ad-3b3d-458a-868d-939ba427f153",
+    "s2_id": "e326d127fe781abd306367c9c9e99333c0f9a669",
+    "arxiv_id": null,
+    "doi": "10.1038/sdata.2017.127"
+  },
+  "C121": {
+    "paper_uuid": "45840c22-826b-49b6-84a9-ba8b05c361ec",
+    "s2_id": "d164fc8d71ca304bbd7833de5d03ad0a5ca32afa",
+    "arxiv_id": "2011.04843",
+    "doi": "10.1145/3529754"
+  },
+  "C122": {
+    "paper_uuid": "f97751fc-82da-423e-abf9-2e9d76f7eb31",
+    "s2_id": "2fcad63cc68ca74acdfafdbc145325ee59952f24",
+    "arxiv_id": "2402.14207",
+    "doi": "10.18653/v1/2024.naacl-long.347"
+  },
+  "C123": {
+    "paper_uuid": "b79382ff-dffd-424b-930e-356b1b8dbb33",
+    "s2_id": "fef0393e997ec51b184e39c712be63197d99fd46",
+    "arxiv_id": "2401.08406",
+    "doi": "10.48550/arXiv.2401.08406"
+  },
+  "C124": {
+    "paper_uuid": "756a65c8-cb9c-4daf-93df-d5ef9bc5678d",
+    "s2_id": "1d284b5c1182307577beb143a67ddb1535e2d9f2",
+    "arxiv_id": null,
+    "doi": "10.3390/systems11070351"
+  },
+  "C125": {
+    "paper_uuid": "9b6836e8-bde1-4a33-bb50-32c635b6e5bc",
+    "s2_id": "e1e48e1ff640ec9bd3c5b61c9f30c0957b61dec6",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-019-0942-7"
+  },
+  "C126": {
+    "paper_uuid": "c1c5156a-914a-455b-ba8f-de407c02857f",
+    "s2_id": "56214030211d3c0212fc0da9b97735ead9021cc5",
+    "arxiv_id": "2010.14235",
+    "doi": "10.18653/v1/2020.emnlp-main.648"
+  },
+  "C127": {
+    "paper_uuid": "6d0dd414-df28-459c-86a0-9bfcf1a202ba",
+    "s2_id": "3fbd0a4bb88925c50eedce8ba19e5a0406d5c71b",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jclinepi.2020.01.005"
+  },
+  "C128": {
+    "paper_uuid": "fd9abd68-f55b-459f-8b12-fcd6f2581b02",
+    "s2_id": "64e21cb48991fc06169692343241cea4c21d0151",
+    "arxiv_id": null,
+    "doi": "10.3115/1620754.1620839"
+  },
+  "C129": {
+    "paper_uuid": "5111b75e-9297-4512-b997-c24733dee198",
+    "s2_id": "64bcfed67750fbf3b52c2b6b60d85f9413401561",
+    "arxiv_id": null,
+    "doi": "10.1038/s41597-020-00602-2"
+  },
+  "C130": {
+    "paper_uuid": "ca568670-d893-4f72-919d-abbd847e7c0a",
+    "s2_id": "9ff53708c41e86f77623bbd592e29475f04447c7",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jclinepi.2021.12.005"
+  },
+  "C131": {
+    "paper_uuid": "ca07ecc1-fe8c-41ee-b5f2-fa01d8df06af",
+    "s2_id": "7a39763121077c5a67343f822e6617fe3013a124",
+    "arxiv_id": "1805.08660",
+    "doi": "10.18653/v1/P18-1207"
+  },
+  "C132": {
+    "paper_uuid": "28144839-429e-4cd6-8daf-5f1b37f6abb9",
+    "s2_id": "fa5f9aa1cb6f97654ca8e6d279ceee1427a87e68",
+    "arxiv_id": "2409.13740",
+    "doi": "10.48550/arXiv.2409.13740"
+  },
+  "C133": {
+    "paper_uuid": "77832ba4-cad2-4e03-ba03-1e4b2cc0a4e7",
+    "s2_id": "ff52c56a82a859f6749cb2b52dab9a6741abc8a5",
+    "arxiv_id": null,
+    "doi": "10.1145/1835804.1835829"
+  },
+  "C134": {
+    "paper_uuid": "57d3d593-c3e0-475e-9d78-0831fe654af9",
+    "s2_id": "3e5ac863f6162a449c67c8e501a757941033c342",
+    "arxiv_id": null,
+    "doi": "10.1093/hmg/ddp519"
+  },
+  "C135": {
+    "paper_uuid": "d580ad31-d258-4685-ac38-c9a12713da9b",
+    "s2_id": "8998b3895cce8b206098197478d3d9bc3add321c",
+    "arxiv_id": "2503.01935",
+    "doi": "10.48550/arXiv.2503.01935"
+  },
+  "C136": {
+    "paper_uuid": "bdb4ec15-1e0c-4429-9eab-e1635b4c7dfb",
+    "s2_id": "8ad74017ac84c5025abfd20c74841813eaafb684",
+    "arxiv_id": null,
+    "doi": "10.1016/j.envint.2020.105623"
+  },
+  "C137": {
+    "paper_uuid": "81684232-bbc3-4f93-9531-74ee45ac4f01",
+    "s2_id": "05ab4b262a2a343aa505ff3640fdf30b2530ac99",
+    "arxiv_id": "2402.01383",
+    "doi": "10.48550/arXiv.2402.01383"
+  },
+  "C138": {
+    "paper_uuid": "ff4a28dd-1181-4ced-887a-e7e2846f7c82",
+    "s2_id": "b9e023bb65f2b28a43ebc05021a7ef90ae8833f1",
+    "arxiv_id": null,
+    "doi": "10.1002/jrsm.1710"
+  },
+  "C139": {
+    "paper_uuid": "444232bb-1e87-434f-89f1-120e98042a97",
+    "s2_id": "6e4bc27f402c8c221b2a0d7418313cc87f52f944",
+    "arxiv_id": "2404.12259",
+    "doi": "10.1145/3613904.3642830"
+  },
+  "C140": {
+    "paper_uuid": "4a961ee2-2044-4af5-b1f9-bfb081abd229",
+    "s2_id": "f7e825f10a6f79c4da47c47d5c0d12343f83deac",
+    "arxiv_id": null,
+    "doi": "10.2147/JMDH.S413470"
+  },
+  "C141": {
+    "paper_uuid": "721ab6fa-29f8-40e3-96ee-318019dce5b1",
+    "s2_id": "9b842f9a3ff58872018a9794cce3a2cc1909942f",
+    "arxiv_id": null,
+    "doi": "10.1038/s41560-021-00866-x"
+  },
+  "C142": {
+    "paper_uuid": "0d7454ef-fb80-4a1f-b4de-9c9b5ed07c19",
+    "s2_id": "108f91acc309d1b31336124bec48657a7736737b",
+    "arxiv_id": null,
+    "doi": "10.1109/TSE.2010.28"
+  },
+  "C143": {
+    "paper_uuid": "5e417df4-cc06-4550-8f79-c3376de1ee05",
+    "s2_id": "70e2ae1f78f032da9244be355822390de43d9e53",
+    "arxiv_id": null,
+    "doi": "10.1038/s41467-024-48512-w"
+  },
+  "C144": {
+    "paper_uuid": "88a44dca-2adb-47c1-bdc4-8b638dc26d9d",
+    "s2_id": "087b759b8b13894248da1a5a3468c44906a6fe39",
+    "arxiv_id": null,
+    "doi": "10.7326/0003-4819-151-8-200910200-00145"
+  },
+  "C145": {
+    "paper_uuid": "86cf3e80-158c-4444-b4a9-d6dbd2b4ed88",
+    "s2_id": "5e7ad80aaee2acfe7fafcaa0d3860de21725e029",
+    "arxiv_id": null,
+    "doi": "10.1145/2911451.2911510"
+  },
+  "C146": {
+    "paper_uuid": "3a98cba8-1d63-4e91-9363-5e1c47412041",
+    "s2_id": "b5850a86c886baef1c536c34c33b23da2e728492",
+    "arxiv_id": null,
+    "doi": "10.18653/V1/2021.NAACL-MAIN.341"
+  },
+  "C147": {
+    "paper_uuid": "b89d27d5-738b-42f0-8ce7-5f16bebc64b3",
+    "s2_id": "fa445f1ba4938a1caf30ecb2deec43ddf5835172",
+    "arxiv_id": "1409.5165",
+    "doi": "10.13016/M25P4M"
+  },
+  "C148": {
+    "paper_uuid": "dec36f23-11a1-4e1e-ab2d-644547e2d21c",
+    "s2_id": "9eadfe920cae4a451af437752de83075ec528288",
+    "arxiv_id": "2305.13091",
+    "doi": "10.18653/v1/2023.findings-emnlp.278"
+  },
+  "C149": {
+    "paper_uuid": "ee0b9bd6-809e-47fa-8dfe-2c75bc302824",
+    "s2_id": "1dc91d5e9466080ea1c180918d7bb47d5c5b44e5",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-024-02609-x"
+  },
+  "C150": {
+    "paper_uuid": "0e385e97-51d1-4bef-a8fd-6d7ec05578fd",
+    "s2_id": "4370d0abff93011622cb3ba95373d716aa8ec7b0",
+    "arxiv_id": null,
+    "doi": "10.1093/bib/bbaa296"
+  },
+  "C151": {
+    "paper_uuid": "9e6d689a-d35f-4689-a0ae-c605161a434e",
+    "s2_id": "7fd938a9683174cde8815bf66a27e0a7c8bc5eb3",
+    "arxiv_id": null,
+    "doi": "10.1111/cobi.13231"
+  },
+  "C152": {
+    "paper_uuid": "e3f6f167-b7b4-4bf8-8ee9-073826bcb690",
+    "s2_id": "d9964ab436eefd21f923a4bc833c6b66692c7f00",
+    "arxiv_id": "2305.13304",
+    "doi": "10.48550/arXiv.2305.13304"
+  },
+  "C153": {
+    "paper_uuid": "2cbbfc0e-c3f5-4f77-b5df-f644725d0e64",
+    "s2_id": "fcf2a5934595a22190596b6c0c5d3e802661713c",
+    "arxiv_id": "2310.01432",
+    "doi": "10.18653/v1/2024.emnlp-main.621"
+  },
+  "C154": {
+    "paper_uuid": "d82e326d-20b6-4aae-8c42-b8fd405ab538",
+    "s2_id": "084e843cd1cc0ffc9c90e0db534df03fb5535674",
+    "arxiv_id": null,
+    "doi": "10.1038/s41524-020-0287-8"
+  },
+  "C155": {
+    "paper_uuid": "9e3934f6-0ba7-4d71-9549-07d70959dcc5",
+    "s2_id": "935489033eb450aaf007cc89d974c431b27cdd74",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-020-01324-7"
+  },
+  "C156": {
+    "paper_uuid": "85b53c1f-f0a8-4dc4-b7f5-ea89e4df366d",
+    "s2_id": "7dfbe4882188dbac938306be93bc58b34450b87f",
+    "arxiv_id": "2404.08680",
+    "doi": "10.1145/3715964"
+  },
+  "C157": {
+    "paper_uuid": "74849444-0fbd-4ed6-880b-f385382e83f1",
+    "s2_id": "57d922f509438de1f1bb9b92a1589dbbacc612ab",
+    "arxiv_id": null,
+    "doi": "10.3390/app12062891"
+  },
+  "C158": {
+    "paper_uuid": "48698659-e1b0-4657-9115-85c2165b3cc8",
+    "s2_id": "e715ff10fa41c54017c9779c8f95d7101014f9bc",
+    "arxiv_id": null,
+    "doi": "10.1093/asj/sjad069"
+  },
+  "C159": {
+    "paper_uuid": "c19049a7-b66d-433c-a22a-8829ef7465ef",
+    "s2_id": "591f5644aede42a2447e48eedb112c70e80089af",
+    "arxiv_id": "2505.13259",
+    "doi": "10.48550/arXiv.2505.13259"
+  },
+  "C160": {
+    "paper_uuid": "365ea7db-f821-4deb-bee3-c61a6d5ee9ad",
+    "s2_id": "f2cd753ef249d1f81e4e04809d5038fb31847ae7",
+    "arxiv_id": null,
+    "doi": "10.1001/jamanetworkopen.2024.12687"
+  },
+  "C161": {
+    "paper_uuid": "b6700a81-c82b-4a8a-9b1e-20eeb892b862",
+    "s2_id": "d420799e75a9dbcd164ba404b00f8519f7ddf3fe",
+    "arxiv_id": null,
+    "doi": "10.1049/IC.2011.0006"
+  },
+  "C162": {
+    "paper_uuid": "d18104e1-2139-4355-896a-3647ee4b4c6c",
+    "s2_id": "1794e90e9334465e80ea496fc6eb211cd17e5522",
+    "arxiv_id": "2006.10315",
+    "doi": "10.1021/acs.chemmater.0c02553"
+  },
+  "C163": {
+    "paper_uuid": "835546c9-762d-4722-a4ee-d323282765b9",
+    "s2_id": "a6aed0c4e0f39a55edb407f492e41f178a62907f",
+    "arxiv_id": "1905.07870",
+    "doi": "10.18653/v1/P19-1191"
+  },
+  "C164": {
+    "paper_uuid": "a631f378-a540-4e93-a64c-7ab265d9284e",
+    "s2_id": "738494dd9c2dc307c0e2d5101c251930c80ed0bc",
+    "arxiv_id": "1705.05420",
+    "doi": "10.1016/j.eswa.2018.11.021"
+  },
+  "C165": {
+    "paper_uuid": "46eb3587-b2e9-4152-be3f-ae715527d410",
+    "s2_id": "799017d2818108e91392c541579cbe9d2cc38e35",
+    "arxiv_id": "2505.13400",
+    "doi": "10.48550/arXiv.2505.13400"
+  },
+  "C166": {
+    "paper_uuid": "682d076c-9bf3-4c0e-9427-0123a236031d",
+    "s2_id": "ba1bb2d152aba3755ac933ecc7f6cc67b1f89f71",
+    "arxiv_id": null,
+    "doi": "10.1080/00472778.2021.1955125"
+  },
+  "C167": {
+    "paper_uuid": "ebc1e3d6-705e-4ac8-b923-c0446f3db3a9",
+    "s2_id": "975e938aaa7624baf6684fdbeb4a5dbb9b94c28f",
+    "arxiv_id": null,
+    "doi": "10.1007/s00415-021-10458-0"
+  },
+  "C168": {
+    "paper_uuid": "2500c881-b500-4016-84e8-eec46a7c8534",
+    "s2_id": "be09be3b9cd5981790213dc624868b2f746353e8",
+    "arxiv_id": null,
+    "doi": "10.1016/j.gfs.2023.100700"
+  },
+  "C169": {
+    "paper_uuid": "1ffd6869-7a7a-4a6b-a8ef-770af9209cf7",
+    "s2_id": "3d297441afbc2124bc805f2a9a4d3db3e21ae217",
+    "arxiv_id": "2310.16146",
+    "doi": "10.48550/arXiv.2310.16146"
+  },
+  "C170": {
+    "paper_uuid": "72e55503-f33c-478c-9365-9de4364a1dbb",
+    "s2_id": "23a6f783190957fee7ec26f72a84738f64bac71a",
+    "arxiv_id": null,
+    "doi": "10.1186/s12874-021-01451-2"
+  },
+  "C171": {
+    "paper_uuid": "c7dc53b9-0797-4039-99b0-4ae2210db67a",
+    "s2_id": "b63576087448fd935657fbb8e892b9dbebb8ebf1",
+    "arxiv_id": null,
+    "doi": "10.3389/frma.2021.685591"
+  },
+  "C172": {
+    "paper_uuid": "9c31acb9-5649-48af-849c-417a192308ff",
+    "s2_id": "b1a7e0822634ae4a817d135a878823ff2941970d",
+    "arxiv_id": null,
+    "doi": "10.1016/j.elecom.2020.106860"
+  },
+  "C173": {
+    "paper_uuid": "62941cb4-aced-496c-8be7-92e386192896",
+    "s2_id": "d4ca44fdfbc2841a9c5df270201dc47c93e03597",
+    "arxiv_id": null,
+    "doi": "10.18653/v1/2020.acl-main.550"
+  },
+  "C174": {
+    "paper_uuid": "525c444f-5326-46fd-93e9-ce405ce931a8",
+    "s2_id": "41a34d9a0df417d84e98da33fc6e3529e10ef8c7",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jclinepi.2021.06.030"
+  },
+  "C175": {
+    "paper_uuid": "7f7277f1-d4f6-47e5-bf16-68d3616df8c5",
+    "s2_id": "85bc3c3707e514430ed29dfedc454d5f77630f46",
+    "arxiv_id": null,
+    "doi": "10.18653/v1/2021.acl-long.473"
+  },
+  "C176": {
+    "paper_uuid": "1f34918d-11e7-4f1e-872e-9c53dcd29b9c",
+    "s2_id": "9cd329e3b86e6869e73a91c467459b1947655b07",
+    "arxiv_id": "2212.08635",
+    "doi": "10.18653/v1/2024.naacl-long.17"
+  },
+  "C177": {
+    "paper_uuid": "6b1dd4df-4833-475c-a53f-94bc568ab8cf",
+    "s2_id": "04562d29a24c51e146989faeedfbbf37e8e8c44e",
+    "arxiv_id": null,
+    "doi": "10.1145/3626252.3630958"
+  },
+  "C178": {
+    "paper_uuid": "3f2f82cf-960b-4dfd-ae55-c3efcd2713ef",
+    "s2_id": "00bc257de9cd4ea70177f34dbe0e8364702a4086",
+    "arxiv_id": null,
+    "doi": "10.14236/EWIC/EASE2009.4"
+  },
+  "C179": {
+    "paper_uuid": "23ee6781-d3d2-4325-98db-e06b81cc9947",
+    "s2_id": "1a96fc84bdb15119930b9da3fd0655880cae77d4",
+    "arxiv_id": null,
+    "doi": "10.1016/j.bjps.2023.03.004"
+  },
+  "C180": {
+    "paper_uuid": "d4f5828e-f87f-4284-a3e4-efdd8a66d71b",
+    "s2_id": "764cf9e8a06e5f7a248ca017eb6f36e5ad8fe910",
+    "arxiv_id": null,
+    "doi": "10.2147/IJGM.S456659"
+  },
+  "C181": {
+    "paper_uuid": "54a7be21-2853-4ad0-8a61-5a9fe45635ed",
+    "s2_id": "b1d4f4eeb13454ab83523d781e6263f8ce68cd9b",
+    "arxiv_id": null,
+    "doi": "10.1504/IJCBDD.2013.052198"
+  },
+  "C182": {
+    "paper_uuid": "c1e16cb3-6d52-4b20-8756-a77e3a6c7057",
+    "s2_id": "194e9a28e3b8edf5bc0c6a178a1173482ca1a2dc",
+    "arxiv_id": null,
+    "doi": "10.1007/s41669-024-00476-9"
+  },
+  "C183": {
+    "paper_uuid": "3724ba78-c566-4d51-82bf-ca858989623c",
+    "s2_id": "ee970ce682df2b667ea99526ab0072c68e3db0e2",
+    "arxiv_id": null,
+    "doi": "10.1093/humrep/dead207"
+  },
+  "C184": {
+    "paper_uuid": "bf3906fd-6350-4957-a0f5-defc34b9dd94",
+    "s2_id": "bc07e4491e7b3972aa0b03116edd544937e8b2da",
+    "arxiv_id": null,
+    "doi": "10.1177/21925682231195783"
+  },
+  "C185": {
+    "paper_uuid": "6ec16c88-f0e4-45ea-9555-de3f1e9fcc24",
+    "s2_id": "5612689cafe919282b4d3afe4ab8b7283a5cb269",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C186": {
+    "paper_uuid": "19b8bbc8-5603-4645-9984-07ee04795c63",
+    "s2_id": "318f05c211644eff765180432dd7b8e3085ab250",
+    "arxiv_id": null,
+    "doi": "10.1007/s10648-024-09862-5"
+  },
+  "C187": {
+    "paper_uuid": "19a6db16-34e8-496d-8d9b-fa687f572091",
+    "s2_id": "32bfc242d0e85f1b6f2ff838c37287f8cfddf7c2",
+    "arxiv_id": null,
+    "doi": "10.18653/v1/W19-2401"
+  },
+  "C188": {
+    "paper_uuid": "4a84f07a-bddc-4e3e-9800-51fbf53fb939",
+    "s2_id": "5fbabc5d28ecddc2fd5d78606c030395dd1a2948",
+    "arxiv_id": null,
+    "doi": "10.1038/s41415-023-6132-y"
+  },
+  "C189": {
+    "paper_uuid": "4cab8748-9d62-4315-9806-a0ebe0c37b62",
+    "s2_id": "a5edc186fedbf351c2deb5320fa0a681dc97595c",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jbi.2020.103578"
+  },
+  "C190": {
+    "paper_uuid": "3701c195-d451-4ef9-bd13-ce449f9ccaad",
+    "s2_id": "9091ebda1f66e10487ae3240e041984eba42ec75",
+    "arxiv_id": "2102.04643",
+    "doi": null
+  },
+  "C191": {
+    "paper_uuid": "9dba9023-f179-4cd8-bf70-502edd57d5d0",
+    "s2_id": "48a846f6247bc2a2ab1687263a6d96d223304d30",
+    "arxiv_id": "2204.10379",
+    "doi": "10.1038/s41597-022-01321-6"
+  },
+  "C192": {
+    "paper_uuid": "11927149-2a5c-4e7f-a20c-cbec33cac038",
+    "s2_id": "3f0212d72d1f35ef69e18bfaf580fd7456114879",
+    "arxiv_id": null,
+    "doi": "10.2196/48933"
+  },
+  "C193": {
+    "paper_uuid": "81a6a2a3-cf18-4c4f-ac22-459895a81fcc",
+    "s2_id": "31c2bb1b88870258250b539ca028185c922da422",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jclinepi.2021.01.010"
+  },
+  "C194": {
+    "paper_uuid": "6ed94706-6fa4-4464-b46d-494c13e213f2",
+    "s2_id": "ee0aa59389230bf9b49073cbc67e739dc4497ca2",
+    "arxiv_id": null,
+    "doi": "10.1186/s12874-024-02203-8"
+  },
+  "C195": {
+    "paper_uuid": "d00fe18a-582e-47a4-92a7-99ab7e88e9a7",
+    "s2_id": "09e3726dfef85a12d8b41f6feae5896a2fa8bb0c",
+    "arxiv_id": null,
+    "doi": "10.1093/jamia/ocae129"
+  },
+  "C196": {
+    "paper_uuid": "65bf6459-c652-4877-aa53-ad95e9086062",
+    "s2_id": "de28e4cbee455fba136072a0f922c49698b0fb58",
+    "arxiv_id": null,
+    "doi": "10.1038/s41586-025-10072-4"
+  },
+  "C197": {
+    "paper_uuid": "9070684f-0ba9-4c6f-b6d3-2e44297b2aac",
+    "s2_id": "906e5e43abeab404c45b3181914857d677dcc01e",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jbi.2011.11.003"
+  },
+  "C198": {
+    "paper_uuid": "2682f45e-8221-4164-8528-d15dea8fcb45",
+    "s2_id": "095d3c6300dc3e9d6037383aa84741094928f601",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjebm-2023-112597"
+  },
+  "C199": {
+    "paper_uuid": "f32a5f1b-d0fb-4d3c-8bc3-c1d89a9346ba",
+    "s2_id": "121aef49e5fbe8d9dc829adaa472a44aff84f4f5",
+    "arxiv_id": "2402.15043",
+    "doi": "10.48550/arXiv.2402.15043"
+  },
+  "C200": {
+    "paper_uuid": "e19fa95e-1bd0-4323-8c40-47b82c908031",
+    "s2_id": "7c22eca5e00d1ea9523be6151e9d40bb77ddb241",
+    "arxiv_id": "2406.03248",
+    "doi": "10.1145/3640457.3688075"
+  },
+  "C201": {
+    "paper_uuid": "ae556a2f-099c-433e-a5c4-ad16a801d70a",
+    "s2_id": "fbd4a9d9bc136f9f35ca915da75a56d827079855",
+    "arxiv_id": null,
+    "doi": "10.1038/s41467-023-43836-5"
+  },
+  "C202": {
+    "paper_uuid": "ad28fbc4-2a09-447d-a87f-2079fe054bd1",
+    "s2_id": "d8e4a1a3b8e2348d082a86bd71967660e00e136d",
+    "arxiv_id": null,
+    "doi": "10.2196/51187"
+  },
+  "C203": {
+    "paper_uuid": "b0c3fc2b-808b-4eac-8bc2-8d7927c9d871",
+    "s2_id": "f721c54d572f033dd72d6e5e6b1833731738e0a9",
+    "arxiv_id": null,
+    "doi": "10.1038/s41746-024-01038-3"
+  },
+  "C204": {
+    "paper_uuid": "4da6723d-9f99-4616-bbeb-e4bc7d879901",
+    "s2_id": "ed0d0f6a16909543706b8ea66a8fe50bc3416e34",
+    "arxiv_id": "1909.00360",
+    "doi": null
+  },
+  "C205": {
+    "paper_uuid": "24265237-cd41-406b-a5ed-4c3433efc9ec",
+    "s2_id": "7c66c96f443443f13d4c359b5f7759a22a1af804",
+    "arxiv_id": null,
+    "doi": "10.3390/jcm12175550"
+  },
+  "C206": {
+    "paper_uuid": "e6d40177-b439-4766-8b2b-ce403cb021af",
+    "s2_id": "356958e84f11ce0b7822ccaf59abd1bff09c33c8",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jbi.2023.104389"
+  },
+  "C207": {
+    "paper_uuid": "ba961304-7492-41d8-b1a3-5fce5899a0ae",
+    "s2_id": "cc80f9033147b9f008cef40488db74be076103e5",
+    "arxiv_id": null,
+    "doi": "10.18653/v1/2021.acl-long.116"
+  },
+  "C208": {
+    "paper_uuid": "dc936cbf-6c9a-4139-91ca-da7d3d7dc0e9",
+    "s2_id": "ca3d180f2f6da6bdc4b8389e2755ea554826492f",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-021-01763-w"
+  },
+  "C209": {
+    "paper_uuid": "95076ae5-111a-4ac9-b3f8-0d1b06824fa9",
+    "s2_id": "bfed3d4c959b64148811376965db84f77ea8292e",
+    "arxiv_id": "2502.05151",
+    "doi": "10.48550/arXiv.2502.05151"
+  },
+  "C210": {
+    "paper_uuid": "8581aa71-bcbf-4886-9a63-a50c211a0872",
+    "s2_id": "7235c99f9c9bc3e56951a829ef30812ab39492b9",
+    "arxiv_id": "2403.08399",
+    "doi": "10.48550/arXiv.2403.08399"
+  },
+  "C211": {
+    "paper_uuid": "58a8b3a3-bf0c-4622-9508-537d122f8cbd",
+    "s2_id": "d7d482a16e7ae29bf5131d2a24d285a84ffa659a",
+    "arxiv_id": null,
+    "doi": "10.2196/33219"
+  },
+  "C212": {
+    "paper_uuid": "a846f60f-3ce3-4dd3-8c0f-856c30b47d95",
+    "s2_id": "d3cdce6abfc0f3b2bad5e35ea19c164cdcca3fcc",
+    "arxiv_id": null,
+    "doi": "10.1093/asj/sjad093"
+  },
+  "C213": {
+    "paper_uuid": "3ff4c156-c7df-4175-ac0c-c8f3c14282c7",
+    "s2_id": "3c9c713d5623cc6135e493494e91251a2ac53222",
+    "arxiv_id": "2207.06875",
+    "doi": "10.48550/arXiv.2207.06875"
+  },
+  "C214": {
+    "paper_uuid": "1e17e0b6-6362-4a5e-b3c7-f4ef33927166",
+    "s2_id": "d894642d6cf1538bd9ed30979337302aef16cf24",
+    "arxiv_id": null,
+    "doi": "10.1016/j.crsus.2024.100217"
+  },
+  "C215": {
+    "paper_uuid": "b328f0e8-bfcb-4fec-80b6-a8e00695f211",
+    "s2_id": "d36d97b1b4314c9f755ad27f020af17d8c8cb52b",
+    "arxiv_id": "2404.15667",
+    "doi": "10.1145/3661167.3661172"
+  },
+  "C216": {
+    "paper_uuid": "93257ea8-5bbf-4890-8753-96390f965bc0",
+    "s2_id": "7324beb6219a7cd43be08d497b99f3300218f263",
+    "arxiv_id": null,
+    "doi": "10.1016/j.crsus.2024.100132"
+  },
+  "C217": {
+    "paper_uuid": "f9150d1e-4a78-4e69-b812-0d9130b90444",
+    "s2_id": "f5117380d098f9b12d99c918646e1fe793a8b4dc",
+    "arxiv_id": null,
+    "doi": "10.1080/14737167.2023.2234639"
+  },
+  "C218": {
+    "paper_uuid": "1d54e8ca-a8e2-4e8f-8db5-9d8ef5499aac",
+    "s2_id": "58ecf86b7d94f394fb0a34449386595635f75769",
+    "arxiv_id": "2205.13339",
+    "doi": "10.1145/3477495.3532065"
+  },
+  "C219": {
+    "paper_uuid": "fcf58408-9e95-4979-96a0-4598546dc81c",
+    "s2_id": "9b9b292bd7814fb9c62b8609e8c28c8693a078f5",
+    "arxiv_id": "2209.13331",
+    "doi": "10.48550/arXiv.2209.13331"
+  },
+  "C220": {
+    "paper_uuid": "265c0285-7b32-443d-9960-c9bdfccedc1d",
+    "s2_id": "828dbdab5791d8539a7f90063d168b9258083326",
+    "arxiv_id": null,
+    "doi": "10.18653/v1/2023.bionlp-1.37"
+  },
+  "C221": {
+    "paper_uuid": "5723080b-3a41-4727-926f-94f3d3b4f5e6",
+    "s2_id": "d27a433eba6a71ac74bcf42809be1648b2d82584",
+    "arxiv_id": null,
+    "doi": "10.1007/978-3-319-76941-7_61"
+  },
+  "C222": {
+    "paper_uuid": "485eb7b3-067b-48d5-8cd9-16881c75638f",
+    "s2_id": "ddaac3c134274b3f40f8bcbad705d80b00af3198",
+    "arxiv_id": null,
+    "doi": "10.1038/s41586-026-10652-y"
+  },
+  "C223": {
+    "paper_uuid": "f5e5308c-6136-42d6-a90f-c61c60b10530",
+    "s2_id": "77f0eb897683c963f989417e7de5e221b34f8639",
+    "arxiv_id": null,
+    "doi": "10.1101/2024.04.21.24306137"
+  },
+  "C224": {
+    "paper_uuid": "9f10f1b8-df55-4a4c-9e24-5c92ecf4d4e9",
+    "s2_id": "4be46ae53206440cfa6cab48f7523df5a701a65f",
+    "arxiv_id": "2401.06320",
+    "doi": "10.1007/978-3-031-56027-9_25"
+  },
+  "C225": {
+    "paper_uuid": "794f803f-c160-475c-bcf7-139a07762a1b",
+    "s2_id": "3059c1f43014fc34c67dbb77d5fa63ac9c3b9706",
+    "arxiv_id": null,
+    "doi": "10.3390/heritage6050214"
+  },
+  "C226": {
+    "paper_uuid": "16c376e7-85ba-415e-95df-3fcaf55bb7aa",
+    "s2_id": "25c56d158a06683002708fb7df67c748c4ebdd24",
+    "arxiv_id": null,
+    "doi": "10.1145/3674805.3686666"
+  },
+  "C227": {
+    "paper_uuid": "7b9ada45-b5b6-4c69-b106-47e623b44e6f",
+    "s2_id": "5cf96d5caa3b08a91a8de00aff3bb45e85dcd0a5",
+    "arxiv_id": "2503.05659",
+    "doi": "10.48550/arXiv.2503.05659"
+  },
+  "C228": {
+    "paper_uuid": "3f12f4fa-afb9-463c-9265-e3138b77f42a",
+    "s2_id": "f778285e080993bc08c3d4ffe8ba16b21a6e2768",
+    "arxiv_id": null,
+    "doi": "10.3389/frma.2023.1178181"
+  },
+  "C229": {
+    "paper_uuid": "725bd593-e5f0-452c-9a89-8422011dcd64",
+    "s2_id": "5215a3cfd67fdc6eb0201822dd0004bd4b830f91",
+    "arxiv_id": "2401.11504",
+    "doi": "10.48550/arXiv.2401.11504"
+  },
+  "C230": {
+    "paper_uuid": "e816ed7e-c584-44d3-8809-c620fb154d8c",
+    "s2_id": "f48752134f8534f6c97ffffed53b15a6b530de31",
+    "arxiv_id": "2109.08098",
+    "doi": null
+  },
+  "C231": {
+    "paper_uuid": "e33751b9-7b20-49a1-8157-83e081634320",
+    "s2_id": "50785c7baa3a895b9683675ae1c31f7e5f9e3bcb",
+    "arxiv_id": "2405.14445",
+    "doi": "10.48550/arXiv.2405.14445"
+  },
+  "C232": {
+    "paper_uuid": "1b2b1017-6383-4f3b-af07-7e08b4d97e64",
+    "s2_id": "9a19aeaa8f789fe27303ddf2ef483f1899d60c0e",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C233": {
+    "paper_uuid": "46247a42-bb64-486f-ac64-4ad9d577351b",
+    "s2_id": "d692cc6f1a755d91a986f3e26f0691c0bab3e85c",
+    "arxiv_id": null,
+    "doi": "10.1002/cl2.1129"
+  },
+  "C234": {
+    "paper_uuid": "1672a9a1-0aad-4ea3-906c-39a78610e2a0",
+    "s2_id": "4155072db4186e6f5d171507f3a1225c76188949",
+    "arxiv_id": "2502.16069",
+    "doi": "10.48550/arXiv.2502.16069"
+  },
+  "C235": {
+    "paper_uuid": "ef9b875f-7998-49b2-bca3-311c4bf38613",
+    "s2_id": "cfd5930277f5029e21987b6b3a1261c8d04c5127",
+    "arxiv_id": null,
+    "doi": "10.1136/bmj-2024-080636"
+  },
+  "C236": {
+    "paper_uuid": "8637dac3-38c2-433f-9c10-1c18a65ed616",
+    "s2_id": "a051bbb9f1634127952a19b69deae786fd818442",
+    "arxiv_id": null,
+    "doi": "10.1177/10556656231223596"
+  },
+  "C237": {
+    "paper_uuid": "3769eba8-5d7c-4621-8cb2-b474fc3c1777",
+    "s2_id": "d13b8ea6f8b02ddd9021e3b6c1afc8ab0c28fc16",
+    "arxiv_id": null,
+    "doi": "10.3390/jpm13101457"
+  },
+  "C238": {
+    "paper_uuid": "63390b75-1958-4f30-8770-327905734644",
+    "s2_id": "784335a19e41dc0cedc5e030cba85b74ba142eff",
+    "arxiv_id": "2305.11828",
+    "doi": "10.48550/arXiv.2305.11828"
+  },
+  "C239": {
+    "paper_uuid": "8ad954f7-f5d7-4b58-9d2c-6bd9fe4c8f08",
+    "s2_id": "13e68297dac3796bc41f39853f6a287a2471425b",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-024-02592-3"
+  },
+  "C240": {
+    "paper_uuid": "ada2bc52-4fa5-44b5-a20f-a08682949fa4",
+    "s2_id": "84936dce62821312ad134f63dde470be556e762b",
+    "arxiv_id": null,
+    "doi": "10.1109/WEEF-GEDC59520.2023.10344098"
+  },
+  "C241": {
+    "paper_uuid": "8dfbfb21-796d-4eda-81b0-4d42e629b960",
+    "s2_id": "4c652efea036960b1ef47a245a08ec97e3ef3abb",
+    "arxiv_id": "2307.06464",
+    "doi": "10.48550/arXiv.2307.06464"
+  },
+  "C242": {
+    "paper_uuid": "d287e3a6-0fcd-4ae3-91fd-c21a1fe69ee7",
+    "s2_id": "0b98bbf70e13375a51ce75077d3e64805f978a15",
+    "arxiv_id": null,
+    "doi": "10.3390/biomedicines11061623"
+  },
+  "C243": {
+    "paper_uuid": "b0223f3a-4865-4d41-b7b8-7780b39e766f",
+    "s2_id": "7a606e80f77e8956db883f59e1a3a893641a106b",
+    "arxiv_id": null,
+    "doi": "10.1027/2151-2604/a000509"
+  },
+  "C244": {
+    "paper_uuid": "215cbd36-c820-4a74-9df7-2c8852a17cfb",
+    "s2_id": "6ea845013122095653c37667efc9d1bd0ec8b2cf",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjgh-2022-010850"
+  },
+  "C245": {
+    "paper_uuid": "3f6f15b5-4658-4c92-b096-eabaeae1a686",
+    "s2_id": "05dc55f5b9930535c584f8076fcf145e9074468d",
+    "arxiv_id": "2105.01044",
+    "doi": "10.1007/978-3-030-99736-6_34"
+  },
+  "C246": {
+    "paper_uuid": "a986eb7c-93a8-406a-b8ed-0eda8acb1eca",
+    "s2_id": "5e49bf591ac886b3dde362e68c78f4ce7974a389",
+    "arxiv_id": null,
+    "doi": "10.7326/ANNALS-24-02189"
+  },
+  "C247": {
+    "paper_uuid": "9748bc29-c11f-4282-b9f5-997048b23e66",
+    "s2_id": "6a4e6f2b14f69fd0cf68487ebab1b33b1105579d",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjhci-2023-100830"
+  },
+  "C248": {
+    "paper_uuid": "220ed58b-2034-410f-a56f-4d0537e86fe6",
+    "s2_id": "8816f3e61fc0e1e467da7922503750ecfb420283",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-022-02074-4"
+  },
+  "C249": {
+    "paper_uuid": "b77ac6b7-f5ba-4deb-8baf-0986a8dea512",
+    "s2_id": "bdaa666ab69f3b19a70a76271884e6efa615b6fe",
+    "arxiv_id": null,
+    "doi": "10.1002/jrsm.1533"
+  },
+  "C250": {
+    "paper_uuid": "b5d9ff65-42be-4353-8b5b-ffe52ce33d36",
+    "s2_id": "77d42c4dc1eb48c1c17e71acea0f7f870eba1594",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C251": {
+    "paper_uuid": "94eb7b50-da7d-4136-b744-625de95abffd",
+    "s2_id": "77717b68d005cf2855f20e139edeb70ef6d5c297",
+    "arxiv_id": null,
+    "doi": "10.1097/j.pain.0000000000003195"
+  },
+  "C252": {
+    "paper_uuid": "df3ecade-f7fe-4978-92d2-0f08574e0d79",
+    "s2_id": "326c7a134d93e5314af0ddfd4b927c5a4582ad70",
+    "arxiv_id": null,
+    "doi": "10.1038/s44168-024-00153-x"
+  },
+  "C253": {
+    "paper_uuid": "f866bde1-4c95-48aa-a02a-ae1f2f679791",
+    "s2_id": "3a559e36d340c740bf28a84d0b99d537be4f24e0",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-024-02523-2"
+  },
+  "C254": {
+    "paper_uuid": "873983d2-ff53-4532-8840-dd26dba13aee",
+    "s2_id": "3949e193d1900e353fcb188c603c4ab8de1e133e",
+    "arxiv_id": null,
+    "doi": "10.3390/fi16050167"
+  },
+  "C255": {
+    "paper_uuid": "e448a9bb-eac3-4f99-a2ec-66eaac4a5290",
+    "s2_id": "15f82070ca31a13a8013367da4272a81ddd9abca",
+    "arxiv_id": null,
+    "doi": "10.1093/ejo/cjae011"
+  },
+  "C256": {
+    "paper_uuid": "1979ef9a-fe4d-422c-88c6-79979ee2d52d",
+    "s2_id": "967dbdfecb348a7bce2dd58cbdd7ae245f796618",
+    "arxiv_id": "2212.09017",
+    "doi": "10.1145/3572960.3572980"
+  },
+  "C257": {
+    "paper_uuid": "a3dc84e7-7af2-4e33-ba54-cab145733a2e",
+    "s2_id": "526c677f5857779359cd129eabcb50bd64d89426",
+    "arxiv_id": null,
+    "doi": "10.3389/fvets.2021.727495"
+  },
+  "C258": {
+    "paper_uuid": "16faee68-a257-4cde-ac76-eb2d657562ae",
+    "s2_id": "66b78551b88f712069a4f38df15cbb7d3edb145f",
+    "arxiv_id": "2106.09866",
+    "doi": "10.1145/3469096.3469872"
+  },
+  "C259": {
+    "paper_uuid": "a84a8428-1595-45b9-89a1-a725b56b8330",
+    "s2_id": "045bd0f190d5b180d939a861afffb8b28e4a824a",
+    "arxiv_id": null,
+    "doi": "10.1016/j.neucom.2025.131928"
+  },
+  "C260": {
+    "paper_uuid": "ee381452-49a4-449a-ae4a-81d8961b1a5f",
+    "s2_id": "b00fafe7afdde9f8e015b1e1a7fb5204d02786fa",
+    "arxiv_id": "2305.15186",
+    "doi": "10.48550/arXiv.2305.15186"
+  },
+  "C261": {
+    "paper_uuid": "9ec2e9d1-0479-41b1-9f24-ef9301c9ea91",
+    "s2_id": "e3dc1482a86846de220de4a18d089ae8067b7231",
+    "arxiv_id": null,
+    "doi": "10.7326/M23-3389"
+  },
+  "C262": {
+    "paper_uuid": "10aeb24c-2106-4151-8dd3-b3ec8d7ebba1",
+    "s2_id": "b2372dc97ccb239a9655062365f58a1c1dbc9ddb",
+    "arxiv_id": null,
+    "doi": "10.1038/s43247-024-01365-z"
+  },
+  "C263": {
+    "paper_uuid": "ada8d3c2-76a9-4b41-85c4-42efde8e2943",
+    "s2_id": "dffea818a1ae499559cad8df4cd027fd50c5c338",
+    "arxiv_id": "2502.14776",
+    "doi": "10.48550/arXiv.2502.14776"
+  },
+  "C264": {
+    "paper_uuid": "f98c6abb-7a11-4503-a923-96f979f43567",
+    "s2_id": "af94a56b7fd76433188860f22da911cdf6b03140",
+    "arxiv_id": null,
+    "doi": "10.1186/s12874-024-02253-y"
+  },
+  "C265": {
+    "paper_uuid": "a208dbd4-52f3-4a58-8265-9c2e91ef93ff",
+    "s2_id": "b52e681c39d31e6abf58ad1f5d9709e2dce12e1f",
+    "arxiv_id": null,
+    "doi": "10.1186/s12911-022-01897-4"
+  },
+  "C266": {
+    "paper_uuid": "ae0d0788-9fce-414e-9601-7b709746cd7c",
+    "s2_id": "4bc8b79599023cc99451b8f1eb89274f4f3a24bc",
+    "arxiv_id": "2106.09871",
+    "doi": "10.1145/3469096.3469873"
+  },
+  "C267": {
+    "paper_uuid": "b7a17d45-f990-4f4d-bca5-c10ac783b684",
+    "s2_id": "8a482ce06d01ae5462f4bc801290eb938c5f4c4c",
+    "arxiv_id": null,
+    "doi": "10.1109/ACCESS.2019.2959056"
+  },
+  "C268": {
+    "paper_uuid": "7b7516a1-3c67-4987-9bb9-de227182c549",
+    "s2_id": "23dfbea73fa633923857879836459a7d892436bf",
+    "arxiv_id": null,
+    "doi": "10.1016/j.tsc.2025.102001"
+  },
+  "C269": {
+    "paper_uuid": "c3422b6c-b2b9-40eb-b5b4-a4878f704592",
+    "s2_id": "3f392287fc443e855865c9e1a595812fa9ac9bf9",
+    "arxiv_id": "2409.09704",
+    "doi": "10.1016/j.ymeth.2024.04.005"
+  },
+  "C270": {
+    "paper_uuid": "9177da43-961c-471b-b287-64fa25e20711",
+    "s2_id": "d4b036ef51f3e0a5182a5e7917dc26f0421c5b62",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjebm-2023-112389"
+  },
+  "C271": {
+    "paper_uuid": "515155ba-35da-43b3-b372-383d2473168f",
+    "s2_id": "ca89781d7915eac3089a7b47a065943ce722109f",
+    "arxiv_id": null,
+    "doi": "10.18653/V1/2020.COLING-MAIN.207"
+  },
+  "C272": {
+    "paper_uuid": "e963b227-7be3-4e54-a194-f4be91b7e265",
+    "s2_id": "100d94272dc2f85f68d574a4f7083054d030e7ee",
+    "arxiv_id": null,
+    "doi": "10.1007/s12209-024-00413-1"
+  },
+  "C273": {
+    "paper_uuid": "8cdf7920-df25-4bbb-9444-069d2e84293a",
+    "s2_id": "7491558e070e25568d28872e1feb4c066dbaa4d2",
+    "arxiv_id": null,
+    "doi": "10.1101/2024.03.20.24304572"
+  },
+  "C274": {
+    "paper_uuid": "e4bf3b57-8332-480a-9cdc-88728b12d25f",
+    "s2_id": "fc92e0080d2e50ae8aef8a4df54e023936962866",
+    "arxiv_id": null,
+    "doi": "10.3390/jcm12165410"
+  },
+  "C275": {
+    "paper_uuid": "af7b1dad-0471-4641-a80d-72530c13ee0a",
+    "s2_id": "d38d5de70f106f1e0efac59aad2201f7c7a28569",
+    "arxiv_id": null,
+    "doi": "10.1007/978-3-030-85292-4_32"
+  },
+  "C276": {
+    "paper_uuid": "220ea6aa-91f8-4947-bb52-56b0f948a88b",
+    "s2_id": "a958cc685f85257f4ede17c78af16dc6ef93c37f",
+    "arxiv_id": null,
+    "doi": "10.1016/j.surge.2023.12.005"
+  },
+  "C277": {
+    "paper_uuid": "53495f75-139e-4f0a-ba2d-bff84432d541",
+    "s2_id": "6d62b146ef86dbcd5d4abb4e35cd6537d6514bf9",
+    "arxiv_id": null,
+    "doi": "10.7759/cureus.40765"
+  },
+  "C278": {
+    "paper_uuid": "7b491dd4-d140-434a-9328-eaee1a2e8506",
+    "s2_id": "37b175da05496974f5cfb4236bcf502f4df24e0a",
+    "arxiv_id": null,
+    "doi": "10.1080/24750158.2022.2087954"
+  },
+  "C279": {
+    "paper_uuid": "ae77da2c-d0d1-4c2b-8547-6d68b356d299",
+    "s2_id": "3bf29a0420b1042f5e0a319c27cb32d46d9cde3e",
+    "arxiv_id": "2412.15249",
+    "doi": null
+  },
+  "C280": {
+    "paper_uuid": "fcbb310f-cc30-4c00-9362-31b7be822743",
+    "s2_id": "cab46b045436965a561e02e9bd94fb59c91766ca",
+    "arxiv_id": null,
+    "doi": "10.1038/s41597-023-02089-z"
+  },
+  "C281": {
+    "paper_uuid": "495a3518-a703-4b16-857e-c638859ce8a2",
+    "s2_id": "a0401aad23c662ab53cd98dc612c6f9820bf9768",
+    "arxiv_id": null,
+    "doi": "10.1007/s13272-025-00818-1"
+  },
+  "C282": {
+    "paper_uuid": "da10c4bc-53f0-4943-8f17-504c01778e80",
+    "s2_id": "40af78e2a0de990ae845f52d88d446ddd1bacbb3",
+    "arxiv_id": null,
+    "doi": "10.1186/s12966-024-01576-9"
+  },
+  "C283": {
+    "paper_uuid": "6c5a3e7f-8427-4451-972e-88e8044db548",
+    "s2_id": "70f28d4da3b2dd0c05efc0aa10991247d990cde0",
+    "arxiv_id": "2211.15397",
+    "doi": "10.48550/arXiv.2211.15397"
+  },
+  "C284": {
+    "paper_uuid": "43c56ccc-90ef-411e-90ee-75960288a20b",
+    "s2_id": "740dfd83faebe727189e03e462d6bdbcf360f095",
+    "arxiv_id": "2108.12746",
+    "doi": "10.1145/3459637.3482415"
+  },
+  "C285": {
+    "paper_uuid": "3cddef8b-e0ac-4ed2-bedd-11919cf5227e",
+    "s2_id": "38670e3bb74a64280ecea5875454c2d57138df80",
+    "arxiv_id": null,
+    "doi": "10.1002/jrsm.1762"
+  },
+  "C286": {
+    "paper_uuid": "df90270c-2ecf-49b1-9bee-fa5ca8496cb3",
+    "s2_id": "40084fcafd6f55ab1295c604c860b6b4f65307f0",
+    "arxiv_id": null,
+    "doi": "10.1080/10447318.2024.2352919"
+  },
+  "C287": {
+    "paper_uuid": "fbdf7877-dd8c-49f9-95ae-b5d469821079",
+    "s2_id": "d6e01b06ce5acdf5e4f9a07a9444f5048132dad6",
+    "arxiv_id": null,
+    "doi": "10.3145/epi.2023.sep.12"
+  },
+  "C288": {
+    "paper_uuid": "373b5652-7fe6-4ac4-a383-d137ce6c9d57",
+    "s2_id": "09757b29515590ae1def3432b46e7e1614ea1297",
+    "arxiv_id": "2110.03802",
+    "doi": "10.1007/s10994-022-06253-1"
+  },
+  "C289": {
+    "paper_uuid": "5448f286-29b7-4e32-a3c4-9a001e96b840",
+    "s2_id": "8464e285d46e5dd811d648a46eca1c310f9d9b3e",
+    "arxiv_id": null,
+    "doi": "10.1080/00015385.2023.2231299"
+  },
+  "C290": {
+    "paper_uuid": "a6132f40-5f46-4a32-b01d-482b3bb8b94c",
+    "s2_id": "64b5f7da174356869a1ad1fbebbf6e66da228dfe",
+    "arxiv_id": null,
+    "doi": "10.1111/ceo.14268"
+  },
+  "C291": {
+    "paper_uuid": "1112eddc-eb69-4342-9930-8909ede44215",
+    "s2_id": "452880bde921d984425ed0abc7a7766e66175f7b",
+    "arxiv_id": "2406.06357",
+    "doi": "10.48550/arXiv.2406.06357"
+  },
+  "C292": {
+    "paper_uuid": "87a38575-688c-469f-a890-9526c7894ee8",
+    "s2_id": "803e1bd00dcdbd4ede2ebc78ec9a6166e625a0d4",
+    "arxiv_id": null,
+    "doi": "10.1007/s12209-023-00358-x"
+  },
+  "C293": {
+    "paper_uuid": "82fe7cda-eb51-4a88-8b5c-114cacb378bd",
+    "s2_id": "d5bc1ecb54f663d1375f425071274e5331996ff9",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjebm-2024-112990"
+  },
+  "C294": {
+    "paper_uuid": "f6598bb8-1919-471f-b3c3-0af6c4285fab",
+    "s2_id": "8aa3b575f3f04268fe2c7cd113274476cf4e46d6",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jmir.2023.11.005"
+  },
+  "C295": {
+    "paper_uuid": "5c1a6d71-0932-48cb-8131-a4e649f8d8b3",
+    "s2_id": "11a97192e47d9baa69aa15d95347e53b7c110c1d",
+    "arxiv_id": null,
+    "doi": "10.2196/52462"
+  },
+  "C296": {
+    "paper_uuid": "23bc31f2-5c40-4e01-9fcf-d671defcb3c3",
+    "s2_id": "013efb1f025d5617ed81c34b3e5a12e55b53d74a",
+    "arxiv_id": null,
+    "doi": "10.3389/fcvm.2021.671569"
+  },
+  "C297": {
+    "paper_uuid": "8aa525ff-7c4b-487b-bd0b-075141135511",
+    "s2_id": "8fe4e0bd652ffc17f859d3b357e460925de29c2d",
+    "arxiv_id": null,
+    "doi": "10.1007/978-3-031-56069-9_28"
+  },
+  "C298": {
+    "paper_uuid": "96c9b103-b2ab-4c5a-a7bb-f84331c909d7",
+    "s2_id": "c522cc70b0efffc9878fe5e5e2ed589d2dece201",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-024-02666-2"
+  },
+  "C299": {
+    "paper_uuid": "b3e61c68-ce45-4052-892b-8dfefae00b16",
+    "s2_id": "2a504a6aa8c50a545409ec88ef32dfdd8e5870b3",
+    "arxiv_id": "2408.01556",
+    "doi": "10.3847/1538-4365/ad7c43"
+  },
+  "C300": {
+    "paper_uuid": "46185499-0fc7-4ec6-83eb-63d8810ec84a",
+    "s2_id": "d3e635423811d53e85c4c48d15dde277fe093509",
+    "arxiv_id": "2507.13300",
+    "doi": "10.18653/v1/2025.acl-long.611"
+  },
+  "C301": {
+    "paper_uuid": "38b0e6e2-b7f2-426c-843f-7ffd7320bced",
+    "s2_id": "cb587ca21aa3b63d884122634e104c6f77998aa1",
+    "arxiv_id": null,
+    "doi": "10.1080/14703297.2025.2530118"
+  },
+  "C302": {
+    "paper_uuid": "783a1d6a-ad47-4795-a0f1-547d54b5ff55",
+    "s2_id": "711443ea73a8da747b95eecab4a89cc08fda37f0",
+    "arxiv_id": null,
+    "doi": "10.2196/51526"
+  },
+  "C303": {
+    "paper_uuid": "e87275b8-fc05-4ba7-8e9f-ce18c78d2b1d",
+    "s2_id": "32ed28b28aed8051f02fd49185a37e0a6179f36a",
+    "arxiv_id": null,
+    "doi": "10.1101/2023.11.19.23298727"
+  },
+  "C304": {
+    "paper_uuid": "2d551578-1238-4145-9a73-8de8d6828581",
+    "s2_id": "8a2ddca9936ca5958506073037418cacded2b417",
+    "arxiv_id": "2304.03512",
+    "doi": "10.48550/arXiv.2304.03512"
+  },
+  "C305": {
+    "paper_uuid": "3af4af74-1986-413c-8562-fe54187cd6ed",
+    "s2_id": "60eccc1e8649fcc914f3075f68f3f173aabbf17a",
+    "arxiv_id": "2112.05596",
+    "doi": "10.1016/j.artmed.2023.102661"
+  },
+  "C306": {
+    "paper_uuid": "71990a8a-d538-4bf5-9256-e4fe6370847e",
+    "s2_id": "effaf4e5a6f215fefc1e3b1f1a3cc2dcf24029c2",
+    "arxiv_id": "2311.08597",
+    "doi": "10.1145/3631990"
+  },
+  "C307": {
+    "paper_uuid": "4c05c4eb-6459-40fa-bb3f-0f844d1ba5b0",
+    "s2_id": "ac8b7f9a789b9b99e1ad894df0b2ff3de5ebd8c8",
+    "arxiv_id": null,
+    "doi": "10.1016/j.ijmedinf.2024.105500"
+  },
+  "C308": {
+    "paper_uuid": "19393690-f78f-41be-a556-1d02126c6a1b",
+    "s2_id": "5ac2ab34db962032d9d6be4af09d53a1b61caf30",
+    "arxiv_id": null,
+    "doi": "10.1101/2024.02.20.24303083"
+  },
+  "C309": {
+    "paper_uuid": "cfc6ec08-7ebd-4d9c-be3f-7375107bb30c",
+    "s2_id": "e2d0bd5bfd0d1d35484552abf9f7fbcd276c8669",
+    "arxiv_id": null,
+    "doi": "10.1109/AICT59525.2023.10313167"
+  },
+  "C310": {
+    "paper_uuid": "3d4ab588-20d5-47bd-ade4-6a545fb3d89b",
+    "s2_id": "02d7fe5ffc543b8d16e87fdd37bedcd00716117d",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-023-02351-w"
+  },
+  "C311": {
+    "paper_uuid": "b11c3663-9cfd-428a-8b4f-f0f55a752dde",
+    "s2_id": "990cbf040426fa9aed01ea8d37e91b4d8c404404",
+    "arxiv_id": null,
+    "doi": "10.1101/2023.09.06.23295072"
+  },
+  "C312": {
+    "paper_uuid": "df8e7e3c-7401-4cf6-90d8-bb410d7c1d4f",
+    "s2_id": "aa431bbc85acd1d0b4b569d03aad261cd66b6833",
+    "arxiv_id": null,
+    "doi": "10.1111/jep.70100"
+  },
+  "C313": {
+    "paper_uuid": "f2cac431-7aa0-4d4a-910f-d3be2edae58e",
+    "s2_id": "282d699fd251bc52e00b74e97e747a5242870781",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-023-02421-z"
+  },
+  "C314": {
+    "paper_uuid": "55da5c00-fc3c-440e-8c4c-7035c1c5b825",
+    "s2_id": "2e89b29b07725e2f638a623adc1a6bde2051ee88",
+    "arxiv_id": null,
+    "doi": "10.3233/JND-200546"
+  },
+  "C315": {
+    "paper_uuid": "81c292e1-c34c-44fa-aa2d-f4c6a130ba6c",
+    "s2_id": "bdfa20099220821ab66c6ecf2cac237006f5c1df",
+    "arxiv_id": "2210.04183",
+    "doi": "10.1145/3539618.3591721"
+  },
+  "C316": {
+    "paper_uuid": "7b88e7a7-f3b2-4748-b853-38441893854e",
+    "s2_id": "bfc9b71088db439e9c85cf524e4bcd34d179fb53",
+    "arxiv_id": "2505.19240",
+    "doi": "10.1145/3801096"
+  },
+  "C317": {
+    "paper_uuid": "939dc7c6-1af2-425f-9631-b22a75518652",
+    "s2_id": "f8dd1282fc9f5e9a39cbe65583cd719cd35c194a",
+    "arxiv_id": null,
+    "doi": "10.1016/j.bja.2026.01.029"
+  },
+  "C318": {
+    "paper_uuid": "8f364d17-9797-4267-aabe-1d079b73fa4c",
+    "s2_id": "061d3e6f4361ce55f709174aa2e13fe626f6b98a",
+    "arxiv_id": null,
+    "doi": "10.1016/j.patter.2025.101318"
+  },
+  "C319": {
+    "paper_uuid": "720065c2-067c-476b-8a94-afc251063722",
+    "s2_id": "a1024997e1ec0350279625c7185443a1bd3d0c2d",
+    "arxiv_id": null,
+    "doi": "10.1007/s41060-025-00777-0"
+  },
+  "C320": {
+    "paper_uuid": "aa18187a-7e2e-44c3-9482-ff2381801934",
+    "s2_id": "2cce74bbd77fc13640b669b33b1faeb5f147fc80",
+    "arxiv_id": null,
+    "doi": "10.1016/j.actpsy.2023.104095"
+  },
+  "C321": {
+    "paper_uuid": "2f2572f2-89a4-4ebe-afc0-032e744c5e4d",
+    "s2_id": "3eff0e1187dbd60f12dd06c5f3291b1eb6858c1a",
+    "arxiv_id": "2308.06610",
+    "doi": "10.48550/arXiv.2308.06610"
+  },
+  "C322": {
+    "paper_uuid": "bd7fb8e5-e764-4dd7-aef1-dd950fbefc44",
+    "s2_id": "ccd7aac95d01ab9f05ab4e86dda425dcc616717d",
+    "arxiv_id": null,
+    "doi": "10.1016/j.nocx.2022.100103"
+  },
+  "C323": {
+    "paper_uuid": "f820e131-3538-40b5-a5b9-46d246ee803c",
+    "s2_id": "6766a8b2759b8ad5bc4c0d12e15aa2cf54b5eb3b",
+    "arxiv_id": null,
+    "doi": "10.2139/ssrn.4797024"
+  },
+  "C324": {
+    "paper_uuid": "3cc99b0d-61c2-4960-9b08-f7ed2c7d6558",
+    "s2_id": "c9a4745f717f36792b85f7d4571f6e6b5469bfe3",
+    "arxiv_id": null,
+    "doi": "10.1002/jrsm.1541"
+  },
+  "C325": {
+    "paper_uuid": "3ade7df2-a913-495a-bd2d-8ffc8f6cdda4",
+    "s2_id": "40fa6bafaf0ea18ef73e1e05731bdcd3179897f1",
+    "arxiv_id": null,
+    "doi": "10.1109/TLT.2025.3617909"
+  },
+  "C326": {
+    "paper_uuid": "0ab2bcc0-1b15-4079-b487-dc527cc3cc21",
+    "s2_id": "392841b900c523b7f02c5f425c2f81757e3946fa",
+    "arxiv_id": "2503.04827",
+    "doi": "10.18653/v1/2025.lm4uc-1.7"
+  },
+  "C327": {
+    "paper_uuid": "19951fa9-12d0-4e1c-88d8-e5072c12b9a3",
+    "s2_id": "83858f09aab4bebaa9b5011b4663466d248ec792",
+    "arxiv_id": "2407.10652",
+    "doi": "10.2312/eurova.20251105"
+  },
+  "C328": {
+    "paper_uuid": "f485a535-a300-41df-acc1-abe9678ccb28",
+    "s2_id": "36ce12cadada7523bcce7edb4a704eba08baa520",
+    "arxiv_id": null,
+    "doi": "10.1021/acsami.5c08837"
+  },
+  "C329": {
+    "paper_uuid": "1d7c996d-46f9-4eb6-a73a-47f62b12033c",
+    "s2_id": "fb72283fc035e82e89f13897611f0dbd6641a9c8",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjgh-2024-015771"
+  },
+  "C330": {
+    "paper_uuid": "a47cccfa-6e02-4617-b12e-ebb29adce864",
+    "s2_id": "c2596190f1b3d34f23341e28ce2d5b1126d2a3ea",
+    "arxiv_id": null,
+    "doi": "10.12680/balneo.2023.614"
+  },
+  "C331": {
+    "paper_uuid": "3e7fe3ac-ef61-4091-9a50-86106c6ff640",
+    "s2_id": "a7cb000aa86eb035cdb527349885191fe52baf86",
+    "arxiv_id": "2309.05238",
+    "doi": "10.1145/3624918.3625322"
+  },
+  "C332": {
+    "paper_uuid": "9c827f33-1eef-4474-a0c4-9fd150c9820d",
+    "s2_id": "37b115139dbeff3ffbcb9927d5383084443c27e2",
+    "arxiv_id": "2305.03276",
+    "doi": "10.48550/arXiv.2305.03276"
+  },
+  "C333": {
+    "paper_uuid": "dc7f5db8-3718-43aa-b56d-62b04eab8f84",
+    "s2_id": "1493c93ed733df86b06733a968505054303606dd",
+    "arxiv_id": "2507.11810",
+    "doi": null
+  },
+  "C334": {
+    "paper_uuid": "6fdd0bbf-e38d-421d-b917-85628efe394d",
+    "s2_id": "d41e2dd043a7843eb7fced7306cfe3373ef3cff9",
+    "arxiv_id": "2507.23276",
+    "doi": "10.48550/arXiv.2507.23276"
+  },
+  "C335": {
+    "paper_uuid": "3bc5bbd5-534b-49d3-94b1-a278c0c228c5",
+    "s2_id": "9e594516ad8925010a7c4309d1de96b2ffdc5502",
+    "arxiv_id": null,
+    "doi": "10.1038/s41598-021-98782-3"
+  },
+  "C336": {
+    "paper_uuid": "fed43945-d775-427d-bf11-5fbb6f5d5758",
+    "s2_id": "923c05778b1c37738863529c9362d1c1f710e36b",
+    "arxiv_id": null,
+    "doi": "10.36253/form-11343"
+  },
+  "C337": {
+    "paper_uuid": "39f5b6a0-f5de-45f0-a006-8a77c0fa77b0",
+    "s2_id": "3c3d700e775418a27e55187856ccec08531a9e9b",
+    "arxiv_id": null,
+    "doi": "10.3390/bs15050685"
+  },
+  "C338": {
+    "paper_uuid": "9922f062-4789-40d3-9bcc-fbdec5c7f0ab",
+    "s2_id": "7456f5060e257b28833bee212cfb0353b96d2aaa",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-024-02699-7"
+  },
+  "C339": {
+    "paper_uuid": "3df991cc-a4ea-41e7-a6e6-6c7a7531b0f0",
+    "s2_id": "46e17a6b833e9be2913434fc77c5c080012bb2d2",
+    "arxiv_id": null,
+    "doi": "10.1007/s44163-023-00091-3"
+  },
+  "C340": {
+    "paper_uuid": "5db23b4d-6d09-4d92-a4d1-27e4586e286f",
+    "s2_id": "e527591014c834bc36a766d8dd14928820685ddd",
+    "arxiv_id": null,
+    "doi": "10.1007/s00590-021-03059-0"
+  },
+  "C341": {
+    "paper_uuid": "9a5e1f25-f350-488d-98d6-8f9fe085cf51",
+    "s2_id": "e4d213e1fa354c886902061a9f7cc381f95d4542",
+    "arxiv_id": "2404.01176",
+    "doi": "10.1145/3724116"
+  },
+  "C342": {
+    "paper_uuid": "c3220649-037c-4763-b487-5b56c2920a26",
+    "s2_id": "374d1e5fd7385353a4a0add1fadce23667662265",
+    "arxiv_id": "2408.07884",
+    "doi": "10.48550/arXiv.2408.07884"
+  },
+  "C343": {
+    "paper_uuid": "308ad92f-07cb-4fd3-ba2e-617873ed69ce",
+    "s2_id": "65aa3aac8fb3eb93224406d991e2c2e0d6d45011",
+    "arxiv_id": "2508.00033",
+    "doi": "10.3390/fi17090412"
+  },
+  "C344": {
+    "paper_uuid": "d15272f8-b819-447f-a6f8-51c01dcaffd5",
+    "s2_id": "3aef92d1908eae912f8079ace0e5b78b4ddbf237",
+    "arxiv_id": "2407.04503",
+    "doi": null
+  },
+  "C345": {
+    "paper_uuid": "7ba315b6-cd76-4940-95a2-eafe58077366",
+    "s2_id": "860c3bf97d063818cd323f0467b5639fb1242ec6",
+    "arxiv_id": "2010.04147",
+    "doi": "10.1109/ICMLA51294.2020.00058"
+  },
+  "C346": {
+    "paper_uuid": "127a6a03-253e-46c3-a023-569a3cc691f4",
+    "s2_id": "ca3ed5bb2a8dfb0ccbfec9936dceea9f84cbde28",
+    "arxiv_id": null,
+    "doi": "10.1016/j.ebiom.2024.105434"
+  },
+  "C347": {
+    "paper_uuid": "2a0ca088-e9ee-4a85-8a8d-dffafc8a1267",
+    "s2_id": "4050bb719f353b7bbea902d3819115fbeb768325",
+    "arxiv_id": null,
+    "doi": "10.1186/s12911-022-02085-0"
+  },
+  "C348": {
+    "paper_uuid": "7f3910b2-7433-4c66-aa55-9f1be71e245f",
+    "s2_id": "99a051611a8f829b2fefc95c313fdb1a48bf98e3",
+    "arxiv_id": "2501.11840",
+    "doi": "10.48550/arXiv.2501.11840"
+  },
+  "C349": {
+    "paper_uuid": "13a46609-5eb8-4cd1-b432-91175938bedf",
+    "s2_id": "9ee4e183e5d710a561b17ff1c157fbf34c97c1a5",
+    "arxiv_id": "2506.00794",
+    "doi": "10.48550/arXiv.2506.00794"
+  },
+  "C350": {
+    "paper_uuid": "7e96b025-b050-4c33-8cec-a9307a199137",
+    "s2_id": "eafca76f1028487e31f29b13ccee8165dc575472",
+    "arxiv_id": null,
+    "doi": "10.1186/s12992-024-01075-3"
+  },
+  "C351": {
+    "paper_uuid": "59ddda47-a61e-46b9-8688-84554a54df79",
+    "s2_id": "bccf09a5447b37c36c728cefb79dbc220955cc5e",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jbi.2024.104628"
+  },
+  "C352": {
+    "paper_uuid": "6d9da97c-abaa-4825-8313-54974fee338b",
+    "s2_id": "5fa5287de26bc173fbaa9375c9d10fb0a30e8de5",
+    "arxiv_id": null,
+    "doi": "10.1108/md-02-2023-0279"
+  },
+  "C353": {
+    "paper_uuid": "b777fe18-cda3-4dc0-8bdb-65095ae5b1a6",
+    "s2_id": "64d6b43a11d81ed98225679078b556915acf3356",
+    "arxiv_id": null,
+    "doi": "10.2196/48949"
+  },
+  "C354": {
+    "paper_uuid": "a0c062b6-7479-4685-89ef-5c9a66e74de7",
+    "s2_id": "83a5e8d910dde279f30032ccb6b5be10d22f093f",
+    "arxiv_id": null,
+    "doi": "10.1038/s41698-025-01265-1"
+  },
+  "C355": {
+    "paper_uuid": "e3fa60e7-9a87-4ca0-abd7-1df11c55cbda",
+    "s2_id": "4693e318cf7f7546b7d2a826d42465e151dd9633",
+    "arxiv_id": null,
+    "doi": "10.1140/epjds/s13688-025-00555-9"
+  },
+  "C356": {
+    "paper_uuid": "682d7257-2b20-4431-99d8-b7efa87ea3a2",
+    "s2_id": "6c0b812f83809a7ad69baa4e2509150c0c380356",
+    "arxiv_id": "2410.12843",
+    "doi": "10.48550/arXiv.2410.12843"
+  },
+  "C357": {
+    "paper_uuid": "cc66fcdf-2a57-4894-8c10-e2d393bbd26b",
+    "s2_id": "b77f5169b595da0ef2429d7eb9f68021cb14db28",
+    "arxiv_id": "2508.10795",
+    "doi": "10.48550/arXiv.2508.10795"
+  },
+  "C358": {
+    "paper_uuid": "77c477b9-9328-4220-a3cf-3e1c01c81114",
+    "s2_id": "cdb34c0092a767848ca1de6fa7e3a6b822585fa4",
+    "arxiv_id": "2503.01424",
+    "doi": "10.48550/arXiv.2503.01424"
+  },
+  "C359": {
+    "paper_uuid": "285fca42-6573-4967-9855-89438c3cb7f9",
+    "s2_id": "ac0c5b2cfe106b1206cf13d20681751d5d5757ef",
+    "arxiv_id": "2402.11041",
+    "doi": "10.37190/e-inf220103"
+  },
+  "C360": {
+    "paper_uuid": "3e9397ad-3b8a-4910-84b5-2b4c24a36d79",
+    "s2_id": "c1422709b4123c890e759d9f8210084448fdf331",
+    "arxiv_id": null,
+    "doi": "10.1007/s10648-025-10041-3"
+  },
+  "C361": {
+    "paper_uuid": "8e5230c3-04ae-448b-a4ee-28e9c9f0232f",
+    "s2_id": "2f2b3c856ae49bc240d09f1a7c5e0eac74e64bb2",
+    "arxiv_id": null,
+    "doi": "10.1016/j.knosys.2025.113284"
+  },
+  "C362": {
+    "paper_uuid": "edea1cbc-1c50-4648-ac89-55ce96851707",
+    "s2_id": "74446309966769c3c3ad86dc3c87f2198fb6121f",
+    "arxiv_id": "2408.12622",
+    "doi": "10.1016/j.patter.2026.101517"
+  },
+  "C363": {
+    "paper_uuid": "19801592-fca4-4f4c-931a-7350da781c2b",
+    "s2_id": "9bfeb7b29fad08d385f8587edc0610eb0be5a244",
+    "arxiv_id": null,
+    "doi": "10.2196/49411"
+  },
+  "C364": {
+    "paper_uuid": "6a7f5b75-794e-4ae0-afe2-2b180eeefc43",
+    "s2_id": "7473edd6ac0313d1566344f1f7b6fad48401d28e",
+    "arxiv_id": "2312.09948",
+    "doi": "10.48550/arXiv.2312.09948"
+  },
+  "C365": {
+    "paper_uuid": "bd425684-df47-4550-8901-11ecf924a656",
+    "s2_id": "760d6c7dbab3a11f2e5b25c153bc72b31e5bac1b",
+    "arxiv_id": null,
+    "doi": "10.2139/ssrn.4540834"
+  },
+  "C366": {
+    "paper_uuid": "48c13434-6cc3-42ac-959d-11aaab26dffe",
+    "s2_id": "0f1f8c29b277018e7c561f69234810deae3bcc30",
+    "arxiv_id": null,
+    "doi": "10.1177/08944393251404052"
+  },
+  "C367": {
+    "paper_uuid": "0fd7e4d4-8877-4dc0-a409-355b836d5a59",
+    "s2_id": "bd151bedb10cb50ec5bb37e0657407e47b67714b",
+    "arxiv_id": null,
+    "doi": "10.1177/03400352251391753"
+  },
+  "C368": {
+    "paper_uuid": "ea6dc858-9cc9-48a9-8c1b-1642b15705b8",
+    "s2_id": "4bf854d9c610c87206cf400448b275542fcd5ca1",
+    "arxiv_id": "2509.26574",
+    "doi": "10.48550/arXiv.2509.26574"
+  },
+  "C369": {
+    "paper_uuid": "58262909-681b-47ac-abc0-fe04d0e8f6e2",
+    "s2_id": "c97dd05b3d7cc56fd560a493c7607d7df89a4adc",
+    "arxiv_id": "2505.03418",
+    "doi": "10.48550/arXiv.2505.03418"
+  },
+  "C370": {
+    "paper_uuid": "8488779d-c8d6-4859-a1eb-49f6a97bdfae",
+    "s2_id": "4fc026329cf56dbffafc995e00234efa9e8a97d6",
+    "arxiv_id": null,
+    "doi": "10.1002/cesm.70046"
+  },
+  "C371": {
+    "paper_uuid": "b036cda5-3521-41b0-a893-d2805498d8bf",
+    "s2_id": "78b2524d368147e14ac50bf5bb42e5d7e24ec70b",
+    "arxiv_id": null,
+    "doi": "10.1007/s11031-025-10123-3"
+  },
+  "C372": {
+    "paper_uuid": "77e900bb-a019-4ae0-a052-f06665ab24b1",
+    "s2_id": "0a7dcd9e794498377d7e626bff6b4c3c34c51cab",
+    "arxiv_id": null,
+    "doi": "10.1016/j.eclinm.2024.102989"
+  },
+  "C373": {
+    "paper_uuid": "239fc334-44fa-4c81-81e2-263f40e7e4d4",
+    "s2_id": "024c14798ea29116321199619eae657eaea09469",
+    "arxiv_id": "2311.07918",
+    "doi": "10.48550/arXiv.2311.07918"
+  },
+  "C374": {
+    "paper_uuid": "af0cc296-c4e1-4cdc-adc0-0a15553a6922",
+    "s2_id": "adac5790581d785203a8e8a1debf7d4bcd3a9204",
+    "arxiv_id": "2505.20231",
+    "doi": "10.1609/aaai.v40i36.40313"
+  },
+  "C375": {
+    "paper_uuid": "1a65c788-7175-449c-871d-48c2fd0ac272",
+    "s2_id": "1191a81272747b2add72d16c6a1ff00d1d8b8b2f",
+    "arxiv_id": "2504.08762",
+    "doi": "10.48550/arXiv.2504.08762"
+  },
+  "C376": {
+    "paper_uuid": "697104e8-46ef-486b-bf5d-b2761ed4bd7c",
+    "s2_id": "13c1726e4be0b18a79f1629b782fe81946b968b2",
+    "arxiv_id": "2407.13993",
+    "doi": "10.48550/arXiv.2407.13993"
+  },
+  "C377": {
+    "paper_uuid": "60273ec5-11c0-4f9a-8cee-ee31fbaf063d",
+    "s2_id": "0366783680420f68c114d2685392b37ba934cc2a",
+    "arxiv_id": null,
+    "doi": "10.3389/fvets.2024.1494870"
+  },
+  "C378": {
+    "paper_uuid": "93798b0d-a0db-46aa-83a8-35a7b9647763",
+    "s2_id": "381ced0f3f8eaf865084d6ab53db7c4400430540",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-024-02587-0"
+  },
+  "C379": {
+    "paper_uuid": "76cf095b-c73a-4e16-a31b-874bfc5bb634",
+    "s2_id": "62f7ab1858750ef6de4ae6c38bbd8564480de67a",
+    "arxiv_id": null,
+    "doi": "10.3928/01477447-20231220-02"
+  },
+  "C380": {
+    "paper_uuid": "d74ad71f-1422-41d3-9971-eb59660df96d",
+    "s2_id": "643ef7703f8a915e1df41544700e4881c7c86800",
+    "arxiv_id": null,
+    "doi": "10.1115/1.4064245"
+  },
+  "C381": {
+    "paper_uuid": "dbb425ca-c9da-49dd-b5e0-4bd036192d4d",
+    "s2_id": "b80cf0e3387ff9e621f9b1c7455247e65e3ee051",
+    "arxiv_id": null,
+    "doi": "10.1145/3528588.3528658"
+  },
+  "C382": {
+    "paper_uuid": "baea2657-211b-418d-a3dd-8bf17383b59f",
+    "s2_id": "f58b1e9a32611e3c93af2b3b2bb2805471b61114",
+    "arxiv_id": null,
+    "doi": "10.1109/CAMP51653.2021.9498061"
+  },
+  "C383": {
+    "paper_uuid": "dd1182fd-0b29-4b86-a9aa-91c4ddb8b840",
+    "s2_id": "4fa702265f6555d01e6396df18b482d7d6236fc4",
+    "arxiv_id": null,
+    "doi": "10.1097/PCC.0000000000002738"
+  },
+  "C384": {
+    "paper_uuid": "8281ba4d-6de7-4dab-97cd-fdc58790ec60",
+    "s2_id": "5e4c18623be775090f2788df30d9afc5c671dfed",
+    "arxiv_id": null,
+    "doi": "10.2196/22860"
+  },
+  "C385": {
+    "paper_uuid": "1d5d2ced-c8d2-43f7-905b-a53bf5cff93b",
+    "s2_id": "fb32fc5813b70cf4e1a151b1e510837dc932ab90",
+    "arxiv_id": null,
+    "doi": "10.1007/978-3-031-34344-5_21"
+  },
+  "C386": {
+    "paper_uuid": "8a5f913c-1d33-4045-b4d8-cf787999d1ed",
+    "s2_id": "1a652dcdb155653c450fa18fc2c710da65dc6c8e",
+    "arxiv_id": null,
+    "doi": "10.2196/68097"
+  },
+  "C387": {
+    "paper_uuid": "f16945a6-40f6-4887-95d4-88934de4d9f4",
+    "s2_id": "cced0bdb54bbeab2a9dfe2f9af912eb344c9d6a8",
+    "arxiv_id": null,
+    "doi": "10.1007/s10567-025-00519-5"
+  },
+  "C388": {
+    "paper_uuid": "09ec8e20-33a9-4c35-b06b-dbb98402f010",
+    "s2_id": "70896a00039a76f0b2a5096633a8223df85ecd9d",
+    "arxiv_id": "2405.02525",
+    "doi": "10.1145/3626772.3657911"
+  },
+  "C389": {
+    "paper_uuid": "310ec748-0b7c-49d4-916b-d87a2a6fcac7",
+    "s2_id": "078fbba1d917e9bf254f06396f1960987a32eacc",
+    "arxiv_id": "2403.14443",
+    "doi": "10.48550/arXiv.2403.14443"
+  },
+  "C390": {
+    "paper_uuid": "dd008059-6bfb-43db-befb-50c0495ba86a",
+    "s2_id": "1292bc1b43f0937e405d634900fff39872238cf6",
+    "arxiv_id": "2508.17647",
+    "doi": "10.48550/arXiv.2508.17647"
+  },
+  "C391": {
+    "paper_uuid": "2d6377dc-c1cc-4036-8188-cf8de64dfe7a",
+    "s2_id": "0e044b432911de4997e88bf1f271ecba738ee09e",
+    "arxiv_id": null,
+    "doi": "10.48550/arXiv.2404.09077"
+  },
+  "C392": {
+    "paper_uuid": "086ffd42-e5a2-425f-afc3-67020eecfe7d",
+    "s2_id": "2da1a96f4d8c6780d0ee59b7ac36ef9b28898bd7",
+    "arxiv_id": null,
+    "doi": "10.1177/10497315241243310"
+  },
+  "C393": {
+    "paper_uuid": "b099937a-4938-4fa5-8da9-3cefd09e0072",
+    "s2_id": "e6c30459128f4421f97d44224f0e3b3fbcddec43",
+    "arxiv_id": null,
+    "doi": "10.1101/2024.04.08.588614"
+  },
+  "C394": {
+    "paper_uuid": "73bf6ef7-2eea-40a7-80b1-e8c7561d8c75",
+    "s2_id": "3f427ae9d7d3ee821edb53597d9f6119ef43b994",
+    "arxiv_id": null,
+    "doi": "10.6087/kcse.332"
+  },
+  "C395": {
+    "paper_uuid": "d44c7591-6dc0-43f9-91d4-b12e3ef32da1",
+    "s2_id": "abb1b90217082d15c0d0afa9bf1689acb04549e2",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C396": {
+    "paper_uuid": "c47dad0a-5046-468f-a847-b7078dd930ed",
+    "s2_id": "899539650b823935247d74c7fdd62e98866df2b0",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C397": {
+    "paper_uuid": "549e4392-9cba-423b-a987-7f500a256bfe",
+    "s2_id": "0add0f64831d8927f67ab0783341604fa14af9e4",
+    "arxiv_id": null,
+    "doi": "10.3390/diagnostics15121451"
+  },
+  "C398": {
+    "paper_uuid": "de1f2052-9ccc-43c5-b0fb-27757e93ba76",
+    "s2_id": "9e7ea9ad26986a8a6007853e7388216f780042e4",
+    "arxiv_id": null,
+    "doi": "10.1109/WSESE66602.2025.00010"
+  },
+  "C399": {
+    "paper_uuid": "2a4c5781-0154-4b9e-bb59-0d2fae71520e",
+    "s2_id": "3894107c79e4e585daec95a3eec506b51f8b6547",
+    "arxiv_id": "2507.19027",
+    "doi": "10.1109/ESEM64174.2025.00053"
+  },
+  "C400": {
+    "paper_uuid": "1ce01862-0571-487b-bf58-777a3c986706",
+    "s2_id": "91fe6c69aec81890745aea9e93c340dea9615989",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jbi.2025.104860"
+  },
+  "C401": {
+    "paper_uuid": "82190ef6-2a8c-45b0-af99-72db69f43a49",
+    "s2_id": "b0096042e61569321302b723ba47618c6647545b",
+    "arxiv_id": "2411.19169",
+    "doi": "10.1145/3710904"
+  },
+  "C402": {
+    "paper_uuid": "006fad7d-5a95-4c9e-bdbb-e863dbf9afc1",
+    "s2_id": "ea55496df8421f7d38b59b61c9eb8dc661fcf321",
+    "arxiv_id": "2510.23045",
+    "doi": "10.48550/arXiv.2510.23045"
+  },
+  "C403": {
+    "paper_uuid": "a54738f7-6a42-4a31-9223-ccf35173cfb4",
+    "s2_id": "59087a91539883877289ceb562272f1cc13e9545",
+    "arxiv_id": null,
+    "doi": "10.3389/fninf.2025.1609077"
+  },
+  "C404": {
+    "paper_uuid": "23dd19b8-0324-4880-bf83-75a545c0501d",
+    "s2_id": "808d90bb7b35d13ea45b3d07162781279e557d83",
+    "arxiv_id": null,
+    "doi": "10.1016/j.scitotenv.2025.179963"
+  },
+  "C405": {
+    "paper_uuid": "e18f6e6e-35de-4ad4-8975-c594a8151c89",
+    "s2_id": "c49246372bae0297be10f4f1cdf5cb9518a4387e",
+    "arxiv_id": null,
+    "doi": "10.2196/65297"
+  },
+  "C406": {
+    "paper_uuid": "d2bef797-e8a2-4625-901c-8e6dba72fa63",
+    "s2_id": "b1c91b1c61be5dc4814215aa6eba76a3d25daf96",
+    "arxiv_id": null,
+    "doi": "10.3758/s13428-025-02685-4"
+  },
+  "C407": {
+    "paper_uuid": "ba94d2ad-23fc-456d-a6f5-903cc2b13de3",
+    "s2_id": "69fe27a8335bc30697bb4c083dee45cb3a1d8985",
+    "arxiv_id": null,
+    "doi": "10.1007/s40273-025-01481-4"
+  },
+  "C408": {
+    "paper_uuid": "a589cc08-fe30-4531-85b5-2bea85078d90",
+    "s2_id": "eb60e9919645e32bcd9b70ac611c0d81743ccfda",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C409": {
+    "paper_uuid": "33ad9ac4-1cf8-4052-8d25-918ae0a5412e",
+    "s2_id": "6d433c81c1f2927a783a643a0be356b466c59b8f",
+    "arxiv_id": "2404.13078",
+    "doi": "10.48550/arXiv.2404.13078"
+  },
+  "C410": {
+    "paper_uuid": "805775d0-27a5-44e3-9e18-65873ae26b06",
+    "s2_id": "e922a498fd17ad2aac47b35b842c37820a3c2410",
+    "arxiv_id": "2401.08104",
+    "doi": "10.1007/978-3-031-56066-8_13"
+  },
+  "C411": {
+    "paper_uuid": "2d1b1854-01e0-465c-a88b-f1d26f980dd5",
+    "s2_id": "b1678837218f5f14a4b02299a17873f73ee3dce7",
+    "arxiv_id": null,
+    "doi": "10.1109/CCWC60891.2024.10427829"
+  },
+  "C412": {
+    "paper_uuid": "a9f12071-d853-4f6a-bd01-6ddc185b8bdb",
+    "s2_id": "767c6a8a9e9f24f259cf51dfde4e1d125d735b0b",
+    "arxiv_id": "2310.04074",
+    "doi": "10.48550/arXiv.2310.04074"
+  },
+  "C413": {
+    "paper_uuid": "648d86c7-ef7f-48b9-b1c8-360aed7cf9d6",
+    "s2_id": "68125f7f946f98d179cfef7adace9e233d8d5f4a",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-023-02353-8"
+  },
+  "C414": {
+    "paper_uuid": "f6d25f6a-b7bb-4474-aabc-a701022e9856",
+    "s2_id": "6b6c01a8e0b3813b619b855f701c503a3c5d57d6",
+    "arxiv_id": null,
+    "doi": "10.1109/REW57809.2023.00071"
+  },
+  "C415": {
+    "paper_uuid": "68463132-ce06-41cf-baba-e06fcf88c630",
+    "s2_id": "35663529dbb67f43e32c247947a161ebadd83a96",
+    "arxiv_id": "2510.11409",
+    "doi": "10.1016/j.cag.2026.104537"
+  },
+  "C416": {
+    "paper_uuid": "f029f0da-8994-4f81-a48b-4a0b150e27b1",
+    "s2_id": "c841bca27810791d4da4a7c5a1ee53d48575b8d2",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-024-02472-w"
+  },
+  "C417": {
+    "paper_uuid": "f05e4c16-c202-4e2d-993f-5f61c436d3e0",
+    "s2_id": "228bd3504bccb609bce363992ea50184e0d2bcae",
+    "arxiv_id": null,
+    "doi": "10.2196/56418"
+  },
+  "C418": {
+    "paper_uuid": "f000ae86-19bd-480f-aa54-c22404600bc8",
+    "s2_id": "65cb41aaa20e5b3859ae0dd0e8fe998174c49a63",
+    "arxiv_id": null,
+    "doi": "10.1007/s10618-023-00961-5"
+  },
+  "C419": {
+    "paper_uuid": "b3d979be-1837-4287-801d-23fe42636e5a",
+    "s2_id": "7b030e59067f2e017b3720eb08b7a00f751591e4",
+    "arxiv_id": "2403.02752",
+    "doi": "10.1109/TVCG.2024.3459961"
+  },
+  "C420": {
+    "paper_uuid": "b83c575a-5f54-4149-a509-77f2987e8b27",
+    "s2_id": "bdfb6a8add335f5e29d4391f62e433e2cf989f83",
+    "arxiv_id": "2410.12130",
+    "doi": "10.48550/arXiv.2410.12130"
+  },
+  "C421": {
+    "paper_uuid": "8b8042e7-0bf1-4f2c-a869-1b19f0cb3f32",
+    "s2_id": "13e079da1dba19509dfd1fd05440b1a52666603a",
+    "arxiv_id": null,
+    "doi": "10.1186/s12859-025-06159-4"
+  },
+  "C422": {
+    "paper_uuid": "4ae29e86-2b79-4818-a933-fde51fb2da09",
+    "s2_id": "6efc7de886a6391997ac5d145c149d5d1f6c4395",
+    "arxiv_id": null,
+    "doi": "10.1002/ksa.70145"
+  },
+  "C423": {
+    "paper_uuid": "681e3e02-29cf-4ff8-b040-fc96fde22bb9",
+    "s2_id": "e6746ae7ec75f81ab143a232499719a7f3394dcb",
+    "arxiv_id": null,
+    "doi": "10.59717/j.xinn-inform.2025.100013"
+  },
+  "C424": {
+    "paper_uuid": "79086670-1cbe-4297-b6d4-b325a3619bcf",
+    "s2_id": "e28730411cb516b9915140ab780f9155b42a21f2",
+    "arxiv_id": null,
+    "doi": "10.1017/rsm.2024.16"
+  },
+  "C425": {
+    "paper_uuid": "fb028249-9841-446a-9577-aebc6929de8d",
+    "s2_id": "e16ba49a2988e11139eb6827d8e66c1707e1b96f",
+    "arxiv_id": "2403.18173",
+    "doi": "10.48550/arXiv.2403.18173"
+  },
+  "C426": {
+    "paper_uuid": "ec2d131d-ebb2-44b8-88e3-063b4bda0d08",
+    "s2_id": "adb1b9d0ded8b43384b1d8ac8fa3b6ff53ea7422",
+    "arxiv_id": null,
+    "doi": "10.1097/SPV.0000000000001505"
+  },
+  "C427": {
+    "paper_uuid": "0485001e-027f-4f0b-9474-4a6ca2999201",
+    "s2_id": "6384921f1bd1059c6b4c37ac3c4e4f19e45d40c1",
+    "arxiv_id": null,
+    "doi": "10.1101/2023.10.31.23297818"
+  },
+  "C428": {
+    "paper_uuid": "44058626-4a4a-4a7e-90f6-a6efb3e1baaf",
+    "s2_id": "f11d58e16c3eee7d85ccf5ae99b774894341aaa0",
+    "arxiv_id": null,
+    "doi": "10.1145/3539618.3591764"
+  },
+  "C429": {
+    "paper_uuid": "1e14129f-b01c-4433-9601-0bc3fb0db47b",
+    "s2_id": "82c72f1642aaccfa117cf72457a07eecd47ab4b0",
+    "arxiv_id": null,
+    "doi": "10.3233/SHTI230347"
+  },
+  "C430": {
+    "paper_uuid": "031519be-7c21-4eee-90b3-a074c170344e",
+    "s2_id": "963199ba67461b86a1762b403ea66d6b8a5c195a",
+    "arxiv_id": null,
+    "doi": "10.1038/s44284-025-00328-5"
+  },
+  "C431": {
+    "paper_uuid": "914bdb1d-78d8-48ad-86bd-a31068cee736",
+    "s2_id": "0d4e0cf65edff8404e4b8a149f8b909c33753b5a",
+    "arxiv_id": null,
+    "doi": "10.1177/19375867251351027"
+  },
+  "C432": {
+    "paper_uuid": "c9976ea8-b3b2-4f12-a74c-e094bd464321",
+    "s2_id": "197b66afe7c30da389c185d70827528933955c28",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jfp.2025.100488"
+  },
+  "C433": {
+    "paper_uuid": "8bdca46b-7dd4-40c1-b5d2-86c2a1a81c6d",
+    "s2_id": "b788de0d6bd8e4bb2bc690f2c197d3a5daba0413",
+    "arxiv_id": "2503.16515",
+    "doi": "10.1007/978-981-96-0348-0_3"
+  },
+  "C434": {
+    "paper_uuid": "c793d87e-f998-4a64-8884-7c09335ff0a6",
+    "s2_id": "540260940e8750e7943e6832e501d3971fa8e5d2",
+    "arxiv_id": "2510.05138",
+    "doi": "10.48550/arXiv.2510.05138"
+  },
+  "C435": {
+    "paper_uuid": "27d032aa-7bcd-403a-be54-b2ba2e564b35",
+    "s2_id": "cd596fdfb911a92a6305458d61c620c1db79105a",
+    "arxiv_id": null,
+    "doi": "10.1111/nyas.70114"
+  },
+  "C436": {
+    "paper_uuid": "b4ca8938-e8be-416c-8d63-8002afe3e9d3",
+    "s2_id": "70a608f95af6c62ef867b557af5ac222e200c9b9",
+    "arxiv_id": null,
+    "doi": "10.1080/20008066.2025.2546214"
+  },
+  "C437": {
+    "paper_uuid": "f22519f2-dd9d-4237-8f5f-be9c1207c345",
+    "s2_id": "569479c7e099e4a48877a9e9de35cdd858e72f07",
+    "arxiv_id": null,
+    "doi": "10.1186/s12966-025-01834-4"
+  },
+  "C438": {
+    "paper_uuid": "ab13d30a-9c7e-4487-96cf-a6f6ad068646",
+    "s2_id": "eede9d0ea3d43eff884ab1a657ab1dc2beeed0b1",
+    "arxiv_id": null,
+    "doi": "10.3168/jds.2025-26585"
+  },
+  "C439": {
+    "paper_uuid": "b3f4f435-5427-48e7-a09b-047cfde70393",
+    "s2_id": "784bf699d02349bfd5a9a9c82e2b45f0bf6cb96f",
+    "arxiv_id": "2402.18582",
+    "doi": "10.48550/arXiv.2402.18582"
+  },
+  "C440": {
+    "paper_uuid": "262f129a-133a-47ba-9381-a0d236fd5e91",
+    "s2_id": "07c3193adce71cc0e11ce55f31488345314d6f23",
+    "arxiv_id": "2311.15110",
+    "doi": "10.48550/arXiv.2311.15110"
+  },
+  "C441": {
+    "paper_uuid": "6320d0d6-6580-410c-9ddb-de386338dfbc",
+    "s2_id": "b5cd009b9b6cdc293d70aa4d869cb8ea5d9e2da6",
+    "arxiv_id": "2311.05754",
+    "doi": "10.18653/v1/2023.emnlp-main.229"
+  },
+  "C442": {
+    "paper_uuid": "ee034491-278e-4aaa-8306-4f5c0ed0ecc6",
+    "s2_id": "e9ba6d98caf0a0035ce8d5c22d11a1dfd85f2b47",
+    "arxiv_id": null,
+    "doi": "10.3390/app13137639"
+  },
+  "C443": {
+    "paper_uuid": "1bbb768f-8426-4526-a3bf-cd85972be8af",
+    "s2_id": "0195652a1e52d602532f36ed2095b3b15b8cb0f5",
+    "arxiv_id": null,
+    "doi": "10.1007/978-3-030-50420-5_32"
+  },
+  "C444": {
+    "paper_uuid": "68d0c430-1e8c-4f8a-9dd6-8bc9da50e096",
+    "s2_id": "b81dcd32fbf9bcef7a5314cf94466251dd3b7d3e",
+    "arxiv_id": null,
+    "doi": "10.3390/info16050420"
+  },
+  "C445": {
+    "paper_uuid": "c93a7612-2ab4-49fd-9fe8-67e2a6c1d44a",
+    "s2_id": "eefd1e8fa5f5b9aacdd4ffa9cafe69bb84cfa7d9",
+    "arxiv_id": null,
+    "doi": "10.5195/jmla.2025.1860"
+  },
+  "C446": {
+    "paper_uuid": "46fb4221-c84d-4176-b695-2239ce065f35",
+    "s2_id": "34cc06f9eba528f06172f91568ee0b864a605b03",
+    "arxiv_id": null,
+    "doi": "10.3390/a15090324"
+  },
+  "C447": {
+    "paper_uuid": "db16c941-33c5-4240-aa5e-44e357470809",
+    "s2_id": "f3ff6656da6af3f6df700d39f5e4a8ff141ec1bb",
+    "arxiv_id": null,
+    "doi": "10.12688/wellcomeopenres.16570.1"
+  },
+  "C448": {
+    "paper_uuid": "6f98291c-b1d9-475d-998b-6ca21f97944e",
+    "s2_id": "0c981bc2f2cb3423fdfaee746fb9fc2ee6516ffc",
+    "arxiv_id": null,
+    "doi": "10.5220/0013562900003967"
+  },
+  "C449": {
+    "paper_uuid": "3a35750d-fa55-4746-b04c-60e54b4e15be",
+    "s2_id": "df310a430b2baab484e68a900da3ccb653974ad2",
+    "arxiv_id": "2508.04337",
+    "doi": "10.48550/arXiv.2508.04337"
+  },
+  "C450": {
+    "paper_uuid": "cdf9b14e-c281-4424-8470-bd72be7b2c7f",
+    "s2_id": "f2f73a205920f2ce13e865cd4e2466fd32b911eb",
+    "arxiv_id": "2510.16234",
+    "doi": "10.48550/arXiv.2510.16234"
+  },
+  "C451": {
+    "paper_uuid": "6e50e055-ff81-415c-ab37-0df330b7a27f",
+    "s2_id": "a5a4b987cf667683d1a17663806520e8b694ba0d",
+    "arxiv_id": "2508.11310",
+    "doi": "10.48550/arXiv.2508.11310"
+  },
+  "C452": {
+    "paper_uuid": "8a1e5b3e-fac6-4faa-b964-21461e2fa49e",
+    "s2_id": "88979931e01a35081bd2f780f568437c1fc84c42",
+    "arxiv_id": "2510.16549",
+    "doi": "10.1109/JCDL67857.2025.00032"
+  },
+  "C453": {
+    "paper_uuid": "071bf5cc-db8e-411c-9277-f172a545e1e5",
+    "s2_id": "2e1fcbb38d887933486171e49fea10333b023dfd",
+    "arxiv_id": null,
+    "doi": "10.1038/s43247-025-03171-7"
+  },
+  "C454": {
+    "paper_uuid": "b390142f-5042-4e71-892a-b06c7a43f9bc",
+    "s2_id": "27fb8a5de8a63e2cfb6f85e0377da9d2c2420ffd",
+    "arxiv_id": null,
+    "doi": "10.1111/joes.70042"
+  },
+  "C455": {
+    "paper_uuid": "463e8b36-3e6b-4381-834c-2259c03b4bbd",
+    "s2_id": "f4d200843e34af6c3dd06dd86acc6a495d6fe20a",
+    "arxiv_id": null,
+    "doi": "10.1016/j.ajcnut.2025.101127"
+  },
+  "C456": {
+    "paper_uuid": "7751ddb3-3b53-4481-9452-eb982acb4a27",
+    "s2_id": "075243640bdc4b9a83b51d24c0c0e6a6c09a0502",
+    "arxiv_id": null,
+    "doi": "10.3389/fpsyg.2025.1662868"
+  },
+  "C457": {
+    "paper_uuid": "d3ec7383-6f8d-4d9c-b5f1-826445d33522",
+    "s2_id": "c47e94dde08a5c01cf7fec2c411625f155e4943b",
+    "arxiv_id": null,
+    "doi": "10.1017/cts.2025.10173"
+  },
+  "C458": {
+    "paper_uuid": "2e75226b-dfcf-42a7-9207-836950fc8858",
+    "s2_id": "fcfeb3090220c009374556decec1dd46c37cf366",
+    "arxiv_id": null,
+    "doi": "10.3102/00346543251338057"
+  },
+  "C459": {
+    "paper_uuid": "02262aa9-d8c4-4fd5-8f0e-59f52bfbed30",
+    "s2_id": "d801b5835c9831d7f9213e1cc28df5ba30c7dbcf",
+    "arxiv_id": null,
+    "doi": "10.1007/s40258-025-00963-y"
+  },
+  "C460": {
+    "paper_uuid": "d509ffd9-dce2-40f5-b54c-ef887084ba83",
+    "s2_id": "13f93d7c18d6dfb27f4ac2312f1f85b9f4632af4",
+    "arxiv_id": "2401.00338",
+    "doi": "10.48550/arXiv.2401.00338"
+  },
+  "C461": {
+    "paper_uuid": "5ea89bea-7f85-4e14-8dec-9bbb4d7ec55d",
+    "s2_id": "ad33d98ed5a7f1c4f977bf322e1df9f665c174fa",
+    "arxiv_id": "2312.13521",
+    "doi": null
+  },
+  "C462": {
+    "paper_uuid": "ad789598-9b55-442e-a5a7-b5a1571f418a",
+    "s2_id": "b40c499e0c60e313ea2d2bc3ab94c4bd422beaa2",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C463": {
+    "paper_uuid": "7a31cfcc-e077-45b6-bc08-8138b062665b",
+    "s2_id": "8154c7551849b1c1e74b62fd094f58847963b4f7",
+    "arxiv_id": null,
+    "doi": "10.1177/01655515251379058"
+  },
+  "C464": {
+    "paper_uuid": "bdeade44-2e18-468d-8228-24a1d6601719",
+    "s2_id": "3bccb26bc0ccb72d178353000f0e594ae387c7a9",
+    "arxiv_id": null,
+    "doi": "10.1007/s10815-025-03498-2"
+  },
+  "C465": {
+    "paper_uuid": "312ef882-a974-4fd8-9904-64b46e6911e5",
+    "s2_id": "1249773da575646cd13aacd33ce6428b2b3df5fd",
+    "arxiv_id": null,
+    "doi": "10.1186/s13023-024-03403-7"
+  },
+  "C466": {
+    "paper_uuid": "3ddaa560-4b0d-408b-8802-4fcce47d6d9c",
+    "s2_id": "c0cc8822a1c2b032e05f71f0179cfaca332c1a70",
+    "arxiv_id": null,
+    "doi": "10.1002/cl2.1424"
+  },
+  "C467": {
+    "paper_uuid": "e8591f35-203a-4ce8-b271-b7eeafa0da96",
+    "s2_id": "dd8cad5ae6cb0b87d0056c987aeb1487a9405481",
+    "arxiv_id": null,
+    "doi": "10.1145/3594536.3595167"
+  },
+  "C468": {
+    "paper_uuid": "562afa13-7083-47c7-9a27-a6c43ecc0b6a",
+    "s2_id": "8ea9dcb0b4ffcf9c7857498262ab8302fb08f6cf",
+    "arxiv_id": null,
+    "doi": "10.18653/v1/2025.ijcnlp-long.127"
+  },
+  "C469": {
+    "paper_uuid": "22bd057b-b0ee-492a-94d1-6aaab40c3ddd",
+    "s2_id": "7f252a5420b509d5d73a827f5b3f9221ea114030",
+    "arxiv_id": "2511.14362",
+    "doi": "10.48550/arXiv.2511.14362"
+  },
+  "C470": {
+    "paper_uuid": "c29b7a10-db8e-425e-9ca1-bc65524fbb7c",
+    "s2_id": "7aab05d4365672b8d4634342ad80fe485c297fad",
+    "arxiv_id": "2505.24302",
+    "doi": "10.48550/arXiv.2505.24302"
+  },
+  "C471": {
+    "paper_uuid": "77af75e8-1f3a-437b-9df6-dddaf4b0e476",
+    "s2_id": "3c225458594f0e22a1d73e0ebde47086edc21c6f",
+    "arxiv_id": null,
+    "doi": "10.1109/AICT61888.2024.10740404"
+  },
+  "C472": {
+    "paper_uuid": "ff5ee511-da71-43be-8ab2-c3ad592fb71a",
+    "s2_id": "ae975510eb2e744e2e580fa9126cabe48d1ec7fa",
+    "arxiv_id": "2409.13524",
+    "doi": "10.1109/SIN63213.2024.10871242"
+  },
+  "C473": {
+    "paper_uuid": "e8bcdf75-212f-4528-9f0d-b657b8118f65",
+    "s2_id": "697cdd5cad6d2fee24e91e282e0b2832bb6a0380",
+    "arxiv_id": "2504.18880",
+    "doi": "10.1016/j.tramat.2026.100176"
+  },
+  "C474": {
+    "paper_uuid": "a8e83e3f-80b1-4295-8bb0-56af30b17007",
+    "s2_id": "9b93ac373628c1b1605f611c8ae80b55b884f145",
+    "arxiv_id": null,
+    "doi": "10.1016/j.ipm.2026.104704"
+  },
+  "C475": {
+    "paper_uuid": "a0cc966b-ac4d-4a22-bf66-974b3f1d83f0",
+    "s2_id": "3e3e77fcff9117c98d54575e153b817f2a308dfc",
+    "arxiv_id": null,
+    "doi": "10.2196/83543"
+  },
+  "C476": {
+    "paper_uuid": "41be4f4a-00af-401a-86d8-233f71bec989",
+    "s2_id": "ac5c0030d169568cf3e8ae9ef1e094f9625c1f5b",
+    "arxiv_id": null,
+    "doi": "10.1186/s13731-025-00563-z"
+  },
+  "C477": {
+    "paper_uuid": "70c558fc-15ec-42d3-837a-d3a8b38c419a",
+    "s2_id": "a8b72acf1b9601ca1dcf8d934dcc9d63d94836f7",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-026-03185-y"
+  },
+  "C478": {
+    "paper_uuid": "a79749a6-2a63-494e-82a2-cf9bd68fc0ba",
+    "s2_id": "6973d1b266bd5ef5e4cd807b6a662eda21996c6b",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjopen-2025-103821"
+  },
+  "C479": {
+    "paper_uuid": "d74ffe45-5a10-4c91-bbb3-62aa7f96fada",
+    "s2_id": "701655cbea49880a4e05ceaf0948e385c7e0e2e0",
+    "arxiv_id": null,
+    "doi": "10.1371/journal.pone.0326521"
+  },
+  "C480": {
+    "paper_uuid": "87dbd881-5c0f-4406-83c3-0d12c082ca0d",
+    "s2_id": "4d0e15973bdd44300df13a98dc2c1ede8b0a6a90",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C481": {
+    "paper_uuid": "3ebd94fd-67a3-4733-b444-727cf80ef2a5",
+    "s2_id": "d4ea5d817285058fe7514773dcdea01ca1d34d5c",
+    "arxiv_id": null,
+    "doi": "10.1145/3539618.3591768"
+  },
+  "C482": {
+    "paper_uuid": "d9b92d70-7bcf-4b6b-84e8-2eca1a01626c",
+    "s2_id": "17db88b7e957a28104bf71324ddcd6099c8eba4d",
+    "arxiv_id": null,
+    "doi": "10.1016/j.toxlet.2026.111871"
+  },
+  "C483": {
+    "paper_uuid": "8d01648b-86e8-4ee4-9998-60100e304379",
+    "s2_id": "8fa5256dab7fd98fc28299608b6a043fc9dacbd2",
+    "arxiv_id": "2601.12805",
+    "doi": "10.48550/arXiv.2601.12805"
+  },
+  "C484": {
+    "paper_uuid": "f1fe0d17-6d2a-4b6b-a0c5-e64fe4d4029c",
+    "s2_id": "13bf568279b48fe2eaf003cda60198ea417417e9",
+    "arxiv_id": null,
+    "doi": "10.1177/09557490251386269"
+  },
+  "C485": {
+    "paper_uuid": "9a51c948-5c8c-44fd-ad86-5c7d513a219c",
+    "s2_id": "ff4512162cb0f1da0f1237fb14f50c729d947873",
+    "arxiv_id": null,
+    "doi": "10.1097/CRD.0000000000001042"
+  },
+  "C486": {
+    "paper_uuid": "72fb621a-dbce-48cf-9098-fa1bc68663b3",
+    "s2_id": "b69d8bf564791c679c84287f12d3d7fb284ff9f2",
+    "arxiv_id": null,
+    "doi": "10.1053/j.jvca.2025.07.026"
+  },
+  "C487": {
+    "paper_uuid": "779039b6-6937-43f8-955b-d8de1d947a6f",
+    "s2_id": "686f96295b750d7fc7a6b5fde2d041b8de9f2e46",
+    "arxiv_id": null,
+    "doi": "10.1002/cl2.70070"
+  },
+  "C488": {
+    "paper_uuid": "6cac84f8-534e-4c10-a6de-c0a1f8f4c489",
+    "s2_id": "6f121129d42a46b0ce17cfb4e33a486949d7c2ec",
+    "arxiv_id": null,
+    "doi": "10.1177/23814683251328375"
+  },
+  "C489": {
+    "paper_uuid": "eea50eb6-463b-4ff2-8e1a-fddc7c7c775e",
+    "s2_id": "8170f837e59160101adfd3c3bfbe463626291615",
+    "arxiv_id": "2405.04621",
+    "doi": "10.48550/arXiv.2405.04621"
+  },
+  "C490": {
+    "paper_uuid": "2af06c1b-bc0d-4e71-af25-8892999a9bea",
+    "s2_id": "c46ccd503603042db01d7846631630811a5a6daa",
+    "arxiv_id": null,
+    "doi": "10.1007/s10489-023-04516-5"
+  },
+  "C491": {
+    "paper_uuid": "86d38f3f-ae17-4110-b447-c4ebcae0c0fe",
+    "s2_id": "4f232eae8c914c23bea4a7adc687dc658215dc19",
+    "arxiv_id": "2310.13711",
+    "doi": "10.48550/arXiv.2310.13711"
+  },
+  "C492": {
+    "paper_uuid": "ff7b984c-1ca5-4f48-a5fc-3c09d024dc50",
+    "s2_id": "40764e6d9c16babc7bdd7312299c90f2b0b097de",
+    "arxiv_id": "2511.07490",
+    "doi": "10.48550/arXiv.2511.07490"
+  },
+  "C493": {
+    "paper_uuid": "95dd84ce-18a0-44f3-971c-e7be75c36f41",
+    "s2_id": "8a7d938b4c2987af9f568e0bff09d4c623c4a709",
+    "arxiv_id": "2604.20622",
+    "doi": "10.48550/arXiv.2604.20622"
+  },
+  "C494": {
+    "paper_uuid": "98d033b9-993a-4391-8b9d-96fe05367865",
+    "s2_id": "79312d2c70b4c4f507083fab5c71650dc1818549",
+    "arxiv_id": "2509.15292",
+    "doi": "10.48550/arXiv.2509.15292"
+  },
+  "C495": {
+    "paper_uuid": "199327a1-e61f-4f62-9ef6-5a7540f2411e",
+    "s2_id": "0e6f86b63bf06fae17f8fab2c3cedcce2d4eadeb",
+    "arxiv_id": "2508.14317",
+    "doi": "10.48550/arXiv.2508.14317"
+  },
+  "C496": {
+    "paper_uuid": "9ff577f7-e3d3-4d62-a0a7-40f3b2c40d17",
+    "s2_id": "61cbf4b79155dc3647beb963e3786ce98a9b92ae",
+    "arxiv_id": "2506.08235",
+    "doi": "10.48550/arXiv.2506.08235"
+  },
+  "C497": {
+    "paper_uuid": "c1eb379c-a095-4a97-a673-65641a27c8d3",
+    "s2_id": "fddd386820dadfa0c26949a1a1286057b6336d74",
+    "arxiv_id": null,
+    "doi": "10.11591/ijeecs.v38.i1.pp344-356"
+  },
+  "C498": {
+    "paper_uuid": "8114623f-280d-4e2a-ab08-52a94f7135a7",
+    "s2_id": "e35059fa3094409d1c29573475962b6f563d2e4e",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C499": {
+    "paper_uuid": "e1890432-9c44-4310-b27a-6e69e95da5d0",
+    "s2_id": "6000f0458d01aba3aa38db43cded1de23f80532b",
+    "arxiv_id": "2603.00084",
+    "doi": "10.48550/arXiv.2603.00084"
+  },
+  "C500": {
+    "paper_uuid": "f2afa773-6f07-43d3-bf3c-c2a53bd6710a",
+    "s2_id": "1aca798539462516a81d13fb7c7645bf1a2d51d6",
+    "arxiv_id": "2601.04577",
+    "doi": "10.48550/arXiv.2601.04577"
+  },
+  "C501": {
+    "paper_uuid": "803d846f-ac7a-468a-9ce9-7d88062c4de4",
+    "s2_id": "ba4c3e40e1f3d286579a4cfde7b6af75759a8b73",
+    "arxiv_id": "2602.03433",
+    "doi": "10.1016/j.engappai.2026.115119"
+  },
+  "C502": {
+    "paper_uuid": "82c85cc2-8358-4ff1-9e79-1807d7a37b9d",
+    "s2_id": "1de5557c0bbf71e01ea7c4ded127442d3d9ed3c4",
+    "arxiv_id": "2601.15062",
+    "doi": "10.48550/arXiv.2601.15062"
+  },
+  "C503": {
+    "paper_uuid": "fff587a3-2837-456e-9b25-9afe2568f2e9",
+    "s2_id": "b6c8ab6e8a68766331c4285f48141c72aa4f0f3f",
+    "arxiv_id": null,
+    "doi": "10.1016/j.ard.2026.05.006"
+  },
+  "C504": {
+    "paper_uuid": "33d7316d-dada-4c5a-9b0d-469f188fa701",
+    "s2_id": "686ac4d54af6d3e297f140cbe62c7c549e14981d",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jsams.2026.06.010"
+  },
+  "C505": {
+    "paper_uuid": "e1c76f7d-307b-436f-8f92-2bb0347cd418",
+    "s2_id": "4ee4173cffca07916054f2f516ce195e63e67350",
+    "arxiv_id": null,
+    "doi": "10.1038/s41746-026-02523-7"
+  },
+  "C506": {
+    "paper_uuid": "22bf01a0-ab36-43b4-ba91-634f33adebc9",
+    "s2_id": "1d8367e2eaab5f0a3116c961539921bc4d7314d0",
+    "arxiv_id": null,
+    "doi": "10.1016/j.dr.2026.101248"
+  },
+  "C507": {
+    "paper_uuid": "9412ab06-91c6-4549-a768-bf076cd59158",
+    "s2_id": "f428724d267cc930575d914aa6b8335002e5d2b7",
+    "arxiv_id": null,
+    "doi": "10.1007/s40265-025-02278-7"
+  },
+  "C508": {
+    "paper_uuid": "965a8651-06f5-4612-b1c4-e963c7500553",
+    "s2_id": "8d81800645f4e17a3aab9c36476612cf659067aa",
+    "arxiv_id": null,
+    "doi": "10.3389/fnut.2026.1731627"
+  },
+  "C509": {
+    "paper_uuid": "2eac21c3-522f-4225-aca5-845af7021504",
+    "s2_id": "8f4e3f82c1b7069eb42e5b7cc20cb3eb3d8eb99f",
+    "arxiv_id": null,
+    "doi": "10.1002/cesm.70068"
+  },
+  "C510": {
+    "paper_uuid": "4b588556-5ccb-48b3-9770-9036e09f5da5",
+    "s2_id": "b9525fd6f5fa391f3933f73cdf186b4dd4185043",
+    "arxiv_id": null,
+    "doi": "10.1017/rsm.2025.10053"
+  },
+  "C511": {
+    "paper_uuid": "71034b69-2028-4d89-8d97-075d3b121ef7",
+    "s2_id": "7afafcbbb4a483994c9ce526a20c4f9fc916d4a3",
+    "arxiv_id": null,
+    "doi": "10.1016/j.isci.2025.113559"
+  },
+  "C512": {
+    "paper_uuid": "90669716-36c0-4fa3-a89c-cf4a8a64abaf",
+    "s2_id": "08d085835a818e95c5f5de2c889dcb05311eb0c4",
+    "arxiv_id": null,
+    "doi": "10.1007/s10198-025-01834-y"
+  },
+  "C513": {
+    "paper_uuid": "b1a08799-6519-42fe-98de-e057ea3517ff",
+    "s2_id": "e9cfa39d1adc881763f830018f466028c85c4bc5",
+    "arxiv_id": null,
+    "doi": "10.1111/liv.70293"
+  },
+  "C514": {
+    "paper_uuid": "70fc7e7a-3b51-4e75-ac1e-c91a70d9ee0a",
+    "s2_id": "e15576f94c09178711b34c4f871c94a86d5a803d",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-025-02895-z"
+  },
+  "C515": {
+    "paper_uuid": "88b461f9-6e0a-48e4-a283-64e3cc3e9a1e",
+    "s2_id": "e1c4a389fb707e8ad374bd0b8a97519ca59e7ba4",
+    "arxiv_id": null,
+    "doi": "10.1016/j.mex.2025.103545"
+  },
+  "C516": {
+    "paper_uuid": "4feef9ca-7aab-46ad-a867-8c7e5a69c142",
+    "s2_id": "018ada3a026fe8b7ada109186949e4865d7e5f23",
+    "arxiv_id": null,
+    "doi": "10.1186/s11556-025-00370-1"
+  },
+  "C517": {
+    "paper_uuid": "86fbf123-5c29-4191-a786-d28db8787ce3",
+    "s2_id": "f0cc0340d81ed021f43322c9f15e30a5e6956e9b",
+    "arxiv_id": null,
+    "doi": "10.1186/s12909-025-06983-5"
+  },
+  "C518": {
+    "paper_uuid": "93d6a91b-493b-4fc6-b002-9b28020e6033",
+    "s2_id": "5f0594084006df8d7cd720d5b5fb36d98f727cd3",
+    "arxiv_id": null,
+    "doi": "10.1101/2024.05.22.24307740"
+  },
+  "C519": {
+    "paper_uuid": "02c4913c-81f5-4da1-8c08-24c07deba3b2",
+    "s2_id": "2c2081cf9c5cfcbfe40e1ae4cea41f8345b78865",
+    "arxiv_id": "2405.11817",
+    "doi": "10.48550/arXiv.2405.11817"
+  },
+  "C520": {
+    "paper_uuid": "18b335de-9287-4735-9182-a217ede87982",
+    "s2_id": "55a2a90746dffb50c9101eebfbfed495809db3d2",
+    "arxiv_id": null,
+    "doi": "10.1145/3657304"
+  },
+  "C521": {
+    "paper_uuid": "11c98b9c-aee1-453b-855f-d15c83707ebb",
+    "s2_id": "871bb3b39ea098ea48c4b0e1fd0134891343461b",
+    "arxiv_id": null,
+    "doi": "10.54254/2755-2721/35/20230380"
+  },
+  "C522": {
+    "paper_uuid": "dd178b59-6ec7-404c-b9e4-8ff6fe6f8884",
+    "s2_id": "6dbf018d06221a44bafa897e257f5630abec5994",
+    "arxiv_id": null,
+    "doi": "10.1109/IEIR59294.2023.10391253"
+  },
+  "C523": {
+    "paper_uuid": "6a345f08-693b-4c98-84b7-1738c8217e2c",
+    "s2_id": "436e2182e4bb586f000a88ea071d8c97935426e2",
+    "arxiv_id": "2307.04573",
+    "doi": "10.1007/s44230-024-00070-6"
+  },
+  "C524": {
+    "paper_uuid": "0ccc94d5-7884-450b-ad8d-4965b0574521",
+    "s2_id": "0c5540e4f6883fb9ca6b2c4f988661aeed186ad9",
+    "arxiv_id": "2004.06222",
+    "doi": null
+  },
+  "C525": {
+    "paper_uuid": "0af7b721-9e2b-4a6a-8903-e3b71b7916ea",
+    "s2_id": "74778ce2dd08ed3835bd719745efdd9c1078917a",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C526": {
+    "paper_uuid": "ae6115c8-ea54-46d3-aa8a-e7d089133dbd",
+    "s2_id": "2872e90b005fefb1cdd4bf8fc498f5003ac8c1ee",
+    "arxiv_id": null,
+    "doi": "10.1017/rsm.2026.10080"
+  },
+  "C527": {
+    "paper_uuid": "9fef3553-e91f-43b1-a93b-6629f80a90dc",
+    "s2_id": "da7a06dc3911da5f6dd70240f9e6cc3ad102c443",
+    "arxiv_id": null,
+    "doi": "10.3758/s13428-026-03052-7"
+  },
+  "C528": {
+    "paper_uuid": "4415bf91-328a-4b26-892d-20da1b9ee815",
+    "s2_id": "c8e3036486fae4727435f805ff91cec61d5eb98e",
+    "arxiv_id": null,
+    "doi": "10.47989/ir31260449"
+  },
+  "C529": {
+    "paper_uuid": "85b6a0ae-14b8-4b25-80d1-8697cf1de1f1",
+    "s2_id": "e29944eef7de683b60a5bc17fa0567f8523ff91d",
+    "arxiv_id": null,
+    "doi": "10.1039/d5cs01323b"
+  },
+  "C530": {
+    "paper_uuid": "491df8d7-5b73-4218-a5df-1925f8bdf822",
+    "s2_id": "de2edd61377a48139b262212f5c452e929e21e68",
+    "arxiv_id": null,
+    "doi": "10.1145/3772318.3792787"
+  },
+  "C531": {
+    "paper_uuid": "9a4c5795-a665-45ae-8ab1-c50c3b09e748",
+    "s2_id": "d84da3ac04bda69caccaed73f035d02c23f9f2ea",
+    "arxiv_id": null,
+    "doi": "10.1016/j.cities.2026.106775"
+  },
+  "C532": {
+    "paper_uuid": "1e3fa817-f54e-4c0e-a64e-c8a74c8243f6",
+    "s2_id": "ed72b8aa94585e00fc462be7fb1a37a9418cf43e",
+    "arxiv_id": null,
+    "doi": "10.1111/joes.70081"
+  },
+  "C533": {
+    "paper_uuid": "039f8a92-5e2d-46da-9fbb-941e4b37c038",
+    "s2_id": "8bf59c0520bae22647285902e8dea890c0caef43",
+    "arxiv_id": null,
+    "doi": "10.1038/s41432-026-01206-2"
+  },
+  "C534": {
+    "paper_uuid": "b97ef718-0408-4063-b43f-fb5e7622a62b",
+    "s2_id": "a380719c653de66dcadb4ad953290ba04095f8d9",
+    "arxiv_id": null,
+    "doi": "10.1145/3777490.3777511"
+  },
+  "C535": {
+    "paper_uuid": "354f6a5c-cb62-4ad8-863d-6ffca9466e8c",
+    "s2_id": "e3266caf41521111addbbcc0106f491e2070ce17",
+    "arxiv_id": null,
+    "doi": "10.1192/bja.2025.10186"
+  },
+  "C536": {
+    "paper_uuid": "89261f0a-3379-45e9-80fa-0b6d8cc8fbf6",
+    "s2_id": "52141dfbb0e271a56d3124cf065025a20a2d687e",
+    "arxiv_id": null,
+    "doi": "10.1007/s10916-025-02305-w"
+  },
+  "C537": {
+    "paper_uuid": "59e7733c-8bbf-4428-aa7c-2bed0901993a",
+    "s2_id": "0d6b32a181b30ad4451332f2ff993029e13cecb5",
+    "arxiv_id": null,
+    "doi": "10.1016/j.jcrc.2025.155358"
+  },
+  "C538": {
+    "paper_uuid": "e0f894bd-c1b7-4e88-a0a7-1072562b4f6f",
+    "s2_id": "2586dc6d359c33771abaf099718534a6618fe5aa",
+    "arxiv_id": null,
+    "doi": "10.3390/educsci15111488"
+  },
+  "C539": {
+    "paper_uuid": "97a01df0-b229-444b-93aa-f352523ed954",
+    "s2_id": "7543c4368d844cf0a9320e43630cd26b502b6ad1",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjdhai-2025-000017"
+  },
+  "C540": {
+    "paper_uuid": "45b2f4dc-c324-4d7d-a1fd-ea1c21b934bc",
+    "s2_id": "2118b8fee4dcc34239d0bea24490c15a3087599a",
+    "arxiv_id": null,
+    "doi": "10.2196/84322"
+  },
+  "C541": {
+    "paper_uuid": "a760dbbe-0432-4ae0-b2dd-97174019ce0a",
+    "s2_id": "3dbd28a4f58d654327ccab312d7c0368538d9f6d",
+    "arxiv_id": null,
+    "doi": "10.1021/acsomega.5c04542"
+  },
+  "C542": {
+    "paper_uuid": "53c31380-80b0-4ae4-a8a6-5feae20e9e05",
+    "s2_id": "4a0f5271eed9a06df32e2aa6a411ec5b42404c03",
+    "arxiv_id": "2508.20693",
+    "doi": "10.48550/arXiv.2508.20693"
+  },
+  "C543": {
+    "paper_uuid": "3cbf992c-e0e0-49ec-90f7-3d8a93b16565",
+    "s2_id": "d637650b6d2d32b3b61ccd31ed0080a0289129e2",
+    "arxiv_id": "2507.14586",
+    "doi": "10.48550/arXiv.2507.14586"
+  },
+  "C544": {
+    "paper_uuid": "45998e50-a422-4346-bdda-e3274cd659e8",
+    "s2_id": "22d2f8f0198e2543c4d414fe5659f883d08a1559",
+    "arxiv_id": "2606.15380",
+    "doi": "10.1145/3805712.3809924"
+  },
+  "C545": {
+    "paper_uuid": "94058276-f099-46ad-ba8e-10b880221c3e",
+    "s2_id": "1aa54fc96e93d26a878fe61c08ee316562b20db5",
+    "arxiv_id": null,
+    "doi": "10.1186/s12874-026-02866-5"
+  },
+  "C546": {
+    "paper_uuid": "98b83fa7-6238-49b5-b498-945ceaa2394b",
+    "s2_id": "2bde2d5f023e183af7e862be4f5d1ac3376d5357",
+    "arxiv_id": null,
+    "doi": "10.1177/02698811251353251"
+  },
+  "C547": {
+    "paper_uuid": "8b3093e4-22fd-43fc-874d-7e7efc159806",
+    "s2_id": "1a9be404a63df6ebf616cfbb924ca555d7f094df",
+    "arxiv_id": "2505.01907",
+    "doi": "10.1145/3726302.3729879"
+  },
+  "C548": {
+    "paper_uuid": "a7330cd2-3281-4a85-9f04-5d817d442a6d",
+    "s2_id": "46b05c11c466955d65e89ecbb4ebb56f20668e79",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-024-02516-1"
+  },
+  "C549": {
+    "paper_uuid": "d1675b7b-7554-44e5-acb0-2205891d8bec",
+    "s2_id": "086e36dc723d4f99508a58576f987b85374dcbf3",
+    "arxiv_id": null,
+    "doi": "10.21203/rs.3.rs-124386/v1"
+  },
+  "C550": {
+    "paper_uuid": "7a94cadf-b12d-4064-ac40-c7ebf48fffbd",
+    "s2_id": "6f6497206f8684652a9e3e0cabe5acd2eb56f12c",
+    "arxiv_id": null,
+    "doi": null
+  },
+  "C551": {
+    "paper_uuid": "471240b8-460c-4a2f-a330-49eabad1a77b",
+    "s2_id": "1408d44c4040c84040e74f8d1dac00dbf5ce391d",
+    "arxiv_id": null,
+    "doi": "10.1109/TAI.2025.3626467"
+  },
+  "C552": {
+    "paper_uuid": "cb806031-ab06-4244-959c-b191bc1af595",
+    "s2_id": "c58603e2ebd78701c32ee1c4898d46aa3a3b3ade",
+    "arxiv_id": "2512.11661",
+    "doi": "10.48550/arXiv.2512.11661"
+  },
+  "C553": {
+    "paper_uuid": "2b8b7417-2286-405b-820f-dd0660634035",
+    "s2_id": "fa1548006229b0e179c729ef819f0e56f8730d2e",
+    "arxiv_id": "2509.03565",
+    "doi": "10.1145/3746027.3754813"
+  },
+  "C554": {
+    "paper_uuid": "f9a99101-8aac-4887-8ae1-7b1b1a8153cb",
+    "s2_id": "c631bd18fd644636efac88b8e2d68b48e3eb4e46",
+    "arxiv_id": "2508.01558",
+    "doi": "10.1145/3746027.3755520"
+  },
+  "C555": {
+    "paper_uuid": "961e1f95-474a-4e2c-a84b-96d9ac8dcbed",
+    "s2_id": "7c3038d15957585bcc68eee0bd715a6991dc4798",
+    "arxiv_id": "2605.23204",
+    "doi": null
+  },
+  "C556": {
+    "paper_uuid": "e494440a-df40-414d-84e2-e10d7c2af550",
+    "s2_id": "8939cf4ab770d9bbf6cb4a43c01c2ea9991bc6bf",
+    "arxiv_id": "2605.04375",
+    "doi": null
+  },
+  "C557": {
+    "paper_uuid": "7a1e8f03-a97a-44a7-bb2e-868fb6c51e20",
+    "s2_id": "69443e94a22683647ecc958f44534beedca923c3",
+    "arxiv_id": "2604.22861",
+    "doi": "10.48550/arXiv.2604.22861"
+  },
+  "C558": {
+    "paper_uuid": "c05a0e64-f86d-44d7-b6f7-c3a1d56787fa",
+    "s2_id": "800c7566c7e16ae0481e24f56cca50c500e1643c",
+    "arxiv_id": "2603.05910",
+    "doi": "10.48550/arXiv.2603.05910"
+  },
+  "C559": {
+    "paper_uuid": "392cbf41-0068-478f-aaca-b155ac0162f2",
+    "s2_id": "942bff1e3ca5821f658aac987190550475cfc29a",
+    "arxiv_id": "2602.20639",
+    "doi": "10.48550/arXiv.2602.20639"
+  },
+  "C560": {
+    "paper_uuid": "fa67470b-318f-45c3-9dbf-fb1012f8acb2",
+    "s2_id": "2f52111b3f0e6d266a76ea4595e7546bd483813e",
+    "arxiv_id": null,
+    "doi": "10.1109/FIE63693.2025.11328649"
+  },
+  "C561": {
+    "paper_uuid": "e5e3860c-2b9a-48a5-b4c5-c20ec9e416c6",
+    "s2_id": "fcb69fc4494390d113d2966beb818bdd814544c0",
+    "arxiv_id": null,
+    "doi": "10.1109/ACCESS.2025.3613246"
+  },
+  "C562": {
+    "paper_uuid": "ef379910-22fd-4de0-a1fd-2e16426e70d7",
+    "s2_id": "4f88d2417fcd299dd75e1bda0c50135e04e592d7",
+    "arxiv_id": "2504.05732",
+    "doi": null
+  },
+  "C563": {
+    "paper_uuid": "a27f5ec6-09f3-402d-89d1-d4b721dabe26",
+    "s2_id": "07e8828f0b98a9bfe75901410f211401a1a6239f",
+    "arxiv_id": null,
+    "doi": "10.1108/jd-04-2026-0185"
+  },
+  "C564": {
+    "paper_uuid": "a6fbabce-30fb-4b3e-b5b2-32b294d7e360",
+    "s2_id": "416ee088a93b45cacba7dd79ddc8dc6dd517469b",
+    "arxiv_id": null,
+    "doi": "10.26102/2310-6018/2026.57.6.020"
+  },
+  "C565": {
+    "paper_uuid": "211f8246-9008-4b8c-ae3c-266996561ffc",
+    "s2_id": "07c857df19ee5424532f1c509a97c5dae116ccdd",
+    "arxiv_id": "2606.27382",
+    "doi": "10.7544/issn1000-1239.202550223"
+  },
+  "C566": {
+    "paper_uuid": "a005155a-fc15-4ab2-b290-d9def6d053ca",
+    "s2_id": "ef2cc535e75abb13c1680a96195465cccc57777e",
+    "arxiv_id": "2605.15118",
+    "doi": null
+  },
+  "C567": {
+    "paper_uuid": "df7ebd94-1883-45e8-8166-15bbd809dc9b",
+    "s2_id": "7acaa698c8dab7a65ea4321b9908f0b7f78ac261",
+    "arxiv_id": null,
+    "doi": "10.1371/journal.pone.0347933"
+  },
+  "C568": {
+    "paper_uuid": "8002a30b-92d5-42b9-821e-469c9cfa3c80",
+    "s2_id": "86467da542c90e5424ac485100b85631e34b8214",
+    "arxiv_id": null,
+    "doi": "10.1109/ICSFT67370.2026.11566349"
+  },
+  "C569": {
+    "paper_uuid": "414a15d2-899b-4b17-adf2-a48781a0c7ed",
+    "s2_id": "36cc33e1219b064abe349268fc68e8633261259c",
+    "arxiv_id": null,
+    "doi": "10.3390/aieduc2020008"
+  },
+  "C570": {
+    "paper_uuid": "6f177a78-810a-473d-985c-af2597e5e95f",
+    "s2_id": "96a8d01dc9366782f86a317937a72a8e4cd4b029",
+    "arxiv_id": null,
+    "doi": "10.1109/AAIML67890.2026.11498163"
+  },
+  "C571": {
+    "paper_uuid": "1f0170eb-8cea-4de8-888a-47a11d3af8cd",
+    "s2_id": "3cf808dbac30a9a287ace4577bf443e1325f4e47",
+    "arxiv_id": null,
+    "doi": "10.1186/s12874-026-02814-3"
+  },
+  "C572": {
+    "paper_uuid": "cebf6e46-251d-47a6-bfc3-201b618616ef",
+    "s2_id": "d082f247eff3a994d191d59121390e8a8ca3e72b",
+    "arxiv_id": null,
+    "doi": "10.3390/systems14020181"
+  },
+  "C573": {
+    "paper_uuid": "d58978bd-f4bf-4a70-9719-1fb4d8d04475",
+    "s2_id": "2f912410ddc8786bec97153bbbdefc34211435ff",
+    "arxiv_id": null,
+    "doi": "10.1002/ksa.70286"
+  },
+  "C574": {
+    "paper_uuid": "65e3d85e-05e7-40d9-b617-d4c267acd1b8",
+    "s2_id": "c7a2b69c6b87043015e70cebf654f5918760efaa",
+    "arxiv_id": null,
+    "doi": "10.1007/s00417-025-07092-1"
+  },
+  "C575": {
+    "paper_uuid": "08677cdb-8329-4121-9ebd-0ac77ff63bc1",
+    "s2_id": "d1a9d8dc2ad25d2de5c33c76b2253f4b61e513b4",
+    "arxiv_id": null,
+    "doi": "10.64898/2025.12.22.696019"
+  },
+  "C576": {
+    "paper_uuid": "6d9e2c0f-7268-4775-a726-612ccfd6c5c0",
+    "s2_id": "4e24fbbe3f3a50780dd0e6e546c6965ff4a70243",
+    "arxiv_id": null,
+    "doi": "10.1109/ICANCS65819.2025.11376736"
+  },
+  "C577": {
+    "paper_uuid": "3bd2715f-9b3c-4264-a3f6-8cca000fcf3b",
+    "s2_id": "6c010db76675f2857f84ffd8ef091b54cf826b6f",
+    "arxiv_id": "2509.08032",
+    "doi": "10.48550/arXiv.2509.08032"
+  },
+  "C578": {
+    "paper_uuid": "20350e38-6923-4a93-8839-a931fc9495e9",
+    "s2_id": "36d9870db9f73b57699901657164848c95e1d80c",
+    "arxiv_id": null,
+    "doi": "10.1016/j.ipm.2026.104885"
+  },
+  "C579": {
+    "paper_uuid": "84afc19b-f964-4ab1-8b3b-ebf1e3872690",
+    "s2_id": "12f059d1afd8d251a03b42afebd931e597bdcd8d",
+    "arxiv_id": "2607.05461",
+    "doi": null
+  },
+  "C580": {
+    "paper_uuid": "b6022f45-b92a-4a86-a7e0-bca2bad8cb84",
+    "s2_id": "baa210b6b4fdf14d53f0a16b695f80d2953e027c",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjopen-2026-117423"
+  },
+  "C581": {
+    "paper_uuid": "ed085357-abc7-4367-b884-2c097059a94c",
+    "s2_id": "a90c58806c0d7f85c9e48ed183fcf7bd1550a5e8",
+    "arxiv_id": null,
+    "doi": "10.1080/28375300.2026.2693831"
+  },
+  "C582": {
+    "paper_uuid": "a6de3de7-eb94-466e-b62c-9543f0506575",
+    "s2_id": "f536b263ad9d58fdd28345a4c551445875026f76",
+    "arxiv_id": null,
+    "doi": "10.3389/fspor.2026.1852179"
+  },
+  "C583": {
+    "paper_uuid": "d2764c11-c6ba-41f7-a6fd-4b8a340f7016",
+    "s2_id": "34d640c4882a789413567882fb89001c819ba26f",
+    "arxiv_id": null,
+    "doi": "10.3390/app16125816"
+  },
+  "C584": {
+    "paper_uuid": "ed20e694-61e4-4da6-967a-d8503dbe2b5f",
+    "s2_id": "6d7195adaf60dbe1fd4a0a3085a6e96476d89c2e",
+    "arxiv_id": null,
+    "doi": "10.1016/j.ijmedinf.2026.106516"
+  },
+  "C585": {
+    "paper_uuid": "8b0c9e56-9dc5-4d21-9cbd-84b2e5f9baef",
+    "s2_id": "eaa2ff82c4dc04202cebcb793b2bcef3ffb6fd5e",
+    "arxiv_id": null,
+    "doi": "10.1136/bmjopen-2025-113547"
+  },
+  "C586": {
+    "paper_uuid": "b09e6c9e-bd8d-4aee-bdf4-a28328541278",
+    "s2_id": "934fcf57b43be1d400417386730f1f84de20ebbd",
+    "arxiv_id": null,
+    "doi": "10.1016/j.psj.2026.107258"
+  },
+  "C587": {
+    "paper_uuid": "3055d024-05e3-4430-a423-830f94d2487e",
+    "s2_id": "29989fcbe9e47ba9fd07b3c7b5ea5c903a9cdf74",
+    "arxiv_id": null,
+    "doi": "10.1145/3774905.3795598"
+  },
+  "C588": {
+    "paper_uuid": "084a7a68-214b-46b3-9ad1-d040d74dcb2a",
+    "s2_id": "e00924fbdf0bcc2d448dd4960802305e215a3643",
+    "arxiv_id": null,
+    "doi": "10.1016/j.addbeh.2026.108738"
+  },
+  "C589": {
+    "paper_uuid": "718d1b0c-80ef-4c14-bbc9-e381090c0692",
+    "s2_id": "94fb9e4883f6536a3eb26da97552211c122fd481",
+    "arxiv_id": null,
+    "doi": "10.1002/gps.70213"
+  },
+  "C590": {
+    "paper_uuid": "63ea9454-3f5b-4cc1-b5a6-ee89eea9eec3",
+    "s2_id": "bda66369217e340981368565d0ceac7026828053",
+    "arxiv_id": null,
+    "doi": "10.5334/bc.642"
+  },
+  "C591": {
+    "paper_uuid": "499f76f6-753e-481d-8781-074e82fdcdef",
+    "s2_id": "4807bc984295edb261675a1f980858d9cfab3f27",
+    "arxiv_id": null,
+    "doi": "10.1111/cts.70562"
+  },
+  "C592": {
+    "paper_uuid": "52d31c42-f41c-41c5-b6fa-ac6e9ee1ac5c",
+    "s2_id": "f2bb6132a7c0fa0a417700b30c0a8ef6796c055c",
+    "arxiv_id": null,
+    "doi": "10.3352/jeehp.2026.23.6"
+  },
+  "C593": {
+    "paper_uuid": "cc90027c-3a76-4195-8c86-856418e67875",
+    "s2_id": "50053acf4cfd645f30fc6de2980094b28855ac64",
+    "arxiv_id": null,
+    "doi": "10.1007/s40262-026-01633-5"
+  },
+  "C594": {
+    "paper_uuid": "dbfc147e-059c-4e26-97bc-df1ace4f8682",
+    "s2_id": "0cf7af63b17f9da635e14f936d20ac1f6bd953b1",
+    "arxiv_id": null,
+    "doi": "10.1016/j.prevetmed.2026.106877"
+  },
+  "C595": {
+    "paper_uuid": "7b7984cd-1933-413b-8d50-80fc9ccbeba1",
+    "s2_id": "5b168e0ffd87fd31009e3143d0ae144a22bf08e9",
+    "arxiv_id": null,
+    "doi": "10.5195/jmla.2026.2286"
+  },
+  "C596": {
+    "paper_uuid": "cad9d0b6-45c5-4b80-a682-af2eb057983b",
+    "s2_id": "d152813c5a2e3a54c2844413213c6a8d6a640829",
+    "arxiv_id": null,
+    "doi": "10.1016/j.nbsj.2026.100331"
+  },
+  "C597": {
+    "paper_uuid": "9c03384c-28a8-435a-a51c-53b0f6d82bc7",
+    "s2_id": "6e1295ae6243f9e8ff202927a9d758d890ff514b",
+    "arxiv_id": null,
+    "doi": "10.1136/rmdopen-2025-006578"
+  },
+  "C598": {
+    "paper_uuid": "e02c2693-d8db-4787-9f56-d9a105fc8578",
+    "s2_id": "e7793d4c777b1ed5aa53f2922f51f0d43e11e1f7",
+    "arxiv_id": null,
+    "doi": "10.1093/chidev/aacag043"
+  },
+  "C599": {
+    "paper_uuid": "5e8ae843-7812-4f86-8b8b-288b087ee2c0",
+    "s2_id": "c023b22e3920fe1287598d8e4e7e2fbbc848c745",
+    "arxiv_id": null,
+    "doi": "10.25053/redufor.v11.e16184"
+  },
+  "C600": {
+    "paper_uuid": "cefdba7f-1020-4774-b5eb-e1fb89d89192",
+    "s2_id": "33122e593fbcb7bed2c4ec9fd30dc95165a862bb",
+    "arxiv_id": null,
+    "doi": "10.1371/journal.pone.0344943"
+  },
+  "C601": {
+    "paper_uuid": "a8e891b0-b090-4e00-9061-a13bd0e07318",
+    "s2_id": "b39eef1bc02879637bb4e967aba998982acaa2cb",
+    "arxiv_id": null,
+    "doi": "10.3389/fspor.2026.1712235"
+  },
+  "C602": {
+    "paper_uuid": "d86a8fc1-d152-492f-9066-05d1350a405c",
+    "s2_id": "02bea72519c8c40dc235e26a9dcf4ee593e62bb8",
+    "arxiv_id": null,
+    "doi": "10.1038/s44387-026-00080-8"
+  },
+  "C603": {
+    "paper_uuid": "a228c2ce-cbd9-4b0c-884d-9fc8882ab53a",
+    "s2_id": "247fbc8f8881929e08cce104ed29cfef1001cfc8",
+    "arxiv_id": null,
+    "doi": "10.2196/92780"
+  },
+  "C604": {
+    "paper_uuid": "7c5726fa-d28f-413e-8716-f89b9ad338e1",
+    "s2_id": "03c323cde3bb455ebecb3f22899e69bcd8356b46",
+    "arxiv_id": null,
+    "doi": "10.1177/20552076261455158"
+  },
+  "C605": {
+    "paper_uuid": "aea7d017-7e83-4dfe-8053-9243eac79366",
+    "s2_id": "98acf51bd736d7ed59b84a0c2a99070455ffcfb2",
+    "arxiv_id": null,
+    "doi": "10.1016/j.neubiorev.2026.106605"
+  },
+  "C606": {
+    "paper_uuid": "cad1118e-dbcc-4eb9-b971-754df2bdf9ea",
+    "s2_id": "17bcda79689dfcee7fa62c4b180cf89fa3e19dfc",
+    "arxiv_id": null,
+    "doi": "10.1108/jcm-02-2025-7582"
+  },
+  "C607": {
+    "paper_uuid": "ab3c46de-7d63-4f08-afb2-147328aef3c1",
+    "s2_id": "649b2208e887396b3cd74438956aeab47409f5b1",
+    "arxiv_id": null,
+    "doi": "10.1016/j.mex.2026.103799"
+  },
+  "C608": {
+    "paper_uuid": "b72a1ea7-2c05-402b-bc76-81fb7e28b8e4",
+    "s2_id": "f3574f852e864068c703f8eae935cb5bfb90f40b",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-025-02939-4"
+  },
+  "C609": {
+    "paper_uuid": "b079487e-cf2b-478c-9e5b-aeb206edfbe1",
+    "s2_id": "a5cba01ad55f40c75094bd6769d479c09f4399d2",
+    "arxiv_id": null,
+    "doi": "10.2196/86596"
+  },
+  "C610": {
+    "paper_uuid": "640ef77d-8f1d-493e-8f07-1a090b8bd168",
+    "s2_id": "51ec40721963d0409c01797d195c2c7e36dde0a1",
+    "arxiv_id": null,
+    "doi": "10.1080/15582159.2025.2575559"
+  },
+  "C611": {
+    "paper_uuid": "6a684bc5-cd21-4980-851e-37c2da1711a3",
+    "s2_id": "89da8e4bc23748fe046eaf16c131fb52e81dbead",
+    "arxiv_id": null,
+    "doi": "10.1101/2025.10.13.25337935"
+  },
+  "C612": {
+    "paper_uuid": "01d9d963-350a-4e5d-8da5-9f1ed06dc2b2",
+    "s2_id": "940cef7ec2db33110fbe7fc94f3df5e52f30b9e7",
+    "arxiv_id": null,
+    "doi": "10.1109/AIIM67611.2025.11233035"
+  },
+  "C613": {
+    "paper_uuid": "4c081cdb-2bb9-47f2-9a99-10d14316706f",
+    "s2_id": "30286300e501ee5dc1647c8ee2f8d159357d00d4",
+    "arxiv_id": null,
+    "doi": "10.1371/journal.pone.0312969"
+  },
+  "C614": {
+    "paper_uuid": "81c9009b-6ee5-4ea3-87a8-631e2f5d0323",
+    "s2_id": "f0387ddc890537485565fb46590cb911cf5a06ee",
+    "arxiv_id": null,
+    "doi": "10.18690/um.fov.4.2025.44"
+  },
+  "C615": {
+    "paper_uuid": "67af5dae-4fdb-44bc-ad9e-3374755899dc",
+    "s2_id": "9dc0d8ebef7fe3a54c4bcd7ea77c8f2b3871e59f",
+    "arxiv_id": null,
+    "doi": "10.12688/f1000research.162549.1"
+  },
+  "C616": {
+    "paper_uuid": "291d20ee-00e2-4bcd-9d35-a4699a3bd640",
+    "s2_id": "090654db34b0fdc48a8338657597143cf8ab659a",
+    "arxiv_id": null,
+    "doi": "10.2196/92132"
+  },
+  "C617": {
+    "paper_uuid": "72500c98-44d7-44f9-b119-b7d276c18440",
+    "s2_id": "3f218d2d41b8cc5af40c0f80da7ce0fb6320a0ad",
+    "arxiv_id": null,
+    "doi": "10.1017/pds.2026.10597"
+  },
+  "C618": {
+    "paper_uuid": "313dd09a-f738-4c67-aa0e-101ed73f0b8d",
+    "s2_id": "a095f7729e3d3ad1fd5c23e85c65202709c08983",
+    "arxiv_id": null,
+    "doi": "10.1080/0048721x.2026.2690653"
+  },
+  "C619": {
+    "paper_uuid": "ff18e27d-f126-4d09-a5b8-0abdf93bcf7e",
+    "s2_id": "545b1c693967f109fb7457587b34462c937e8763",
+    "arxiv_id": null,
+    "doi": "10.1080/14737167.2026.2691995"
+  },
+  "C620": {
+    "paper_uuid": "a5b5c710-4dfd-4c95-a859-86ef8a202a1a",
+    "s2_id": "ad3a822addabf68a888b5b13f3a3bfd0e0886eeb",
+    "arxiv_id": null,
+    "doi": "10.1145/3810204"
+  },
+  "C621": {
+    "paper_uuid": "3f8dda67-5dee-4e3f-8e61-4f0505ac9a79",
+    "s2_id": "c49673dbbb4a8c1e87474fbb8f805055eb03a7ac",
+    "arxiv_id": null,
+    "doi": "10.1111/rec.70458"
+  },
+  "C622": {
+    "paper_uuid": "4a51c60e-d5fc-4393-8878-b22924d20aad",
+    "s2_id": "03c1d3c9ed0c68ca90fe960c7f9192c23138daf1",
+    "arxiv_id": "2606.08036",
+    "doi": null
+  },
+  "C623": {
+    "paper_uuid": "71ffa432-d59d-48db-bada-881b6afef878",
+    "s2_id": "585355c187990495e87f3ca58bc0d039292b0123",
+    "arxiv_id": "2605.30543",
+    "doi": null
+  },
+  "C624": {
+    "paper_uuid": "4ad431b0-7332-4707-b160-986c38cbd1e4",
+    "s2_id": "c6efea59de8b73c1d010a84f610e16146495546e",
+    "arxiv_id": null,
+    "doi": "10.64818/pijtrcs.3107.8494.0047"
+  },
+  "C625": {
+    "paper_uuid": "6297530b-8ced-4623-9abf-199208c27f25",
+    "s2_id": "70a04e093b8b4a47fc98cb56c58a7caa6d272ad6",
+    "arxiv_id": null,
+    "doi": "10.1108/aeds-11-2025-0610"
+  },
+  "C626": {
+    "paper_uuid": "4ee21cbe-4947-4147-9549-ada5fcccbbc9",
+    "s2_id": "0549281b6d5b260bac3fc134fb3120bb4ccf9124",
+    "arxiv_id": null,
+    "doi": "10.1109/DAS69882.2026.11553334"
+  },
+  "C627": {
+    "paper_uuid": "6e89fc20-f457-452c-b33b-628d74850494",
+    "s2_id": "cb8be67d63ae0c7bad70bfd37571653f1bb91a74",
+    "arxiv_id": null,
+    "doi": "10.3389/fdata.2026.1762571"
+  },
+  "C628": {
+    "paper_uuid": "3035e2fe-e53d-4f23-ac9c-d1f61a0ad6fe",
+    "s2_id": "2cab4e6f2893ff3c66f1cbe96d4c12c3c1e115a3",
+    "arxiv_id": null,
+    "doi": "10.1109/CSCWD68734.2026.11582469"
+  },
+  "C629": {
+    "paper_uuid": "21e8f86c-a16a-4f90-bfad-9f8af0449319",
+    "s2_id": "2a66e78bb5c4ef5056bf4eb7d13e46cdede773ab",
+    "arxiv_id": "2605.16377",
+    "doi": null
+  },
+  "C630": {
+    "paper_uuid": "ca4b4d53-0d48-4eed-96c4-207c9c10e4cc",
+    "s2_id": "93feefe5ad69cbda6b1a559a7ed89d9e20ec420c",
+    "arxiv_id": null,
+    "doi": "10.1038/s41431-026-02108-8"
+  },
+  "C631": {
+    "paper_uuid": "fc769ef1-1527-44d7-960f-e8349ecd94dc",
+    "s2_id": "2d237701c445ad0842f319ed1ee9f80ce461998b",
+    "arxiv_id": null,
+    "doi": "10.3390/info17050449"
+  },
+  "C632": {
+    "paper_uuid": "b0c5c85f-053d-4cb4-8c97-f442d241f807",
+    "s2_id": "dff594e17636a01c9d3ed77209a44669506405a7",
+    "arxiv_id": null,
+    "doi": "10.1093/ehjdh/ztag070"
+  },
+  "C633": {
+    "paper_uuid": "d14292ba-6630-4ee2-aef4-7ae0413caa2f",
+    "s2_id": "7527390d432ab0f45dacea3b6e305825b52b8929",
+    "arxiv_id": null,
+    "doi": "10.1177/10225536261459518"
+  },
+  "C634": {
+    "paper_uuid": "81fb61e5-e472-4cea-a8d6-9fdb991dbdb5",
+    "s2_id": "dc5674f08e9dc8deb4057aca20d05bd39c89dd36",
+    "arxiv_id": null,
+    "doi": "10.62487/saimsaraed91d2be"
+  },
+  "C635": {
+    "paper_uuid": "044e7df9-a1ab-4d3b-9e9b-9393c5c3ca6c",
+    "s2_id": "578c1873ea151cf8abf4a5170aab7d30ce43b6a1",
+    "arxiv_id": "2604.05224",
+    "doi": "10.48550/arXiv.2604.05224"
+  },
+  "C636": {
+    "paper_uuid": "a080ed11-881c-4db8-ae79-ab859eb757fb",
+    "s2_id": "e491199ff09ea4b78e5389bdbd4af7096faa3a2a",
+    "arxiv_id": null,
+    "doi": "10.1016/j.watres.2026.125995"
+  },
+  "C637": {
+    "paper_uuid": "2d36cf45-0617-4615-b44f-8d6c45f4072f",
+    "s2_id": "43f594ca62d1526f92f412385de9c44f5774fa68",
+    "arxiv_id": null,
+    "doi": "10.1016/j.ijmedinf.2026.106453"
+  },
+  "C638": {
+    "paper_uuid": "9ffb4311-93ce-45a4-af48-d280e07f81a1",
+    "s2_id": "9c54e45e448e27d13124e1cbe3eba8303495de29",
+    "arxiv_id": "2604.09633",
+    "doi": "10.48550/arXiv.2604.09633"
+  },
+  "C639": {
+    "paper_uuid": "a886ba42-d125-4dd4-8be7-43abfff7a43a",
+    "s2_id": "4ed3c20ca02ea38ce7a862690419b7e80c2f2912",
+    "arxiv_id": null,
+    "doi": "10.1109/INFOTEH68759.2026.11477705"
+  },
+  "C640": {
+    "paper_uuid": "c90f1ce4-239e-4dfd-9a15-1ad644de3567",
+    "s2_id": "56b7ba76249e5be96d203b7d6c54620097b1c37c",
+    "arxiv_id": null,
+    "doi": "10.64898/2026.03.03.709341"
+  },
+  "C641": {
+    "paper_uuid": "846a0973-6cab-4a22-b1a0-281f69629ce3",
+    "s2_id": "d86321ac3ccb47c41d002df2056b65325c91a0e1",
+    "arxiv_id": null,
+    "doi": "10.3390/bioengineering13030365"
+  },
+  "C642": {
+    "paper_uuid": "bf9a1a18-0503-41fd-8c47-bfb644250e7e",
+    "s2_id": "f1781d5a19d65453b22b9b11054873bfc5d776d6",
+    "arxiv_id": "2602.22500",
+    "doi": "10.48550/arXiv.2602.22500"
+  },
+  "C643": {
+    "paper_uuid": "161a3169-067f-4df4-9407-3f509c2be988",
+    "s2_id": "8f437f4c7294ecc142ace1c9a36581ea8622dee2",
+    "arxiv_id": "2602.23492",
+    "doi": null
+  },
+  "C644": {
+    "paper_uuid": "11fe629f-43ce-48a8-8a41-c1de55b89b6c",
+    "s2_id": "6897f8cdd895cfe87889182a1e94d49dacec753f",
+    "arxiv_id": null,
+    "doi": "10.1111/nicc.70397"
+  },
+  "C645": {
+    "paper_uuid": "c1d84952-ce04-4115-a6bf-bfed63a6fd68",
+    "s2_id": "5b60b88b570b35c1f3da88b3d3193f17753b4b2a",
+    "arxiv_id": "2602.09163",
+    "doi": "10.48550/arXiv.2602.09163"
+  },
+  "C646": {
+    "paper_uuid": "8c31b41a-9886-4944-a7fa-61c210f2e282",
+    "s2_id": "54a3e3730ed8aa6c5bfbe9bb5b3353e93456e6dd",
+    "arxiv_id": "2601.15170",
+    "doi": null
+  },
+  "C647": {
+    "paper_uuid": "4c2f06da-6bd6-4846-b6f5-db0831e812f3",
+    "s2_id": "9ae015425eff9d20dcc1518c5332943a4a64d68f",
+    "arxiv_id": "2601.07648",
+    "doi": null
+  },
+  "C648": {
+    "paper_uuid": "7c356a74-22f6-432e-b98a-b02f1690385f",
+    "s2_id": "c9278b94d0ed415bff17a9a127a9c3e0ae06c86a",
+    "arxiv_id": "2601.19925",
+    "doi": "10.3389/frma.2026.1807672"
+  },
+  "C649": {
+    "paper_uuid": "c9848413-52d7-4be0-9445-a5876d14c6cd",
+    "s2_id": "b8ddcfa14f4f98cf4967ff2cf5b85166fd6b1d61",
+    "arxiv_id": null,
+    "doi": "10.1155/hbe2/8695447"
+  },
+  "C650": {
+    "paper_uuid": "b52e265e-2381-4d48-a24f-e0d89619c3a0",
+    "s2_id": "a6595b3a3575cd2a27ba07ace28d66162fd955dc",
+    "arxiv_id": null,
+    "doi": "10.63163/jpehss.v3i4.974"
+  },
+  "C651": {
+    "paper_uuid": "a6771fd0-ed8e-4630-8ada-c1e327d52283",
+    "s2_id": "42f821f8b382c5b6a96279c48beec806da450773",
+    "arxiv_id": null,
+    "doi": "10.1186/s12936-025-05722-x"
+  },
+  "C652": {
+    "paper_uuid": "c5dd6e30-f71e-47c3-ba53-59372c22fb1a",
+    "s2_id": "a71722d0e07803db36b64868735178bfd0b711d4",
+    "arxiv_id": null,
+    "doi": "10.3390/publications13040067"
+  },
+  "C653": {
+    "paper_uuid": "9ba95dd7-311e-41b4-8137-1aab06086a9a",
+    "s2_id": "c8747f03eba0dc07b280b3781a97375118a373b2",
+    "arxiv_id": null,
+    "doi": "10.1177/09557490251406841"
+  },
+  "C654": {
+    "paper_uuid": "5f5f3366-1b1c-4543-b736-70aa60daf3cb",
+    "s2_id": "f6019894431e306d1528be383598f493eb295a24",
+    "arxiv_id": "2606.08301",
+    "doi": "10.21555/rpc.v7i2.3675"
+  },
+  "C655": {
+    "paper_uuid": "c2ad7faa-e266-4939-89e3-0ba265c647ce",
+    "s2_id": "2ceecc6529b93c06790c9da8160471b2721020b1",
+    "arxiv_id": null,
+    "doi": "10.1200/CCI-25-00233"
+  },
+  "C656": {
+    "paper_uuid": "e737967b-bffa-4f08-af36-f0ab83a7f58e",
+    "s2_id": "ed71b5a65e48f7d20c01e2a0cdf267a1e365ef82",
+    "arxiv_id": null,
+    "doi": "10.69528/jkmla.2025.52.1.28"
+  },
+  "C657": {
+    "paper_uuid": "394016ec-1c7c-4f2f-8c67-edcf83f32aa0",
+    "s2_id": "d358c3fa011c7209475c7ca556839a5ccba3919a",
+    "arxiv_id": null,
+    "doi": "10.1109/ICCT67417.2025.11374097"
+  },
+  "C658": {
+    "paper_uuid": "dd04edd4-8539-4a77-a58a-c6d74b41223a",
+    "s2_id": "69484e675d5c24115914f89d633f01e45ef912f4",
+    "arxiv_id": null,
+    "doi": "10.63973/1998-6785/2025-3/21-30"
+  },
+  "C659": {
+    "paper_uuid": "37d35a30-8cfe-415f-8971-cd54b4d9c0ff",
+    "s2_id": "ba886850c7f5b6bae7ba70fd8564ad5e7a4faa5e",
+    "arxiv_id": null,
+    "doi": "10.1101/2025.09.10.25334730"
+  },
+  "C660": {
+    "paper_uuid": "5c10d761-81ec-4000-9727-a03fad968848",
+    "s2_id": "bf2502509783c165c8a847615dfb34d22facd70f",
+    "arxiv_id": "2508.15822",
+    "doi": "10.48550/arXiv.2508.15822"
+  },
+  "C661": {
+    "paper_uuid": "9cd450a2-b843-4793-86b1-bb1c4ca246ce",
+    "s2_id": "bd8c8f0e5efb4e50d150e774a4142764f3a6b799",
+    "arxiv_id": null,
+    "doi": "10.6087/kcse.384"
+  },
+  "C662": {
+    "paper_uuid": "650aec0a-9e7b-4bb9-88d7-1e32d3986106",
+    "s2_id": "b0037165c0b499396cc7e128834bc54ecf344775",
+    "arxiv_id": null,
+    "doi": "10.1093/jamia/ocaf071"
+  },
+  "C663": {
+    "paper_uuid": "190324e7-9a86-4ddf-bf81-e9428c01544a",
+    "s2_id": "988c27c081100737193b8c7c1f3378a0321fbb22",
+    "arxiv_id": null,
+    "doi": "10.1016/j.caeo.2026.100386"
+  },
+  "C664": {
+    "paper_uuid": "bef00717-bc5c-464f-9819-a83bb6ad3ed4",
+    "s2_id": "1aa7b8c2386f29eb6ba414b17994465bbdee8608",
+    "arxiv_id": null,
+    "doi": "10.1109/ACCESS.2026.3700013"
+  },
+  "C665": {
+    "paper_uuid": "a86a024e-5c0a-4d35-b5de-5db62e7bce76",
+    "s2_id": "b3b5716df62c4556a82e2fc46641e9ca37b3458a",
+    "arxiv_id": "2606.17588",
+    "doi": null
+  },
+  "C666": {
+    "paper_uuid": "87c1dc9f-1a99-458b-bd34-96ee72805b74",
+    "s2_id": "99fb73cb7dfaeb871dd24f708482e925cf29550d",
+    "arxiv_id": "2606.16839",
+    "doi": null
+  },
+  "C667": {
+    "paper_uuid": "a904ca4c-1abe-42ef-bb1f-7f778373abae",
+    "s2_id": "5d8c7b0f5f431913f6f4cdf9c0e61452744c342b",
+    "arxiv_id": "2604.08602",
+    "doi": "10.48550/arXiv.2604.08602"
+  },
+  "C668": {
+    "paper_uuid": "64cd7511-35c4-4f5c-a93e-f2594e88eadb",
+    "s2_id": "ea728d4f8881729bafc0a2062849fcff389f3143",
+    "arxiv_id": null,
+    "doi": "10.1080/14693062.2026.2692573"
+  },
+  "C669": {
+    "paper_uuid": "78dbd505-14a8-4a88-886d-3ded110e8e4c",
+    "s2_id": "13c6445f5feccc82074f37b029a8bf66d670d666",
+    "arxiv_id": null,
+    "doi": "10.1088/1748-9326/ae7988"
+  },
+  "C670": {
+    "paper_uuid": "653833e0-394f-42f1-8d35-b57863b54293",
+    "s2_id": "e8bd939e7045686fd4ffc0037065bc7b43f65ccc",
+    "arxiv_id": "2606.07071",
+    "doi": "10.1145/3805712.3809548"
+  },
+  "C671": {
+    "paper_uuid": "695cd893-c628-40ba-8851-f9efbd2d5b75",
+    "s2_id": "6982e93323c8f42c7bfcbf88ed91b4b188ea351e",
+    "arxiv_id": "2605.29603",
+    "doi": null
+  },
+  "C672": {
+    "paper_uuid": "c2d92d41-23e4-40eb-84b5-67d4d6dd3458",
+    "s2_id": "38c75a53282bd07329edd68763658f164d92c88e",
+    "arxiv_id": null,
+    "doi": "10.3390/modelling7020072"
+  },
+  "C673": {
+    "paper_uuid": "771695b9-ae7b-4d1d-b976-93f1cf26aa2d",
+    "s2_id": "d12b600470916b198a711df284f122c29e809941",
+    "arxiv_id": null,
+    "doi": "10.1186/s13643-026-03101-4"
+  },
+  "C674": {
+    "paper_uuid": "345d0ef3-ed61-4d5a-907a-ad07f8926edc",
+    "s2_id": "ef85fbce4ed6a22eedf7a1d1d5be33ec534b599d",
+    "arxiv_id": null,
+    "doi": "10.1186/s13104-026-07651-7"
+  },
+  "C675": {
+    "paper_uuid": "cdd2c0d0-2e26-49a6-8a7d-d765a4c87ecf",
+    "s2_id": "6ee67b98ddef0ccbc0b6abd0a2d7ee5a2d6d0550",
+    "arxiv_id": null,
+    "doi": "10.1109/FLLM67465.2025.11391146"
+  },
+  "C676": {
+    "paper_uuid": "de978637-ea26-4c34-8787-d9f467e2b2c4",
+    "s2_id": "3dfb00e1fff43ea01f32d0f3cd9408d56cfa6338",
+    "arxiv_id": null,
+    "doi": "10.1186/s13750-025-00369-2"
+  },
+  "C677": {
+    "paper_uuid": "158e170d-3fac-480f-ac74-797ac220cd1f",
+    "s2_id": "3909758fa6568c42d194097b3ad53025ca569270",
+    "arxiv_id": null,
+    "doi": "10.1017/rsm.2025.10025"
+  },
+  "C678": {
+    "paper_uuid": "1525864e-7787-49a5-9d42-1e581f079a8d",
+    "s2_id": "562a19137e74e37e7220111a8024a74887169a36",
+    "arxiv_id": null,
+    "doi": "10.1007/s11831-026-10655-y"
+  },
+  "C679": {
+    "paper_uuid": "68086292-146c-4664-bf59-fe044c760684",
+    "s2_id": "84ff57a3b88d179136b6dc8bca537f55ab7467c4",
+    "arxiv_id": "2606.02403",
+    "doi": "10.18653/v1/2026.acl-demo.13"
+  },
+  "C680": {
+    "paper_uuid": "236275d4-2ab8-4ed1-929f-0b6f27682cc4",
+    "s2_id": "42f4b458ad87b140f2c86039121be13e1cdc6bf9",
+    "arxiv_id": null,
+    "doi": "10.1038/s43247-026-03514-y"
+  },
+  "C681": {
+    "paper_uuid": "6f0e52fc-aa49-4087-a358-0e0a86843bc9",
+    "s2_id": "5546246f1c9acd7e32ff7c76c8877419f9865271",
+    "arxiv_id": "2601.18239",
+    "doi": "10.48550/arXiv.2601.18239"
+  },
+  "C682": {
+    "paper_uuid": "638b47d3-8e8b-4d02-bc55-fb410403a1b0",
+    "s2_id": "ab864101c734f14b3932e545ce3c528f40ebe57e",
+    "arxiv_id": "2509.19370",
+    "doi": "10.48550/arXiv.2509.19370"
+  },
+  "C683": {
+    "paper_uuid": "b9ef8b42-3674-4192-98f5-55105da2a388",
+    "s2_id": "8974e6d453610a260093012e5b21505dc5da823c",
+    "arxiv_id": "2607.00597",
+    "doi": null
+  },
+  "C684": {
+    "paper_uuid": "486d5d6d-f1f1-48b3-aec5-0571211b204a",
+    "s2_id": "552c4017f39358ff048022534a84fe9b7c32cbd9",
+    "arxiv_id": null,
+    "doi": "10.7717/peerj-cs.3921"
+  },
+  "C685": {
+    "paper_uuid": "0a1971d0-349d-429c-8d75-eba95c8cd1fe",
+    "s2_id": "3e1f51cfcea69c3dccde2bd3136736e1ba761a21",
+    "arxiv_id": "2605.22566",
+    "doi": null
+  },
+  "C686": {
+    "paper_uuid": "5e22f0f4-501e-46f5-b4ec-04845293aa8b",
+    "s2_id": "30cc770c76a349140975e1332f9280c110177564",
+    "arxiv_id": "2511.00476",
+    "doi": "10.1140/epjds/s13688-026-00647-0"
+  },
+  "C687": {
+    "paper_uuid": "d90860d0-1f25-4187-ad2f-7c7e35ec004d",
+    "s2_id": "2712c41092dee5c93cdd9a4c7feea2ad67fbfd02",
+    "arxiv_id": "2510.26750",
+    "doi": "10.48550/arXiv.2510.26750"
+  },
+  "C688": {
+    "paper_uuid": "cbf53afb-ac1d-4df3-b2b9-35c1762c3fc6",
+    "s2_id": "aa9986f5b7b936fc4c41d5d58828ea92b8c5792e",
+    "arxiv_id": null,
+    "doi": "10.1145/3776759.3776840"
+  },
+  "C689": {
+    "paper_uuid": "54675abb-bdcc-4371-981b-22ef099338c4",
+    "s2_id": "4b128832997968d11be2ab1a137f58ca448952ef",
+    "arxiv_id": "2509.13672",
+    "doi": "10.48550/arXiv.2509.13672"
+  },
+  "C690": {
+    "paper_uuid": "c4ec18e2-d5b5-4267-b1eb-04e04d1dc171",
+    "s2_id": "f31bf05356a2bc40ac181fc78df7471745075d6d",
+    "arxiv_id": "2412.02149",
+    "doi": "10.48550/arXiv.2412.02149"
+  },
+  "C691": {
+    "paper_uuid": "bb47a468-863e-4f6f-b91c-9e209c055686",
+    "s2_id": "855fa31a49c5715a0679d34d8586d928a5ae6b02",
+    "arxiv_id": null,
+    "doi": "10.2172/2462994"
+  },
+  "C692": {
+    "paper_uuid": "64806a21-44ae-475b-acdc-76139d167b80",
+    "s2_id": "911dec288cf92dde6260255bc0f56dfa083625cd",
+    "arxiv_id": "2604.00945",
+    "doi": "10.48550/arXiv.2604.00945"
+  },
+  "C693": {
+    "paper_uuid": "65cf4008-690f-4aa7-a7b8-48cf5e267acb",
+    "s2_id": "6f7eb294a62762b14167e7714135020d43701995",
+    "arxiv_id": "2604.19772",
+    "doi": "10.48550/arXiv.2604.19772"
+  },
+  "C694": {
+    "paper_uuid": "425b23e6-53d9-4568-ac20-80f1d9fcf643",
+    "s2_id": "bd0af87d08569c1aa473a8dc90900694b28bc0b5",
+    "arxiv_id": "2601.21733",
+    "doi": "10.48550/arXiv.2601.21733"
+  },
+  "C695": {
+    "paper_uuid": "cfc0eb9b-0584-4748-b195-e1b6c8e4e70e",
+    "s2_id": "a332a5c87ee339e35b4c982312d775b162398418",
+    "arxiv_id": "2601.09728",
+    "doi": "10.48550/arXiv.2601.09728"
+  },
+  "C696": {
+    "paper_uuid": "30121fe6-c61e-4ef6-9a8e-4d4b46279ff8",
+    "s2_id": "743e386a611eea3f13490e2600211b5c57b24da6",
+    "arxiv_id": null,
+    "doi": "10.1109/ICCSC66714.2025.11135215"
+  },
+  "C697": {
+    "paper_uuid": "611299cd-84c9-4145-8927-eab12d8b1473",
+    "s2_id": "1271e9ca8d5c677fc3aad81519fc8b6240a18130",
+    "arxiv_id": "2506.08196",
+    "doi": "10.48550/arXiv.2506.08196"
+  },
+  "C698": {
+    "paper_uuid": "3928bf87-5863-4967-a7f9-34b811d3351d",
+    "s2_id": "dc8e95137e157aa18ec543099a7162ebb2c3dd32",
+    "arxiv_id": "2407.08270",
+    "doi": "10.48550/arXiv.2407.08270"
+  }
+}

@@ -1,0 +1,62 @@
+[project]
+slug        = "galesic-human-social-sensing"
+title       = "Human social sensing and network-based opinion estimation"
+description = """
+A systematic review of Human Social Sensing (HSS): using the structure and signals of
+social networks to estimate population-level opinions, behaviours, and social phenomena.
+Covers network-based sampling methods, social inference under cognitive biases, crowd
+wisdom in networked settings, and the intersection of social cognition with survey
+methodology.
+"""
+criteria = """
+Include if the paper is primarily concerned with any of:
+- Human social sensing as a methodology: inferring population statistics (opinions,
+  behaviours, beliefs) from social network structure or locally-observable network signals.
+  Includes friend-of-a-friend estimation, network-based surveys, and ego-network sampling.
+- Social influence and social learning in networks: how beliefs, opinions, or behaviours
+  spread through social networks; opinion dynamics models; echo chambers and filter bubbles
+  when studied as estimation problems.
+- Wisdom of crowds and collective intelligence: conditions under which aggregating
+  distributed social judgements improves accuracy; crowd forecasting; prediction markets
+  viewed through the lens of social sensing.
+- Cognitive biases in social perception: majority illusion, friendship paradox effects
+  on opinion estimation, biased social sampling, availability heuristics in social
+  contexts — especially empirical or formal models of these effects.
+- Network-based survey methodology: respondent-driven sampling (RDS), network scale-up
+  methods (NSUM), adaptive sampling designs exploiting social network structure.
+- Social media as a sensing substrate: inferring latent population states from social
+  media behaviour or network topology; audit studies of algorithmic amplification
+  when framed as a sensing problem.
+- Formal models of social epistemology or Bayesian social learning that bear directly
+  on estimation accuracy from networked agents.
+
+Exclude:
+- Pure social network analysis (community detection, centrality, link prediction) without
+  a population-estimation or sensing application.
+- Opinion formation/dynamics models focused purely on convergence behaviour without
+  connection to sensing, inference, or survey methodology.
+- Political science papers focused on electoral outcomes as the primary contribution
+  (rather than methodology for social sensing).
+- Recommendation systems, advertising targeting, or information diffusion papers whose
+  primary frame is delivery rather than sensing.
+- Natural language processing or content analysis papers using social media text without
+  a network-sensing angle.
+"""
+
+# Seeds: author-selected salient papers from the HSS literature
+[[seeds]]
+doi = "10.1038/s41562-018-0302-y"    # HSS1: Galesic et al. (2018) Nature Human Behaviour
+
+[[seeds]]
+arxiv_id = "1802.06505"              # HSS2: NK (2019) TKDE
+
+[[seeds]]
+doi = "10.1016/j.electstud.2021.102433"  # HSS3: Ahlstrom-Vij (2021) Electoral Studies
+
+[loop]
+yield_threshold   = 0.05
+stale_rounds      = 2
+escape_attempts   = 2
+hub_percentile    = 80
+screen_batch      = 20
+max_rounds        = 60

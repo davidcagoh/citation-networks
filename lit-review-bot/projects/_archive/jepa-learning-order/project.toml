@@ -1,0 +1,72 @@
+[project]
+slug        = "jepa-learning-order"
+title       = "JEPA Learning Order: Theoretical Foundations and SSL Dynamics"
+description = """
+A systematic review of the theoretical literature on Joint Embedding Predictive
+Architectures (JEPA) and related self-supervised learning theory. Focuses on
+training dynamics, implicit bias, feature learning order, and convergence results
+for JEPA-style objectives; deep linear network theory underpinning these analyses;
+and formal comparisons between JEPA-style (joint-embedding predictive) and
+MAE-style (reconstruction) objectives. Motivated by the paper "JEPA Learns
+Influential Features First: A Proof Without Simultaneous Diagonalisability"
+(Goh, 2026).
+"""
+criteria = """
+Include if the paper addresses any of:
+- Theoretical analysis of Joint Embedding Predictive Architectures (JEPA) or
+  self-distillation networks — training dynamics, implicit bias, feature ordering,
+  convergence, or representation quality.
+- Deep linear network theory: ODE-based analysis of gradient flow, implicit
+  regularisation, feature learning order, or matrix factorisation dynamics.
+- Self-supervised learning theory: formal analysis of why SSL objectives (masked
+  autoencoders, contrastive learning, self-distillation, predictive coding) learn
+  the representations they do — including collapse analysis, spectral properties,
+  or information-theoretic bounds.
+- Comparison of JEPA-style (joint-embedding predictive) vs MAE-style
+  (reconstruction) objectives: theoretical or empirical analysis of the difference
+  in learned representations.
+- Balanced initialisation, overparameterisation, or implicit acceleration results
+  that apply to the encoder architectures studied in SSL theory.
+- Formal verification of SSL or deep learning theory results in a proof assistant
+  (Lean, Coq, Isabelle).
+
+Exclude:
+- Purely empirical SSL papers with no theoretical analysis (no theorem, no formal
+  claim).
+- Architecture papers (new transformer variants, attention mechanisms) without SSL
+  theory contribution.
+- Downstream task papers that use a pre-trained JEPA model only as a frozen
+  feature extractor.
+- Reinforcement learning or world-model papers that use JEPA terminology but study
+  sequential decision-making rather than representation learning theory.
+- Survey papers on self-supervised learning generally, unless they contain original
+  theoretical results.
+- Papers on speech, audio, or text SSL with no connection to the visual/linear-
+  network theory studied here.
+"""
+
+# Seeds: papers cited in "JEPA Learns Influential Features First" (Goh, 2026).
+# Selected to triangulate the theoretical and empirical JEPA literature.
+
+[[seeds]]
+arxiv_id = "2407.03475"   # Littwin et al. (2024) — How JEPA avoids noisy features (direct predecessor)
+
+[[seeds]]
+arxiv_id = "1802.06509"   # Arora, Cohen, Hazan (2018) — Implicit acceleration by overparameterization
+
+[[seeds]]
+arxiv_id = "1905.13655"   # Arora, Cohen, Hu, Luo (2019) — Implicit regularization in deep matrix factorization
+
+[[seeds]]
+arxiv_id = "2301.08243"   # Assran et al. (2023) — I-JEPA: Self-supervised learning from images with JEPA
+
+[[seeds]]
+arxiv_id = "2404.08471"   # Bardes et al. (2024) — V-JEPA: Revisiting Feature Prediction for Visual Representations from Video
+
+[loop]
+yield_threshold  = 0.05
+stale_rounds     = 2
+escape_attempts  = 2
+hub_percentile   = 80
+screen_batch     = 20
+max_rounds       = 500

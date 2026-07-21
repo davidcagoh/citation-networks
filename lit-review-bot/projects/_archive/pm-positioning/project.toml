@@ -1,0 +1,89 @@
+[project]
+slug        = "pm-positioning"
+title       = "Positioning Persona Memory: Bounded Cross-Session Context vs. Retrieval-Based Long-Term Memory"
+description = """
+A targeted literature discovery pass to support the positioning argument for
+Persona Memory (PM), a bounded (<=270 token) cross-session context system for
+enterprise AI agents. PM injects a single structured summary once at session
+start rather than retrieving facts from a large accumulated history. This
+review is seeded from two clusters: (1) "Beyond pass@1" (Goh et al. reading,
+2603.29231), which finds that unbounded intra-task memory scaffolds injected
+every turn universally hurt long-horizon agent performance and explicitly
+calls for alternative bounded/structured memory architectures as future work;
+and (2) the current cross-session user-memory benchmark literature
+(PersonaMem, MemoryCD, LoCoMo, LongMemEval), which uniformly frames the
+problem as retrieval accuracy from large (100K+ token) histories rather than
+as bounded structured context injection. The goal is to find any literature
+that (a) already proposes bounded/non-retrieval alternatives to long-history
+retrieval for cross-session memory, (b) evaluates memory quality by
+downstream task/response quality rather than retrieval accuracy, or (c)
+frames persistent agent memory as a governance/auditability problem for
+enterprise deployment rather than a personalization problem -- so we can
+correctly claim novelty (or concede prior art) for PM's positioning.
+"""
+criteria = """
+Include if the paper addresses any of:
+- Cross-session or long-term user memory for LLM-based conversational agents
+  or assistants (multi-session, not single-turn).
+- Benchmarks or evaluations of agent memory systems, especially those
+  measuring downstream task/response quality rather than pure retrieval
+  accuracy (recall@k, F1 against a gold fact).
+- Memory architectures that are bounded/fixed-size (a capped summary,
+  profile, or scratchpad) rather than an unbounded retrieval index over
+  full history.
+- Reliability, capability-vs-reliability, or long-horizon agent evaluation
+  frameworks (e.g. pass@k framings, repeated-attempt reliability metrics)
+  that discuss agent memory, context accumulation, or scratchpad failure
+  modes.
+- Governance, auditability, accountability, or observability framings of
+  persistent AI agent state or context (as opposed to purely
+  personalization/UX framings).
+- Enterprise or professional-domain (non-consumer) framing of agent memory
+  or personalization, as distinct from consumer chat personalization
+  (product recommendations, life advice, entertainment).
+- Session summarization or hierarchical/recursive summary approaches used
+  as a memory mechanism (not just as a text-compression technique).
+
+Exclude:
+- Papers about intra-task memory only (a single task execution's own
+  scratchpad/chain-of-thought), with no cross-session component, unless they
+  explicitly discuss failure modes of unbounded accumulation (relevant to
+  the pass@1 comparison).
+- Pure retrieval-system papers (vector DB design, embedding models, ANN
+  search) with no agent-memory framing.
+- Persona/personality *simulation* papers (roleplay, character consistency)
+  with no memory-persistence mechanism.
+- Papers solely about knowledge-graph construction or extraction pipelines
+  with no cross-session memory application (this is covered by a separate
+  existing review; do not duplicate).
+- Multimodal (vision/audio) personalization papers unless the underlying
+  memory mechanism is directly comparable (bounded vs. retrieval).
+"""
+
+# Seeds: the pass@1 paper (source of the bounded-vs-unbounded distinction)
+# plus the four cross-session memory benchmarks identified in the 2026-06-30
+# literature sweep (session-log.md) as the crowded field PM must be
+# positioned against.
+
+[[seeds]]
+arxiv_id = "2603.29231"   # "Beyond pass@1": reliability science framework for long-horizon LLM agents; names bounded/structured memory as future work
+
+[[seeds]]
+arxiv_id = "2504.14225"   # PersonaMem — Know Me, Respond to Me: dynamic user profiling benchmark (COLM 2025)
+
+[[seeds]]
+arxiv_id = "2603.25973"   # MemoryCD — long-context user memory benchmark, 387K token histories, lifelong cross-domain personalization
+
+[[seeds]]
+arxiv_id = "2402.17753"   # LoCoMo — Evaluating Very Long-Term Conversational Memory of LLM Agents
+
+[[seeds]]
+arxiv_id = "2410.10813"   # LongMemEval — benchmarking chat assistants on long-term interactive memory
+
+[loop]
+yield_threshold  = 0.05
+stale_rounds     = 2
+escape_attempts  = 2
+hub_percentile   = 80
+screen_batch     = 20
+max_rounds       = 500
