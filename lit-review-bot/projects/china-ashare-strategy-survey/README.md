@@ -197,6 +197,56 @@ single new signal candidate found so far.
 Note: "Dissecting Momentum in China" isn't yet well-indexed in Semantic Scholar (too new/preprint),
 so no forward-citation trail was available for the survey's key ruled-out-momentum finding.
 
+### Reconciling the overlapping short-horizon candidates (2026-07-21)
+
+Flagged repeatedly, never resolved until now — five candidates in this survey are all
+"retail-driven, session/T+1-adjacent" and were each found in a different search round. Comparing
+their precise mechanism, horizon, and investor attribution (from what's already extracted, no new
+searching):
+
+| Candidate | Return window | Attributed to | Overlaps with |
+|---|---|---|---|
+| Daily momentum (Gao et al.) | Close-to-close, day *t*→*t+1*, reverses within a week | New investors specifically (account-level data, causal) | Overnight-MAX (see below) |
+| Last-hour momentum (Yang) | Intraday, half-hour→half-hour, *resets each session* — explicitly checked not to carry to next day's first half-hour | Retail broadly (82% of volume), T+1-driven end-of-day risk absorption | None of the others — genuinely distinct window |
+| Overnight-MAX/lottery (Gu, Hu & Xiong) | Close-to-open (overnight gap) specifically, decomposed out of the monthly MAX anomaly | Retail, T+1-constrained overnight demand accumulation | Daily momentum (see below) |
+| Day-night institutional timing (Qiu, Huang & Jiang) | U-shaped: profits at session open+close, ~zero midday | **Institutions**, not retail — the one candidate with a different investor-type attribution | Possibly the counterparty side of the other four, not a competitor for the same alpha |
+| Turnover crowding (SHAP study) | Cross-sectional, monthly rebalance, level-based (not timing-based) | Retail crowding proxy, no specific time-of-day mechanism | Possibly redundant with daily momentum if it's just flagging the same stocks |
+
+**Genuinely distinct, not overlapping:** last-hour momentum. Its return window (within-session,
+half-hour granularity) doesn't overlap any other candidate's, and the paper explicitly tested and
+rejected next-day carryover — this is real, additional evidence, not the same signal restated.
+
+**Real, unresolved overlap risk #1 — daily momentum vs. overnight-MAX.** Daily momentum's "day
+*t* return" is a close-to-close number that *includes* the overnight gap. New investors chasing a
+stock's prior-day gain (daily momentum's mechanism) very plausibly manifests as buying at the next
+day's open in response to seeing yesterday's close — i.e. the same retail behavior overnight-MAX
+already documents as T+1-constrained overnight demand accumulation. These may be two papers
+describing one mechanism from different decompositions (whole-day vs. overnight-only), not two
+independently stackable signals. Not resolvable from the literature alone — needs the actual
+overnight/intraday decomposition of the daily-momentum effect, which neither paper's abstract-level
+extraction settles.
+
+**Real, unresolved overlap risk #2 — turnover-crowding vs. daily momentum.** The turnover filter
+might just be re-identifying the same stocks daily momentum already flags (high-turnover stocks
+are mechanically the ones seeing the new-investor attention-chasing that drives daily momentum) —
+or it might be a genuinely orthogonal cross-sectional signal. Needs an empirical correlation check
+between the two candidates' stock selections, not resolvable from what's extracted.
+
+**Likely complementary, not overlapping — day-night institutional timing.** The only candidate
+attributed to institutions rather than retail. Plausible reading: institutions are the counterparty
+liquidating *into* the retail-driven demand the other four candidates describe, at exactly the
+session-boundary times those candidates also target — which would make this a description of the
+other side of the same trades, not a competing alpha source. Genuinely uncertain without the full
+paper (only abstract-level extraction available) — flagged as the lowest-confidence read in this
+table.
+
+**Bottom line:** treat this survey's candidate count as smaller than five once double-counting is
+resolved — plausibly 3-4 real, independent mechanisms (low-vol core, last-hour momentum, one
+combined overnight/daily-momentum mechanism, and turnover-crowding pending its own check), not
+five stackable ones. This can't be fully resolved from literature alone; it needs the actual
+overnight/intraday return decomposition run on real data, which is exactly the kind of check this
+survey's assembled eval toolkit (break-even cost, mainboard breakpoints, PBO/DSR) is for.
+
 ### Open methodological flag (from the eval survey, see `trading-eval-survey/`)
 This flag is about the prior effort's *own parameter tuning*, not the literature theses above.
 Its parameter choices (60d vol window, N=20/30 stock count, −0.025 trend threshold, regime-detector
