@@ -4,6 +4,78 @@ Reverse-chronological. Start every session here, then check open-questions.md.
 
 ---
 
+## 2026-07-21 (session 45, Wiki consolidation + eval-methodology dive) — litdiscover/synthesis wikis collapsed to one flat file each after too much info spread too thin; reference-systems promoted to repo root; found how competing survey-generation systems actually claim superiority; zeitgeist codebase-map refreshed and a new post-paper direction recorded
+
+**Started as a wiki health check**, then pivoted into a real dive: dug into
+`lit-review-bot/projects/automated-lit-review-methodology/` (an old LitDiscover-engine-driven
+project) at the user's request to see how competing automated-lit-review-generation systems
+(AutoSurvey, LiRA, SurveyX, SurveyGen-I, InteractiveSurvey, etc.) each claim to beat the others.
+Found the project's own raw discovery pool was mostly noise (generic high-citation ML papers
+pulled in by traversal); the real answer lived in `reference-systems/deep-dives.md`'s per-system
+"how it performed" fields. Synthesized the pattern across systems: pick a metric family
+(citation-grounding NLI, LLM-judge coverage/structure/relevance, ROUGE, reference-relevance IoU),
+build your own benchmark, beat "naive RAG" plus 1-2 named predecessors on your own axes — and the
+underlying metrics are almost all inherited from AutoSurvey's own single, never-repeated
+meta-validation (ρ≈0.54 against human judgment), not independently re-validated by each borrower.
+
+<details>
+
+- **Archived + promoted based on that finding:** `automated-lit-review-methodology/` moved to
+  `lit-review-bot/projects/_archive/` (noise, superseded by `deep-dives.md`);
+  `lit-review-bot/reference-systems/` (14 cloned systems + `deep-dives.md`) promoted to the repo
+  root — important enough on its own, not just a LitDiscover subfolder. `.gitignore`, both
+  READMEs, and cross-references across the wiki updated to match.
+- **User flagged the wiki itself was part of the problem** ("too much info... all over the damn
+  place... shouldn't it just be notes and roadmap or even one flat file") — mid-restructure of
+  `wiki/litdiscover/` at the time, which was ironically about to make one of the files longer
+  while "fixing" this. Stopped, asked, collapsed instead.
+- **`wiki/litdiscover/`'s five files** (`research-roadmap.md`, `discovery-roadmap.md`,
+  `corpus-curation-prior-art.md`, `decisions.md`, `open-questions.md` — 2,261 lines) merged into
+  one flat `litdiscover.md`, most-important-first, leading with the thing that now gates
+  everything else in the file: whether the manual pipeline (session 44) replaces the engine's
+  Discovery stage entirely, which directly contradicted `discovery-roadmap.md` §7 step 0's
+  standing (and now stale) instruction to build the §4.0 end-to-end harness "ahead of any further
+  work." `manual-pipeline-retrospective.md` kept separate — already tight and the newest,
+  most-load-bearing doc in the directory.
+- **`wiki/synthesis/`'s nine files** (`roadmap.md`, `q-synth-plan.md`,
+  `representation-learning-plan.md`, `background/` ×2, `example-comparison/` ×4 — 2,064 lines,
+  nested three directories deep) collapsed the same way into `synthesis.md`. Direct motivation:
+  this is exactly where the "no mature synthesis-quality eval standard exists" finding lived
+  (`background/eval-standard-gap.md`) — buried enough that it got missed in this session's own
+  earlier review of the project (surfaced only when independently rediscovered via `deep-dives.md`
+  during the eval-methodology dive above) — now placed prominently near the top instead, and
+  cross-linked to `litdiscover.md`'s own independent discovery of the same shape of gap one stage
+  earlier (discovery/screening, not just synthesis).
+- **Mid-turn git housekeeping:** user asked to pull/push, having not done either in a while.
+  Fetch confirmed no upstream divergence (just 8 commits ahead, nothing new on origin) — finished
+  the in-progress restructure first rather than pushing a half-done state, then committed and
+  pushed both the litdiscover and synthesis consolidations as separate commits.
+- **`wiki/zeitgeist/` checked against the same complaint and found not to need it** — 4 flat
+  files, 285 lines total, no nesting, each with a distinct job (state snapshot / append-only
+  decisions / live todo / archived research note). Real issue was staleness, not structure:
+  `codebase-map.md` hadn't been updated since session 21 (2026-04-16) and still showed NST
+  training as in-progress and Time Curves as waiting on it, when `decisions.md` already recorded
+  both as complete-but-dropped-from-scope as of 2026-04-17. Fixed.
+- **New direction recorded, not just a refresh:** user decided Zeitgeist isn't done at the
+  §§1–4 paper — a time-axis-aware t-SNE/force-directed layout (not SG-t-SNE's current
+  symmetrized, atemporal projection) is now planned as post-paper work, with LitDiscover's own
+  traversal rounds named as a possible alternate temporal signal on a recovered subgraph, not just
+  publication year. Recorded in `decisions.md` (explicitly not reopening the §§1–4 scope
+  decision) and `open-questions.md`, cross-linked to `synthesis.md`'s already-planned Q-SYNTH
+  NST-vs-UMAP-vs-SG-t-SNE comparison on the same K17-RGC subgraph rather than standing up new
+  infrastructure.
+
+</details>
+
+**Next:** none of session 44's three continuation threads (fresh A-share dataset, manual-pipeline
+methodology refinement, lit-review-eval-methodology survey scoping) were started this session —
+still open. Zeitgeist's new time-axis-layout thread is unscoped past the idea itself (t-SNE vs.
+force-directed not chosen, doesn't live anywhere yet, "LitDiscover round" isn't currently a field
+`core/loop.py` persists per included paper). LitDiscover's own top blocker
+(`check_citation_grounding()` never run against a real project) remains untouched.
+
+---
+
 ## 2026-07-21 (session 44, Manual pipeline / A-share + eval surveys) — Manual composable-pipeline experiment run end-to-end (keyword search → curate/extract → refine → forward/co-citation) across two new Zotero-backed surveys; china-ashare-strategy-survey synthesis built and reconciled; pipeline retrospective written for a future LitDiscover redesign
 
 **2-tier exp:** Started as ordinary wiki/codebase questions, then pivoted hard: user is exploring a manual, human-steered discovery/curation pipeline as a *candidate replacement* for LitDiscover itself, not an addition to it — motivated by LitDiscover's own finding that co-citation was the only real-signal non-traversal operator while embedding/venue/recency all failed. Built two new project folders (`lit-review-bot/projects/china-ashare-strategy-survey/`, `trading-eval-survey/`) after moving `projects/` out of the litdiscover engine's own repo (was accidentally version-controlled inside the private-but-PyPI-adjacent package repo). Ran the full planned pipeline across both, discovered along the way that a Feishu-competition weekly-search job had already pre-seeded the same Zotero group library with real prior results (`low_vol.py` CAGR=+9.32%/SR=0.85, best-so-far `vol_managed` Score=0.3116) — deliberately not reused (narrow single-regime dataset), but its validated/ruled-out hypotheses carried forward as a literature-cross-checked seed list. Closed by reconciling 5 overlapping short-horizon candidates down to ~3-4 real mechanisms, and writing up 8 concrete findings for a future LitDiscover redesign.
