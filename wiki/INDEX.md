@@ -46,7 +46,7 @@ Three contributions, each with its own subdirectory:
 |---|---|---|
 | [LitDiscover](litdiscover/) | Paper **desk-rejected by IP&M** (2026-07-07) — redo planned; engine on PyPI but **out of date**. Discovery/screening evaluation redesigned 2026-07-14 around an end-to-end recall/precision metric, after isolated-stage numbers proved indefensible on their own. **2026-07-21:** a manual candidate-replacement pipeline is being dogfooded in parallel — not yet a decision to replace the engine, still gathering evidence; wiki consolidated to one file (`litdiscover/litdiscover.md`), see there for full status | Information Processing & Management (redo) |
 | [Zeitgeist](zeitgeist/) | Active — §§1–4 figures done, §§1+8 rewrite next; **its own repo** (`github.com/davidcagoh/citation-dynamics`, local clone renamed `zeitgeist/`) | COMPLEX NETWORKS 2026 (~Aug) |
-| [Synthesis](synthesis/) | Refactored 2026-07-14 into 3 tracks (see `synthesis/roadmap.md`); K17-RGC gold set verified, pipeline not yet run | Post-Zeitgeist thesis chapter |
+| [Synthesis](synthesis/) | 3 tracks, consolidated into one file 2026-07-21 (`synthesis/synthesis.md`); K17-RGC gold set verified, pipeline not yet run | Post-Zeitgeist thesis chapter |
 
 ---
 
@@ -92,27 +92,15 @@ clone's rename** (repo itself is still `github.com/davidcagoh/citation-dynamics`
 
 ## Synthesis
 
-**Refactored 2026-07-14 into a single entry point + three protocol tracks. Read
-[synthesis/roadmap.md](synthesis/roadmap.md) first** — it states the goal, each track's real
-status, and the one next action per track, so nothing below needs re-deriving that.
+**Consolidated 2026-07-21 (session 45)** — `roadmap.md`, `q-synth-plan.md`,
+`representation-learning-plan.md`, `background/` (2 files), and `example-comparison/` (4 files),
+2,064 lines across 9 files nested three directories deep, merged into one flat file after the
+eval-standard-gap finding below got buried and missed in a later session's own review of this
+project.
 
 | File | Purpose |
 |---|---|
-| [synthesis/roadmap.md](synthesis/roadmap.md) | **Start here.** Goal, three-track status table, immediate next action per track, what "rigor" means before any track counts as a real result |
-| [synthesis/q-synth-plan.md](synthesis/q-synth-plan.md) | Graph-native track — K17-RGC pipeline (Leiden + power-law + embedding), the Leiden-vs-BlueRed and NST-vs-UMAP-vs-SG-t-SNE method comparisons, success criteria, blocking prerequisites. Merged from the former `experiment-spec.md` + `methods-comparison.md` |
-| [synthesis/representation-learning-plan.md](synthesis/representation-learning-plan.md) | Embedding-native track (formerly `litdiscover/phase-representation-roadmap.md`) — does a structured 6-field summary embed better for clustering than raw text? 4-condition design; ground truth built, pipeline not yet run, 3 open design decisions before it can be |
-| [synthesis/example-comparison/](synthesis/example-comparison/) | LLM-text-native track, **complete as a control condition** — three methods run over the same 27-paper corpus; still LitDiscover's own related-work-drafting source, grouped here because it's a disjoint corpus-structuring protocol, not because it stopped serving that role. Renamed from `background/lineages/` (2026-07-14) |
-| [synthesis/background/reference-implementation-survey.md](synthesis/background/reference-implementation-survey.md) | Code-grounded (not paper-text) audit of 14 cloned reference systems: embedding/clustering choices, synthesis-mechanism deep-dives, paper-vs-code fidelity gaps (SurveyX's "attribute forest" doesn't exist in code, SurveyGen's re-ranking formula doesn't match its stated coefficients, InteractiveSurvey's clustering variable is named `hdbscan_model` but instantiates `AgglomerativeClustering`), plus each system's paper-reported eval/results |
-| [synthesis/background/eval-standard-gap.md](synthesis/background/eval-standard-gap.md) | Is there a mature eval standard for synthesis quality across the LLM-narrative-generation corpus? No — converged-but-unvalidated (AutoSurvey's citation-NLI + LLM-judge rubric reused everywhere, but ρ≈0.54 against human judgment and no shared benchmark); the "synthesis"/"critical analysis" axis specifically has no validated instrument anywhere in the corpus |
-
-**`synthesis/example-comparison/` — three LLM-text-native corpus-structuring methods:**
-
-| File | Method | Finding |
-|---|---|---|
-| [similarity-cluster.md](synthesis/example-comparison/similarity-cluster.md) | **Deprecated 2026-07-13** — thematic clustering, kept unedited as the control condition in `lineage-comparison.md`, not a drafting source | Only 12/32 real citation edges represented; 3 drawn edges have no textual support |
-| [explicit-citation-graph.md](synthesis/example-comparison/explicit-citation-graph.md) | O(n) bottom-up — read each paper once, extract only what it explicitly states about others; connected-components analysis (union-find) on the resulting graph | 32 confirmed edges; 19-paper giant component, 2-paper satellite, isolates — ground truth for the other two methods |
-| [implicit-pairwise-analysis.md](synthesis/example-comparison/implicit-pairwise-analysis.md) | O(n²)-ish content-matching — date-ordered pairwise check of named limitations vs. later mechanisms | 10 new uncited-but-real edges (likely undercounted); unioned with the 32 explicit edges, 2 previously fully-isolated papers (ResearchRabbit, Scholar Augment) get pulled into the field's main connected structure |
-| [lineage-comparison.md](synthesis/example-comparison/lineage-comparison.md) | Worked example — ProfOlaf drawn all three ways | 6 real relationships total; no single method found more than half |
+| [synthesis/synthesis.md](synthesis/synthesis.md) | **Start here for everything Synthesis** — goal, three-track status table, the eval-standard-gap finding (prominent, not buried), each track's full detail, the reference-implementation code-fidelity audit, all in one file |
 
 **Why all three tracks are grouped under Synthesis, not scattered across LitDiscover:** all three
 answer the same question — given a curated paper set, structure it into interpretable organization

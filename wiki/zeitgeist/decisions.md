@@ -35,7 +35,7 @@ Choices that have already been made and why. Read this before changing any param
 ## §§5–6 (NST + Time Curves) dropped from paper scope
 **Decision date:** 2026-04-17
 **Why:** Time Curves on the full corpus computes per-year centroids averaged over 446 communities — the corpus-level signal is noise. NST diagnostic figures (spatial PCA, temporal vs year Spearman ρ=−0.668) were not interpretable or compelling. Both were adopted for methodological novelty rather than because they answered a specific research question.
-**Implication:** Paper scope is now §§1–4 only. NST embeddings and Time Curves outputs are archived in `data/` but not cited in the paper. The embedding/clustering comparison work is deferred to the signature-patterns thesis chapter — see `wiki/synthesis/q-synth-plan.md`.
+**Implication:** Paper scope is now §§1–4 only. NST embeddings and Time Curves outputs are archived in `data/` but not cited in the paper. The embedding/clustering comparison work is deferred to the signature-patterns thesis chapter — see `wiki/synthesis/synthesis.md` (Q-SYNTH section).
 
 ---
 

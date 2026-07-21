@@ -61,7 +61,7 @@ one `operator(paper_set) -> OperatorResult` contract in `litdiscover/discovery/`
 measures pure graph reachability with zero screening in the loop. Precision's denominator (the
 candidate pool) is *produced by* discovery — so a discovery-only recall number or a
 screening-only precision number can't be defended alone as evidence of system quality, ever
-(this is the same structural point Synthesis's `eval-standard-gap.md` makes independently for
+(this is the same structural point `../synthesis/synthesis.md` makes independently for
 survey-generation quality — see Prior Art below). **New primary metric defined but not yet
 built:** end-to-end recall/precision/F1 of the real `status=included` set (not raw candidates)
 against a survey's true bibliography, budget-capped per run, full seeds→discovered→included
@@ -136,8 +136,8 @@ real project** (see Status above).
 4. Map-reduce's reduce step loses access to source fields — same root cause as #1, no separate fix.
 
 **Representation question** (does a structured-summary embedding cluster better than raw text
-before k-means) moved to `../synthesis/representation-learning-plan.md` — motivated by
-`../synthesis/example-comparison/similarity-cluster.md`'s corpus-scale clustering failure
+before k-means) moved to `../synthesis/synthesis.md` (Representation learning section) —
+motivated by that file's (LLM-text-native section) corpus-scale clustering failure
 (12/32 real edges survived, 3 fabricated).
 
 **Immediate next step, unchanged:** run `litdiscover synthesize` on a real project to get the
@@ -175,7 +175,7 @@ gate is a real, measured stopping rule of the same shape, in a field where most 
 (ResearchRabbit, ASReview) have none at all — a genuine, defensible point of novelty.
 
 **The eval-standard gap — same finding as Synthesis's, independently arrived at, now reinforced a
-third time.** `../synthesis/background/eval-standard-gap.md` found no validated synthesis-quality
+third time.** `../synthesis/synthesis.md` (eval-standard gap section) found no validated synthesis-quality
 standard exists (AutoSurvey's citation-NLI + LLM-judge rubric got copied near-verbatim into LiRA/
 SurveyX/SurveyGen-I, but only reaches ρ≈0.54 against human judgment, computed once, never
 re-validated downstream). This directory's own discovery/screening research found the same shape
@@ -236,7 +236,7 @@ specific axis, once it's actually run (see Status above).
 Thematic-bucket clustering (`similarity-cluster.md`, deprecated) was audited and found to
 represent only 12/32 real citation edges with 3 fabricated ones. Two more rigorous methods
 (`explicit-citation-graph.md`, `implicit-pairwise-analysis.md`, both in
-`../synthesis/example-comparison/`) replaced it as the actual related-work-drafting source.
+`../synthesis/synthesis.md`, LLM-text-native section) replaced it as the actual related-work-drafting source.
 
 ---
 
