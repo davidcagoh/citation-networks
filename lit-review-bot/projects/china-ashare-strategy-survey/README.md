@@ -152,6 +152,48 @@ Lower priority (found via the same forward-citation pass, not pursued further): 
 household long-term-care asset allocation, Sina Weibo COVID-sentiment sensitivity, IPO-sentiment
 lottery demand, oil-futures lottery gambling — all tangential to this RQ.
 
+### Fourth pass (2026-07-21) — co-citation, via a well-connected paper's own reference neighborhood
+
+True co-citation (Blitz et al.'s citers' shared reference overlaps) wasn't computable — the one
+paper whose reference list would've been richest ("Luck 'duels' among factors in China") has its
+references elided by the publisher. Fell back to mining the neighborhood of a broad, well-cited
+(52 citations) survey paper instead, same underlying goal. High yield — the best round yet for
+methodological rigor specifically:
+
+- **"Anomalies in the China A-share market" (Jansen/Swinkels/Zhou 2021)** — tests 32 known
+  anomalies against 20 years of A-share data and, uniquely in this collection, computes
+  **break-even transaction costs per anomaly**. Value/low-vol are low-turnover and cost-robust
+  (book-to-market tolerates 1.47% costs at a 1-month hold). Short-horizon effects — short-term
+  vol, short-term/residual reversal, seasonal, abnormal turnover — have break-even costs as low as
+  **0.12%**. This is the single most important execution-realism data point in the collection:
+  it means this survey's several short-horizon candidates (daily momentum, last-hour momentum,
+  overnight-MAX, day-night institutional timing) are structurally the same kind of high-turnover
+  effect this paper shows gets wiped out by realistic costs — none of them can be trusted as
+  "execution-realistic" without the equivalent break-even-cost check run on fresh data.
+- **"More Powerful Tests for Anomalies in the China A-Share Market" (Jansen/Swinkels/Zhou 2023)**
+  — China's short usable sample leaves *conventional* single-characteristic portfolio sorts
+  statistically underpowered; an efficient sorting procedure (characteristics + covariance matrix)
+  roughly doubles t-statistics, turning 3 significant anomalies into 9 on the same data.
+  Reassuringly, efficient-sorting and equal-weighted portfolios correlate highly — same anomaly,
+  better-powered test, not a different phenomenon. Actionable: before downweighting any borderline
+  candidate in this survey as "too weak," try this power upgrade first.
+- **"Replicating and Digesting Anomalies in the Chinese A-Share Market" (Li/Liu/Liu/Wei 2023/2024,
+  Management Science, 34 citations)** — replicates 469 anomaly variables under mainboard-only
+  breakpoints + value-weighted returns: **83.37% show no significant spread**, rising to 84-87%
+  after risk adjustment. Directly argues the field's *conventional* procedure — all-A-share
+  breakpoints with equal-weighted returns — overweights microcaps far beyond real investable
+  capacity, inflating apparent significance. **This sits in real tension with "Calm Stocks, Wild
+  Hopes"'s finding that equal-weighted portfolios show a stronger low-vol/IVOL anomaly than
+  value-weighted** — reconciled by "More Powerful Tests" above: the *breakpoint choice*
+  (mainboard-only vs. all-share), not the weighting scheme itself, is what drives the inflation.
+  Actionable: re-check this survey's low-vol/lottery candidates against mainboard-only breakpoints
+  before trusting any equal-weighted result at face value — the prior effort's 2270-asset universe
+  likely included small/micro-caps beyond real investment capacity, exactly this failure mode.
+
+Taken together, this round's three papers give this survey a concrete, quantified execution-
+realism and statistical-power toolkit it didn't have before — arguably more valuable than any
+single new signal candidate found so far.
+
 Note: "Dissecting Momentum in China" isn't yet well-indexed in Semantic Scholar (too new/preprint),
 so no forward-citation trail was available for the survey's key ruled-out-momentum finding.
 
