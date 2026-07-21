@@ -12,6 +12,14 @@ systems, `deep-dives.md`, and the source PDFs (`fulltext/` → `reference-pdfs/`
 LitDiscover engine, the reference-systems corpus, and the RLD paper together; the wiki keeps its
 own research/decisions docs separately in `wiki/litdiscover/` as before.
 
+**Manual pipeline experiment (2026-07-21, session 44):** a candidate replacement for the
+LitDiscover engine — keyword search → curate/extract → refine → forward/co-citation, Zotero-backed
+— is being dogfooded on two real surveys under `lit-review-bot/projects/`:
+`china-ashare-strategy-survey/` and `trading-eval-survey/`. `projects/` itself moved out of
+`lit-review-bot/litdiscover/` (the engine's own repo) to `lit-review-bot/projects/` as part of this.
+See `wiki/litdiscover/manual-pipeline-retrospective.md` for what running it taught about the process
+itself, and the two project READMEs for survey content/synthesis.
+
 **Repo admin (2026-07-14, session 43):** `citation-dynamics` GitHub repo renamed to `zeitgeist`
 (local clone's remote repointed); `automated-lit-reviews` deleted from GitHub (`deprecated-bot/`
 keeps a local-only copy, its own `origin` now points at a dead URL); June-24 (Mohammed Junaid
@@ -36,7 +44,7 @@ Three contributions, each with its own subdirectory:
 
 | Contribution | Status | Target |
 |---|---|---|
-| [LitDiscover](litdiscover/) | Paper **desk-rejected by IP&M** (2026-07-07) — redo planned; engine on PyPI but **out of date**. Discovery/screening evaluation redesigned 2026-07-14 around an end-to-end recall/precision metric (§4.0 of `discovery-roadmap.md`), after isolated-stage numbers proved indefensible on their own | Information Processing & Management (redo) |
+| [LitDiscover](litdiscover/) | Paper **desk-rejected by IP&M** (2026-07-07) — redo planned; engine on PyPI but **out of date**. Discovery/screening evaluation redesigned 2026-07-14 around an end-to-end recall/precision metric (§4.0 of `discovery-roadmap.md`), after isolated-stage numbers proved indefensible on their own. **2026-07-21:** a manual candidate-replacement pipeline is being dogfooded in parallel (see `manual-pipeline-retrospective.md`) — not yet a decision to replace the engine, still gathering evidence | Information Processing & Management (redo) |
 | [Zeitgeist](zeitgeist/) | Active — §§1–4 figures done, §§1+8 rewrite next; **its own repo** (`github.com/davidcagoh/citation-dynamics`, local clone renamed `zeitgeist/`) | COMPLEX NETWORKS 2026 (~Aug) |
 | [Synthesis](synthesis/) | Refactored 2026-07-14 into 3 tracks (see `synthesis/roadmap.md`); K17-RGC gold set verified, pipeline not yet run | Post-Zeitgeist thesis chapter |
 
