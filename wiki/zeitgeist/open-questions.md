@@ -4,6 +4,35 @@ Check this at the start of each session.
 
 ---
 
+## NEW (2026-07-21): time-axis-aware layout — post-paper, not COMPLEX NETWORKS 2026 scope
+
+**Decision:** Zeitgeist isn't done once the §§1–4 paper ships. Implement a proper
+t-SNE/force-directed layout with an explicit time axis — not SG-t-SNE's current symmetrized,
+atemporal 2D layout, and not NST's spatial-PCA approach that failed to separate communities at
+full-corpus scale (ρ=−0.668, §§5–6 dropped 2026-04-17, see `decisions.md`). This is a genuine
+revival of that dropped work, not a reversal of the paper-scope decision — the paper stays
+§§1–4, this is the next thing after it.
+
+**Possible extension named by the user:** use LitDiscover's own traversal *rounds* (BFS depth /
+discovery-cycle number from `core/loop.py`) as an alternate or additional temporal/ordering axis,
+instead of relying only on real publication year — worth exploring specifically on a
+LitDiscover-recovered subgraph (K17-RGC, per `wiki/synthesis/synthesis.md`'s Q-SYNTH track) where
+traversal order is itself a meaningful signal about a paper's position relative to the seed set,
+not just when it was published.
+
+**Where this connects:** `nst-timecurves-comparison.md` already has the three-method comparison
+(NST / SG-t-SNE / Time Curves) this extends. `wiki/synthesis/synthesis.md`'s Q-SYNTH track already
+plans an NST-vs-UMAP-vs-SG-t-SNE comparison on the K17-RGC subgraph specifically — this new
+time-axis-layout idea and the LitDiscover-rounds extension belong there as a fourth condition or a
+follow-up, not as separate new infrastructure.
+
+**Not yet scoped:** which of t-SNE-with-time or force-directed-with-time to actually build first,
+whether it lives in `citation-dynamics/` or gets folded into Q-SYNTH's own pipeline, and how
+"LitDiscover round" would be extracted/logged per-paper if used as the axis (not currently a field
+`traverse`/`core/loop.py` persists per included paper — would need checking).
+
+---
+
 ## NEXT: address PDF review feedback
 **Action:** User is reviewing `writings/zeitgeist_paper.pdf`. Address any content or formatting issues next session.
 

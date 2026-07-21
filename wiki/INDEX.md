@@ -45,7 +45,7 @@ Three contributions, each with its own subdirectory:
 | Contribution | Status | Target |
 |---|---|---|
 | [LitDiscover](litdiscover/) | Paper **desk-rejected by IP&M** (2026-07-07) — redo planned; engine on PyPI but **out of date**. Discovery/screening evaluation redesigned 2026-07-14 around an end-to-end recall/precision metric, after isolated-stage numbers proved indefensible on their own. **2026-07-21:** a manual candidate-replacement pipeline is being dogfooded in parallel — not yet a decision to replace the engine, still gathering evidence; wiki consolidated to one file (`litdiscover/litdiscover.md`), see there for full status | Information Processing & Management (redo) |
-| [Zeitgeist](zeitgeist/) | Active — §§1–4 figures done, §§1+8 rewrite next; **its own repo** (`github.com/davidcagoh/citation-dynamics`, local clone renamed `zeitgeist/`) | COMPLEX NETWORKS 2026 (~Aug) |
+| [Zeitgeist](zeitgeist/) | First full LNCS draft compiled (§§1–4 scope), user reviewing PDF; **its own repo** (`github.com/davidcagoh/citation-dynamics`, local clone renamed `zeitgeist/`). **2026-07-21:** not done past the paper — time-axis-aware layout (t-SNE/force-directed) planned as post-paper work, see `zeitgeist/open-questions.md` | COMPLEX NETWORKS 2026 (~Aug) |
 | [Synthesis](synthesis/) | 3 tracks, consolidated into one file 2026-07-21 (`synthesis/synthesis.md`); K17-RGC gold set verified, pipeline not yet run | Post-Zeitgeist thesis chapter |
 
 ---

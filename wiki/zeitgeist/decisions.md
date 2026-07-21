@@ -66,3 +66,19 @@ Choices that have already been made and why. Read this before changing any param
 **Decision date:** 2026-04-12
 **Why:** Eliminates 662 MB of duplication. Single canonical copy; symlink is gitignored in lit-review.
 **Implication:** If the APS dataset is updated, update `citation-dynamics/data/processed/` only.
+
+---
+
+## Zeitgeist isn't done at the paper — time-axis layout revived as post-paper work
+**Decision date:** 2026-07-21
+**Why:** §§5–6 (NST + Time Curves) were dropped from the COMPLEX NETWORKS 2026 paper scope
+(2026-04-17) because neither was interpretable/compelling *at full-corpus scale*. That doesn't
+mean the underlying idea — a layout that actually respects time, not SG-t-SNE's symmetrized
+atemporal 2D projection — was wrong, just that it didn't work at 709K-node scale with the methods
+tried. Decided to revive it as explicit post-paper future work: build a proper t-SNE/force-directed
+layout with a real time axis, and try LitDiscover's own traversal rounds as an alternate temporal
+signal on a recovered subgraph, not just publication year.
+**Implication:** does not reopen or change the §§1–4 paper scope decision above. Lives as an open
+item in `open-questions.md`, and connects to `wiki/synthesis/synthesis.md`'s Q-SYNTH track
+(NST-vs-UMAP-vs-SG-t-SNE comparison, already planned on the same K17-RGC subgraph) rather than
+standing up separate new infrastructure.

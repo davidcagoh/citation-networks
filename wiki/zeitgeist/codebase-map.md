@@ -1,6 +1,16 @@
 # Codebase Map: citation-dynamics/
 
-Last updated: session 21, 2026-04-16.
+Last updated: 2026-07-21 (session 45) — was stale since session 21 (2026-04-16); Phase 3/4 status
+below corrected against `decisions.md`'s 2026-04-17 entry, which the table hadn't caught up to.
+
+**Paper status:** first full LNCS draft compiled (`writings/zeitgeist_paper.pdf`, §§1–4 scope
+only per `decisions.md`), user reviewing — see `open-questions.md`'s NEXT item.
+
+**Zeitgeist is not done past the paper.** 2026-07-21 decision: implement a proper time-axis-aware
+layout (t-SNE/force-directed with an explicit temporal dimension, not the symmetrized/atemporal
+SG-t-SNE currently in the pipeline) as post-paper future work — see `open-questions.md`'s new
+top entry and `nst-timecurves-comparison.md` for the existing three-method comparison this
+extends, not replaces.
 
 ## Pipeline Status
 
@@ -9,8 +19,8 @@ Last updated: session 21, 2026-04-16.
 | 1 — HDF5 build | `src/phase1_build_graph.py` | ✅ | `data/exported/aps-2022-citation-graph.h5` |
 | 2 — Leiden full corpus | `src/phase2_leiden_cluster.py` | ✅ | `data/exported/aps-2022-leiden-1p00.npz` |
 | 2b — Zeitgeist fitting | `src/phase2b_zeitgeist_fit.py` | ✅ | `data/analysis/zeitgeist_community_fits.csv` |
-| 3 — NST training | `src/phase3_nst_train.py` | 🔄 cluster job 159670 | `data/exported/aps-nst-model.pt` + `aps-nst-embeddings.npy` |
-| 4 — Time Curves | `src/phase4_timecurves.py` | ⏳ awaits Phase 3 | `data/analysis/timecurves_nst_result.npz` |
+| 3 — NST training | `src/phase3_nst_train.py` | ✅ ran to completion (cluster job 159670) — **dropped from paper scope 2026-04-17**, not still running | `data/exported/aps-nst-model.pt` + `aps-nst-embeddings.npy` |
+| 4 — Time Curves | `src/phase4_timecurves.py` | ✅ ran to completion — **dropped from paper scope 2026-04-17** (corpus-level centroid averaging over 446 communities was uninformative), not still awaiting Phase 3 | `data/analysis/timecurves_nst_result.npz` |
 | 5 — Synthesis subgraph | `src/phase5_synthesis_subgraph.py` | ✅ | `data/synthesis/k17-rgc-subgraph.npz` |
 
 Run everything: `make -f citation-dynamics/Makefile all`
