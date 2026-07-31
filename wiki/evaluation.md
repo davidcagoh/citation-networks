@@ -96,10 +96,10 @@ mean 11–53 references where present). The two CS-domain reviews in the corpus 
 and the candidate review for the actual experiment (`Hall_2012`) in
 `evals/synergy-eval/README.md`.
 
-**The clean, guaranteed-comparable experiment regardless:** run LitDiscover's `screen_batch()`
-against SYNERGY's 26 reviews / CLEF TAR's topics, get a real F1/WSS@95, compare directly against
-ASReview's 83% / SWIFT-Review's 54%. That's viable today, no data-format risk — CLEF TAR/SYNERGY
-were both built for exactly this comparison.
+A screening comparison against these two (`screen_batch()` vs. ASReview's 83%/SWIFT-Review's 54%
+WSS@95) would be low-risk and viable today — **deliberately not pursued** (see Open questions
+below): LitDiscover's claim is about Discovery, and Screening already has the best-supported eval
+infrastructure of the four stages, making its comparability gap the least valuable one to close.
 
 ---
 
@@ -163,6 +163,13 @@ literature might otherwise expect Q-SYNTH held to that same unvalidated bar.
   (small/medium/large, both CS-domain reviews), consistently strong, `Hall_2012` identified as the
   best candidate for the actual experiment.
 - Design the seed-subset/traverse/recall experiment as a second closed corpus alongside APS
-  (`litdiscover/protocol-log.md`, `evals/aps-eval/`) — not yet scoped.
-- Run LitDiscover's `screen_batch()` against SYNERGY/CLEF TAR — the clean, low-risk experiment,
-  doable independent of the discovery-experiment design above.
+  (`litdiscover/protocol-log.md`, `evals/aps-eval/`), against `Hall_2012` — not yet scoped. **The
+  only active experiment from this file** — see below.
+- ~~Run LitDiscover's `screen_batch()` against SYNERGY/CLEF TAR~~ — **dropped 2026-07-31,
+  deliberately not pursued.** LitDiscover's actual claim is about Discovery, not Screening;
+  Screening already has the best-supported eval infrastructure of the four stages (real,
+  decades-old, externally validated standards — see the by-stage table above), which is exactly
+  why closing its comparability gap isn't worth the effort here. If a reviewer asks how
+  LitDiscover's screening compares to prior work, ProfOlaf's own human-vs-LLM near-parity finding
+  (F1 0.928 vs. 0.927 human, `litdiscover/litdiscover.md` Prior Art) is existing evidence LLM
+  screening is competitive — no new number of our own needed.
