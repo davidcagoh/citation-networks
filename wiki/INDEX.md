@@ -58,6 +58,7 @@ Three contributions, each with its own subdirectory:
 |---|---|---|
 | [session-log.md](session-log.md) | What was done each session + UofT cluster SSH reference | Start of every session |
 | [concepts.md](concepts.md) | Cross-cutting methodological ideas (metric families, distribution fitting, citation motifs, HDP, traversal visualization) | When designing statistical validation or scoping future work |
+| [evaluation.md](evaluation.md) | Cross-cutting eval-methodology findings shared by LitDiscover + Synthesis (not Zeitgeist): which eval methods apply to which pipeline-stage claim, SYNERGY vs. CLEF TAR, the synthesis-side eval-standard-gap evidence table | Before claiming any stage of LitDiscover or Synthesis "does X better," or before designing a new benchmark experiment |
 | [research-program.md](research-program.md) | Plain-language narrative overview of all three pillars + two speculative extensions | Sharing the program with a collaborator |
 
 ---

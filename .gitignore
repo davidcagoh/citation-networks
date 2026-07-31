@@ -1,6 +1,6 @@
 # Ignore nested git repos (tracked separately)
 /lit-review-bot/litdiscover/
-/lit-review-bot/paper/
+/lit-review-bot/evals/
 /zeitgeist/
 
 # Deprecated repo, archived on GitHub — kept locally for now

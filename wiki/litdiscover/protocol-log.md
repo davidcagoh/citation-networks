@@ -40,7 +40,7 @@ Operators and modes referenced by shorthand in the composition table below.
 | `HUBFILTER` | forward-traversal hub skip | `gini-adaptive` (80th/90th/95th by Gini) vs `fixed-80th` | `gini-adaptive` in production; `fixed-80th` is a simulation-only approximation |
 | `COMPOSE` | how multiple operators' outputs combine | `isolated` (each measured alone) vs `chained` (sequential, output feeds next) | `isolated` only — chained tried once, rejected |
 | `SCREEN_LLM` | screening backend | `gemini-2.5-flash` vs `llama-3.1-8b-instant` | `gemini-2.5-flash` |
-| `HUMAN_STEER` | who drives mode-switching/stopping decisions | `engine` (yield-threshold gate, automatic) vs `human` (manual pipeline, judgment call each time) | undecided — this is the live question |
+| `HUMAN_STEER` | who drives mode-switching/stopping decisions | `engine` (yield-threshold gate, fully automatic) vs `human` (manual pipeline, judgment call each time) vs **`checkpoint`** (proposed 2026-07-31: autopilot's automation runs each operator to completion, but pauses after every operator finish to surface its output + a proposed next step, human gives go/no-go before continuing — turn-based, not manual-labor) | undecided — this is the live question; `checkpoint` is the direction favored in discussion, not yet built |
 
 ---
 
@@ -57,6 +57,7 @@ Operators and modes referenced by shorthand in the composition table below.
 | `HUBFILTER=fixed-80th` | Simulation only (`N_ROUNDS`/`PARETO_P` sweeps), never production | **Kept as approximation only** | Explicit in `litdiscover.md`: stand-in for tractability, not a claim about production semantics. |
 | `SCREEN_LLM=gemini-2.5-flash` | Production | **Kept** | `llama-3.1-8b-instant` tried and rejected — too permissive, high false-include rate. |
 | `KEYWORD (iterated) + FWD (age-targeted) + CO (fallback-anchor) + [reconcile]` · `HUMAN_STEER=human` | Dogfooded on 2 surveys, 2026-07-21 (session 44) | **Undecided — gates everything else** | Motivated by `CO` being the one operator with real isolated signal. Surfaced 3 stages the engine has no analog for: citation-verification gate, redundancy reconciliation, yield-based *mode-switching* (not just stopping). Not decided whether these get built into the engine (`HUMAN_STEER=engine`) or the manual path stays primary. |
+| `KEYWORD (context-conditioned escape hatch)` | **Proposed 2026-07-31, not yet built or tried** | — | Diagnosed why the existing escape hatch underperforms the manual pipeline's query refinement: it's not human-vs-LLM, it's *starved context*. Today's escape hatch conditions the refinement LLM call on the static `criteria` text only — blind to what actually happened. Proposal: condition it on prior round's screening outcomes (which papers included/excluded and the LLM's stated reason), extraction notes from included papers, and a diff of criteria changes across rounds (what changed and why). Same shape as `keyword_search_operator`'s existing call site (`core/loop.py`'s escape-hatch trigger) — a richer prompt, not a new operator contract. Not started; needs its own isolated benchmark before promotion, same as `CO` got 2026-07-14. Composes with `HUMAN_STEER=checkpoint` below — a checkpoint's human go/no-go at each step is itself free context (accept/reject + why) this richer prompt could condition on next round. |
 
 ---
 

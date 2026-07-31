@@ -7,7 +7,8 @@ One file, most-important-first — same collapsing treatment as `wiki/litdiscove
 lines across 9 files, nested three directories deep — buried enough that the eval-standard-gap
 finding below got missed in a later session's own review of this project). Full detail (the raw
 32/10-edge tables, the per-system code-fidelity deep-dives, the mermaid diagrams not kept below)
-is in git history if ever needed.
+is in git history if ever needed. The eval-standard-gap finding itself later moved on again, to
+`../evaluation.md` (2026-07-31) — see below.
 
 ---
 
@@ -56,46 +57,23 @@ than assuming a better prompt or embedding model fixes clustering on its own.
 ## The eval-standard gap — read this before citing any survey-generation system as a benchmark
 
 **No mature evaluation standard exists for synthesis/survey-generation quality**, anywhere in the
-LLM-narrative-generation literature (AutoSurvey, SurveyX, LiRA, SurveyGen-I, etc.). This is
-positioning material for *both* Q-SYNTH and the representation-learning track — it's the evidence
-for why that literature's evaluation methodology doesn't set a bar either track needs to clear,
-since no validated bar exists yet for the "synthesis" construct itself. `litdiscover.md`'s own
-Prior Art section found the same shape of gap independently, one stage earlier (discovery/
-screening) — see there for how the two findings connect; a third independent pass rereading
-`deep-dives.md`'s "how it performed" claims directly (session 45) reinforced it again.
-
-| Maturity criterion | Status in this corpus |
-|---|---|
-| A metric everyone reuses, not reinvents | Partially met — AutoSurvey's citation-NLI check + LLM-judge rubric got copied near-verbatim: LiRA's CQF1, SurveyX's extension, SurveyGen-I's 5-axis version |
-| Validated correlation with human judgment | **Not met** — AutoSurvey's own meta-eval only reaches Spearman ρ≈0.5429 even with a mixture of judges; SurveyX found human raters *stricter* than the automated judge; SciReviewGen's ROUGE-based system was preferred by humans only 22.2% of the time vs. 68.9% for ground truth — metric and human preference pointed opposite directions |
-| A shared benchmark/test set | **Not met** — nearly every system builds its own (SciReviewGen's dataset, SurveyGen's 4,205-survey dataset, AutoSurvey's 20 LLM topics, Meow's self-constructed 100-survey set) |
-| Same judge model/prompt across papers | **Not met** — GPT-4o-mini, GPT-4, Claude-3-haiku, Gemini-1.5-pro all used as judges, different rubric axis counts (3-axis vs. 5-axis) |
-| A validated ground truth for "good synthesis" itself | **Not met** — every system defers to human-written surveys as gold, but no system validates that "matches a human survey" is the right target in the first place |
-
-**The specific gap that matters most:** the axis closest to what "synthesis" actually means — not
-citation mechanics, not structural templating — is the *least* measured of all. Only SurveyGen-I
-(its "Synthesis" sub-dimension showed the single largest gain of any sub-metric in the whole
-corpus, +0.41 over the strongest baseline — meaning synthesis was the weakest prior capability,
-exactly where the most headroom existed) and SurveyX (its "Critical Analysis" axis, plus its own
-admission that even after winning on citation precision/recall it still trails human
-reference-relevance, IoU 0.55) even attempt a distinct sub-score for it. Neither validates that
-sub-score against human judgment *separately* from the aggregate — the one meta-validation effort
-that exists in this corpus (AutoSurvey's ρ≈0.54) was computed on the overall judge score, not
-per-axis. The construct this field's own papers agree is hardest and least solved is also the one
-with zero independent validation of its measurement instrument. Roughly where machine translation
-was before BLEU — except less validated: each paper runs one meta-validation study, once, on its
-own benchmark, and the next paper reuses the code (AutoSurvey → LiRA → SurveyX) without
-re-checking the correlation that code implies. Citation-count-driven convergence toward a shared
-implementation, not validation-driven convergence toward a trustworthy one.
+LLM-narrative-generation literature (AutoSurvey, SurveyX, LiRA, SurveyGen-I, etc.) — full evidence
+table, the ρ≈0.54 meta-validation finding, and how this connects to Discovery/Screening's own
+(differently-shaped) eval gaps moved to `../evaluation.md` (2026-07-31, pulled out after this
+finding had been cross-referenced between this file and `litdiscover.md` three separate times).
+This is positioning material for *both* Q-SYNTH and the representation-learning track — the
+evidence for why that literature's evaluation methodology doesn't set a bar either track needs to
+clear, since no validated bar exists yet for the "synthesis" construct itself.
 
 **Implication:** state explicitly in any Synthesis-facing writing that no validated
 synthesis-quality standard exists for the LLM-narrative-generation line of work — the "cite as
 background, not competitors" framing this project already uses, now with specific evidence behind
-it. Separately: since Q-SYNTH doesn't generate narrative text, it isn't exposed to this gap
-directly — its own success criteria (cluster interpretability, temporal-ordering plausibility,
-expert recognition) are a genuinely more tractable validation problem than "is this generated
-prose good synthesis," worth stating explicitly since a reviewer familiar with the AutoSurvey-style
-literature might otherwise expect Q-SYNTH held to that same unvalidated bar.
+it (`../evaluation.md`). Separately: since Q-SYNTH doesn't generate narrative text, it isn't
+exposed to this gap directly — its own success criteria (cluster interpretability,
+temporal-ordering plausibility, expert recognition) are a genuinely more tractable validation
+problem than "is this generated prose good synthesis," worth stating explicitly since a reviewer
+familiar with the AutoSurvey-style literature might otherwise expect Q-SYNTH held to that same
+unvalidated bar.
 
 ---
 

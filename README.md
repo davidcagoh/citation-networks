@@ -34,7 +34,7 @@ citation-networks/
 ├── lit-review-bot/
 │   ├── litdiscover/                   # LitDiscover engine (own repo: github.com/davidcagoh/litdiscover), pip installable
 │   ├── projects/                      # Research-run project folders (Zotero-backed manual pipeline surveys + LitDiscover-engine-driven runs); projects/_archive/ holds retired ones
-│   └── paper/                         # RLD paper (own repo: github.com/davidcagoh/robust-literature-discovery)
+│   └── evals/                         # Eval infra: aps-eval/, live-survey-eval/, synergy-eval/ (own repo: github.com/davidcagoh/robust-literature-discovery); manuscript paused, archived under evals/_archive/drafts/
 └── deprecated-bot/                # Older, inactive literature-review variant (own repo: automated-lit-reviews — deleted from GitHub)
 ```
 
@@ -48,14 +48,14 @@ citation-networks/
 
 ## Setup
 
-`zeitgeist/`, `lit-review-bot/litdiscover/`, and `lit-review-bot/paper/` are each their own git
+`zeitgeist/`, `lit-review-bot/litdiscover/`, and `lit-review-bot/evals/` are each their own git
 repo (gitignored here, not submodules — see rationale below). After cloning `citation-networks`,
 clone them separately:
 
 ```bash
 git clone https://github.com/davidcagoh/zeitgeist.git
 git clone https://github.com/davidcagoh/litdiscover.git lit-review-bot/litdiscover
-git clone https://github.com/davidcagoh/robust-literature-discovery.git lit-review-bot/paper
+git clone https://github.com/davidcagoh/robust-literature-discovery.git lit-review-bot/evals
 ```
 
 Kept as independent repos (rather than submodules) because `litdiscover` and `zeitgeist` are both

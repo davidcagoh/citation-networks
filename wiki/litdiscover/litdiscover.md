@@ -172,9 +172,12 @@ match trained raters under a well-designed protocol. Active-learning re-rankers 
 SWIFT-Review/Active-Screener) are measured via WSS@95 (ASReview 83%, SWIFT-Review 54%) — the
 field's standard screening-efficiency metric. **No system in this 27+5-method corpus reports a
 screening precision/recall number against a citation-traversal-fed queue** — the exact gap
-Discovery's §4.0 end-to-end metric above closes; running `screen_batch()` against an external
-CLEF TAR/SYNERGY dataset would measure the classifier's competence on somebody else's pool, not
-whether LitDiscover's own discovery-fed queue produces a good corpus.
+Discovery's §4.0 end-to-end metric above closes; running `screen_batch()` against SYNERGY/CLEF
+TAR would measure the classifier's competence on somebody else's pool, not whether LitDiscover's
+own discovery-fed queue produces a good corpus. Full by-stage breakdown of what actually applies
+to which claim (Discovery/Screening/Extraction/Synthesis), plus the SYNERGY-vs-CLEF-TAR
+distinction (they're not interchangeable — only SYNERGY carries a citation graph), moved to
+`../evaluation.md` (2026-07-31).
 
 **Stopping criteria are the rarest feature in the whole corpus** — only SWIFT-Active Screener
 (negative-binomial recall-estimation, stops at ~40% screened for 95% recall) and SocLitGen
@@ -182,19 +185,11 @@ whether LitDiscover's own discovery-fed queue produces a good corpus.
 gate is a real, measured stopping rule of the same shape, in a field where most comparable tools
 (ResearchRabbit, ASReview) have none at all — a genuine, defensible point of novelty.
 
-**The eval-standard gap — same finding as Synthesis's, independently arrived at, now reinforced a
-third time.** `../synthesis/synthesis.md` (eval-standard gap section) found no validated synthesis-quality
-standard exists (AutoSurvey's citation-NLI + LLM-judge rubric got copied near-verbatim into LiRA/
-SurveyX/SurveyGen-I, but only reaches ρ≈0.54 against human judgment, computed once, never
-re-validated downstream). This directory's own discovery/screening research found the same shape
-of gap one stage earlier: decades-old *relative-recall* methodology exists for discovery-in-
-isolation, CLEF TAR/SYNERGY is mature for screening-in-isolation, but nobody validates the two
-*together* against a citation-traversal-fed queue. Rereading `deep-dives.md`'s "how it performed"
-claims directly (session 45, 2026-07-21) reinforced this a third way: nearly every
-survey-generation system's "beats baseline X" claim inherits an unvalidated metric from whichever
-paper it borrowed code from, rather than re-validating against human judgment itself — three
-independent angles on the same underlying problem: this field has no shared, validated way to
-know whether any of these systems actually work.
+**The eval-standard gap — same finding as Synthesis's, independently arrived at.** Full evidence
+and the by-stage breakdown of what's actually a validity gap vs. a comparability gap moved to
+`../evaluation.md` (2026-07-31) — this directory's own discovery/screening research found the same
+*shape* of gap `synthesis/synthesis.md` found for narrative-generation quality, one stage earlier,
+but the underlying cause turns out to differ by stage (see there).
 
 ---
 
@@ -209,7 +204,7 @@ wired in) in a separate `operators.py`, plus `graph_source.py` (a `GraphSource`/
 `pareto_hub_threshold`, budget accounting) + `orchestrator.py` (thin CLI entry point, renamed from
 `traverse()` since backward/forward are just 2 of 8 operators now) + unchanged `s2_client.py`.
 `GraphSource`'s class-based source-injection replaced by a `source: Literal["s2","local_corpus"]`
-argument + `corpus: CorpusIndex` — the closed-corpus benchmark track (`paper/closed-corpus-eval/`)
+argument + `corpus: CorpusIndex` — the closed-corpus benchmark track (`evals/aps-eval/`)
 still works, just without a class wrapper; venue inference (APS-specific) moved out of the engine
 entirely into the dataset loader, since `operators.py` should carry zero dataset knowledge.
 `forward_cites.py` deleted outright — its lookup was literally `forward_traversal_operator`
