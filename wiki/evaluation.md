@@ -86,15 +86,15 @@ and support different experiments:
   real included set — a second, externally-published closed corpus for the operator-composition
   work (`litdiscover/protocol-log.md`), not just APS.
 
-**Verified against the raw data (2026-07-31).** Downloaded the smallest review (`Donners_2021`,
-258 records) via the `synergy-dataset` pip package (yields full `pyalex.Work` objects, not the
-GitHub repo's identifiers-only CSVs) and checked `referenced_works` directly: 154/258 (60%) have a
-populated, real per-paper OpenAlex reference list (mean ~29, range 0–263) — not a subset
-restricted to the 169k-record pool. Zero-reference records are normal OpenAlex coverage variance,
-not a SYNERGY-specific gap. **The discovery-recall experiment below is viable**, not just
-theoretical — see `evals/synergy-eval/README.md` for the full verification and next steps
-(coverage should be checked per-review before picking which review(s) to run on, since
-`Donners_2021` alone doesn't establish density across all 26).
+**Verified against the raw data (2026-07-31), across 7 of the 26 reviews.** Downloaded via the
+`synergy-dataset` pip package (yields full `pyalex.Work` objects, not the GitHub repo's
+identifiers-only CSVs) and checked `referenced_works` directly — coverage is consistently strong
+across size and domain (60–99% of records have a populated reference list, depending on review;
+mean 11–53 references where present). The two CS-domain reviews in the corpus (`Hall_2012`,
+`Radjenovic_2013` — closest to LitDiscover's own topic space) have the *highest* coverage, 92–94%.
+**The discovery-recall experiment below is viable**, not just theoretical — full per-review table
+and the candidate review for the actual experiment (`Hall_2012`) in
+`evals/synergy-eval/README.md`.
 
 **The clean, guaranteed-comparable experiment regardless:** run LitDiscover's `screen_batch()`
 against SYNERGY's 26 reviews / CLEF TAR's topics, get a real F1/WSS@95, compare directly against
@@ -159,8 +159,9 @@ literature might otherwise expect Q-SYNTH held to that same unvalidated bar.
 
 - ~~Pull an actual SYNERGY dataset file and inspect the reference field directly~~ — **done
   2026-07-31**, verified real and usable, see above.
-- Check `referenced_works` coverage density across all 26 reviews (only `Donners_2021` checked so
-  far) before picking which review(s) to run the discovery experiment on.
+- ~~Check `referenced_works` coverage density across reviews~~ — **done 2026-07-31**, 7/26 checked
+  (small/medium/large, both CS-domain reviews), consistently strong, `Hall_2012` identified as the
+  best candidate for the actual experiment.
 - Design the seed-subset/traverse/recall experiment as a second closed corpus alongside APS
   (`litdiscover/protocol-log.md`, `evals/aps-eval/`) — not yet scoped.
 - Run LitDiscover's `screen_batch()` against SYNERGY/CLEF TAR — the clean, low-risk experiment,
