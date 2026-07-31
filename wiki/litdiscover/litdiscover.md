@@ -9,6 +9,11 @@ lines) and is the newest, most-load-bearing document in this directory.
 
 Pipeline: `SEED papers (2-5) → DISCOVER → SCREEN (LLM) → EXTRACT → SYNTHESIZE`
 
+**Deciding what to try next on the discovery algorithm itself?** See
+[protocol-log.md](protocol-log.md) — every protocol variant/config tried so far, verdict (kept/
+rejected/undecided), and why. This file's Discovery section below is status; `protocol-log.md` is
+the decision history behind it.
+
 ---
 
 ## Status right now (2026-07-21)
@@ -52,8 +57,11 @@ lives in `reference-systems/deep-dives.md`.
 extraction with S2 fallback; forward: S2 `/citations`; both gated by a Gini-adaptive Pareto hub
 filter) and an LLM-keyword→S2-search escape hatch that fires when traversal stalls. Five more
 operators shipped 2026-07-14 via TDD: embedding search (S2's own SPECTER Recommendations API),
-author expansion, venue expansion, recency-only search, and co-citation retrieval. All seven share
-one `operator(paper_set) -> OperatorResult` contract in `litdiscover/discovery/`.
+author expansion, venue expansion, recency-only search, and co-citation retrieval. All eight
+(traversal ×2 + these 5 + keyword search) share one `operator(paper_set) -> OperatorResult`
+contract, now unified in a single `litdiscover/discovery/operators.py` (consolidated 2026-07-31,
+see Decisions below) — `discovery/` is down to 3 files total (`s2_client.py`, `operators.py`,
+`orchestrator.py`).
 
 **The methodological finding that matters most:** the original system's headline recall
 (89–98% closed-corpus, 73–100% live-survey) had never had its precision checked. Checked
@@ -191,6 +199,33 @@ know whether any of these systems actually work.
 ---
 
 ## Decisions
+
+**Discovery layer consolidated, 11 files → 3 (2026-07-31, session 46).** `discovery/` had
+accumulated 2 CLI-wired operators in `traverse.py` and 5 more (built for a benchmark, never
+wired in) in a separate `operators.py`, plus `graph_source.py` (a `GraphSource`/`S2Source`/
+`ClosedCorpusSource` class hierarchy), `budget.py`, `search.py`, and 3 files (`verify.py`,
+`relwork.py`, `forward_cites.py`) that weren't discovery operators at all. Merged into
+`operators.py` (all 8 operators, `OperatorResult`/new `CorpusIndex` dataclasses,
+`pareto_hub_threshold`, budget accounting) + `orchestrator.py` (thin CLI entry point, renamed from
+`traverse()` since backward/forward are just 2 of 8 operators now) + unchanged `s2_client.py`.
+`GraphSource`'s class-based source-injection replaced by a `source: Literal["s2","local_corpus"]`
+argument + `corpus: CorpusIndex` — the closed-corpus benchmark track (`paper/closed-corpus-eval/`)
+still works, just without a class wrapper; venue inference (APS-specific) moved out of the engine
+entirely into the dataset loader, since `operators.py` should carry zero dataset knowledge.
+`forward_cites.py` deleted outright — its lookup was literally `forward_traversal_operator`
+unfiltered over the whole included set, not a distinct mechanism; its report-writing moved to
+`reports.py`, its DB-write generalized into `db/client.py::ingest_candidates()`. `verify.py`/
+`relwork.py` moved to a new `tools/` package (neither produces discovery candidates). Verified,
+not just tested: `litdiscover`'s 246 tests green, plus a real regression run of the paper's
+canonical `04b_cold_start_lowseed.py` against the actual APS dataset — the deterministic `top_k`
+seed strategy came back byte-identical to the pre-migration git-committed result (100.0000%
+recall, 72,395 corpus size, exact match), proving the actual engine's behavior is unchanged.
+Along the way, found (not fixed) a pre-existing bug in the eval script's own `random`/
+`contaminated` seed generation (`list(some_set)` before `random.shuffle()`, combined with
+Python's default per-process hash randomization) that makes those two strategies'
+numbers non-reproducible on any rerun — unrelated to this refactor. Full account:
+`wiki/session-log.md` session 46. Decision source of truth going forward:
+`wiki/litdiscover/protocol-log.md`.
 
 **Key parameters** (APS closed-corpus validation): `N_ROUNDS=2` (round 3 adds only 2.4pp for the
 worst survey, negligible elsewhere); `PARETO_P=80` in simulation, but production's actual filter
