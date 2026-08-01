@@ -47,7 +47,7 @@ source for everything in this file) promoted from `lit-review-bot/reference-syst
 root — important enough on its own. `lit-review-bot/projects/automated-lit-review-methodology/`
 archived to `_archive/` — its raw discovery pool turned out to be mostly noise (generic
 high-citation ML papers pulled in by traversal), and the curated version of that work already
-lives in `reference-systems/deep-dives.md`.
+lives in `../reference-systems/deep-dives.md`.
 
 ---
 
@@ -117,7 +117,7 @@ just an area LitDiscover happened to prioritize.
 (research_questions/contributions/methodology/system_or_tool/datasets/metrics/key_results/
 limitations/future_work/themes/related_to). No validation against ground truth anywhere.
 
-**Known gap:** the ad hoc 6-field template used for `reference-systems/deep-dives.md` (Problem /
+**Known gap:** the ad hoc 6-field template used for `../reference-systems/deep-dives.md` (Problem /
 How it works / How evaluated / How performed / Relation to prior work / Limitations) proved rich
 enough to support real downstream analysis the 11-field schema was never asked to support — not
 yet ported, open question is prompt-only change vs. an `extractions` table migration.
@@ -156,7 +156,7 @@ actual grounding-precision number — gates whether #2/#3 above are worth buildi
 ## Prior Art
 
 Full per-system deep-dives (27 methods + 5-entry verification cohort, 6-field template each) live
-in `../../reference-systems/deep-dives.md` — this section is the synthesized findings, not a
+in `../reference-systems/deep-dives.md` — this section is the synthesized findings, not a
 duplicate of the table.
 
 **Discovery mechanisms, grouped:** citation-graph traversal is a two-system family

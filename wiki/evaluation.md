@@ -15,7 +15,7 @@ what's shared.
 
 LitDiscover's four pipeline stages support four different, separable claims — "we discover
 better," "we screen better," "we extract better," "we synthesize better." Sorting every eval
-method found across the 27+5-method `../reference-systems/deep-dives.md` corpus (Table 1/2 there)
+method found across the 27+5-method `reference-systems/deep-dives.md` corpus (Table 1/2 there)
 by which claim it would actually support, not just which claim a paper says it supports:
 
 ### Discovery ("we find better candidates")

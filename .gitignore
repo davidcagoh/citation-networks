@@ -3,25 +3,35 @@
 /lit-review-bot/evals/
 /zeitgeist/
 
+# Local-only navigation symlinks (2026-08-01) -- convenience for cd-ing directly
+# into a nested project without knowing the parent path back to wiki/. Not real
+# repo structure; never meant to resolve on any other clone. (wiki/reference-systems
+# and wiki/utils are NOT symlinks -- moved for real 2026-08-01, tracked normally.)
+/lit-review-bot/wiki
+/synthesis/wiki
+/zeitgeist/wiki
+
 # Deprecated repo, archived on GitHub — kept locally for now
 /deprecated-bot/
 
 # External reference clones (competitor codebases, not our own repo content)
-# Promoted to repo root 2026-07-21 — important enough to stop being a lit-review-bot subfolder.
-/reference-systems/InteractiveSurvey/
-/reference-systems/LitLLM/
-/reference-systems/PROMPTHEUS/
-/reference-systems/ProfOlaf/
-/reference-systems/SLR-automation/
-/reference-systems/SciReviewGen/
-/reference-systems/SurveyGen/
-/reference-systems/SurveyGen-I/
-/reference-systems/SurveyX/
-/reference-systems/asreview/
-/reference-systems/auto-review-writing/
-/reference-systems/litllms-for-literature-review-tmlr/
-/reference-systems/llassist/
-/reference-systems/robotsearch/
+# Moved into wiki/reference-systems/ 2026-08-01 (previously repo root, promoted
+# from lit-review-bot/ 2026-07-21) -- these are research material, belong with
+# the wiki, not sibling to it.
+/wiki/reference-systems/InteractiveSurvey/
+/wiki/reference-systems/LitLLM/
+/wiki/reference-systems/PROMPTHEUS/
+/wiki/reference-systems/ProfOlaf/
+/wiki/reference-systems/SLR-automation/
+/wiki/reference-systems/SciReviewGen/
+/wiki/reference-systems/SurveyGen/
+/wiki/reference-systems/SurveyGen-I/
+/wiki/reference-systems/SurveyX/
+/wiki/reference-systems/asreview/
+/wiki/reference-systems/auto-review-writing/
+/wiki/reference-systems/litllms-for-literature-review-tmlr/
+/wiki/reference-systems/llassist/
+/wiki/reference-systems/robotsearch/
 
 # Obsidian vault config (personal, not project content)
 .obsidian/
@@ -42,6 +52,6 @@ __pycache__/
 
 # Large binary / generated files
 wiki/*.pdf
-/reference-systems/reference-pdfs/
+/wiki/reference-systems/reference-pdfs/
 *.log
 texput.log

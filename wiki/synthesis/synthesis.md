@@ -144,7 +144,7 @@ open question here: is the problem embeddings *in general*, or specifically *wha
 | **Current baseline** (title+themes+contributions[0]) | Cheap, in production. Themes/contributions are single free-text LLM outputs — no structural guarantee they capture the axes that actually distinguish papers. |
 | **Abstract embedding** | Author-written, no LLM-summarization drift, but conflates motivation/method/results into one paragraph the embedding model must disentangle unsupervised. |
 | **Full-text embedding** | Richest signal, noisiest — boilerplate dilutes topic signal, needs chunking+pooling. |
-| **Structured-summary embedding** | Embed the 6-field deep-dive template (Problem/How it works/How evaluated/How performed/Relation to prior work/Limitations) — already validated in `reference-systems/deep-dives.md` for 22 papers. Hypothesis: forcing the LLM to separate motivation from method from evaluation *before* embedding gives axes that align with how papers are actually organized, rather than asking embedding geometry to discover that separation from raw text alone. |
+| **Structured-summary embedding** | Embed the 6-field deep-dive template (Problem/How it works/How evaluated/How performed/Relation to prior work/Limitations) — already validated in `../reference-systems/deep-dives.md` for 22 papers. Hypothesis: forcing the LLM to separate motivation from method from evaluation *before* embedding gives axes that align with how papers are actually organized, rather than asking embedding geometry to discover that separation from raw text alone. |
 
 **The deeper hypothesis:** not "do summaries help embeddings" but that representations which
 explicitly encode a paper's discourse structure (its scientific role) organize a field better than
@@ -174,7 +174,7 @@ flat-vs-hierarchical scoring — not yet resolved.
 
 ## LLM-text-native — `example-comparison/` (complete, control condition)
 
-Three methods run over the same 27-paper corpus (`reference-systems/deep-dives.md`): thematic
+Three methods run over the same 27-paper corpus (`../reference-systems/deep-dives.md`): thematic
 clustering (deprecated), explicit citation-graph extraction (O(n), only what papers state about
 each other), and implicit pairwise content-matching (O(n²)-ish, uncited-but-real relationships).
 **They disagree more than expected.**

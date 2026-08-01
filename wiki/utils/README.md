@@ -4,12 +4,14 @@ Standalone scratch scripts for working with `.bib` files against the Semantic Sc
 API, independent of any single project's database. Each is self-contained (own S2 client,
 own rate limiting) so it can be pointed at any `.bib` file, anywhere.
 
-Both integrated equivalents also exist inside the LitDiscover engine itself
-(`lit-review-bot/litdiscover/litdiscover/discovery/forward_cites.py` and `verify.py`, exposed as
-the `forward-cites` and `verify` CLI commands) — those operate on a project's own
-`papers`/`edges` database tables and reuse LitDiscover's shared S2 client/rate-limit code. Use
-the scripts here instead when you just have a loose `.bib` file and no project database, e.g.
-sanity-checking a paper's `refs.bib` before submission.
+Both integrated equivalents also exist inside the LitDiscover engine itself, still exposed as the
+`forward-cites` and `verify` CLI commands — `forward-cites` is now `forward_traversal_operator`
+(unfiltered over the whole included set) via `litdiscover/reports.py`/`db/client.py`, and `verify`
+lives at `lit-review-bot/litdiscover/litdiscover/tools/verify.py` (moved from `discovery/`
+2026-07-31, discovery-layer consolidation). Both operate on a project's own `papers`/`edges`
+database tables and reuse LitDiscover's shared S2 client/rate-limit code. Use the scripts here
+instead when you just have a loose `.bib` file and no project database, e.g. sanity-checking a
+paper's `refs.bib` before submission.
 
 ## Setup
 

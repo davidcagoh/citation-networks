@@ -4,13 +4,14 @@
 
 **Presenting this program to someone new?** Read [research-program.md](research-program.md) first — narrative overview of all three pillars + the two speculative extensions, written for a potential collaborator.
 
-**Repo layout note (2026-07-14):** the actual `litdiscover` codebase, the 14 cloned reference
-systems, `deep-dives.md`, and the source PDFs (`fulltext/` → `reference-pdfs/`) all now live under
-`lit-review-bot/` at the repo root (`lit-review-bot/litdiscover/`, `lit-review-bot/reference-systems/`,
-`lit-review-bot/reference-systems/deep-dives.md`, `lit-review-bot/reference-systems/reference-pdfs/`)
-— not deleted, confirmed via directory listing. `lit-review-bot/` is the shell folder for the
-LitDiscover engine, the reference-systems corpus, and the eval infrastructure together; the wiki
-keeps its own research/decisions docs separately in `wiki/litdiscover/` as before.
+**Repo layout note (updated 2026-08-01):** the `litdiscover` codebase and eval infrastructure live
+under `lit-review-bot/` at the repo root (`lit-review-bot/litdiscover/`, `lit-review-bot/evals/`).
+The 14 cloned reference systems, `deep-dives.md`, and the source PDFs (`reference-pdfs/`) moved
+`lit-review-bot/` → repo root (2026-07-21) → **`wiki/reference-systems/` (2026-08-01, session 47)**
+— research material, belongs with the wiki rather than sibling to it. `wiki/utils/` (also moved
+2026-08-01) holds `forward_cites.py`/`verify_refs.py`. `lit-review-bot/` is the shell folder for
+just the LitDiscover engine and eval infrastructure now; the wiki keeps its own research/decisions
+docs in `wiki/litdiscover/` as before.
 
 **`lit-review-bot/paper/` renamed `lit-review-bot/evals/` (2026-08-01, session 47):** same GitHub
 repo (`robust-literature-discovery`) — the paused IP&M manuscript archived to
@@ -83,7 +84,7 @@ structure grew unreadable. Full prior detail is in git history if ever needed.
 | [../lit-review-bot/litdiscover/litdiscover/discovery/README.md](../lit-review-bot/litdiscover/litdiscover/discovery/README.md) | Lives next to the code it documents rather than in the wiki. Reference doc (not research framing) for how `litdiscover/discovery/` actually works: module map, the `OperatorResult` contract, all 7 operators, the `GraphSource` protocol/`S2Source`/`ClosedCorpusSource`, rate limiting + budget accounting, and what the CLI actually calls vs. what's research-only |
 | [litdiscover/manual-pipeline-retrospective.md](litdiscover/manual-pipeline-retrospective.md) | 2026-07-21: retrospective on a manual candidate-replacement pipeline (keyword search → curate/extract → refine → forward/co-citation) run end-to-end on two real surveys (`lit-review-bot/projects/china-ashare-strategy-survey/`, `trading-eval-survey/`) — 8 concrete findings for a LitDiscover redesign, incl. a missing "reconcile for redundancy" stage, forward-citation age-targeting rule, and independent convergence on LitDiscover's own cycle-yield stopping logic |
 | [litdiscover/protocol-log.md](litdiscover/protocol-log.md) | 2026-07-31: source of truth for discovery-algorithm configurations tried — protocol-variant table (verdict: kept/rejected/undecided + why) and a concrete run log, separate from session-log's narrative |
-| [../reference-systems/deep-dives.md](../reference-systems/deep-dives.md) | Lives with the reference-systems corpus it documents, not in the wiki. Source doc — 22 full 6-field method deep-dives + Methods/Evaluation-Methods tables, mined from the 366-paper corpus, plus a 5-entry verification cohort and SurveyLens. Source PDFs at `../reference-systems/reference-pdfs/`. **Promoted from `lit-review-bot/reference-systems/` to the repo root 2026-07-21** — important enough on its own (directly answers "how does each system claim to be better than the others," see session 45) to stop being a lit-review-bot subfolder. |
+| [reference-systems/deep-dives.md](reference-systems/deep-dives.md) | Lives with the reference-systems corpus it documents, now inside the wiki. Source doc — 22 full 6-field method deep-dives + Methods/Evaluation-Methods tables, mined from the 366-paper corpus, plus a 5-entry verification cohort and SurveyLens. Source PDFs at `reference-systems/reference-pdfs/`. Moved `lit-review-bot/` → repo root (2026-07-21) → `wiki/reference-systems/` (2026-08-01) — important enough on its own (directly answers "how does each system claim to be better than the others," see session 45) to belong with the wiki rather than sibling to it. |
 
 ---
 
