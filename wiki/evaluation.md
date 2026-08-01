@@ -103,6 +103,70 @@ infrastructure of the four stages, making its comparability gap the least valuab
 
 ---
 
+## SYNERGY `Hall_2012` results (2026-08-01)
+
+Code: `evals/synergy-eval/` (55/55 tests, TDD throughout). Full config/methodology in
+`litdiscover/protocol-log.md`'s Run log; this section is the numbers.
+
+**Step 1 — isolated 5-operator baseline** (BWD/FWD/AUTH/VENUE + CO reconstructed as `FWD∘BWD`,
+top_k seeds, k∈{1,2,3}):
+
+| Operator | recall @k=3 | precision @k=3 |
+|---|---|---|
+| BWD | 3.0% | 75% |
+| FWD | 36.6% | 43% |
+| AUTH | 4.0% | 50% |
+| VENUE | 9.9% | 23% |
+| CO | 28.7% | 49–65% |
+
+CO is the best recall/precision balance — **replicates the 2026-07-14 live-survey finding on a
+second, independent corpus**, not a fluke of one dataset. FWD is unexpectedly strong here (37%
+recall) versus dead on live S2 (+0/+1/+0 gold, 2026-07-14): closed-corpus forward traversal only
+reaches papers already inside Hall_2012's own screened pool — on-topic by construction — unlike
+open-web forward citations, which reach mostly off-topic citers. FWD's weakness is
+corpus-shape-dependent, not universal.
+
+**Step 2 — composition sweep**, 12 hand-picked sequences × 3 modes (isolated / chained-unfiltered
+/ chained-filtered-by-gold-label) × 9 seed conditions (126 conditions total):
+
+- **Best condition: `BWD→FWD→CO→VENUE`, chained-unfiltered, k=3 — 76.2% recall, 27.2% precision.**
+- **Chaining beats isolated-union almost everywhere** — e.g. `BWD→FWD→AUTH` chained: 50.5% recall
+  vs. 11.9% isolated. Refines the single 2026-07-14 rejected chaining result (`FWD unfiltered +
+  citation-count frontier`, both recall and precision worse) — that finding was about *that
+  specific unfiltered design*, not chaining in general.
+- **Filtering's effect on precision has no universal sign — it depends on which operator it
+  precedes**, confirmed via per-stage diagnostics (multiplier, marginal gold) at contaminated
+  seeds, k=3/2-wrong:
+
+  | Sequence | stage-2 multiplier (unfilt.→filt.) | marginal gold (unfilt.→filt.) | stage-2 precision |
+  |---|---|---|---|
+  | `BWD→FWD` | 6.58 → 4.67 | 17 → 17 (unchanged) | 21.5% → 60.7% |
+  | `FWD→BWD` | 2.83 → 3.75 | 9 → 7 (lost 2) | 52.9% → 46.7% |
+
+  Filtering before `FWD` (a high-fan-out operator) strips noise for free — same true positives,
+  far fewer false ones. Filtering before `BWD` (not a multiplier) costs real finds — some of the
+  filtered-out non-gold `FWD` candidates were legitimate bridge nodes `BWD` would have profitably
+  explored.
+- **Two clean negatives**: `FWD→FWD` (repeated forward) is dead everywhere, ~1% recall regardless
+  of mode or k. Any sequence ending in `VENUE` craters precision (13–27% vs. 44–80% for
+  non-`VENUE` chains) — consistent with `VENUE`'s null isolated result above.
+- **Stage overlap** (Jaccard of raw candidates, kitchen-sink chain): `BWD↔CO` and `FWD↔CO` both
+  exactly 0% — CO finds nothing redundant with either traversal operator here, a local,
+  exact-number replication of `live-survey-eval/11_redundancy_check.py`'s finding that co-citation
+  isn't redundant with forward traversal.
+- **Simulated yield-stop**: production's existing `core/loop.py` `YIELD_THRESHOLD=0.05` stopping
+  rule would already have cut `BWD→BWD`, `FWD→FWD`, and every isolated-mode `VENUE` sequence short
+  — no new mechanism needed to avoid those specific dead ends.
+
+**A bug caught and fixed mid-build, not silently corrected**: the overlap diagnostic was
+initially computed from `new_candidates` (each stage's contribution *after* dedup against
+everything found by earlier stages) — which is disjoint across stages by construction, so it read
+`0.0` for every pair regardless of what the operators actually found. Fixed by computing overlap
+from `raw_candidates` (pre-dedup) instead; caught via a regression test before any of the numbers
+above were reported.
+
+---
+
 ## The eval-standard gap (synthesis-side) — read this before citing any survey-generation system as a benchmark
 
 **No mature evaluation standard exists for synthesis/survey-generation quality**, anywhere in the
@@ -162,9 +226,13 @@ literature might otherwise expect Q-SYNTH held to that same unvalidated bar.
 - ~~Check `referenced_works` coverage density across reviews~~ — **done 2026-07-31**, 7/26 checked
   (small/medium/large, both CS-domain reviews), consistently strong, `Hall_2012` identified as the
   best candidate for the actual experiment.
-- Design the seed-subset/traverse/recall experiment as a second closed corpus alongside APS
-  (`litdiscover/protocol-log.md`, `evals/aps-eval/`), against `Hall_2012` — not yet scoped. **The
-  only active experiment from this file** — see below.
+- ~~Design and run the seed-subset/traverse/recall experiment against `Hall_2012`~~ — **done
+  2026-08-01**, isolated baseline + 126-condition composition sweep with per-stage diagnostics, see
+  results section above. Not extended to the other 25 reviews yet — open if this needs to become a
+  multi-review claim rather than a single-review one.
+- Explain the `FWD→BWD` contaminated-seed precision dip (52.9%→46.7% with filtering) more
+  rigorously than "some non-gold candidates were bridge nodes" — currently a single-condition
+  observation, not verified across other sequences/k values.
 - ~~Run LitDiscover's `screen_batch()` against SYNERGY/CLEF TAR~~ — **dropped 2026-07-31,
   deliberately not pursued.** LitDiscover's actual claim is about Discovery, not Screening;
   Screening already has the best-supported eval infrastructure of the four stages (real,
