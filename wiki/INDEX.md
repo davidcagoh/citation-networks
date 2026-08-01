@@ -9,10 +9,17 @@ systems, `deep-dives.md`, and the source PDFs (`fulltext/` → `reference-pdfs/`
 `lit-review-bot/` at the repo root (`lit-review-bot/litdiscover/`, `lit-review-bot/reference-systems/`,
 `lit-review-bot/reference-systems/deep-dives.md`, `lit-review-bot/reference-systems/reference-pdfs/`)
 — not deleted, confirmed via directory listing. `lit-review-bot/` is the shell folder for the
-LitDiscover engine, the reference-systems corpus, and the RLD paper together; the wiki keeps its
-own research/decisions docs separately in `wiki/litdiscover/` as before.
+LitDiscover engine, the reference-systems corpus, and the eval infrastructure together; the wiki
+keeps its own research/decisions docs separately in `wiki/litdiscover/` as before.
 
-**Discovery-layer consolidation (2026-07-31, session 46):** `lit-review-bot/litdiscover/litdiscover/discovery/` refactored from 11 files to 3 — all 8 discovery operators (backward/forward traversal + author/venue/recency/embedding/co-citation/keyword search) now live in one `operators.py`; the old `GraphSource`/`S2Source`/`ClosedCorpusSource` class hierarchy dissolved into a `source="s2"|"local_corpus"` argument; `forward_cites.py` deleted (was duplicating `forward_traversal_operator`); `verify.py`/`relwork.py` moved to a new `tools/` package. Full test suite green (246/246), real APS-dataset regression run confirms zero behavior change in the actual engine. New source of truth for discovery-algorithm configurations: `wiki/litdiscover/protocol-log.md`. See session 46 in `session-log.md` for the full account, including a pre-existing (unrelated) nondeterminism bug found in `paper/`'s own eval script.
+**`lit-review-bot/paper/` renamed `lit-review-bot/evals/` (2026-08-01, session 47):** same GitHub
+repo (`robust-literature-discovery`) — the paused IP&M manuscript archived to
+`evals/_archive/drafts/`, `closed-corpus-eval/` renamed `aps-eval/`, new `synergy-eval/` track
+added (external SYNERGY-dataset discovery-operator benchmark, built + run this session). See
+`wiki/evaluation.md` for the eval-methodology findings and `session-log.md` session 47 for the
+full account.
+
+**Discovery-layer consolidation (2026-07-31, session 46):** `lit-review-bot/litdiscover/litdiscover/discovery/` refactored from 11 files to 3 — all 8 discovery operators (backward/forward traversal + author/venue/recency/embedding/co-citation/keyword search) now live in one `operators.py`; the old `GraphSource`/`S2Source`/`ClosedCorpusSource` class hierarchy dissolved into a `source="s2"|"local_corpus"` argument; `forward_cites.py` deleted (was duplicating `forward_traversal_operator`); `verify.py`/`relwork.py` moved to a new `tools/` package. Full test suite green (246/246), real APS-dataset regression run confirms zero behavior change in the actual engine. New source of truth for discovery-algorithm configurations: `wiki/litdiscover/protocol-log.md`. See session 46 in `session-log.md` for the full account, including a pre-existing (unrelated) nondeterminism bug found in `evals/`'s own eval script (fixed 2026-08-01, session 47).
 
 **Manual pipeline experiment (2026-07-21, session 44):** a candidate replacement for the
 LitDiscover engine — keyword search → curate/extract → refine → forward/co-citation, Zotero-backed
