@@ -1,6 +1,9 @@
-# Citation Networks — Project Wiki
+# Citation Networks — Detailed Wiki Map
 
-**Start every session:** read `session-log.md` → check the relevant project's `open-questions.md`.
+> This is the legacy detailed navigation and historical status map. Start with
+> [`_index.md`](_index.md), then read only the active project or experiment file.
+> `session-log.md` is frozen as historical context; new sessions rely on current
+> state plus git history rather than adding chronological session summaries.
 
 **Presenting this program to someone new?** Read [research-program.md](research-program.md) first — narrative overview of all three pillars + the two speculative extensions, written for a potential collaborator.
 

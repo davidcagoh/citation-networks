@@ -3,10 +3,7 @@
 /lit-review-bot/evals/
 /zeitgeist/
 
-# Local-only navigation symlinks (2026-08-01) -- convenience for cd-ing directly
-# into a nested project without knowing the parent path back to wiki/. Not real
-# repo structure; never meant to resolve on any other clone. (wiki/reference-systems
-# and wiki/utils are NOT symlinks -- moved for real 2026-08-01, tracked normally.)
+# Local-only navigation symlinks -- convenience for nested projects.
 /lit-review-bot/wiki
 /synthesis/wiki
 /zeitgeist/wiki
@@ -14,24 +11,21 @@
 # Deprecated repo, archived on GitHub — kept locally for now
 /deprecated-bot/
 
-# External reference clones (competitor codebases, not our own repo content)
-# Moved into wiki/reference-systems/ 2026-08-01 (previously repo root, promoted
-# from lit-review-bot/ 2026-07-21) -- these are research material, belong with
-# the wiki, not sibling to it.
-/wiki/reference-systems/InteractiveSurvey/
-/wiki/reference-systems/LitLLM/
-/wiki/reference-systems/PROMPTHEUS/
-/wiki/reference-systems/ProfOlaf/
-/wiki/reference-systems/SLR-automation/
-/wiki/reference-systems/SciReviewGen/
-/wiki/reference-systems/SurveyGen/
-/wiki/reference-systems/SurveyGen-I/
-/wiki/reference-systems/SurveyX/
-/wiki/reference-systems/asreview/
-/wiki/reference-systems/auto-review-writing/
-/wiki/reference-systems/litllms-for-literature-review-tmlr/
-/wiki/reference-systems/llassist/
-/wiki/reference-systems/robotsearch/
+# Archived external reference clones (competitor codebases, not our own code).
+/archive/wiki-legacy/reference-systems/InteractiveSurvey/
+/archive/wiki-legacy/reference-systems/LitLLM/
+/archive/wiki-legacy/reference-systems/PROMPTHEUS/
+/archive/wiki-legacy/reference-systems/ProfOlaf/
+/archive/wiki-legacy/reference-systems/SLR-automation/
+/archive/wiki-legacy/reference-systems/SciReviewGen/
+/archive/wiki-legacy/reference-systems/SurveyGen/
+/archive/wiki-legacy/reference-systems/SurveyGen-I/
+/archive/wiki-legacy/reference-systems/SurveyX/
+/archive/wiki-legacy/reference-systems/asreview/
+/archive/wiki-legacy/reference-systems/auto-review-writing/
+/archive/wiki-legacy/reference-systems/litllms-for-literature-review-tmlr/
+/archive/wiki-legacy/reference-systems/llassist/
+/archive/wiki-legacy/reference-systems/robotsearch/
 
 # Obsidian vault config (personal, not project content)
 .obsidian/
@@ -52,6 +46,6 @@ __pycache__/
 
 # Large binary / generated files
 wiki/*.pdf
-/wiki/reference-systems/reference-pdfs/
+/archive/wiki-legacy/reference-systems/reference-pdfs/
 *.log
 texput.log

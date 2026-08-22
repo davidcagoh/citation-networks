@@ -2,8 +2,8 @@
 
 PhD research workspace: three connected projects studying citation networks — LitDiscover
 (literature discovery), Zeitgeist (temporal/community structure), Synthesis (applying the two
-together). See [`wiki/research-program.md`](wiki/research-program.md) for the full narrative
-overview; this file is repo navigation only.
+together). Current scientific state lives in [`wiki/_index.md`](wiki/_index.md); this file is
+repo navigation only.
 
 ## The pipeline
 
@@ -29,9 +29,9 @@ Each stage's output feeds the next. LitDiscover finds the papers; Zeitgeist's me
 ```
 citation-networks/
 ├── literature-workbench/          # New local-first synthesis application (greenfield MVP)
-├── wiki/                          # Shared project wiki (session logs, decisions, open questions)
-│   ├── reference-systems/             # 14 cloned reference literature-review-automation systems + deep-dives.md (moved into wiki/ 2026-08-01 — research material, belongs with the wiki)
-│   └── utils/                         # forward_cites.py, verify_refs.py (moved into wiki/ 2026-08-01)
+├── wiki/                          # Minimal program/project state + formal experiments
+│   └── projects/                      # One small current-state page per active research workstream
+├── archive/wiki-legacy/           # Frozen prior wiki, reference systems, and standalone utilities
 ├── zeitgeist/                     # Zeitgeist: temporal embedding, phase characterization (own repo: github.com/davidcagoh/zeitgeist)
 ├── lit-review-bot/
 │   ├── litdiscover/                   # LitDiscover engine (own repo: github.com/davidcagoh/litdiscover), pip installable
@@ -48,9 +48,9 @@ but does not import or mutate their databases or application code.
 
 | Project | Status | Target |
 |---|---|---|
-| [LitDiscover](wiki/litdiscover/) | Desk-rejected by IP&M — redo in progress. Discovery/screening eval redesigned around an end-to-end recall/precision metric | Information Processing & Management (redo) |
-| [Zeitgeist](wiki/zeitgeist/) | Active — first full draft written, figures done | COMPLEX NETWORKS 2026 |
-| [Synthesis](wiki/synthesis/) | Three parallel tracks (graph-native, embedding-native, text-native control) | Post-Zeitgeist thesis chapter |
+| [LitDiscover](archive/wiki-legacy/litdiscover/litdiscover.md) | Desk-rejected by IP&M — redo in progress. Discovery/screening eval redesigned around an end-to-end recall/precision metric | Information Processing & Management (redo) |
+| [Zeitgeist](archive/wiki-legacy/zeitgeist/codebase-map.md) | Active — first full draft written, figures done | COMPLEX NETWORKS 2026 |
+| [Synthesis](archive/wiki-legacy/synthesis/synthesis.md) | Three parallel tracks (graph-native, embedding-native, text-native control) | Post-Zeitgeist thesis chapter |
 
 ## Setup
 
@@ -70,4 +70,6 @@ submodule's pinned-commit pointer would drift constantly against that.
 
 ## Wiki
 
-Start at [`wiki/INDEX.md`](wiki/INDEX.md) — session logs, decisions, and open questions per project.
+Start at [`wiki/_index.md`](wiki/_index.md) for current scientific state and one next action.
+[`archive/wiki-legacy/`](archive/wiki-legacy/) holds the frozen detailed record when deeper
+context is needed.
