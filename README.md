@@ -1,34 +1,26 @@
 # citation-networks
 
-PhD research workspace: three connected projects studying citation networks — LitDiscover
-(literature discovery), Zeitgeist (temporal/community structure), Synthesis (applying the two
-together). Current scientific state lives in [`wiki/_index.md`](wiki/_index.md); this file is
-repo navigation only.
+PhD research workspace with two active programs: Literature Workbench, the
+functional system for literature discovery and synthesis, and Zeitgeist, an
+independent analytical study of temporal and community structure in citation
+networks. Current scientific state lives in [`wiki/_index.md`](wiki/_index.md);
+this file is repo navigation only.
 
-## The pipeline
+## Programs
 
-```
- ┌───────────────┐        ┌────────────────┐        ┌───────────────┐
- │  LitDiscover  │        │   Zeitgeist     │        │   Synthesis   │
- │               │        │                 │        │               │
- │  Recover a    │  ───▶  │  Resolve the    │  ───▶  │  Apply that   │
- │  field's full │        │  structure      │        │  structure to │
- │  paper set    │        │  inside a       │        │  a recovered  │
- │  from a few   │        │  citation graph │        │  set, and see │
- │  seed papers  │        │  (communities,  │        │  if it reads  │
- │               │        │  power laws,    │        │  as real      │
- │               │        │  time windows)  │        │  research     │
- │               │        │                 │        │  threads      │
- └───────────────┘        └────────────────┘        └───────────────┘
-```
-
-Each stage's output feeds the next. LitDiscover finds the papers; Zeitgeist's methods describe how they're structured; Synthesis points those methods at a LitDiscover result to see if the whole thing works end to end.
+- **Literature Workbench** unifies the former LitDiscover and Synthesis
+  programs: brief/seeds → discovery → evidence and relations → review plan →
+  grounded draft and verification. Its supplied-corpus vertical slice works;
+  live discovery remains a deferred milestone.
+- **Zeitgeist** is analytical rather than a required pipeline stage. Its
+  citation-network results may inform Workbench methods when experimentally
+  useful.
 
 ## Structure
 
 ```
 citation-networks/
-├── literature-workbench/          # New local-first synthesis application (greenfield MVP)
+├── literature-workbench/          # Active local-first discovery + synthesis system
 ├── wiki/                          # Minimal program/project state + formal experiments
 │   └── projects/                      # One small current-state page per active research workstream
 ├── archive/wiki-legacy/           # Frozen prior wiki, reference systems, and standalone utilities
@@ -46,11 +38,14 @@ but does not import or mutate their databases or application code.
 
 ## Status (see wiki for full detail)
 
-| Project | Status | Target |
+| Program | Status | Target |
 |---|---|---|
-| [LitDiscover](archive/wiki-legacy/litdiscover/litdiscover.md) | Desk-rejected by IP&M — redo in progress. Discovery/screening eval redesigned around an end-to-end recall/precision metric | Information Processing & Management (redo) |
-| [Zeitgeist](archive/wiki-legacy/zeitgeist/codebase-map.md) | Active — first full draft written, figures done | COMPLEX NETWORKS 2026 |
-| [Synthesis](archive/wiki-legacy/synthesis/synthesis.md) | Three parallel tracks (graph-native, embedding-native, text-native control) | Post-Zeitgeist thesis chapter |
+| [Literature Workbench](wiki/projects/literature-workbench.md) | Supplied-corpus provenance slice complete; live discovery and scientific evaluation pending | Unified research instrument |
+| [Zeitgeist](wiki/projects/zeitgeist.md) | First full draft written; figures complete | COMPLEX NETWORKS 2026 |
+
+LitDiscover and Synthesis are predecessor programs. Their code, evaluations,
+and research records remain available as inputs to the Workbench rather than
+active top-level workstreams.
 
 ## Setup
 

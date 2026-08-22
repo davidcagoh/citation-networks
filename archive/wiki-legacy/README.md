@@ -7,7 +7,8 @@ at session start.
 Contents include:
 
 - chronological session logs and the former detailed index;
-- project roadmaps, decisions, retrospectives, and prior experiment records;
+- LitDiscover and Synthesis predecessor roadmaps, decisions, retrospectives,
+  and prior experiment records;
 - the reference-system deep dives, local external clones, and source PDFs;
 - standalone bibliography utilities superseded by LitDiscover commands.
 

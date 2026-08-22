@@ -37,6 +37,8 @@ __pycache__/
 *.pyo
 *.egg-info/
 .env
+.env.*
+!.env.example
 
 # Jupyter
 .ipynb_checkpoints/
@@ -49,3 +51,5 @@ wiki/*.pdf
 /archive/wiki-legacy/reference-systems/reference-pdfs/
 *.log
 texput.log
+*.db-shm
+*.db-wal

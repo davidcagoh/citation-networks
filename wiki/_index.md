@@ -2,20 +2,18 @@
 
 ## Question
 
-Can a citation-network pipeline recover a field from minimal seeds and expose
-its temporal and methodological structure well enough to support an auditable
-scientific synthesis?
+Can literature discovery and synthesis be unified in an auditable workbench,
+and which citation-network structures meaningfully improve its account of a
+field?
 
 ## Current state
 
-No formal experiment is running. The three active research workstreams remain
-distinct but connected:
+No formal experiment is running. There are two active programs:
 
-| Workstream | Current state |
+| Program | Current state |
 |---|---|
-| [LitDiscover](projects/litdiscover.md) | End-to-end evaluation direction established; engine versus manual pipeline unresolved. |
-| [Zeitgeist](projects/zeitgeist.md) | §§1–4 paper draft complete; awaiting review feedback; post-paper temporal-layout question remains active. |
-| [Synthesis](projects/synthesis.md) | Three representation tracks retained; provenance workbench vertical slice complete but not scientifically evaluated. |
+| [Literature Workbench](projects/literature-workbench.md) | Unified functional successor to LitDiscover and Synthesis. Its supplied-corpus provenance slice works; live discovery and scientific evaluation remain pending. |
+| [Zeitgeist](projects/zeitgeist.md) | Independent analytical program. §§1–4 paper draft complete; awaiting review feedback; post-paper temporal-layout question remains active. |
 
 ## What we know
 
@@ -32,7 +30,8 @@ distinct but connected:
 
 ## Open
 
-- Whether the manual discovery pipeline should replace the current engine.
+- Which predecessor discovery methods should become Workbench adapters, and
+  whether live discovery meets an explicit end-to-end budget.
 - Whether relation-aware, provenance-preserving planning improves synthesis
   quality over a paper-list baseline.
 - Which protocol can evaluate synthesis quality without overstating what

@@ -8,10 +8,12 @@ and active time windows?
 
 ## Current state
 
-The full §§1–4 LNCS paper draft is compiled and awaiting review feedback. The
-data, Leiden, community-fit, NST, Time Curves, and K17-RGC subgraph phases have
-all run. NST and Time Curves were excluded from the paper after negative or
-uninformative results; a time-axis-aware layout remains post-paper work.
+Zeitgeist is an independent analytical program, not a required stage of the
+Literature Workbench. The full §§1–4 LNCS paper draft is compiled and awaiting
+review feedback. The data, Leiden, community-fit, NST, Time Curves, and K17-RGC
+subgraph phases have all run. NST and Time Curves were excluded from the paper
+after negative or uninformative results; a time-axis-aware layout remains
+post-paper work.
 
 ## What we know
 
