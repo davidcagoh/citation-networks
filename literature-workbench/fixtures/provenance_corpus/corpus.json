@@ -1,0 +1,57 @@
+[
+  {
+    "title": "Episodic Memory for Persistent Language Agents",
+    "authors": ["A. Chen", "M. Ortiz"],
+    "year": 2022,
+    "venue": "Agent Systems",
+    "text": "Long-running language agents lose task context as interactions accumulate. Episodic retrieval stores compact interaction traces and recalls them by semantic similarity. On multi-session tasks, retrieval improved goal completion but occasionally surfaced stale observations.",
+    "entity_type": "method",
+    "entity_label": "episodic retrieval",
+    "evidence": "Episodic retrieval stores compact interaction traces and recalls them by semantic similarity.",
+    "claim": "Episodic retrieval establishes a semantic-recall baseline for persistent agents, but the trace store can surface stale observations."
+  },
+  {
+    "title": "Reflective Memory Consolidation in Autonomous Agents",
+    "authors": ["S. Rao", "J. Bell"],
+    "year": 2023,
+    "venue": "Machine Intelligence",
+    "text": "Unfiltered episodic stores accumulate redundant traces and retrieval interference. Reflective consolidation clusters related experiences into durable summaries before later retrieval. Consolidation reduced interference on long-horizon planning, although summarization removed some task-specific detail.",
+    "entity_type": "mechanism",
+    "entity_label": "reflective consolidation",
+    "evidence": "Reflective consolidation clusters related experiences into durable summaries before later retrieval.",
+    "claim": "To reduce interference in unfiltered episodic stores, reflective consolidation compresses related experiences into durable summaries, trading task detail for cleaner recall."
+  },
+  {
+    "title": "Graph-Structured Memory for Tool-Using Agents",
+    "authors": ["L. Ibrahim", "P. Singh"],
+    "year": 2024,
+    "venue": "Computational Agents",
+    "text": "Flat similarity retrieval often misses dependencies among tools, observations, and goals. Graph memory represents these dependencies as typed edges and traverses them during recall. The graph improved multi-step tool use but introduced maintenance overhead as memories changed.",
+    "entity_type": "architectural_primitive",
+    "entity_label": "graph memory",
+    "evidence": "Graph memory represents these dependencies as typed edges and traverses them during recall.",
+    "claim": "Where flat similarity retrieval misses dependencies, graph memory uses typed-edge traversal to improve multi-step tool use, at the cost of maintenance overhead."
+  },
+  {
+    "title": "Conflict-Aware Retrieval for Agent Memory",
+    "authors": ["N. Foster", "D. Kim"],
+    "year": 2025,
+    "venue": "Language Agent Workshop",
+    "text": "Recency and similarity alone can retrieve mutually inconsistent memories. Conflict-aware retrieval attaches temporal validity and contradiction links to stored claims. It reduced contradictory answers in changing environments while increasing retrieval latency.",
+    "entity_type": "method",
+    "entity_label": "conflict-aware retrieval",
+    "evidence": "Conflict-aware retrieval attaches temporal validity and contradiction links to stored claims.",
+    "claim": "Where recency and similarity retrieve inconsistent memories, conflict-aware retrieval adds temporal validity and contradiction links, reducing inconsistent answers while increasing latency."
+  },
+  {
+    "title": "Ablating Memory Quality Signals in LLM Agents",
+    "authors": ["K. Martin"],
+    "year": 2025,
+    "venue": "Evaluation Notes",
+    "text": null,
+    "entity_type": "evaluation",
+    "entity_label": "memory quality ablation",
+    "evidence": null,
+    "claim": null
+  }
+]

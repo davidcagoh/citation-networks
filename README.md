@@ -28,6 +28,7 @@ Each stage's output feeds the next. LitDiscover finds the papers; Zeitgeist's me
 
 ```
 citation-networks/
+├── literature-workbench/          # New local-first synthesis application (greenfield MVP)
 ├── wiki/                          # Shared project wiki (session logs, decisions, open questions)
 │   ├── reference-systems/             # 14 cloned reference literature-review-automation systems + deep-dives.md (moved into wiki/ 2026-08-01 — research material, belongs with the wiki)
 │   └── utils/                         # forward_cites.py, verify_refs.py (moved into wiki/ 2026-08-01)
@@ -38,6 +39,10 @@ citation-networks/
 │   └── evals/                         # Eval infra: aps-eval/, live-survey-eval/, synergy-eval/ (own repo: github.com/davidcagoh/robust-literature-discovery); manuscript paused, archived under evals/_archive/drafts/
 └── deprecated-bot/                # Older, inactive literature-review variant (own repo: automated-lit-reviews — deleted from GitHub)
 ```
+
+`literature-workbench/` is intentionally isolated from the legacy engines. It
+may load shared credentials by explicit environment-file path in later slices,
+but does not import or mutate their databases or application code.
 
 ## Status (see wiki for full detail)
 
