@@ -150,6 +150,27 @@ describe("Literature Workbench", () => {
     expect(api.updateCorpusMembership).toHaveBeenCalledWith("project-1", "paper-1", "included");
   });
 
+  it("builds a grounded review after live screening", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture({
+      getWorkspace: vi.fn().mockResolvedValue({
+        ...(await apiFixture().getWorkspace("project-1")),
+        corpus: { papers: [
+          { id: "paper-1", title: "Candidate One", year: 2025, document_status: "available", status: "included", discovery_routes: ["semantic_search"] },
+        ] },
+      }),
+    });
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Find memory systems.");
+    await user.click(screen.getByRole("button", { name: "Discover papers" }));
+    await user.click(screen.getByRole("tab", { name: "Run / Costs" }));
+    await user.click(screen.getByRole("button", { name: "Build grounded review" }));
+
+    expect(api.runPipeline).toHaveBeenCalledWith("project-1");
+  });
+
   it("runs the supplied-corpus workflow and exposes claim evidence", async () => {
     const user = userEvent.setup();
     render(<WorkbenchApp api={apiFixture()} />);
