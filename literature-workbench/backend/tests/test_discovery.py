@@ -339,6 +339,16 @@ def test_survey_route_orders_review_hits_by_strength_and_citations() -> None:
     ]
 
 
+def test_survey_route_queries_cover_multiple_review_families() -> None:
+    queries = DiscoveryService._route_queries("memory systems", "survey_search")
+
+    assert queries == [
+        "memory systems review survey benchmark",
+        "memory systems systematic review meta-analysis",
+        "memory systems umbrella review tutorial",
+    ]
+
+
 def test_discovery_deduplicates_same_provider_result(tmp_path: Path) -> None:
     provider = FakeDiscoveryProvider()
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
@@ -474,7 +484,7 @@ def test_discovery_can_run_multiple_named_routes_with_separate_usage_events(tmp_
 
         assert response.status_code == 201
         assert response.json()["route_count"] == 3
-        assert len(provider.queries) == 3
+        assert len(provider.queries) == 5
         with app.state.database.session() as database:
             events = list(
                 database.scalars(
@@ -486,6 +496,8 @@ def test_discovery_can_run_multiple_named_routes_with_separate_usage_events(tmp_
             assert [event.route for event in events] == [
                 "semantic_search",
                 "survey_search",
+                "survey_search",
+                "survey_search",
                 "recent_search",
             ]
             usage = list(
@@ -494,7 +506,7 @@ def test_discovery_can_run_multiple_named_routes_with_separate_usage_events(tmp_
                 )
             )
             assert len(usage) == 3
-            assert sum(event.external_api_calls for event in usage) == 3
+            assert sum(event.external_api_calls for event in usage) == 5
 
 
 def test_seminal_route_records_foundational_query_provenance(tmp_path: Path) -> None:
