@@ -9,10 +9,13 @@ from app.db import Database
 from app.models import (
     CorpusMembership,
     DiscoveryEvent,
+    EvidenceSpan,
     Paper,
     Project,
     ReviewPlan,
     ReviewSentence,
+    ScientificRelation,
+    SourceDocument,
     SynthesisClaim,
 )
 
@@ -74,6 +77,22 @@ class ProjectExporter:
                     select(SynthesisClaim).where(SynthesisClaim.project_id == project_id)
                 )
             )
+            paper_ids = [paper["id"] for paper in papers]
+            source_documents = list(
+                db.scalars(
+                    select(SourceDocument).where(SourceDocument.paper_id.in_(paper_ids))
+                )
+            )
+            evidence_spans = list(
+                db.scalars(select(EvidenceSpan).where(EvidenceSpan.paper_id.in_(paper_ids)))
+            )
+            relations = list(
+                db.scalars(
+                    select(ScientificRelation).where(
+                        ScientificRelation.project_id == project_id
+                    )
+                )
+            )
             events = list(
                 db.scalars(
                     select(DiscoveryEvent)
@@ -104,6 +123,45 @@ class ProjectExporter:
                     for event in events
                 ],
                 "plan": self._plan_json(plan),
+                "source_documents": [
+                    {
+                        "id": document.id,
+                        "paper_id": document.paper_id,
+                        "source_type": document.source_type,
+                        "source_uri": document.source_uri,
+                        "text": document.text,
+                        "parsing_quality": document.parsing_quality,
+                        "parser": document.parser,
+                    }
+                    for document in source_documents
+                ],
+                "evidence_spans": [
+                    {
+                        "id": span.id,
+                        "paper_id": span.paper_id,
+                        "source_document_id": span.source_document_id,
+                        "section": span.section,
+                        "start_offset": span.start_offset,
+                        "end_offset": span.end_offset,
+                        "verbatim_text": span.verbatim_text,
+                        "normalized_text": span.normalized_text,
+                        "extractor_version": span.extractor_version,
+                    }
+                    for span in evidence_spans
+                ],
+                "relations": [
+                    {
+                        "id": relation.id,
+                        "source_entity_ids": relation.source_entity_ids,
+                        "target_entity_ids": relation.target_entity_ids,
+                        "relation_type": relation.relation_type,
+                        "evidence_span_ids": relation.evidence_span_ids,
+                        "confidence": relation.confidence,
+                        "inference_level": relation.inference_level,
+                        "justification": relation.justification,
+                    }
+                    for relation in relations
+                ],
                 "review": {
                     "sentences": [
                         {
