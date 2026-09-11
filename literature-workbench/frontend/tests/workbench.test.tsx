@@ -30,6 +30,7 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
     createProject: vi.fn().mockResolvedValue({ id: "project-1" }),
     ingestFixture: vi.fn().mockResolvedValue({ paper_count: 5 }),
     acquire: vi.fn().mockResolvedValue({ project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0 }),
+    ingestSourceText: vi.fn().mockResolvedValue({ project_id: "project-1", paper_id: "paper-1", status: "included", source_type: "text" }),
     scopePreview: vi.fn().mockResolvedValue({
       project_id: "project-1",
       scope: { query: "memory", mode: "thorough", suggested_focus: ["Methods"] },
@@ -68,6 +69,22 @@ function deferred<T>() {
 }
 
 describe("Literature Workbench", () => {
+  it("imports pasted source text and opens its grounded review", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture();
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Imported study");
+    await user.type(screen.getByLabelText("Research brief"), "Inspect this study.");
+    await user.type(screen.getByLabelText("Optional source text"), "The study evaluates memory.");
+    await user.click(screen.getByRole("button", { name: "Import source text" }));
+
+    expect(api.ingestSourceText).toHaveBeenCalledWith("project-1", expect.objectContaining({
+      title: "Imported study", text: "The study evaluates memory.",
+    }));
+    expect(api.runPipeline).toHaveBeenCalledWith("project-1", { max_papers: 50 });
+  });
+
   it("previews scope and projected budget before discovery", async () => {
     const user = userEvent.setup();
     const api = apiFixture();

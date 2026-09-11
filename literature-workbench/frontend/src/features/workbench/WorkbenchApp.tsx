@@ -26,6 +26,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   const [activeTab, setActiveTab] = useState<Tab>("Brief");
   const [title, setTitle] = useState("");
   const [prompt, setPrompt] = useState("");
+  const [sourceText, setSourceText] = useState("");
   const [session, setSession] = useState<Session | null>(null);
   const [runState, setRunState] = useState<RunState>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -117,6 +118,30 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     } catch (caught) {
       setRunState("idle");
       setError(caught instanceof Error ? caught.message : "Scope preview could not be created.");
+    }
+  }
+
+  async function handleImportSource() {
+    if (!title.trim() || !prompt.trim() || !sourceText.trim()) return;
+    setError(null);
+    try {
+      setRunState("creating");
+      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim() });
+      await api.ingestSourceText(project.id, {
+        title: title.trim(),
+        source_uri: `user://${project.id}/source-text`,
+        text: sourceText.trim(),
+      });
+      setRunState("running");
+      await api.acquire(project.id);
+      const run = await api.runPipeline(project.id, { max_papers: maxPapers });
+      const workspace = await api.getWorkspace(project.id, run.id);
+      setSession({ projectId: project.id, paperCount: workspace.corpus.papers.length, workspace });
+      setRunState("complete");
+      setActiveTab("Corpus");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "The source could not be imported.");
     }
   }
 
@@ -309,7 +334,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             key={activeTab}
           >
             {activeTab === "Brief" && (
-              <BriefForm title={title} prompt={prompt} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setScopePreview(null); setPreviewProjectId(null); }} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} preview={scopePreview} />
+              <BriefForm title={title} prompt={prompt} sourceText={sourceText} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} preview={scopePreview} />
             )}
             {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} paperCount={session?.paperCount ?? null} onScreen={screenPaper} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} onSave={savePlan} />}
@@ -332,12 +357,14 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   );
 }
 
-function BriefForm({ title, prompt, busy, status, onTitle, onPrompt, onSubmit, onDiscover, onPreview, preview }: {
-  title: string; prompt: string; busy: boolean; status: string;
+function BriefForm({ title, prompt, sourceText, busy, status, onTitle, onPrompt, onSourceText, onSubmit, onDiscover, onPreview, onImport, preview }: {
+  title: string; prompt: string; sourceText: string; busy: boolean; status: string;
   onTitle: (value: string) => void; onPrompt: (value: string) => void;
+  onSourceText: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onDiscover: () => void;
   onPreview: () => Promise<void>;
+  onImport: () => Promise<void>;
   preview: ScopePreview | null;
 }) {
   return (
@@ -350,10 +377,15 @@ function BriefForm({ title, prompt, busy, status, onTitle, onPrompt, onSubmit, o
         <label className={styles.label} htmlFor="research-brief">Research brief <span className={styles.hint}>Question or synthesis goal</span></label>
         <textarea id="research-brief" aria-label="Research brief" className={styles.textarea} value={prompt} onChange={(event) => onPrompt(event.target.value)} placeholder="What should this review explain, compare, or resolve?" required />
       </div>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="source-text">Optional source text <span className={styles.hint}>Paste one paper or excerpt</span></label>
+        <textarea id="source-text" aria-label="Optional source text" className={styles.textarea} value={sourceText} onChange={(event) => onSourceText(event.target.value)} placeholder="Paste source text to run it through the provenance pipeline." />
+      </div>
       <div className={styles.actionRow}>
         <button className={styles.primary} type="submit" disabled={busy}>{busy ? status : "Create and run fixture"}</button>
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onPreview}>Preview scope</button>
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onDiscover}>Discover papers</button>
+        <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim() || !sourceText.trim()} onClick={onImport}>Import source text</button>
         <span className={styles.microcopy}>Local fixture or live provider-backed discovery</span>
       </div>
       {preview && <section className={styles.planHeader} aria-label="Scope preview">

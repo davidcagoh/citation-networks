@@ -96,6 +96,15 @@ export interface WorkbenchApi {
     available_count: number;
     degraded_count: number;
   }>;
+  ingestSourceText(projectId: string, input: {
+    title: string;
+    source_uri: string;
+    text: string;
+    authors?: string[];
+    year?: number;
+    venue?: string;
+    doi?: string;
+  }): Promise<{ project_id: string; paper_id: string; status: string; source_type: string }>;
   scopePreview(projectId: string, input?: { mode?: "quick" | "thorough"; max_papers?: number }): Promise<ScopePreview>;
   runDiscovery(projectId: string, query: string, limit?: number): Promise<{
     candidate_count: number;
@@ -206,6 +215,21 @@ function parseAcquisition(value: unknown): {
     paper_count: number(acquisition.paper_count, "acquisition.paper_count"),
     available_count: number(acquisition.available_count, "acquisition.available_count"),
     degraded_count: number(acquisition.degraded_count, "acquisition.degraded_count"),
+  };
+}
+
+function parseSourceText(value: unknown): {
+  project_id: string;
+  paper_id: string;
+  status: string;
+  source_type: string;
+} {
+  const source = object(value, "source text");
+  return {
+    project_id: string(source.project_id, "source text.project_id"),
+    paper_id: string(source.paper_id, "source text.paper_id"),
+    status: string(source.status, "source text.status"),
+    source_type: string(source.source_type, "source text.source_type"),
   };
 }
 
@@ -477,6 +501,11 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/fixtures/provenance-corpus`, parseIngest, { method: "POST" }),
     acquire: (projectId) =>
       request(baseUrl, `/projects/${projectId}/runs/acquisition`, parseAcquisition, { method: "POST" }),
+    ingestSourceText: (projectId, input) =>
+      request(baseUrl, `/projects/${projectId}/sources/text`, parseSourceText, {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
     scopePreview: (projectId, input) =>
       request(baseUrl, `/projects/${projectId}/runs/scope-preview`, parseScopePreview, {
         method: "POST",

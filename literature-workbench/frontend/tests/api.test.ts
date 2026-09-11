@@ -14,6 +14,21 @@ function response(body: unknown, options: { ok?: boolean; status?: number; text?
 afterEach(() => vi.unstubAllGlobals());
 
 describe("workbench API adapter", () => {
+  it("ingests pasted source text as a project paper", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      project_id: "project-1", paper_id: "paper-1", status: "included", source_type: "text",
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").ingestSourceText("project-1", {
+      title: "Study", source_uri: "user://study", text: "Full text.",
+    })).resolves.toEqual({ project_id: "project-1", paper_id: "paper-1", status: "included", source_type: "text" });
+    expect(fetchMock).toHaveBeenCalledWith("http://api/projects/project-1/sources/text", expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({ title: "Study", source_uri: "user://study", text: "Full text." }),
+    }));
+  });
+
   it("loads a scope preview with a projected budget", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
       project_id: "project-1",
