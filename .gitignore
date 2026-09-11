@@ -1,14 +1,11 @@
-# Ignore nested git repos (tracked separately)
-/lit-review-bot/litdiscover/
-/lit-review-bot/evals/
+# Local working trees and research records (kept outside this public shell)
+/literature-workbench/
+/wiki/
+/archive/
 /zeitgeist/
+/lit-review-bot/
 
-# Local-only navigation symlinks -- convenience for nested projects.
-/lit-review-bot/wiki
-/synthesis/wiki
-/zeitgeist/wiki
-
-# Deprecated repo, archived on GitHub — kept locally for now
+# Deprecated local material
 /deprecated-bot/
 
 # Archived external reference clones (competitor codebases, not our own code).
@@ -26,14 +23,6 @@
 /archive/wiki-legacy/reference-systems/litllms-for-literature-review-tmlr/
 /archive/wiki-legacy/reference-systems/llassist/
 /archive/wiki-legacy/reference-systems/robotsearch/
-
-# Archived local-only predecessor repositories and demo artifacts.
-/archive/deprecated-bot/
-/archive/lit-review-bot/litdiscover/
-/archive/lit-review-bot/evals/
-/archive/lit-review-bot/wiki
-/archive/synthesis/
-/archive/literature-workbench-demo.webm
 
 # Obsidian vault config (personal, not project content)
 .obsidian/
