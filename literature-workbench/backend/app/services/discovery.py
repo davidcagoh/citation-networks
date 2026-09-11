@@ -12,6 +12,7 @@ from sqlalchemy import select
 
 from app.db import Database
 from app.models import (
+    CitationEdge,
     CorpusMembership,
     DiscoveryEvent,
     Paper,
@@ -43,6 +44,10 @@ class DiscoveryProvider(Protocol):
 
     def search(self, query: str, limit: int) -> Sequence[DiscoveryCandidate]: ...
 
+    def related(
+        self, external_id: str, direction: str, limit: int
+    ) -> Sequence[DiscoveryCandidate]: ...
+
 
 class SemanticScholarProvider:
     name = "semantic-scholar"
@@ -70,6 +75,33 @@ class SemanticScholarProvider:
         except Exception as exc:
             raise DiscoveryProviderError("Semantic Scholar search failed") from exc
         return [self._candidate(item) for item in payload.get("data", []) if self._valid(item)]
+
+    def related(self, external_id: str, direction: str, limit: int) -> list[DiscoveryCandidate]:
+        endpoint = "references" if direction == "backward" else "citations"
+        params = urlencode(
+            {
+                "limit": limit,
+                "fields": "paperId,title,authors,year,venue,externalIds,abstract,url",
+            }
+        )
+        headers = {"Accept": "application/json", "User-Agent": "literature-workbench/0.1"}
+        if self.api_key:
+            headers["x-api-key"] = self.api_key
+        request = Request(
+            f"https://api.semanticscholar.org/graph/v1/paper/{external_id}/{endpoint}?{params}",
+            headers=headers,
+        )
+        try:
+            with urlopen(request, timeout=self.timeout_seconds) as response:
+                payload = json.load(response)
+        except Exception as exc:
+            raise DiscoveryProviderError("Semantic Scholar citation expansion failed") from exc
+        candidates = []
+        for item in payload.get("data", []):
+            paper = item.get("citedPaper") or item.get("citingPaper")
+            if isinstance(paper, dict) and self._valid(paper):
+                candidates.append(self._candidate(paper))
+        return candidates
 
     @staticmethod
     def _valid(item: object) -> bool:
@@ -164,6 +196,95 @@ class DiscoveryService:
                     )
                 )
         return total_candidates, len(routes)
+
+    def expand_citations(
+        self, project_id: str, paper_id: str, direction: str, limit: int
+    ) -> int:
+        with self.database.session() as db:
+            seed = db.scalar(
+                select(Paper).where(Paper.id == paper_id, Paper.project_id == project_id)
+            )
+            if seed is None:
+                raise DiscoveryProviderError("Paper not found")
+            external_id = (seed.metadata_provenance or {}).get("external_id")
+            if not external_id:
+                raise DiscoveryProviderError("Paper has no provider identifier")
+        candidates = self.provider.related(external_id, direction, limit)
+        route = f"citation_{direction}"
+        with self.database.session() as db:
+            seed = db.get(Paper, paper_id)
+            for rank, candidate in enumerate(candidates, start=1):
+                related = self._find_paper(db, project_id, candidate)
+                if related is None:
+                    related = Paper(
+                        project_id=project_id,
+                        canonical_title=candidate.title,
+                        authors=candidate.authors,
+                        year=candidate.year,
+                        venue=candidate.venue,
+                        doi=candidate.doi,
+                        abstract=candidate.abstract,
+                        metadata_provenance={
+                            "provider": self.provider.name,
+                            "external_id": candidate.external_id,
+                            "source_uri": candidate.source_uri,
+                        },
+                    )
+                    db.add(related)
+                    db.flush()
+                    db.add(
+                        CorpusMembership(
+                            project_id=project_id,
+                            paper_id=related.id,
+                            status="candidate",
+                            relevance_score=candidate.score or 0.0,
+                            relevance_rationale=f"Found by {route} citation expansion",
+                        )
+                    )
+                source_id, target_id = (
+                    (seed.id, related.id) if direction == "backward" else (related.id, seed.id)
+                )
+                existing = db.scalar(
+                    select(CitationEdge).where(
+                        CitationEdge.project_id == project_id,
+                        CitationEdge.source_paper_id == source_id,
+                        CitationEdge.target_paper_id == target_id,
+                    )
+                )
+                if existing is None:
+                    db.add(
+                        CitationEdge(
+                            project_id=project_id,
+                            source_paper_id=source_id,
+                            target_paper_id=target_id,
+                            direction=direction,
+                            provider=self.provider.name,
+                        )
+                    )
+                self._persist_abstract(db, related, candidate)
+                db.add(
+                    DiscoveryEvent(
+                        project_id=project_id,
+                        paper_id=related.id,
+                        route=route,
+                        query=seed.canonical_title,
+                        action="candidate",
+                        rank=rank,
+                        score=candidate.score,
+                        rationale=(
+                            f"Found by {route} citation expansion from {seed.canonical_title}"
+                        ),
+                        provider=self.provider.name,
+                    )
+                )
+            db.add(
+                UsageCostEvent(
+                    project_id=project_id,
+                    provider=self.provider.name,
+                    external_api_calls=1,
+                )
+            )
+        return len(candidates)
 
     @staticmethod
     def _route_query(query: str, route: str) -> str:

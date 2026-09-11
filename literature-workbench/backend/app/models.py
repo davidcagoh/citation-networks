@@ -105,6 +105,23 @@ class DiscoveryEvent(Base):
     created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
+class CitationEdge(Base):
+    __tablename__ = "citation_edges"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), index=True
+    )
+    source_paper_id: Mapped[str] = mapped_column(
+        ForeignKey("papers.id", ondelete="CASCADE"), index=True
+    )
+    target_paper_id: Mapped[str] = mapped_column(
+        ForeignKey("papers.id", ondelete="CASCADE"), index=True
+    )
+    direction: Mapped[str] = mapped_column(String(20))
+    provider: Mapped[str] = mapped_column(String(80), default="manual")
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
+
+
 class SourceDocument(Base):
     __tablename__ = "source_documents"
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)

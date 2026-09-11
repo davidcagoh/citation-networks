@@ -11,6 +11,7 @@ from sqlalchemy import func, select
 
 from app.db import Database
 from app.domain import (
+    CitationExpansionRequest,
     CorpusMembershipUpdate,
     DiscoveryRequest,
     PipelineRequest,
@@ -333,6 +334,27 @@ def create_app(
             "route_count": route_count,
             "provider": discovery.provider.name,
             "query": value.query,
+        }
+
+    @app.post("/projects/{project_id}/runs/citation-expansion", status_code=201)
+    def expand_citations(project_id: str, value: CitationExpansionRequest) -> dict:
+        try:
+            count = discovery.expand_citations(
+                project_id, value.paper_id, value.direction, value.limit
+            )
+        except DiscoveryProviderError as exc:
+            message = str(exc)
+            if message in {"Project not found", "Paper not found"}:
+                raise HTTPException(404, message) from exc
+            if message == "Paper has no provider identifier":
+                raise HTTPException(422, message) from exc
+            raise HTTPException(502, "Discovery provider unavailable") from exc
+        return {
+            "project_id": project_id,
+            "paper_id": value.paper_id,
+            "direction": value.direction,
+            "candidate_count": count,
+            "provider": discovery.provider.name,
         }
 
     @app.post("/projects/{project_id}/integrations/zotero/import", status_code=201)
