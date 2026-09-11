@@ -12,6 +12,7 @@ from app.domain import ScientificRelationCreate
 from app.main import create_app
 from app.models import (
     CorpusMembership,
+    DiscoveryEvent,
     EvidenceSpan,
     Paper,
     Project,
@@ -146,6 +147,85 @@ def test_corpus_aggregates_multiple_documents_and_extraction_selects_best_source
             span = database.scalar(select(EvidenceSpan).where(EvidenceSpan.paper_id == paper.id))
             assert span is not None
             assert span.source_document_id == preferred_id
+
+
+def test_corpus_screening_updates_membership_and_excludes_paper_from_pipeline(
+    tmp_path: Path,
+) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = create_fixture_project(client)
+        assert client.post(f"/projects/{project_id}/runs/pipeline").status_code == 201
+        corpus = client.get(f"/projects/{project_id}/corpus").json()
+        paper_id = corpus["papers"][0]["id"]
+
+        response = client.patch(
+            f"/projects/{project_id}/corpus/{paper_id}",
+            json={"status": "excluded", "relevance_score": 0.1, "relevance_rationale": "Out of scope"},
+        )
+        assert response.status_code == 200
+        assert response.json()["status"] == "excluded"
+        assert response.json()["relevance_rationale"] == "Out of scope"
+
+        assert client.post(f"/projects/{project_id}/runs/pipeline").status_code == 201
+        filtered = client.get(f"/projects/{project_id}/corpus").json()
+        paper = next(item for item in filtered["papers"] if item["id"] == paper_id)
+        assert paper["status"] == "excluded"
+        assert filtered["coverage"]["included"] == 4
+
+        with app.state.database.session() as database:
+            assert database.scalar(
+                select(func.count()).select_from(ScientificEntity).where(
+                    ScientificEntity.paper_id == paper_id
+                )
+            ) == 0
+
+
+def test_corpus_screening_rejects_invalid_or_foreign_membership(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = create_fixture_project(client)
+        other_project_id = create_fixture_project(client, "Other")
+        paper_id = client.get(f"/projects/{project_id}/corpus").json()["papers"][0]["id"]
+
+        invalid = client.patch(
+            f"/projects/{project_id}/corpus/{paper_id}", json={"status": "maybe"}
+        )
+        foreign = client.patch(
+            f"/projects/{other_project_id}/corpus/{paper_id}", json={"status": "excluded"}
+        )
+        assert invalid.status_code == 422
+        assert foreign.status_code == 404
+
+
+def test_corpus_includes_discovery_route_provenance(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = create_fixture_project(client)
+        with app.state.database.session() as database:
+            paper = database.scalar(select(Paper).where(Paper.project_id == project_id))
+            assert paper is not None
+            database.add(
+                DiscoveryEvent(
+                    project_id=project_id,
+                    paper_id=paper.id,
+                    route="seed",
+                    query="agent memory",
+                    action="included",
+                    rank=1,
+                    score=0.91,
+                    rationale="User supplied seed",
+                    provider="manual",
+                )
+            )
+
+        item = next(
+            item
+            for item in client.get(f"/projects/{project_id}/corpus").json()["papers"]
+            if item["id"] == paper.id
+        )
+        assert item["discovery_routes"] == ["seed"]
+        assert item["discovery_events"][0]["rationale"] == "User supplied seed"
 
 
 def test_pipeline_repairs_partial_persisted_stage_artifacts(tmp_path: Path) -> None:
