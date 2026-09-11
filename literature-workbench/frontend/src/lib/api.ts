@@ -504,6 +504,7 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
           required_routes_executed: boolean(checks.required_routes_executed, "coverage audit.stopping_certificate.checks.required_routes_executed"),
           all_candidates_screened: boolean(checks.all_candidates_screened, "coverage audit.stopping_certificate.checks.all_candidates_screened"),
           selected_sources_available: boolean(checks.selected_sources_available, "coverage audit.stopping_certificate.checks.selected_sources_available"),
+          quality_signals_available: boolean(checks.quality_signals_available ?? true, "coverage audit.stopping_certificate.checks.quality_signals_available"),
         },
       };
     })(),

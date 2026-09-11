@@ -1011,6 +1011,24 @@ def create_app(
                 {"provider": provider, "attempts": totals[0], "failures": totals[1]}
                 for provider, totals in provider_totals.items()
             ]
+            signal_by_route = {item["route"]: item for item in signal_coverage}
+            signal_requirements = {
+                "recent_search": "papers_with_publication_date",
+                "seminal_search": "papers_with_citation_count",
+            }
+            quality_signals_available = all(
+                signal_by_route.get(route, {}).get(signal_field, 0)
+                == next(
+                    (
+                        summary["candidate_events"]
+                        for summary in route_summaries
+                        if summary["route"] == route
+                    ),
+                    0,
+                )
+                for route, signal_field in signal_requirements.items()
+                if mode in {"comprehensive", "systematic"} and route in executed_routes
+            )
             limitations: list[str] = []
             if candidates:
                 limitations.append("candidate papers remain unscreened")
@@ -1021,6 +1039,8 @@ def create_app(
             required_routes_executed = all(route in executed_routes for route in required_routes)
             if not required_routes_executed:
                 limitations.append("required discovery routes remain unexecuted")
+            if mode in {"comprehensive", "systematic"} and not quality_signals_available:
+                limitations.append("latest/seminal routes lack complete provider signals")
             all_candidates_screened = not candidates
             selected_sources_available = selected_with_text == len(selected)
             stopping_certificate = {
@@ -1031,6 +1051,7 @@ def create_app(
                     "required_routes_executed": required_routes_executed,
                     "all_candidates_screened": all_candidates_screened,
                     "selected_sources_available": selected_sources_available,
+                    "quality_signals_available": quality_signals_available,
                 },
             }
             ready = stopping_certificate["status"] == "satisfied"
