@@ -689,7 +689,7 @@ function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen, o
         <span>Corpus checkpoint · <strong>{audit.status === "ready_for_corpus_checkpoint" ? "ready" : "incomplete"}</strong> · {audit.routes.count} route{audit.routes.count === 1 ? "" : "s"} executed</span>
         <span>Stopping certificate · <strong>{audit.stopping_certificate.status}</strong></span>
         <span>{audit.screening.selected}/{audit.screening.total} selected · {audit.source_text.selected_with_usable_text}/{audit.source_text.selected_total} with usable text</span>
-        {audit.routes.summaries.length > 0 && <span>Route yield · {audit.routes.summaries.map((summary) => `${summary.route.replace("_search", "")}: ${summary.unique_papers}`).join(" · ")}</span>}
+        {(audit.routes.summaries ?? []).length > 0 && <span>Route yield · {(audit.routes.summaries ?? []).map((summary) => `${summary.route.replace("_search", "")}: ${summary.unique_papers}`).join(" · ")}</span>}
         {audit.limitations.length > 0 && <span>{audit.limitations.join("; ")}</span>}
         <button className={styles.secondary} type="button" onClick={onLivingUpdate}>Refresh living review</button>
         {approval === "corpus" && <button className={styles.primary} type="button" onClick={onApprove}>Approve corpus checkpoint</button>}
