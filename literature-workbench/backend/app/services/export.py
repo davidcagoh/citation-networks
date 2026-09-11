@@ -13,10 +13,14 @@ from app.models import (
     Paper,
     Project,
     ReviewPlan,
+    ReviewProtocol,
     ReviewSentence,
+    Run,
     ScientificRelation,
     SourceDocument,
+    StageRun,
     SynthesisClaim,
+    UsageCostEvent,
 )
 
 ExportFormat = Literal["markdown", "json", "bibtex"]
@@ -45,6 +49,27 @@ class ProjectExporter:
                     .order_by(Paper.year, Paper.canonical_title)
                 ).all()
             )
+            protocol = db.scalar(
+                select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
+            )
+            runs = list(
+                db.scalars(
+                    select(Run)
+                    .where(Run.project_id == project_id)
+                    .order_by(Run.started_at, Run.id)
+                )
+            )
+            run_ids = [run.id for run in runs]
+            stages = list(
+                db.scalars(select(StageRun).where(StageRun.run_id.in_(run_ids)))
+            ) if run_ids else []
+            usage_events = list(
+                db.scalars(
+                    select(UsageCostEvent)
+                    .where(UsageCostEvent.project_id == project_id)
+                    .order_by(UsageCostEvent.id)
+                )
+            )
             papers = [
                 {
                     "id": paper.id,
@@ -57,6 +82,8 @@ class ProjectExporter:
                     "status": membership.status,
                     "relevance_score": membership.relevance_score,
                     "relevance_rationale": membership.relevance_rationale,
+                    "coverage_cluster": membership.coverage_cluster,
+                    "metadata_provenance": paper.metadata_provenance,
                 }
                 for membership, paper in memberships
             ]
@@ -107,6 +134,64 @@ class ProjectExporter:
                     "prompt": project.prompt,
                     "created_at": project.created_at.isoformat(),
                 },
+                "protocol": (
+                    {
+                        "review_mode": protocol.review_mode,
+                        "research_questions": protocol.research_questions,
+                        "inclusion_criteria": protocol.inclusion_criteria,
+                        "exclusion_criteria": protocol.exclusion_criteria,
+                        "sources": protocol.sources,
+                        "cutoff_date": protocol.cutoff_date,
+                        "update_policy": protocol.update_policy,
+                        "updated_at": protocol.updated_at.isoformat(),
+                    }
+                    if protocol
+                    else None
+                ),
+                "runs": [
+                    {
+                        "id": run.id,
+                        "review_mode": run.review_mode,
+                        "status": run.status,
+                        "max_papers": run.max_papers,
+                        "max_external_api_calls": run.max_external_api_calls,
+                        "max_cost_usd": run.max_cost_usd,
+                        "estimated_cost_usd": run.estimated_cost_usd,
+                        "started_at": run.started_at.isoformat(),
+                        "completed_at": run.completed_at.isoformat()
+                        if run.completed_at
+                        else None,
+                        "stages": [
+                            {
+                                "id": stage.id,
+                                "stage": stage.stage,
+                                "position": stage.position,
+                                "status": stage.status,
+                                "provider": stage.provider,
+                                "model": stage.model,
+                                "input_objects": stage.input_objects,
+                                "artifact_ids": stage.artifact_ids,
+                                "error": stage.error,
+                            }
+                            for stage in stages
+                            if stage.run_id == run.id
+                        ],
+                    }
+                    for run in runs
+                ],
+                "usage_cost_events": [
+                    {
+                        "id": event.id,
+                        "run_id": event.run_id,
+                        "stage_run_id": event.stage_run_id,
+                        "provider": event.provider,
+                        "input_tokens": event.input_tokens,
+                        "output_tokens": event.output_tokens,
+                        "external_api_calls": event.external_api_calls,
+                        "cost_usd": event.cost_usd,
+                    }
+                    for event in usage_events
+                ],
                 "corpus": papers,
                 "discovery_events": [
                     {

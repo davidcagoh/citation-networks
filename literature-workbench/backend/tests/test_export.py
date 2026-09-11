@@ -30,7 +30,13 @@ def test_exports_markdown_json_and_bibtex(tmp_path: Path) -> None:
         assert exported_json.status_code == 200
         body = exported_json.json()
         assert body["project"]["title"] == "Memory"
+        assert body["protocol"]["review_mode"] == "sufficient"
+        assert body["protocol"]["update_policy"] == "on_demand"
+        assert body["runs"][0]["status"] == "completed"
+        assert len(body["usage_cost_events"]) == 4
         assert len(body["corpus"]) == 5
+        assert body["corpus"][0]["coverage_cluster"] == "regression-fixture"
+        assert body["corpus"][0]["metadata_provenance"]["provider"] == "bundled-provenance-corpus"
         assert body["review"]["sentences"]
         assert len(body["source_documents"]) == 5
         assert body["evidence_spans"]

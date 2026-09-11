@@ -14,6 +14,7 @@ from app.db import Database
 from app.domain import EvidenceSpanCreate, ScientificEntityCreate, ScientificRelationCreate
 from app.models import (
     CorpusMembership,
+    DiscoveryEvent,
     EvidenceSpan,
     Paper,
     Project,
@@ -158,8 +159,10 @@ class PipelineService:
                 db.add(
                     SourceDocument(
                         paper_id=paper.id,
+                        source_type="text",
                         text=record["text"],
                         parsing_quality="complete" if record["text"] else "degraded",
+                        parser="bundled-provenance-corpus-v1",
                     )
                 )
                 db.add(
@@ -167,6 +170,17 @@ class PipelineService:
                         project_id=project_id,
                         paper_id=paper.id,
                         coverage_cluster="regression-fixture",
+                    )
+                )
+                db.add(
+                    DiscoveryEvent(
+                        project_id=project_id,
+                        paper_id=paper.id,
+                        route="fixture_import",
+                        query="bundled provenance corpus",
+                        action="candidate",
+                        rationale="Loaded from the bundled deterministic regression corpus",
+                        provider="bundled-provenance-corpus",
                     )
                 )
             return len(fixture)

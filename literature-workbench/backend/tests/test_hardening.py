@@ -233,8 +233,11 @@ def test_corpus_includes_discovery_route_provenance(tmp_path: Path) -> None:
             for item in client.get(f"/projects/{project_id}/corpus").json()["papers"]
             if item["id"] == paper.id
         )
-        assert item["discovery_routes"] == ["seed"]
-        assert item["discovery_events"][0]["rationale"] == "User supplied seed"
+        assert item["discovery_routes"] == ["fixture_import", "seed"]
+        assert any(
+            event["rationale"] == "User supplied seed"
+            for event in item["discovery_events"]
+        )
 
 
 def test_pipeline_repairs_partial_persisted_stage_artifacts(tmp_path: Path) -> None:

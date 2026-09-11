@@ -165,6 +165,25 @@ def test_prisma_report_reconciles_protocol_search_and_screening_flow(tmp_path: P
         assert body["search"]["queries"] == ["memory", "memory recent latest"]
 
 
+def test_prisma_report_counts_bundled_fixture_identification(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={"title": "Memory", "prompt": "Survey memory", "review_mode": "systematic"},
+        ).json()["id"]
+        assert client.post(
+            f"/projects/{project_id}/fixtures/provenance-corpus"
+        ).status_code == 201
+
+        report = client.get(f"/projects/{project_id}/prisma-report").json()
+
+    assert report["flow"]["identified"] == 5
+    assert report["flow"]["unique_identified"] == 5
+    assert report["flow"]["reports_sought"] == 5
+    assert report["flow"]["reports_not_retrieved"] == 1
+
+
 def test_prisma_screened_count_excludes_unresolved_candidates(tmp_path: Path) -> None:
     app = create_app(
         f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=ProtocolDiscoveryProvider()

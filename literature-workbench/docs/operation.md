@@ -49,7 +49,9 @@ unsupported content, extraction failures, and sources over 5 MB are rejected.
 
 ## Source coverage
 
-- Fixture papers provide deterministic full source text and expected evidence.
+- Fixture papers provide deterministic source provenance and expected evidence;
+  the intentionally empty ablation record remains visible as a degraded,
+  not-retrieved report in PRISMA output.
 - Live discovery persists the provider-supplied abstract as an `abstract`
   `SourceDocument`.
 - Build-time acquisition also attempts discovered direct `.pdf`, `.html`, and
@@ -126,7 +128,8 @@ Run budgets persist on each pipeline run. The paper cap is enforced before a
 run is created; provider calls and local pipeline usage appear separately in
 the cost ledger. Runs persist stage artifacts and can be resumed after a
 failure. The JSON export includes source documents, evidence spans, relations,
-claims, review text, and discovery events.
+claims, review text, discovery events, the saved protocol, corpus metadata and
+coverage provenance, plus run budgets, stage statuses, and usage/cost events.
 
 Discovery also enforces the request's external-call cap before fan-out begins
 (100 calls by default for the API request). A multi-source request consumes one
