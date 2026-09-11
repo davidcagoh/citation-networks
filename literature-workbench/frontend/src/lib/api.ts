@@ -195,6 +195,7 @@ export interface WorkbenchApi {
   expandCitations(projectId: string, paperId: string, direction: "backward" | "forward", limit?: number): Promise<CitationExpansionResult>;
   livingUpdate(projectId: string, limit?: number): Promise<LivingUpdateResult>;
   approveProvider(projectId: string, input: Omit<ProviderApproval, "id" | "project_id" | "approved" | "approved_at">): Promise<ProviderApproval>;
+  updateReviewSentence(projectId: string, sentenceId: string, text: string): Promise<ReviewSentence>;
   runDiscovery(projectId: string, query: string, limit?: number, routes?: DiscoveryRoute[]): Promise<{
     candidate_count: number;
     route_count: number;
@@ -616,19 +617,23 @@ function parsePlanResponse(value: unknown): ReviewPlan | { plans: ReviewPlan[] }
   return parsePlan(candidate);
 }
 
+function parseReviewSentence(value: unknown, label: string): ReviewSentence {
+  const sentence = object(value, label);
+  return {
+    id: string(sentence.id, `${label}.id`),
+    text: string(sentence.text, `${label}.text`),
+    substantive: boolean(sentence.substantive, `${label}.substantive`),
+    claim_id: nullableString(sentence.claim_id, `${label}.claim_id`),
+    evidence_span_ids: array(sentence.evidence_span_ids ?? [], `${label}.evidence_span_ids`).map((item, evidenceIndex) => string(item, `${label}.evidence_span_ids[${evidenceIndex}]`)),
+  };
+}
+
 function parseReview(value: unknown): Workspace["review"] {
   const review = object(value, "review");
   return {
     sentences: array(review.sentences, "review.sentences").map((sentenceValue, index) => {
       const label = `review.sentences[${index}]`;
-      const sentence = object(sentenceValue, label);
-      return {
-        id: string(sentence.id, `${label}.id`),
-        text: string(sentence.text, `${label}.text`),
-        substantive: boolean(sentence.substantive, `${label}.substantive`),
-        claim_id: nullableString(sentence.claim_id, `${label}.claim_id`),
-        evidence_span_ids: array(sentence.evidence_span_ids ?? [], `${label}.evidence_span_ids`).map((item, evidenceIndex) => string(item, `${label}.evidence_span_ids[${evidenceIndex}]`)),
-      };
+      return parseReviewSentence(sentenceValue, label);
     }),
   };
 }
@@ -786,6 +791,11 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/provider-approvals`, parseProviderApproval, {
         method: "POST",
         body: JSON.stringify(input),
+      }),
+    updateReviewSentence: (projectId, sentenceId, text) =>
+      request(baseUrl, `/projects/${projectId}/review/${sentenceId}`, (value) => parseReviewSentence(value, "review sentence"), {
+        method: "PATCH",
+        body: JSON.stringify({ text }),
       }),
     runDiscovery: (projectId, query, limit = 20, routes) =>
       request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {

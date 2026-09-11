@@ -444,6 +444,28 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     }
   }
 
+  async function updateReviewSentence(sentenceId: string, text: string) {
+    if (!session) return;
+    try {
+      const updated = await api.updateReviewSentence(session.projectId, sentenceId, text);
+      setSession((current) => current ? {
+        ...current,
+        workspace: {
+          ...current.workspace,
+          review: {
+            ...current.workspace.review,
+            sentences: current.workspace.review.sentences.map((sentence) =>
+              sentence.id === sentenceId ? { ...sentence, ...updated } : sentence,
+            ),
+          },
+        },
+      } : current);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Review sentence could not be saved.");
+      throw caught;
+    }
+  }
+
   function selectTab(tab: Tab) {
     if (tab !== "Review") {
       evidenceController.current?.abort();
@@ -528,6 +550,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
                 evidence={selectedEvidence}
                 evidenceLoading={evidenceLoading}
                 onInspect={inspectClaim}
+                onEdit={updateReviewSentence}
                 issues={verificationIssues}
                 onVerify={runVerification}
                 onResolve={resolveVerificationIssue}
@@ -753,15 +776,18 @@ function Structure({ workspace, approval, onApprove, onSave }: {
   );
 }
 
-function Review({ workspace, evidence, evidenceLoading, onInspect, issues, onVerify, onResolve }: {
+function Review({ workspace, evidence, evidenceLoading, onInspect, onEdit, issues, onVerify, onResolve }: {
   workspace: Workspace | null;
   evidence: ClaimEvidence | null;
   evidenceLoading: boolean;
   onInspect: (claimId: string) => void;
+  onEdit: (sentenceId: string, text: string) => Promise<void>;
   issues: VerificationIssue[];
   onVerify: () => Promise<void>;
   onResolve: (issueId: string) => Promise<void>;
 }) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draftText, setDraftText] = useState("");
   if (!workspace) return <Empty text="Complete the fixture run to generate a grounded review." />;
   return (
     <>
@@ -772,9 +798,18 @@ function Review({ workspace, evidence, evidenceLoading, onInspect, issues, onVer
       <div className={styles.reviewGrid}>
         <article className={styles.prose} aria-label="Generated review">
           {workspace.review.sentences.map((sentence) => (
-            <p key={sentence.id}>{sentence.substantive && sentence.claim_id ? (
-              <button className={styles.claim} type="button" onClick={() => onInspect(sentence.claim_id!)}>{sentence.text}</button>
-            ) : sentence.text}</p>
+            <div key={sentence.id}>
+              {editingId === sentence.id ? (
+                <div className={styles.field}>
+                  <textarea aria-label="Draft sentence" className={styles.textarea} value={draftText} onChange={(event) => setDraftText(event.target.value)} />
+                  <button className={styles.primary} type="button" onClick={async () => { await onEdit(sentence.id, draftText); setEditingId(null); }}>Save sentence</button>
+                </div>
+              ) : (
+                <p>{sentence.substantive && sentence.claim_id ? (
+                  <button className={styles.claim} type="button" onClick={() => onInspect(sentence.claim_id!)}>{sentence.text}</button>
+                ) : sentence.text} <button className={styles.secondary} type="button" onClick={() => { setEditingId(sentence.id); setDraftText(sentence.text); }}>Edit sentence {sentence.id}</button></p>
+              )}
+            </div>
           ))}
         </article>
         <aside className={styles.inspector} aria-live="polite">
