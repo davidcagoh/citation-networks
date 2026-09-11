@@ -12,6 +12,11 @@ abstract-backed evidence with explicit provenance. This live path is a
 conservative MVP: full-text acquisition and model-backed semantic extraction
 are not yet enabled.
 
+Use “Preview scope” to see the transparent focus areas and projected provider
+call budget before discovery. The execution ledger also exposes a hard paper
+cap for each grounded-review run; discovery usage is recorded separately from
+the zero-cost local pipeline stages.
+
 ## Run locally
 
 Backend (terminal 1):

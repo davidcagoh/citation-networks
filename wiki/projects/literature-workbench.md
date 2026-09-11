@@ -16,6 +16,9 @@ abstract-backed grounded review, inspect its evidence, verify claims, edit the
 plan, and export Markdown, JSON, or BibTeX. Live extraction is intentionally
 conservative: it quotes bounded provider abstracts and does not invent
 cross-paper relations or full-text findings.
+Scope preview and a persisted per-run paper budget are also available; live
+provider calls appear in the cost ledger separately from local deterministic
+stages.
 
 No formal experiment is running.
 
