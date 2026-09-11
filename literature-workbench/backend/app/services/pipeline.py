@@ -249,11 +249,30 @@ class PipelineService:
     def _extract(self, project_id: str) -> list[str]:
         created: list[str] = []
         with self.database.session() as db:
+            inactive_paper_ids = set(
+                db.scalars(
+                    select(CorpusMembership.paper_id).where(
+                        CorpusMembership.project_id == project_id,
+                        CorpusMembership.status.not_in(["included", "pinned"]),
+                    )
+                )
+            )
+            if inactive_paper_ids:
+                db.execute(
+                    delete(EvidenceSpan).where(EvidenceSpan.paper_id.in_(inactive_paper_ids))
+                )
+                db.execute(
+                    delete(ScientificEntity).where(ScientificEntity.paper_id.in_(inactive_paper_ids))
+                )
+                db.flush()
             papers = list(
                 db.scalars(
                     select(Paper)
                     .join(CorpusMembership, CorpusMembership.paper_id == Paper.id)
-                    .where(CorpusMembership.project_id == project_id)
+                    .where(
+                        CorpusMembership.project_id == project_id,
+                        CorpusMembership.status.in_(["included", "pinned"]),
+                    )
                     .order_by(Paper.year, Paper.canonical_title)
                 )
             )
@@ -400,7 +419,10 @@ class PipelineService:
                 db.scalars(
                     select(ScientificEntity)
                     .join(CorpusMembership, CorpusMembership.paper_id == ScientificEntity.paper_id)
-                    .where(CorpusMembership.project_id == project_id)
+                    .where(
+                        CorpusMembership.project_id == project_id,
+                        CorpusMembership.status.in_(["included", "pinned"]),
+                    )
                     .join(Paper, Paper.id == ScientificEntity.paper_id)
                     .order_by(Paper.year, Paper.canonical_title)
                 )
@@ -465,7 +487,10 @@ class PipelineService:
                 db.scalars(
                     select(ScientificEntity)
                     .join(CorpusMembership, CorpusMembership.paper_id == ScientificEntity.paper_id)
-                    .where(CorpusMembership.project_id == project_id)
+                    .where(
+                        CorpusMembership.project_id == project_id,
+                        CorpusMembership.status.in_(["included", "pinned"]),
+                    )
                     .join(Paper, Paper.id == ScientificEntity.paper_id)
                     .order_by(Paper.year, Paper.canonical_title)
                 )

@@ -9,9 +9,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
 
 from app.db import Database
-from app.domain import ProjectCreate
+from app.domain import CorpusMembershipUpdate, ProjectCreate
 from app.models import (
     CorpusMembership,
+    DiscoveryEvent,
     EvidenceSpan,
     Paper,
     Project,
@@ -197,6 +198,14 @@ def create_app(database_url: str | None = None) -> FastAPI:
                     .group_by(ScientificEntity.paper_id)
                 ).all()
             )
+            events_by_paper: dict[str, list[DiscoveryEvent]] = defaultdict(list)
+            for event in db.scalars(
+                select(DiscoveryEvent)
+                .where(DiscoveryEvent.project_id == project_id)
+                .order_by(DiscoveryEvent.created_at, DiscoveryEvent.id)
+            ):
+                if event.paper_id is not None:
+                    events_by_paper[event.paper_id].append(event)
             papers = [
                 {
                     "id": paper.id,
@@ -212,6 +221,22 @@ def create_app(database_url: str | None = None) -> FastAPI:
                     "entity_count": entity_counts.get(paper.id, 0),
                     "document_status": document.parsing_quality if document else "degraded",
                     "source_type": document.source_type if document else None,
+                    "discovery_routes": list(
+                        dict.fromkeys(event.route for event in events_by_paper[paper.id])
+                    ),
+                    "discovery_events": [
+                        {
+                            "id": event.id,
+                            "route": event.route,
+                            "query": event.query,
+                            "action": event.action,
+                            "rank": event.rank,
+                            "score": event.score,
+                            "rationale": event.rationale,
+                            "provider": event.provider,
+                        }
+                        for event in events_by_paper[paper.id]
+                    ],
                 }
                 for membership, paper in rows
                 for document in [documents.get(paper.id)]
@@ -221,10 +246,57 @@ def create_app(database_url: str | None = None) -> FastAPI:
                 "paper_count": len(papers),
                 "papers": papers,
                 "coverage": {
-                    "included": len(papers),
-                    "with_text": sum(paper["document_status"] == "complete" for paper in papers),
-                    "degraded": sum(paper["document_status"] == "degraded" for paper in papers),
+                    "included": sum(paper["status"] in {"included", "pinned"} for paper in papers),
+                    "excluded": sum(paper["status"] == "excluded" for paper in papers),
+                    "candidates": sum(paper["status"] == "candidate" for paper in papers),
+                    "with_text": sum(
+                        paper["status"] in {"included", "pinned"}
+                        and paper["document_status"] == "complete"
+                        for paper in papers
+                    ),
+                    "degraded": sum(
+                        paper["status"] in {"included", "pinned"}
+                        and paper["document_status"] == "degraded"
+                        for paper in papers
+                    ),
                 },
+            }
+
+    @app.patch("/projects/{project_id}/corpus/{paper_id}")
+    def update_corpus_membership(
+        project_id: str, paper_id: str, value: CorpusMembershipUpdate
+    ) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            membership = db.scalar(
+                select(CorpusMembership).where(
+                    CorpusMembership.project_id == project_id,
+                    CorpusMembership.paper_id == paper_id,
+                )
+            )
+            if membership is None:
+                raise HTTPException(404, "Corpus paper not found")
+            membership.status = value.status
+            if value.relevance_score is not None:
+                membership.relevance_score = value.relevance_score
+            if value.relevance_rationale is not None:
+                membership.relevance_rationale = value.relevance_rationale
+            db.add(
+                DiscoveryEvent(
+                    project_id=project_id,
+                    paper_id=paper_id,
+                    route="screening",
+                    action=value.status,
+                    rationale=value.relevance_rationale or f"User marked paper {value.status}",
+                    provider="manual",
+                )
+            )
+            return {
+                "project_id": project_id,
+                "paper_id": paper_id,
+                "status": membership.status,
+                "relevance_score": membership.relevance_score,
+                "relevance_rationale": membership.relevance_rationale,
             }
 
     @app.get("/projects/{project_id}/graph")
@@ -234,7 +306,8 @@ def create_app(database_url: str | None = None) -> FastAPI:
             paper_ids = list(
                 db.scalars(
                     select(CorpusMembership.paper_id).where(
-                        CorpusMembership.project_id == project_id
+                        CorpusMembership.project_id == project_id,
+                        CorpusMembership.status.in_(["included", "pinned"]),
                     )
                 )
             )
@@ -342,7 +415,8 @@ def create_app(database_url: str | None = None) -> FastAPI:
             corpus_paper_ids = set(
                 db.scalars(
                     select(CorpusMembership.paper_id).where(
-                        CorpusMembership.project_id == project_id
+                        CorpusMembership.project_id == project_id,
+                        CorpusMembership.status.in_(["included", "pinned"]),
                     )
                 )
             )

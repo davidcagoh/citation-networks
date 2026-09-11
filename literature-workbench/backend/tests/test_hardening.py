@@ -57,6 +57,7 @@ PROJECT_TABLES = [
     Project,
     ResearchBrief,
     CorpusMembership,
+    DiscoveryEvent,
     Paper,
     SourceDocument,
     EvidenceSpan,
@@ -161,7 +162,11 @@ def test_corpus_screening_updates_membership_and_excludes_paper_from_pipeline(
 
         response = client.patch(
             f"/projects/{project_id}/corpus/{paper_id}",
-            json={"status": "excluded", "relevance_score": 0.1, "relevance_rationale": "Out of scope"},
+            json={
+                "status": "excluded",
+                "relevance_score": 0.1,
+                "relevance_rationale": "Out of scope",
+            },
         )
         assert response.status_code == 200
         assert response.json()["status"] == "excluded"

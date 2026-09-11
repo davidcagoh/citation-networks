@@ -35,6 +35,12 @@ class ProjectCreate(BaseModel):
         return value
 
 
+class CorpusMembershipUpdate(BaseModel):
+    status: Literal["candidate", "included", "excluded", "pinned"]
+    relevance_score: float | None = Field(default=None, ge=0, le=1)
+    relevance_rationale: str | None = Field(default=None, min_length=1, max_length=10_000)
+
+
 class EvidenceSpanCreate(BaseModel):
     paper_id: str
     source_document_id: str

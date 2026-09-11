@@ -69,6 +69,25 @@ class CorpusMembership(Base):
     coverage_cluster: Mapped[str] = mapped_column(String(100), default="agent-memory")
 
 
+class DiscoveryEvent(Base):
+    __tablename__ = "discovery_events"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), index=True
+    )
+    paper_id: Mapped[str | None] = mapped_column(
+        ForeignKey("papers.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    route: Mapped[str] = mapped_column(String(80))
+    query: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    action: Mapped[str] = mapped_column(String(30), default="candidate")
+    rank: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    rationale: Mapped[str] = mapped_column(Text)
+    provider: Mapped[str] = mapped_column(String(80), default="manual")
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
+
+
 class SourceDocument(Base):
     __tablename__ = "source_documents"
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
