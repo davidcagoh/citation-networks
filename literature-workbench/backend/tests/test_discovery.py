@@ -67,6 +67,22 @@ class FakeDiscoveryProvider:
 
     def search(self, query: str, limit: int) -> list[FakeCandidate]:
         self.queries.append((query, limit))
+        if "review survey benchmark" in query:
+            return [
+                FakeCandidate(
+                    external_id="survey-paper",
+                    title="Memory Systems Survey",
+                    authors=["Survey Researcher"],
+                    year=2025,
+                    venue="Survey Venue",
+                    doi=None,
+                    abstract="A comprehensive review of memory systems.",
+                    source_uri="https://example.test/survey-paper",
+                    score=0.88,
+                    citation_count=80,
+                    publication_date="2025-02-01",
+                )
+            ][:limit]
         return [
             FakeCandidate(
                 external_id="paper-1",
@@ -721,6 +737,7 @@ def test_broader_coverage_audit_emits_stopping_certificate(tmp_path: Path) -> No
             "all_candidates_screened": True,
             "selected_sources_available": True,
             "quality_signals_available": True,
+            "survey_route_has_review_hit": True,
         }
 
 
@@ -779,7 +796,9 @@ def test_broader_audit_rejects_missing_latest_and_seminal_signals(tmp_path: Path
 
     assert audit["stopping_certificate"]["status"] == "incomplete"
     assert audit["stopping_certificate"]["checks"]["quality_signals_available"] is False
+    assert audit["stopping_certificate"]["checks"]["survey_route_has_review_hit"] is False
     assert "latest/seminal routes lack complete provider signals" in audit["limitations"]
+    assert "survey route returned no review-like work" in audit["limitations"]
 
 
 def test_discovery_validates_query_and_limit(tmp_path: Path) -> None:
