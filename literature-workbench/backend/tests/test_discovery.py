@@ -1199,6 +1199,6 @@ def test_openalex_provider_expands_backward_references(monkeypatch) -> None:
 
     assert requests == [
         "https://api.openalex.org/works/W123",
-        "https://openalex.org/W789",
+        "https://api.openalex.org/works/W789",
     ]
     assert candidates[0].external_id == "openalex:W789"
