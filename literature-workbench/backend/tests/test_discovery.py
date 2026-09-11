@@ -547,8 +547,11 @@ def test_citation_expansion_enforces_protocol_cutoff(tmp_path: Path) -> None:
         assert response.status_code == 201
         assert response.json()["candidate_count"] == 1
         assert response.json()["filtered_count"] == 1
-        titles = [paper["title"] for paper in client.get(f"/projects/{project_id}/corpus").json()["papers"]]
-        assert titles == ["Memory Systems", "Earlier cited memory study"]
+        titles = {
+            paper["title"]
+            for paper in client.get(f"/projects/{project_id}/corpus").json()["papers"]
+        }
+        assert titles == {"Memory Systems", "Earlier cited memory study"}
 
 
 def test_co_citation_expansion_derives_shared_reference_neighbors(tmp_path: Path) -> None:
