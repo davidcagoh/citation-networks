@@ -92,12 +92,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 74 | Final prose is generated after structure approval with section context and returned claim IDs, while each persisted sentence retains its own evidence links. | `backend/tests/test_synthesis.py::test_openai_section_writer_returns_claim_linked_sentences`, `backend/tests/test_synthesis.py::test_final_prose_provider_waits_for_structure_approval` | PASS |
 | 75 | Verification flags potentially unsupported causal language as a repairable, claim-linked issue. | `backend/tests/test_verification.py::test_verification_flags_causal_language_for_manual_review` | PASS |
 | 76 | Verification flags substantive review sentences that lack a claim/citation mapping. | `backend/tests/test_verification.py::test_verification_flags_substantive_uncited_review_sentence` | PASS |
+| 77 | Opt-in extraction supports multiple typed objects per paper with strict structured output and exact evidence grounding. | `backend/tests/test_synthesis.py::test_openai_extraction_bundle_returns_multiple_grounded_objects`, `backend/tests/test_synthesis.py::test_pipeline_persists_multiple_structured_entities_per_paper` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 110 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.34%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 112 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.32%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.
@@ -114,5 +115,5 @@ This report records the implementation tranche derived from the review-engine pl
 - Multi-source audits distinguish complete fan-out from partial fan-out; provider failures remain a limitation rather than being presented as comprehensive coverage. Route audits also expose marginal new-paper yield and overlap as coverage diagnostics.
 - Full-text acquisition now supports explicitly requested public HTTP(S) text/HTML/PDF URLs with SSRF, redirect, size, and parser guards; richer HTML extraction remains future work. Abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Live cross-paper comparison now uses a conservative grounded overlap heuristic; richer document-level coherence and section editing remain future work.
-- Optional OpenAI Luna structured extraction and section-context final-prose generation are wired and ledgered; richer multi-object extraction and document-level coherence remain future work.
+- Optional OpenAI Luna multi-object structured extraction and section-context final-prose generation are wired and ledgered; document-level coherence remains future work.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.

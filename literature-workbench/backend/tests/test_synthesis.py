@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from app.main import create_app
 from app.services.synthesis import (
     OpenAISynthesisProvider,
+    StructuredExtraction,
     SynthesisUsage,
 )
 
@@ -150,6 +151,47 @@ def test_openai_section_writer_returns_claim_linked_sentences(monkeypatch) -> No
     }
 
 
+def test_openai_extraction_bundle_returns_multiple_grounded_objects(monkeypatch) -> None:
+    def fake_urlopen(request, timeout):
+        body = json.loads(request.data)
+        assert body["text"]["format"]["name"] == "evidence_extraction_bundle"
+        return FakeResponse(
+            {
+                "output_text": json.dumps(
+                    {
+                        "objects": [
+                            {
+                                "entity_type": "method",
+                                "label": "retrieval memory",
+                                "description": "Stores observations.",
+                                "evidence_text": "The system stores observations.",
+                            },
+                            {
+                                "entity_type": "limitation",
+                                "label": "retrieval interference",
+                                "description": "Interference reduces recall.",
+                                "evidence_text": "Interference reduces recall.",
+                            },
+                        ]
+                    }
+                ),
+                "usage": {"input_tokens": 100, "output_tokens": 80},
+            }
+        )
+
+    monkeypatch.setattr("app.services.synthesis.urlopen", fake_urlopen)
+    provider = OpenAISynthesisProvider(api_key="secret-not-printed")
+
+    objects = provider.extract_evidence_bundle(
+        "Memory paper",
+        "The system stores observations. Interference reduces recall.",
+    )
+
+    assert len(objects) == 2
+    assert objects[1].entity_type == "limitation"
+    assert provider.consume_usage().external_api_calls == 1
+
+
 def test_pipeline_uses_structured_extraction_when_provider_is_enabled(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -200,6 +242,50 @@ def test_pipeline_uses_structured_extraction_when_provider_is_enabled(
         assert evidence["evidence"][0]["verbatim_text"] == (
             "Retrieval memory stores prior observations for reuse."
         )
+
+
+def test_pipeline_persists_multiple_structured_entities_per_paper(tmp_path: Path) -> None:
+    class BundleProvider:
+        def extract_evidence_bundle(self, paper_title: str, source_text: str):
+            return [
+                StructuredExtraction(
+                    "method",
+                    "retrieval memory",
+                    "Stores observations.",
+                    "The system stores observations.",
+                ),
+                StructuredExtraction(
+                    "limitation",
+                    "retrieval interference",
+                    "Interference reduces recall.",
+                    "Interference reduces recall.",
+                ),
+            ]
+
+        def draft_claim(
+            self, default_text: str, evidence_texts: list[str], claim_type: str
+        ) -> str:
+            return default_text
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", synthesis_provider=BundleProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Review memory"}
+        ).json()["id"]
+        assert client.post(
+            f"/projects/{project_id}/sources/text",
+            json={
+                "title": "Memory Study",
+                "source_uri": "file:///memory-study",
+                "text": "The system stores observations. Interference reduces recall.",
+            },
+        ).status_code == 201
+        assert client.post(f"/projects/{project_id}/runs/pipeline").status_code == 201
+
+        papers = client.get(f"/projects/{project_id}/corpus").json()["papers"]
+        assert papers[0]["entity_count"] == 2
 
 
 def test_final_prose_provider_waits_for_structure_approval(tmp_path: Path) -> None:

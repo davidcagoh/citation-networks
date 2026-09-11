@@ -617,6 +617,7 @@ class PipelineService:
             evidence_section = (
                 "full_text" if extractor_version == "fulltext-heuristic-v1" else "abstract"
             )
+            structured_items = []
             if fixture_extraction:
                 start, evidence_text = self._bounded_evidence(
                     document.text, paper.metadata_provenance.get("evidence")
@@ -629,19 +630,30 @@ class PipelineService:
                 entity_type = "claim"
                 entity_label = paper.canonical_title
                 extraction_method = extractor_version
-                extractor = getattr(self.synthesis_provider, "extract_evidence", None)
-                if callable(extractor):
-                    structured = extractor(paper.canonical_title, document.text)
-                    if structured is not None:
-                        structured_evidence = getattr(structured, "evidence_text", "")
-                        structured_start = document.text.find(structured_evidence)
-                        if structured_start >= 0:
-                            start = structured_start
-                            evidence_text = structured_evidence
-                            entity_type = structured.entity_type
-                            entity_label = structured.label
-                            extractor_version = "openai-structured-v1"
-                            extraction_method = "openai-structured-v1"
+                bundle_extractor = getattr(
+                    self.synthesis_provider, "extract_evidence_bundle", None
+                )
+                if callable(bundle_extractor):
+                    structured_items = bundle_extractor(paper.canonical_title, document.text)
+                if not structured_items:
+                    extractor = getattr(self.synthesis_provider, "extract_evidence", None)
+                    if callable(extractor):
+                        structured = extractor(paper.canonical_title, document.text)
+                        if structured is not None:
+                            structured_items = [structured]
+                if structured_items:
+                    structured = structured_items[0]
+                    structured_evidence = getattr(structured, "evidence_text", "")
+                    structured_start = document.text.find(structured_evidence)
+                    if structured_start >= 0:
+                        start = structured_start
+                        evidence_text = structured_evidence
+                        entity_type = structured.entity_type
+                        entity_label = structured.label
+                        extractor_version = "openai-structured-v1"
+                        extraction_method = "openai-structured-v1"
+                    else:
+                        structured_items = []
             existing_spans = (
                 [
                     evidence_spans[span_id]
@@ -653,6 +665,7 @@ class PipelineService:
             )
             if (
                 existing is not None
+                and not structured_items
                 and len(existing_spans) == len(existing.evidence_span_ids)
                 and all(span.source_document_id == document.id for span in existing_spans)
                 and all(span.extractor_version == extractor_version for span in existing_spans)
@@ -665,9 +678,20 @@ class PipelineService:
                 continue
             with self.database.session() as db:
                 if existing is not None:
-                    persisted_entity = db.get(ScientificEntity, existing.id)
-                    if persisted_entity is not None:
-                        db.delete(persisted_entity)
+                    db.execute(
+                        delete(ScientificEntity).where(
+                            ScientificEntity.paper_id == paper.id,
+                            ScientificEntity.extraction_method.in_(
+                                [
+                                    "deterministic-fixture",
+                                    "abstract-heuristic-v1",
+                                    "text-heuristic-v1",
+                                    "fulltext-heuristic-v1",
+                                    "openai-structured-v1",
+                                ]
+                            ),
+                        )
+                    )
                 db.execute(
                     delete(EvidenceSpan).where(
                         EvidenceSpan.paper_id == paper.id,
@@ -704,6 +728,36 @@ class PipelineService:
                 )
             )
             created.extend([span.id, entity.id])
+            if structured_items and extractor_version == "openai-structured-v1":
+                seen_evidence = {evidence_text}
+                for structured in structured_items[1:]:
+                    extra_evidence = getattr(structured, "evidence_text", "")
+                    extra_start = document.text.find(extra_evidence)
+                    if extra_start < 0 or extra_evidence in seen_evidence:
+                        continue
+                    seen_evidence.add(extra_evidence)
+                    extra_span = self.provenance.add_span(
+                        EvidenceSpanCreate(
+                            paper_id=paper.id,
+                            source_document_id=document.id,
+                            section=evidence_section,
+                            start_offset=extra_start,
+                            end_offset=extra_start + len(extra_evidence),
+                            verbatim_text=extra_evidence,
+                            extractor_version="openai-structured-v1",
+                        )
+                    )
+                    extra_entity = self.provenance.add_entity(
+                        ScientificEntityCreate(
+                            paper_id=paper.id,
+                            type=structured.entity_type,
+                            normalized_label=structured.label,
+                            description=structured.description,
+                            evidence_span_ids=[extra_span.id],
+                            extraction_method="openai-structured-v1",
+                        )
+                    )
+                    created.extend([extra_span.id, extra_entity.id])
         return created
 
     def _discard_extraction(self, paper_id: str, entity: ScientificEntity | None) -> None:
