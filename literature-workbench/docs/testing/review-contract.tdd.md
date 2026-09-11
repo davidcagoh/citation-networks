@@ -38,6 +38,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 20 | Comprehensive/systematic discovery includes an explicit adjacent-fields route for cross-disciplinary coverage. | `backend/tests/test_discovery.py::test_cross_disciplinary_route_records_adjacent_fields_query`, `frontend/tests/workbench.test.tsx` | PASS |
 | 21 | Zotero imports prefer a published record over a preprint while retaining the preprint as alternate provenance. | `backend/tests/test_zotero.py::test_zotero_prefers_published_record_but_retains_preprint_provenance` | PASS |
 | 22 | Corpus audits expose candidate yield and unique-paper yield for every executed discovery route. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, `frontend/tests/api.test.ts` | PASS |
+| 23 | Discovery preserves provider citation-count and publication-date signals through the API and screening UI. | `backend/tests/test_discovery.py::test_discovery_persists_candidates_and_route_provenance`, frontend type/lint checks | PASS |
 
 ## Validation evidence
 
