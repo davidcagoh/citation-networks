@@ -190,3 +190,23 @@ def test_discovered_abstract_can_flow_to_grounded_review(tmp_path: Path) -> None
                     ScientificRelation.project_id == project_id
                 )
             ) == 0
+
+
+def test_pipeline_requires_an_included_or_pinned_paper(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=FakeDiscoveryProvider(),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "agent memory", "limit": 1},
+        )
+
+        response = client.post(f"/projects/{project_id}/runs/pipeline")
+
+        assert response.status_code == 409
+        assert "Include or pin" in response.json()["detail"]
