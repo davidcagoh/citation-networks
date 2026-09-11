@@ -9,6 +9,10 @@ export interface Paper {
   title: string;
   year: number | null;
   document_status: string;
+  status?: "candidate" | "included" | "excluded" | "pinned";
+  relevance_score?: number;
+  relevance_rationale?: string;
+  discovery_routes?: string[];
   entity_count?: number;
 }
 
@@ -63,6 +67,17 @@ export interface ClaimEvidence {
 export interface WorkbenchApi {
   createProject(input: { title: string; prompt: string }): Promise<{ id: string }>;
   ingestFixture(projectId: string): Promise<{ paper_count: number }>;
+  runDiscovery(projectId: string, query: string, limit?: number): Promise<{
+    candidate_count: number;
+    provider: string;
+    query: string;
+  }>;
+  updateCorpusMembership(
+    projectId: string,
+    paperId: string,
+    status: "candidate" | "included" | "excluded" | "pinned",
+    relevance_rationale?: string,
+  ): Promise<{ status: string; relevance_score: number; relevance_rationale: string }>;
   runPipeline(projectId: string): Promise<{ id: string; status: string }>;
   getWorkspace(projectId: string, runId?: string): Promise<Workspace>;
   getClaimEvidence(projectId: string, claimId: string, signal?: AbortSignal): Promise<ClaimEvidence>;
@@ -128,6 +143,28 @@ function parseIngest(value: unknown): { paper_count: number } {
   return { paper_count: number(ingest.paper_count, "ingest.paper_count") };
 }
 
+function parseDiscovery(value: unknown): { candidate_count: number; provider: string; query: string } {
+  const discovery = object(value, "discovery");
+  return {
+    candidate_count: number(discovery.candidate_count, "discovery.candidate_count"),
+    provider: string(discovery.provider, "discovery.provider"),
+    query: string(discovery.query, "discovery.query"),
+  };
+}
+
+function parseMembership(value: unknown): {
+  status: string;
+  relevance_score: number;
+  relevance_rationale: string;
+} {
+  const membership = object(value, "membership");
+  return {
+    status: string(membership.status, "membership.status"),
+    relevance_score: number(membership.relevance_score, "membership.relevance_score"),
+    relevance_rationale: string(membership.relevance_rationale, "membership.relevance_rationale"),
+  };
+}
+
 function parseRun(value: unknown): { id: string; status: string } {
   const run = object(value, "run");
   return { id: string(run.id, "run.id"), status: string(run.status, "run.status") };
@@ -143,6 +180,10 @@ function parsePaper(value: unknown, index: number): Paper {
     title: string(paper.title, `${label}.title`),
     year,
     document_status: string(paper.document_status, `${label}.document_status`),
+    ...(paper.status === undefined ? {} : { status: string(paper.status, `${label}.status`) as Paper["status"] }),
+    ...(paper.relevance_score === undefined ? {} : { relevance_score: number(paper.relevance_score, `${label}.relevance_score`) }),
+    ...(paper.relevance_rationale === undefined ? {} : { relevance_rationale: string(paper.relevance_rationale, `${label}.relevance_rationale`) }),
+    ...(paper.discovery_routes === undefined ? {} : { discovery_routes: array(paper.discovery_routes, `${label}.discovery_routes`).map((route, routeIndex) => string(route, `${label}.discovery_routes[${routeIndex}]`)) }),
     ...(entityCount === undefined ? {} : { entity_count: number(entityCount, `${label}.entity_count`) }),
   };
 }
@@ -300,6 +341,16 @@ export function createWorkbenchApi(
       request(baseUrl, "/projects", parseProject, { method: "POST", body: JSON.stringify(input) }),
     ingestFixture: (projectId) =>
       request(baseUrl, `/projects/${projectId}/fixtures/provenance-corpus`, parseIngest, { method: "POST" }),
+    runDiscovery: (projectId, query, limit = 20) =>
+      request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {
+        method: "POST",
+        body: JSON.stringify({ query, limit }),
+      }),
+    updateCorpusMembership: (projectId, paperId, status, relevance_rationale) =>
+      request(baseUrl, `/projects/${projectId}/corpus/${paperId}`, parseMembership, {
+        method: "PATCH",
+        body: JSON.stringify({ status, ...(relevance_rationale ? { relevance_rationale } : {}) }),
+      }),
     runPipeline: (projectId) =>
       request(baseUrl, `/projects/${projectId}/runs/pipeline`, parseRun, { method: "POST" }),
     async getWorkspace(projectId, runId) {
