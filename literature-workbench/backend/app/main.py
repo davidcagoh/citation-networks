@@ -957,22 +957,29 @@ def create_app(
                     "cross_disciplinary_search",
                 ]
             executed_routes = list(dict.fromkeys(event.route for event in events))
-            route_summaries = [
-                {
-                    "route": route,
-                    "candidate_events": sum(
-                        event.route == route and event.action == "candidate" for event in events
-                    ),
-                    "unique_papers": len({
-                        event.paper_id
-                        for event in events
-                        if event.route == route
-                        and event.action == "candidate"
-                        and event.paper_id is not None
-                    }),
+            route_summaries = []
+            seen_papers: set[str] = set()
+            for route in executed_routes:
+                route_papers = {
+                    event.paper_id
+                    for event in events
+                    if event.route == route
+                    and event.action == "candidate"
+                    and event.paper_id is not None
                 }
-                for route in executed_routes
-            ]
+                route_summaries.append(
+                    {
+                        "route": route,
+                        "candidate_events": sum(
+                            event.route == route and event.action == "candidate"
+                            for event in events
+                        ),
+                        "unique_papers": len(route_papers),
+                        "new_unique_papers": len(route_papers - seen_papers),
+                        "overlap_papers": len(route_papers & seen_papers),
+                    }
+                )
+                seen_papers.update(route_papers)
             signal_coverage = [
                 {
                     "route": route,

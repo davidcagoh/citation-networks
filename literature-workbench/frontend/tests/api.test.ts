@@ -95,6 +95,7 @@ describe("workbench API adapter", () => {
     const audit = await createWorkbenchApi("http://api").getCoverageAudit("project-1");
     expect(audit.routes.summaries[0]).toEqual({
       route: "semantic_search", candidate_events: 4, unique_papers: 3,
+      new_unique_papers: 3, overlap_papers: 0,
     });
     expect(audit.stopping_certificate).toMatchObject({ status: "satisfied", mode: "comprehensive" });
     expect(audit.stopping_certificate.checks.provider_fanout_complete).toBe(false);

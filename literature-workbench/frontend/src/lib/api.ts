@@ -122,7 +122,7 @@ export interface CoverageAudit {
   routes: {
     executed: string[];
     count: number;
-    summaries: Array<{ route: string; candidate_events: number; unique_papers: number }>;
+    summaries: Array<{ route: string; candidate_events: number; unique_papers: number; new_unique_papers: number; overlap_papers: number }>;
     signal_coverage: Array<{ route: string; papers_with_publication_date: number; papers_with_citation_count: number }>;
   };
   screening: { total: number; selected: number; unresolved_candidates: number; excluded: number };
@@ -472,6 +472,8 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
           route: string(summary.route, `coverage audit.routes.summaries[${index}].route`),
           candidate_events: number(summary.candidate_events, `coverage audit.routes.summaries[${index}].candidate_events`),
           unique_papers: number(summary.unique_papers, `coverage audit.routes.summaries[${index}].unique_papers`),
+          new_unique_papers: number(summary.new_unique_papers ?? summary.unique_papers, `coverage audit.routes.summaries[${index}].new_unique_papers`),
+          overlap_papers: number(summary.overlap_papers ?? 0, `coverage audit.routes.summaries[${index}].overlap_papers`),
         };
       }),
       signal_coverage: (routes.signal_coverage === undefined ? [] : array(routes.signal_coverage, "coverage audit.routes.signal_coverage")).map((item, index) => {

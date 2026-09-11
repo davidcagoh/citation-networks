@@ -673,8 +673,20 @@ def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> 
         assert body["status"] == "incomplete"
         assert body["routes"]["executed"] == ["semantic_search", "recent_search"]
         assert body["routes"]["summaries"] == [
-            {"route": "semantic_search", "candidate_events": 1, "unique_papers": 1},
-            {"route": "recent_search", "candidate_events": 1, "unique_papers": 1},
+            {
+                "route": "semantic_search",
+                "candidate_events": 1,
+                "unique_papers": 1,
+                "new_unique_papers": 1,
+                "overlap_papers": 0,
+            },
+            {
+                "route": "recent_search",
+                "candidate_events": 1,
+                "unique_papers": 1,
+                "new_unique_papers": 0,
+                "overlap_papers": 1,
+            },
         ]
         assert body["routes"]["signal_coverage"] == [
             {

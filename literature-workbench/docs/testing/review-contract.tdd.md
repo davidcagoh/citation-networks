@@ -62,6 +62,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 44 | Scope preview separates discovery fan-out calls, pipeline-budget calls, and their total, reflecting mode and provider count. | `backend/tests/test_scope.py::test_scope_preview_returns_transparent_scope_and_budget`, frontend scope-preview UI/type checks | PASS |
 | 45 | Comprehensive/systematic stopping certificates require the survey route to return at least one review-, survey-, or benchmark-like work. | `backend/tests/test_discovery.py::test_broader_coverage_audit_emits_stopping_certificate`, `backend/tests/test_discovery.py::test_broader_audit_rejects_missing_latest_and_seminal_signals` | PASS |
 | 46 | Comprehensive/systematic stopping certificates require every configured discovery provider to complete every required route; partial fan-out remains incomplete. | `backend/tests/test_discovery.py::test_comprehensive_audit_requires_all_providers_on_required_routes` | PASS |
+| 47 | Coverage audits report marginal new-paper yield and route overlap so later discovery routes can be inspected for diminishing returns. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, frontend parser/UI checks | PASS |
 
 ## Validation evidence
 
@@ -81,7 +82,7 @@ This report records the implementation tranche derived from the review-engine pl
 - Discovery preserves provider citation-count and publication-date signals in provenance and exposes them during screening; they are importance/recency signals, not completeness guarantees.
 - Protocol cutoff dates are enforced for discovery and expose filtered counts; records with only an unknown publication date are retained and should be reviewed as a protocol limitation rather than silently discarded.
 - The default live adapter combines Semantic Scholar and OpenAlex for search and citation expansion; OpenAlex backward expansion is bounded by one metadata request per referenced work.
-- Multi-source audits distinguish complete fan-out from partial fan-out; provider failures remain a limitation rather than being presented as comprehensive coverage.
+- Multi-source audits distinguish complete fan-out from partial fan-out; provider failures remain a limitation rather than being presented as comprehensive coverage. Route audits also expose marginal new-paper yield and overlap as coverage diagnostics.
 - Full-text acquisition now supports explicitly requested public HTTP(S) text/HTML/PDF URLs with SSRF, redirect, size, and parser guards; richer HTML extraction remains future work. Abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Live cross-paper comparison now uses a conservative grounded overlap heuristic; richer paragraph-level generation and section-level editing remain future work.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.
