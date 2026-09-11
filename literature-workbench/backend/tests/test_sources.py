@@ -202,3 +202,24 @@ def test_fetches_public_source_url_with_provenance_and_blocks_private_targets(
 
 def test_extracts_text_from_bounded_pdf_bytes() -> None:
     assert SafeSourceFetcher.extract_pdf_text(minimal_pdf("PDF evidence.")) == "PDF evidence."
+
+
+def test_url_ingestion_deduplicates_existing_paper_identity(tmp_path: Path) -> None:
+    fetcher = FakeSourceFetcher()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", source_fetcher=fetcher)
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Review memory"}
+        ).json()["id"]
+        payload = {
+            "title": "Fetched Memory Study",
+            "source_uri": "https://8.8.8.8/paper.txt",
+            "doi": "10.1234/memory",
+        }
+        first = client.post(f"/projects/{project_id}/sources/url", json=payload)
+        second = client.post(f"/projects/{project_id}/sources/url", json=payload)
+
+        assert first.status_code == 201
+        assert second.status_code == 201
+        assert first.json()["paper_id"] == second.json()["paper_id"]
+        assert client.get(f"/projects/{project_id}/corpus").json()["paper_count"] == 1
