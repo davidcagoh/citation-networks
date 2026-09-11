@@ -21,6 +21,8 @@ EntityType = Literal[
     "assumption",
 ]
 
+ReviewMode = Literal["sufficient", "comprehensive", "systematic", "quick", "thorough"]
+
 
 class ProjectCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200)
@@ -61,8 +63,39 @@ class PipelineRequest(BaseModel):
 
 
 class ScopePreviewRequest(BaseModel):
-    mode: Literal["quick", "thorough"] = "thorough"
+    mode: ReviewMode = "thorough"
     max_papers: int = Field(default=50, ge=1, le=500)
+
+
+class ResourceEnvelope(BaseModel):
+    mode: ReviewMode = "sufficient"
+    recommended: bool = True
+    max_papers: int = Field(default=50, ge=1, le=10_000)
+    max_external_api_calls: int = Field(default=100, ge=0, le=100_000)
+    estimated_input_tokens: int = Field(default=0, ge=0)
+    estimated_output_tokens: int = Field(default=0, ge=0)
+    estimated_cost_usd: float = Field(default=0.0, ge=0)
+
+
+def resource_envelope_for_mode(mode: ReviewMode, max_papers: int) -> ResourceEnvelope:
+    normalized_mode = {
+        "quick": "sufficient",
+        "thorough": "comprehensive",
+    }.get(mode, mode)
+    per_paper = {
+        "sufficient": (2, 500, 250, 0.0),
+        "comprehensive": (6, 1_200, 600, 0.0),
+        "systematic": (10, 2_000, 1_000, 0.0),
+    }[normalized_mode]
+    api_calls, input_tokens, output_tokens, cost = per_paper
+    return ResourceEnvelope(
+        mode=normalized_mode,
+        max_papers=max_papers,
+        max_external_api_calls=max(1, max_papers * api_calls),
+        estimated_input_tokens=max_papers * input_tokens,
+        estimated_output_tokens=max_papers * output_tokens,
+        estimated_cost_usd=cost,
+    )
 
 
 class SourceTextRequest(BaseModel):

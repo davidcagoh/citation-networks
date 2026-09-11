@@ -18,6 +18,7 @@ from app.domain import (
     ReviewPlanUpdate,
     ScopePreviewRequest,
     SourceTextRequest,
+    resource_envelope_for_mode,
     VerificationIssueUpdate,
 )
 from app.models import (
@@ -219,6 +220,7 @@ def create_app(
             ]
             if value.mode == "quick":
                 focus = focus[:2]
+            envelope = resource_envelope_for_mode(value.mode, value.max_papers)
             return {
                 "project_id": project_id,
                 "scope": {
@@ -227,9 +229,8 @@ def create_app(
                     "suggested_focus": focus,
                 },
                 "budget": {
-                    "max_papers": value.max_papers,
-                    "estimated_external_api_calls": 1,
-                    "estimated_cost_usd": 0.0,
+                    **envelope.model_dump(),
+                    "estimated_external_api_calls": envelope.max_external_api_calls,
                 },
             }
 

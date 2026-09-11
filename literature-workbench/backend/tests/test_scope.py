@@ -24,8 +24,13 @@ def test_scope_preview_returns_transparent_scope_and_budget(tmp_path: Path) -> N
         assert body["scope"]["mode"] == "thorough"
         assert body["scope"]["suggested_focus"]
         assert body["budget"] == {
+            "mode": "comprehensive",
+            "recommended": True,
             "max_papers": 30,
-            "estimated_external_api_calls": 1,
+            "max_external_api_calls": 180,
+            "estimated_external_api_calls": 180,
+            "estimated_input_tokens": 36_000,
+            "estimated_output_tokens": 18_000,
             "estimated_cost_usd": 0.0,
         }
 
