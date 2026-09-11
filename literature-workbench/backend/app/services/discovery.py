@@ -5,7 +5,7 @@ import math
 import os
 from collections.abc import Sequence
 from contextlib import suppress
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from typing import Protocol
 from urllib.parse import urlencode
@@ -44,6 +44,7 @@ class DiscoveryCandidate:
     score: float | None
     citation_count: int | None = None
     publication_date: str | None = None
+    provider_name: str | None = None
 
 
 class DiscoveryProvider(Protocol):
@@ -54,6 +55,50 @@ class DiscoveryProvider(Protocol):
     def related(
         self, external_id: str, direction: str, limit: int
     ) -> Sequence[DiscoveryCandidate]: ...
+
+
+class MultiSourceDiscoveryProvider:
+    """Fan out discovery across independent provider adapters."""
+
+    name = "multi-source"
+
+    def __init__(self, providers: Sequence[DiscoveryProvider]) -> None:
+        self.providers = list(providers)
+
+    @property
+    def requires_approval(self) -> bool:
+        return any(getattr(provider, "requires_approval", False) for provider in self.providers)
+
+    def search(self, query: str, limit: int) -> list[DiscoveryCandidate]:
+        candidates: list[DiscoveryCandidate] = []
+        failures = []
+        for provider in self.providers:
+            try:
+                candidates.extend(
+                    replace(candidate, provider_name=provider.name)
+                    for candidate in provider.search(query, limit)
+                )
+            except DiscoveryProviderError as exc:
+                failures.append(exc)
+        if not candidates and failures:
+            raise DiscoveryProviderError("All discovery providers failed") from failures[-1]
+        return candidates
+
+    def related(self, external_id: str, direction: str, limit: int) -> list[DiscoveryCandidate]:
+        provider = next(
+            (
+                item
+                for item in self.providers
+                if external_id.startswith(f"{item.name}:")
+            ),
+            self.providers[0] if self.providers else None,
+        )
+        if provider is None:
+            return []
+        return [
+            replace(candidate, provider_name=provider.name)
+            for candidate in provider.related(external_id, direction, limit)
+        ]
 
 
 class SemanticScholarProvider:
@@ -139,6 +184,95 @@ class SemanticScholarProvider:
         )
 
 
+class OpenAlexProvider:
+    """Free OpenAlex works search adapter.
+
+    OpenAlex exposes works search and rich bibliographic metadata without a
+    paid credential. Citation traversal remains delegated to providers that
+    expose a compatible related-works endpoint.
+    """
+
+    name = "openalex"
+    endpoint = "https://api.openalex.org/works"
+
+    def __init__(self, email: str | None = None, timeout_seconds: float = 20.0) -> None:
+        self.email = email or os.getenv("OPENALEX_EMAIL")
+        self.timeout_seconds = timeout_seconds
+
+    def search(self, query: str, limit: int) -> list[DiscoveryCandidate]:
+        params = {
+            "search": query,
+            "per-page": limit,
+            "select": (
+                "id,title,publication_year,publication_date,doi,cited_by_count,"
+                "authorships,primary_location,abstract_inverted_index"
+            ),
+        }
+        if self.email:
+            params["mailto"] = self.email
+        request = Request(
+            f"{self.endpoint}?{urlencode(params)}",
+            headers={"Accept": "application/json", "User-Agent": "literature-workbench/0.1"},
+        )
+        try:
+            with urlopen(request, timeout=self.timeout_seconds) as response:
+                payload = json.load(response)
+        except Exception as exc:
+            raise DiscoveryProviderError("OpenAlex search failed") from exc
+        return [self._candidate(item) for item in payload.get("results", []) if self._valid(item)]
+
+    def related(self, external_id: str, direction: str, limit: int) -> list[DiscoveryCandidate]:
+        raise DiscoveryProviderError("OpenAlex citation expansion is not configured")
+
+    @staticmethod
+    def _valid(item: object) -> bool:
+        return isinstance(item, dict) and bool(item.get("id")) and bool(item.get("title"))
+
+    @classmethod
+    def _candidate(cls, item: dict) -> DiscoveryCandidate:
+        raw_id = str(item["id"]).rstrip("/").rsplit("/", 1)[-1]
+        doi = item.get("doi")
+        if isinstance(doi, str) and doi.startswith("https://doi.org/"):
+            doi = doi.removeprefix("https://doi.org/")
+        authors = [
+            author.get("author", {}).get("display_name", "")
+            for author in item.get("authorships") or []
+            if isinstance(author, dict)
+        ]
+        location = item.get("primary_location") or {}
+        return DiscoveryCandidate(
+            external_id=f"openalex:{raw_id}",
+            title=str(item["title"]).strip(),
+            authors=[author for author in authors if author],
+            year=item.get("publication_year"),
+            venue=(location.get("source") or {}).get("display_name")
+            if isinstance(location, dict)
+            else None,
+            doi=doi,
+            abstract=cls._abstract(item.get("abstract_inverted_index")),
+            source_uri=location.get("landing_page_url") or item.get("id")
+            if isinstance(location, dict)
+            else item.get("id"),
+            score=None,
+            citation_count=item.get("cited_by_count"),
+            publication_date=item.get("publication_date"),
+        )
+
+    @staticmethod
+    def _abstract(index: object) -> str | None:
+        if not isinstance(index, dict):
+            return None
+        words = []
+        for token, positions in index.items():
+            if isinstance(token, str) and isinstance(positions, list):
+                words.extend(
+                    (position, token)
+                    for position in positions
+                    if isinstance(position, int)
+                )
+        return " ".join(token for _, token in sorted(words)) or None
+
+
 class DiscoveryService:
     def __init__(self, database: Database, provider: DiscoveryProvider) -> None:
         self.database = database
@@ -192,7 +326,7 @@ class DiscoveryService:
                                 f"Filtered by protocol cutoff date {cutoff_date}: "
                                 f"{candidate.title}"
                             ),
-                            provider=self.provider.name,
+                            provider=self._candidate_provider(candidate),
                         )
                     )
                 for rank, candidate in enumerate(candidates, start=1):
@@ -210,7 +344,7 @@ class DiscoveryService:
                             doi=candidate.doi,
                             abstract=candidate.abstract,
                             metadata_provenance={
-                                "provider": self.provider.name,
+                                "provider": self._candidate_provider(candidate),
                                 "external_id": candidate.external_id,
                                 "source_uri": candidate.source_uri,
                                 "citation_count": candidate.citation_count,
@@ -251,7 +385,7 @@ class DiscoveryService:
                             rank=rank,
                             score=candidate.score,
                             rationale=self._rationale(candidate, route),
-                            provider=self.provider.name,
+                            provider=self._candidate_provider(candidate),
                         )
                     )
                 db.add(
@@ -461,7 +595,7 @@ class DiscoveryService:
                             f"Filtered by protocol cutoff date {cutoff_date}: "
                             f"{candidate.title}"
                         ),
-                        provider=self.provider.name,
+                        provider=self._candidate_provider(candidate),
                     )
                 )
             for rank, candidate in enumerate(candidates, start=1):
@@ -476,7 +610,7 @@ class DiscoveryService:
                         doi=candidate.doi,
                         abstract=candidate.abstract,
                         metadata_provenance={
-                            "provider": self.provider.name,
+                            "provider": self._candidate_provider(candidate),
                             "external_id": candidate.external_id,
                             "source_uri": candidate.source_uri,
                             "citation_count": candidate.citation_count,
@@ -512,7 +646,7 @@ class DiscoveryService:
                             source_paper_id=source_id,
                             target_paper_id=target_id,
                             direction=direction,
-                            provider=self.provider.name,
+                            provider=self._candidate_provider(candidate),
                         )
                     )
                 self._persist_abstract(db, related, candidate)
@@ -528,7 +662,7 @@ class DiscoveryService:
                         rationale=(
                             f"Found by {route} citation expansion from {seed.canonical_title}"
                         ),
-                        provider=self.provider.name,
+                        provider=self._candidate_provider(candidate),
                     )
                 )
             db.add(
@@ -555,6 +689,9 @@ class DiscoveryService:
         if candidate.publication_date:
             provenance["publication_date"] = candidate.publication_date
         paper.metadata_provenance = provenance
+
+    def _candidate_provider(self, candidate: DiscoveryCandidate) -> str:
+        return getattr(candidate, "provider_name", None) or self.provider.name
 
     def _ensure_provider_approved(self, db, project_id: str) -> None:
         if not getattr(self.provider, "requires_approval", False):
@@ -657,7 +794,7 @@ class DiscoveryService:
                     source_uri=source_uri,
                     text=abstract,
                     parsing_quality="complete",
-                    parser=f"{self.provider.name}-abstract-v1",
+                    parser=f"{self._candidate_provider(candidate)}-abstract-v1",
                 )
             )
 

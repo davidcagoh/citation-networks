@@ -60,6 +60,8 @@ from app.services.discovery import (
     DiscoveryProvider,
     DiscoveryProviderError,
     DiscoveryService,
+    MultiSourceDiscoveryProvider,
+    OpenAlexProvider,
     SemanticScholarProvider,
 )
 from app.services.export import ExportFormat, ProjectExporter
@@ -136,7 +138,11 @@ def create_app(
         database_url or os.getenv("WORKBENCH_DATABASE_URL", "sqlite:///instance/workbench.db")
     )
     pipeline = PipelineService(database)
-    discovery = DiscoveryService(database, discovery_provider or SemanticScholarProvider())
+    discovery = DiscoveryService(
+        database,
+        discovery_provider
+        or MultiSourceDiscoveryProvider((SemanticScholarProvider(), OpenAlexProvider())),
+    )
     verification = VerificationService(database)
     exporter = ProjectExporter(database)
     zotero = ZoteroService(database, zotero_client or ZoteroClient())
