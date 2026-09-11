@@ -52,6 +52,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 34 | Discovery enforces the saved protocol cutoff date, retains only records at or before it, and reports how many provider candidates were filtered. | `backend/tests/test_protocol.py::test_discovery_enforces_protocol_cutoff_and_reports_filtered_candidates` | PASS |
 | 35 | PRISMA search provenance preserves cutoff-filtered records, and the systematic-review UI exposes that count. | `backend/tests/test_protocol.py::test_discovery_enforces_protocol_cutoff_and_reports_filtered_candidates`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 | 36 | Backward/forward citation expansion applies the saved protocol cutoff and reports filtered network candidates. | `backend/tests/test_discovery.py::test_citation_expansion_enforces_protocol_cutoff`, `frontend/tests/api.test.ts` | PASS |
+| 37 | Cross-disciplinary discovery executes bounded adjacent-field, interdisciplinary-methods, and adjacent-application queries under one auditable route. | `backend/tests/test_discovery.py::test_cross_disciplinary_route_records_adjacent_fields_query` | PASS |
 
 ## Validation evidence
 
