@@ -223,6 +223,17 @@ def test_acquisition_fetches_eligible_discovered_full_text_links(tmp_path: Path)
         assert fetcher.urls == ["https://example.test/discovered.html"]
         corpus = client.get(f"/projects/{project_id}/corpus").json()
         assert corpus["papers"][0]["source_type"] == "html"
+        client.patch(
+            f"/projects/{project_id}/corpus/{corpus['papers'][0]['id']}",
+            json={"status": "included"},
+        )
+        assert client.post(f"/projects/{project_id}/runs/pipeline").status_code == 201
+
+    with app.state.database.session() as database:
+        span = database.scalar(select(EvidenceSpan))
+        assert span is not None
+        assert span.extractor_version == "fulltext-heuristic-v1"
+        assert span.section == "full_text"
 
         html_response = client.post(
             f"/projects/{project_id}/sources/url",
