@@ -70,6 +70,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 52 | Discovery responses report actual external fan-out calls so callers can reconcile provider usage with the preview and cap. | `backend/tests/test_discovery.py::test_multi_source_search_usage_counts_each_provider_attempt`, `frontend/tests/api.test.ts` | PASS |
 | 53 | Compatibility aliases normalize to canonical review contracts at project, protocol, and pipeline boundaries, preserving comprehensive checkpoints for `thorough`. | `backend/tests/test_review_modes.py::test_compatibility_mode_aliases_normalize_to_canonical_contracts` | PASS |
 | 54 | Auto-acquired full-text documents use a distinct full-text extractor/section identity in evidence provenance rather than being mislabeled as abstract evidence. | `backend/tests/test_sources.py::test_acquisition_fetches_eligible_discovered_full_text_links` | PASS |
+| 55 | The Corpus workflow displays the discovery request's external API-call count alongside candidate and cutoff counts. | `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 
 ## Validation evidence
 

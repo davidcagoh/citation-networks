@@ -9,7 +9,7 @@ const tabs = ["Brief", "Corpus", "Structure", "Review", "Run / Costs"] as const;
 type Tab = (typeof tabs)[number];
 type RunState = "idle" | "creating" | "ingesting" | "discovering" | "running" | "complete";
 type ApprovalGate = "corpus" | "structure" | null;
-type Session = { projectId: string; paperCount: number; filteredCount?: number; workspace: Workspace; audit: CoverageAudit; prisma?: PrismaReport; runId?: string; approval: ApprovalGate };
+type Session = { projectId: string; paperCount: number; filteredCount?: number; discoveryCalls?: number; workspace: Workspace; audit: CoverageAudit; prisma?: PrismaReport; runId?: string; approval: ApprovalGate };
 
 function approvalForRunStatus(status: string): ApprovalGate {
   if (status === "awaiting_corpus_approval") return "corpus";
@@ -138,7 +138,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       const workspace = await api.getWorkspace(project.id);
       const audit = await api.getCoverageAudit(project.id);
       const prisma = reviewMode === "systematic" ? await api.getPrismaReport(project.id) : undefined;
-      setSession({ projectId: project.id, paperCount: discovery.candidate_count, filteredCount: discovery.filtered_count, workspace, audit, prisma, approval: null });
+      setSession({ projectId: project.id, paperCount: discovery.candidate_count, filteredCount: discovery.filtered_count, discoveryCalls: discovery.external_api_calls, workspace, audit, prisma, approval: null });
       setVerificationIssues([]);
       setRunState("complete");
       setActiveTab("Corpus");
@@ -585,7 +585,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             {activeTab === "Brief" && (
               <BriefForm title={title} prompt={prompt} sourceText={sourceText} sourceUri={sourceUri} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} zoteroCollectionKey={zoteroCollectionKey} onZoteroCollectionKey={setZoteroCollectionKey} paidProvider={paidProvider} onPaidProvider={setPaidProvider} approvalBy={approvalBy} onApprovalBy={setApprovalBy} approvalJustification={approvalJustification} onApprovalJustification={setApprovalJustification} nonReplicableReason={nonReplicableReason} onNonReplicableReason={setNonReplicableReason} hasSession={Boolean(session)} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSourceUri={setSourceUri} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} onImportUrl={handleImportSourceUrl} onZoteroImport={handleZoteroImport} onZoteroExport={handleZoteroExport} onProviderApproval={handleProviderApproval} preview={scopePreview} />
             )}
-            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} prisma={session?.prisma} paperCount={session?.paperCount ?? null} filteredCount={session?.filteredCount ?? 0} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} onExpand={expandCitations} onCoExpand={expandCoCitations} onLivingUpdate={handleLivingUpdate} />}
+            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} prisma={session?.prisma} paperCount={session?.paperCount ?? null} filteredCount={session?.filteredCount ?? 0} discoveryCalls={session?.discoveryCalls} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} onExpand={expandCitations} onCoExpand={expandCoCitations} onLivingUpdate={handleLivingUpdate} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} approval={session?.approval ?? null} onApprove={approveStructure} onSave={savePlan} />}
             {activeTab === "Review" && (
               <Review
@@ -701,12 +701,13 @@ function BriefForm({ title, prompt, sourceText, sourceUri, reviewMode, onReviewM
   );
 }
 
-function Corpus({ workspace, audit, prisma, paperCount, filteredCount, approval, onApprove, onScreen, onExpand, onCoExpand, onLivingUpdate }: {
+function Corpus({ workspace, audit, prisma, paperCount, filteredCount, discoveryCalls, approval, onApprove, onScreen, onExpand, onCoExpand, onLivingUpdate }: {
   workspace: Workspace | null;
   audit: CoverageAudit | null;
   prisma?: PrismaReport;
   paperCount: number | null;
   filteredCount: number;
+  discoveryCalls?: number;
   approval: ApprovalGate;
   onApprove: () => Promise<void>;
   onScreen: (paperId: string, status: "candidate" | "included" | "excluded" | "pinned") => void;
@@ -718,7 +719,7 @@ function Corpus({ workspace, audit, prisma, paperCount, filteredCount, approval,
   if (!workspace) return <Empty text="Run the fixture from Brief to populate the corpus." />;
   return (
     <>
-      <div className={styles.statline}><strong className={styles.stat}>{paperCount ?? papers.length} papers</strong><span className={styles.statnote}>Screened corpus · provenance retained{filteredCount > 0 ? ` · ${filteredCount} filtered by cutoff` : ""}</span></div>
+      <div className={styles.statline}><strong className={styles.stat}>{paperCount ?? papers.length} papers</strong><span className={styles.statnote}>Screened corpus · provenance retained{filteredCount > 0 ? ` · ${filteredCount} filtered by cutoff` : ""}{discoveryCalls !== undefined ? ` · ${discoveryCalls} external API calls` : ""}</span></div>
       {audit && <section className={styles.reviewToolbar} aria-label="Corpus checkpoint audit">
         <span>Corpus checkpoint · <strong>{audit.status === "ready_for_corpus_checkpoint" ? "ready" : "incomplete"}</strong> · {audit.routes.count} route{audit.routes.count === 1 ? "" : "s"} executed</span>
         <span>Stopping certificate · <strong>{audit.stopping_certificate.status}</strong></span>
