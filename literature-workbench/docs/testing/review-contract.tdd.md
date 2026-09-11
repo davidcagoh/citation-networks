@@ -56,12 +56,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 38 | The default live adapter fans out across free Semantic Scholar and OpenAlex sources and marks each candidate with its provider provenance. | `backend/tests/test_discovery.py::test_openalex_provider_maps_work_metadata_and_abstract`, `backend/tests/test_discovery.py::test_multi_source_provider_merges_and_marks_provider_provenance`, `backend/tests/test_discovery.py::test_app_wires_free_multi_source_discovery_by_default` | PASS |
 | 39 | OpenAlex forward citation expansion maps citing works through the same provider adapter and provenance path. | `backend/tests/test_discovery.py::test_openalex_provider_expands_forward_citations` | PASS |
 | 40 | OpenAlex backward citation expansion follows bounded referenced-work metadata links and maps the resulting records. | `backend/tests/test_discovery.py::test_openalex_provider_expands_backward_references` | PASS |
+| 41 | Multi-source discovery records provider attempts and exposes partial fan-out failures in the coverage audit and Corpus UI. | `backend/tests/test_discovery.py::test_coverage_audit_reports_partial_multi_source_fanout`, frontend API/UI contract checks | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 83 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.24%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 84 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.43%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
@@ -75,6 +76,7 @@ This report records the implementation tranche derived from the review-engine pl
 - Discovery preserves provider citation-count and publication-date signals in provenance and exposes them during screening; they are importance/recency signals, not completeness guarantees.
 - Protocol cutoff dates are enforced for discovery and expose filtered counts; records with only an unknown publication date are retained and should be reviewed as a protocol limitation rather than silently discarded.
 - The default live adapter combines Semantic Scholar and OpenAlex for search and citation expansion; OpenAlex backward expansion is bounded by one metadata request per referenced work.
+- Multi-source audits distinguish complete fan-out from partial fan-out; provider failures remain a limitation rather than being presented as comprehensive coverage.
 - Full-text acquisition now supports explicitly requested public HTTP(S) text/HTML/PDF URLs with SSRF, redirect, size, and parser guards; richer HTML extraction remains future work. Abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Live cross-paper comparison now uses a conservative grounded overlap heuristic; richer paragraph-level generation and section-level editing remain future work.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.
