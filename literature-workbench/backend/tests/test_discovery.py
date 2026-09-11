@@ -253,6 +253,24 @@ def test_seminal_route_records_foundational_query_provenance(tmp_path: Path) -> 
             assert event.route == "seminal_search"
 
 
+def test_cross_disciplinary_route_records_adjacent_fields_query(tmp_path: Path) -> None:
+    provider = FakeDiscoveryProvider()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "agent memory", "limit": 1, "routes": ["cross_disciplinary_search"]},
+        )
+
+        assert response.status_code == 201
+        assert provider.queries == [
+            ("agent memory interdisciplinary cross-disciplinary adjacent fields", 1)
+        ]
+
+
 def test_citation_expansion_persists_directional_edges_and_provenance(tmp_path: Path) -> None:
     provider = FakeDiscoveryProvider()
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
@@ -315,7 +333,7 @@ def test_on_demand_living_update_records_timestamp_and_new_papers(tmp_path: Path
 
         assert response.status_code == 201
         body = response.json()
-        assert body["route_count"] == 4
+        assert body["route_count"] == 5
         assert body["new_paper_count"] == 2
         assert body["last_updated_at"]
         with app.state.database.session() as database:
@@ -486,7 +504,8 @@ def test_broader_coverage_audit_emits_stopping_certificate(tmp_path: Path) -> No
                 "query": "agent memory",
                 "limit": 1,
                 "routes": [
-                    "semantic_search", "survey_search", "recent_search", "seminal_search"
+                    "semantic_search", "survey_search", "recent_search", "seminal_search",
+                    "cross_disciplinary_search",
                 ],
             },
         )
@@ -505,6 +524,7 @@ def test_broader_coverage_audit_emits_stopping_certificate(tmp_path: Path) -> No
             "survey_search",
             "recent_search",
             "seminal_search",
+            "cross_disciplinary_search",
         ]
         assert audit["stopping_certificate"]["checks"] == {
             "required_routes_executed": True,
