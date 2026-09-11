@@ -628,7 +628,12 @@ def create_app(
         )
         if not fetched.text:
             raise HTTPException(502, "Source URL contains no usable text")
-        source_type = "fetched_text" if fetched.content_type == "text/plain" else "html"
+        source_type = (
+            "parsed_pdf"
+            if fetched.content_type == "application/pdf"
+            else "fetched_text" if fetched.content_type == "text/plain" else "html"
+        )
+        parser = "pdf-text-pypdf-v1" if source_type == "parsed_pdf" else "url-fetch-v1"
         with database.session() as db:
             paper = Paper(
                 project_id=project_id,
@@ -653,7 +658,7 @@ def create_app(
                     source_uri=fetched.final_uri,
                     text=fetched.text,
                     parsing_quality="complete",
-                    parser="url-fetch-v1",
+                    parser=parser,
                 )
             )
             db.add(

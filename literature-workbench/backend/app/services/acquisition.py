@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import ipaddress
 import re
 import socket
@@ -8,8 +9,12 @@ from html.parser import HTMLParser
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
+from pypdf import PdfReader
+
 MAX_SOURCE_BYTES = 5 * 1024 * 1024
-ALLOWED_CONTENT_TYPES = {"text/plain", "text/html", "application/xhtml+xml"}
+ALLOWED_CONTENT_TYPES = {
+    "text/plain", "text/html", "application/xhtml+xml", "application/pdf"
+}
 
 
 class SourceAcquisitionError(Exception):
@@ -78,14 +83,26 @@ class SafeSourceFetcher:
             raise SourceAcquisitionError("Source URL could not be fetched") from exc
         if len(text) > MAX_SOURCE_BYTES:
             raise SourceAcquisitionError("Source exceeds the 5 MB limit")
-        try:
-            decoded = text.decode("utf-8")
-        except UnicodeDecodeError as exc:
-            raise SourceAcquisitionError("Source is not UTF-8 text") from exc
-        decoded = self.normalize_text(decoded, content_type)
+        if content_type == "application/pdf":
+            decoded = self.extract_pdf_text(text)
+        else:
+            try:
+                decoded = text.decode("utf-8")
+            except UnicodeDecodeError as exc:
+                raise SourceAcquisitionError("Source is not UTF-8 text") from exc
+            decoded = self.normalize_text(decoded, content_type)
         if not decoded:
             raise SourceAcquisitionError("Source contains no usable text")
         return FetchedSource(text=decoded, content_type=content_type, final_uri=final_uri)
+
+    @staticmethod
+    def extract_pdf_text(payload: bytes) -> str:
+        try:
+            reader = PdfReader(io.BytesIO(payload), strict=False)
+            extracted = "\n".join(page.extract_text() or "" for page in reader.pages)
+        except Exception as exc:
+            raise SourceAcquisitionError("PDF text extraction failed") from exc
+        return re.sub(r"\s+", " ", extracted).strip()
 
     @staticmethod
     def normalize_text(text: str, content_type: str) -> str:
