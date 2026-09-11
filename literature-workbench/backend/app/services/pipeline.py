@@ -172,6 +172,7 @@ class PipelineService:
         self,
         project_id: str,
         *,
+        review_mode: str = "sufficient",
         max_papers: int = 50,
         max_external_api_calls: int = 100,
         max_cost_usd: float = 5.0,
@@ -219,6 +220,7 @@ class PipelineService:
                 )
             run = Run(
                 project_id=project_id,
+                review_mode=review_mode,
                 max_papers=max_papers,
                 max_external_api_calls=max_external_api_calls,
                 max_cost_usd=max_cost_usd,

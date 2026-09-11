@@ -86,7 +86,7 @@ describe("Literature Workbench", () => {
     expect(api.ingestSourceText).toHaveBeenCalledWith("project-1", expect.objectContaining({
       title: "Imported study", text: "The study evaluates memory.",
     }));
-    expect(api.runPipeline).toHaveBeenCalledWith("project-1", { max_papers: 50 });
+    expect(api.runPipeline).toHaveBeenCalledWith("project-1", { review_mode: "sufficient", max_papers: 50 });
   });
 
   it("previews scope and projected budget before discovery", async () => {
@@ -224,7 +224,7 @@ describe("Literature Workbench", () => {
     await user.click(screen.getByRole("button", { name: "Build grounded review" }));
 
     expect(api.acquire).toHaveBeenCalledWith("project-1");
-    expect(api.runPipeline).toHaveBeenCalledWith("project-1", { max_papers: 50 });
+    expect(api.runPipeline).toHaveBeenCalledWith("project-1", { review_mode: "sufficient", max_papers: 50 });
   });
 
   it("runs the supplied-corpus workflow and exposes claim evidence", async () => {

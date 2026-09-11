@@ -38,6 +38,7 @@ class ResearchBrief(Base):
     scope_constraints: Mapped[dict] = mapped_column(JSON, default=dict)
     desired_depth: Mapped[str] = mapped_column(String(30), default="quick")
     desired_length: Mapped[str] = mapped_column(String(30), default="short")
+    review_mode: Mapped[str] = mapped_column(String(30), default="sufficient")
     created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
@@ -208,6 +209,7 @@ class Run(Base):
     project_id: Mapped[str] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"), index=True
     )
+    review_mode: Mapped[str] = mapped_column(String(30), default="sufficient")
     status: Mapped[str] = mapped_column(String(30), default="running")
     max_papers: Mapped[int] = mapped_column(Integer, default=50)
     max_external_api_calls: Mapped[int] = mapped_column(Integer, default=100)

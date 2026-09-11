@@ -99,7 +99,7 @@ export interface ScopePreview {
 export type ReviewMode = "sufficient" | "comprehensive" | "systematic" | "quick" | "thorough";
 
 export interface WorkbenchApi {
-  createProject(input: { title: string; prompt: string }): Promise<{ id: string }>;
+  createProject(input: { title: string; prompt: string; review_mode?: ReviewMode }): Promise<{ id: string }>;
   ingestFixture(projectId: string): Promise<{ paper_count: number }>;
   acquire(projectId: string): Promise<{
     project_id: string;
@@ -146,6 +146,7 @@ export interface WorkbenchApi {
     status: VerificationIssue["status"],
   ): Promise<VerificationIssue>;
   runPipeline(projectId: string, budget?: {
+    review_mode?: ReviewMode;
     max_papers?: number;
     max_external_api_calls?: number;
     max_cost_usd?: number;

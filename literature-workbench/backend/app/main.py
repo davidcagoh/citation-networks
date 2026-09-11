@@ -81,6 +81,7 @@ def _run_json(run: Run) -> dict:
         "id": run.id,
         "project_id": run.project_id,
         "status": run.status,
+        "review_mode": run.review_mode,
         "started_at": run.started_at.isoformat(),
         "completed_at": run.completed_at.isoformat() if run.completed_at else None,
         "budget": {
@@ -164,6 +165,7 @@ def create_app(
                     project_id=project.id,
                     title=value.title,
                     prompt=value.prompt,
+                    review_mode=value.review_mode,
                 )
             )
             return _project_json(project)
@@ -298,6 +300,7 @@ def create_app(
             return _run_json(
                 pipeline.run(
                     project_id,
+                    review_mode=request.review_mode,
                     max_papers=request.max_papers,
                     max_external_api_calls=request.max_external_api_calls,
                     max_cost_usd=request.max_cost_usd,

@@ -66,11 +66,11 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     setEvidenceLoading(false);
     try {
       setRunState("creating");
-      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim() });
+      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
       setRunState("ingesting");
       const ingest = await api.ingestFixture(project.id);
       setRunState("running");
-      const run = await api.runPipeline(project.id);
+      const run = await api.runPipeline(project.id, { review_mode: reviewMode });
       const nextWorkspace = await api.getWorkspace(project.id, run.id);
       setSession({ projectId: project.id, paperCount: ingest.paper_count, workspace: nextWorkspace });
       setVerificationIssues([]);
@@ -92,7 +92,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       setRunState("creating");
       const project = previewProjectId
         ? { id: previewProjectId }
-        : await api.createProject({ title: title.trim(), prompt: prompt.trim() });
+        : await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
       setRunState("discovering");
       const discovery = await api.runDiscovery(project.id, prompt.trim(), 20);
       const workspace = await api.getWorkspace(project.id);
@@ -111,7 +111,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     setError(null);
     try {
       setRunState("creating");
-      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim() });
+      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
       const preview = await api.scopePreview(project.id, { mode: reviewMode, max_papers: maxPapers });
       setScopePreview(preview);
       setPreviewProjectId(project.id);
@@ -127,7 +127,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     setError(null);
     try {
       setRunState("creating");
-      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim() });
+      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
       await api.ingestSourceText(project.id, {
         title: title.trim(),
         source_uri: `user://${project.id}/source-text`,
@@ -135,7 +135,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       });
       setRunState("running");
       await api.acquire(project.id);
-      const run = await api.runPipeline(project.id, { max_papers: maxPapers });
+      const run = await api.runPipeline(project.id, { review_mode: reviewMode, max_papers: maxPapers });
       const workspace = await api.getWorkspace(project.id, run.id);
       setSession({ projectId: project.id, paperCount: workspace.corpus.papers.length, workspace });
       setRunState("complete");
@@ -213,7 +213,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     try {
       setRunState("running");
       await api.acquire(session.projectId);
-      const run = await api.runPipeline(session.projectId, { max_papers: maxPapers });
+      const run = await api.runPipeline(session.projectId, { review_mode: reviewMode, max_papers: maxPapers });
       const workspace = await api.getWorkspace(session.projectId, run.id);
       setSession((current) => current ? {
         ...current,
