@@ -36,12 +36,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 18 | Co-citation expansion derives shared-reference neighbors locally and records derivation provenance. | `backend/tests/test_discovery.py::test_co_citation_expansion_derives_shared_reference_neighbors`, `frontend/tests/workbench.test.tsx` | PASS |
 | 19 | Comprehensive/systematic discovery includes a distinct foundational/seminal route with auditable query provenance. | `backend/tests/test_discovery.py::test_seminal_route_records_foundational_query_provenance`, `frontend/tests/workbench.test.tsx` | PASS |
 | 20 | Comprehensive/systematic discovery includes an explicit adjacent-fields route for cross-disciplinary coverage. | `backend/tests/test_discovery.py::test_cross_disciplinary_route_records_adjacent_fields_query`, `frontend/tests/workbench.test.tsx` | PASS |
+| 21 | Zotero imports prefer a published record over a preprint while retaining the preprint as alternate provenance. | `backend/tests/test_zotero.py::test_zotero_prefers_published_record_but_retains_preprint_provenance` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 69 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 87.20%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 70 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.68%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 45 passed.
 - Frontend lint: `npm run lint` → PASS.
@@ -51,6 +52,7 @@ This report records the implementation tranche derived from the review-engine pl
 
 - Bounded backward and forward multi-hop expansion and local co-citation derivation are implemented with stopping reasons; richer network-saturation heuristics remain future work.
 - Paid-provider approval is enforced at discovery boundaries; an approved provider adapter still must be configured before use. Zotero import/export is available through server-side credentials.
+- Zotero DOI/title deduplication prefers published records and retains alternate preprint provenance; richer edition/version reconciliation remains future work.
 - Full-text acquisition remains conservative; abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Richer paragraph-level generation and section-level editing remain future work.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.
