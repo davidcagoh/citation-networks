@@ -111,4 +111,9 @@ def test_broader_review_runs_pause_for_corpus_approval(tmp_path: Path) -> None:
 
         approved = client.post(f"/projects/{project_id}/runs/{run_id}/approve-corpus")
         assert approved.status_code == 201
-        assert approved.json()["status"] == "completed"
+        assert approved.json()["status"] == "awaiting_structure_approval"
+        structure_approved = client.post(
+            f"/projects/{project_id}/runs/{run_id}/approve-structure"
+        )
+        assert structure_approved.status_code == 201
+        assert structure_approved.json()["status"] == "completed"
