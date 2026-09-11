@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 from collections.abc import Sequence
 from contextlib import suppress
 from dataclasses import dataclass, replace
@@ -896,12 +897,28 @@ class DiscoveryService:
     @staticmethod
     def _find_paper(db, project_id: str, candidate: DiscoveryCandidate) -> Paper | None:
         papers = list(db.scalars(select(Paper).where(Paper.project_id == project_id)))
+        candidate_doi = DiscoveryService._normalize_doi(candidate.doi)
+        candidate_title = DiscoveryService._normalize_title(candidate.title)
         for paper in papers:
             provenance = paper.metadata_provenance or {}
             if provenance.get("external_id") == candidate.external_id:
                 return paper
-            if candidate.doi and paper.doi and paper.doi.lower() == candidate.doi.lower():
+            if candidate_doi and candidate_doi == DiscoveryService._normalize_doi(paper.doi):
                 return paper
-            if paper.canonical_title.casefold() == candidate.title.casefold():
+            if candidate_title == DiscoveryService._normalize_title(paper.canonical_title):
                 return paper
         return None
+
+    @staticmethod
+    def _normalize_doi(doi: str | None) -> str | None:
+        if not doi:
+            return None
+        normalized = doi.strip().casefold()
+        for prefix in ("https://doi.org/", "http://doi.org/", "doi:"):
+            if normalized.startswith(prefix):
+                normalized = normalized.removeprefix(prefix)
+        return normalized.rstrip(" .,;") or None
+
+    @staticmethod
+    def _normalize_title(title: str) -> str:
+        return re.sub(r"[^a-z0-9]+", "", title.casefold())

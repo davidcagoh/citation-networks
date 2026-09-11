@@ -351,15 +351,62 @@ def test_discovery_deduplicates_same_provider_result(tmp_path: Path) -> None:
         assert client.post(path, json={"query": "memory", "limit": 2}).status_code == 201
         assert client.post(path, json={"query": "memory", "limit": 2}).status_code == 201
 
+
+def test_discovery_deduplicates_normalized_cross_provider_identity(tmp_path: Path) -> None:
+    class Provider:
+        def __init__(self, name: str, title: str, doi: str) -> None:
+            self.name = name
+            self.title = title
+            self.doi = doi
+
+        def search(self, query: str, limit: int):
+            return [
+                DiscoveryCandidate(
+                    external_id=f"{self.name}-paper",
+                    title=self.title,
+                    authors=[],
+                    year=2025,
+                    venue=None,
+                    doi=self.doi,
+                    abstract="Abstract.",
+                    source_uri=None,
+                    score=None,
+                )
+            ][:limit]
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=MultiSourceDiscoveryProvider(
+            [
+                Provider("source-a", "A Memory Study", "10.1234/MEMORY"),
+                Provider("source-b", "a-memory-study", "https://doi.org/10.1234/memory"),
+            ]
+        ),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        assert response.status_code == 201
+
+        assert len(client.get(f"/projects/{project_id}/corpus").json()["papers"]) == 1
+
         with app.state.database.session() as database:
             assert database.scalar(
                 select(func.count()).select_from(Paper).where(Paper.project_id == project_id)
-            ) == 2
+            ) == 1
             assert database.scalar(
                 select(func.count()).select_from(CorpusMembership).where(
                     CorpusMembership.project_id == project_id
                 )
-            ) == 2
+            ) == 1
             assert database.scalar(
                 select(func.count()).select_from(DiscoveryEvent).where(
                     DiscoveryEvent.project_id == project_id

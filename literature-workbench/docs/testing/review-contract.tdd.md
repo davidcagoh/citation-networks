@@ -78,12 +78,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 60 | PRISMA `reports_not_retrieved` counts selected records without full-text source documents; abstract-only records are not treated as retrieved reports. | `backend/tests/test_protocol.py::test_prisma_report_reconciles_protocol_search_and_screening_flow` | PASS |
 | 61 | Systematic-review stopping certificates require selected reports to be retrieved as full text; comprehensive surveys retain a separate abstract-only diagnostic. | `backend/tests/test_discovery.py::test_systematic_audit_requires_retrieved_reports` | PASS |
 | 62 | Survey hits rank ahead of non-survey results by review-signal strength, then citation/date signals; general routes use deterministic provider-score tie-breaking. | `backend/tests/test_discovery.py::test_survey_route_orders_review_hits_by_strength_and_citations`, `backend/tests/test_discovery.py::test_seminal_route_orders_candidates_by_citation_signal` | PASS |
+| 63 | Cross-provider records with normalized DOI or title identities collapse into one canonical corpus paper while retaining separate discovery evidence. | `backend/tests/test_discovery.py::test_discovery_deduplicates_normalized_cross_provider_identity` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 95 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.52%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 96 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.07%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.
