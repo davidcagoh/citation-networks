@@ -621,6 +621,13 @@ def create_app(
             if "public" in str(exc) or "HTTP(S)" in str(exc):
                 raise HTTPException(400, str(exc)) from exc
             raise HTTPException(502, "Source URL unavailable") from exc
+        fetched = fetched.__class__(
+            text=SafeSourceFetcher.normalize_text(fetched.text, fetched.content_type),
+            content_type=fetched.content_type,
+            final_uri=fetched.final_uri,
+        )
+        if not fetched.text:
+            raise HTTPException(502, "Source URL contains no usable text")
         source_type = "fetched_text" if fetched.content_type == "text/plain" else "html"
         with database.session() as db:
             paper = Paper(

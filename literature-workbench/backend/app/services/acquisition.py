@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import ipaddress
+import re
 import socket
 from dataclasses import dataclass
+from html.parser import HTMLParser
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
@@ -19,6 +21,25 @@ class FetchedSource:
     text: str
     content_type: str
     final_uri: str
+
+
+class _VisibleTextParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+        self._ignored_depth = 0
+
+    def handle_starttag(self, tag: str, attrs) -> None:
+        if tag.lower() in {"head", "script", "style", "noscript", "template"}:
+            self._ignored_depth += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() in {"head", "script", "style", "noscript", "template"}:
+            self._ignored_depth = max(0, self._ignored_depth - 1)
+
+    def handle_data(self, data: str) -> None:
+        if not self._ignored_depth:
+            self.parts.append(data)
 
 
 class _NoRedirectHandler(HTTPRedirectHandler):
@@ -61,7 +82,18 @@ class SafeSourceFetcher:
             decoded = text.decode("utf-8")
         except UnicodeDecodeError as exc:
             raise SourceAcquisitionError("Source is not UTF-8 text") from exc
+        decoded = self.normalize_text(decoded, content_type)
+        if not decoded:
+            raise SourceAcquisitionError("Source contains no usable text")
         return FetchedSource(text=decoded, content_type=content_type, final_uri=final_uri)
+
+    @staticmethod
+    def normalize_text(text: str, content_type: str) -> str:
+        if content_type in {"text/html", "application/xhtml+xml"}:
+            parser = _VisibleTextParser()
+            parser.feed(text)
+            text = " ".join(parser.parts)
+        return re.sub(r"\s+", " ", text).strip()
 
     @staticmethod
     def validate_public_url(source_uri: str) -> None:
