@@ -18,7 +18,11 @@ class FakeZoteroClient:
                 "data": {
                     "itemType": "journalArticle",
                     "title": "Imported Memory Study",
-                    "creators": [{"creatorType": "author", "firstName": "A", "lastName": "Researcher"}],
+                    "creators": [{
+                        "creatorType": "author",
+                        "firstName": "A",
+                        "lastName": "Researcher",
+                    }],
                     "date": "2025-01-01",
                     "publicationTitle": "Test Journal",
                     "DOI": "10.1234/memory",

@@ -20,6 +20,8 @@ from app.domain import (
     ScopePreviewRequest,
     SourceTextRequest,
     VerificationIssueUpdate,
+    ZoteroExportRequest,
+    ZoteroImportRequest,
     resource_envelope_for_mode,
 )
 from app.models import (
@@ -59,6 +61,7 @@ from app.services.pipeline import (
     select_preferred_documents,
 )
 from app.services.verification import VerificationService
+from app.services.zotero import ZoteroClient, ZoteroError, ZoteroService
 
 MAX_EVIDENCE_RESPONSE_CHARS = 1200
 DEFAULT_ALLOWED_ORIGINS = ("http://localhost:3000", "http://127.0.0.1:3000")
@@ -110,7 +113,9 @@ def _bounded_excerpt(source_text: str, span: EvidenceSpan) -> tuple[str, int]:
 
 
 def create_app(
-    database_url: str | None = None, discovery_provider: DiscoveryProvider | None = None
+    database_url: str | None = None,
+    discovery_provider: DiscoveryProvider | None = None,
+    zotero_client: ZoteroClient | None = None,
 ) -> FastAPI:
     database = Database(
         database_url or os.getenv("WORKBENCH_DATABASE_URL", "sqlite:///instance/workbench.db")
@@ -119,6 +124,7 @@ def create_app(
     discovery = DiscoveryService(database, discovery_provider or SemanticScholarProvider())
     verification = VerificationService(database)
     exporter = ProjectExporter(database)
+    zotero = ZoteroService(database, zotero_client or ZoteroClient())
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -134,6 +140,7 @@ def create_app(
     app.state.discovery = discovery
     app.state.verification = verification
     app.state.exporter = exporter
+    app.state.zotero = zotero
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_allowed_origins(),
@@ -327,6 +334,26 @@ def create_app(
             "provider": discovery.provider.name,
             "query": value.query,
         }
+
+    @app.post("/projects/{project_id}/integrations/zotero/import", status_code=201)
+    def import_zotero(project_id: str, value: ZoteroImportRequest) -> dict:
+        try:
+            count = zotero.import_items(project_id, value.collection_key, value.limit)
+        except ZoteroError as exc:
+            if str(exc) == "Project not found":
+                raise HTTPException(404, str(exc)) from exc
+            raise HTTPException(502, "Zotero import unavailable") from exc
+        return {"project_id": project_id, "imported_count": count, "item_count": count}
+
+    @app.post("/projects/{project_id}/integrations/zotero/export", status_code=201)
+    def export_zotero(project_id: str, value: ZoteroExportRequest) -> dict:
+        try:
+            count = zotero.export_selected(project_id, value.collection_key)
+        except ZoteroError as exc:
+            if str(exc) == "Project not found":
+                raise HTTPException(404, str(exc)) from exc
+            raise HTTPException(502, "Zotero export unavailable") from exc
+        return {"project_id": project_id, "exported_count": count}
 
     @app.post("/projects/{project_id}/runs/scope-preview", status_code=201)
     def scope_preview(project_id: str, value: ScopePreviewRequest) -> dict:
