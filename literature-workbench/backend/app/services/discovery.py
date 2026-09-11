@@ -162,20 +162,29 @@ class DiscoveryService:
         total_candidates = 0
         filtered_candidates = 0
         for route in routes:
-            route_query = self._route_query(query, route)
+            route_queries = self._route_queries(query, route)
+            fetched_candidates: list[DiscoveryCandidate] = []
+            candidate_queries: dict[int, str] = {}
+            for route_query in route_queries:
+                for candidate in self.provider.search(route_query, limit):
+                    fetched_candidates.append(candidate)
+                    candidate_queries[id(candidate)] = route_query
             candidates = self._order_candidates(
-                self.provider.search(route_query, limit), route
+                fetched_candidates, route
             )
             candidates, excluded = self._apply_cutoff(candidates, cutoff_date)
             filtered_candidates += len(excluded)
             total_candidates += len(candidates)
             with self.database.session() as db:
                 for rank, candidate in enumerate(excluded, start=1):
+                    candidate_query = candidate_queries.get(
+                        id(candidate), self._route_query(query, route)
+                    )
                     db.add(
                         DiscoveryEvent(
                             project_id=project_id,
                             route=route,
-                            query=route_query,
+                            query=candidate_query,
                             action="filtered",
                             rank=rank,
                             score=candidate.score,
@@ -187,6 +196,9 @@ class DiscoveryService:
                         )
                     )
                 for rank, candidate in enumerate(candidates, start=1):
+                    candidate_query = candidate_queries.get(
+                        id(candidate), self._route_query(query, route)
+                    )
                     paper = self._find_paper(db, project_id, candidate)
                     if paper is None:
                         paper = Paper(
@@ -234,7 +246,7 @@ class DiscoveryService:
                             project_id=project_id,
                             paper_id=paper.id,
                             route=route,
-                            query=route_query,
+                            query=candidate_query,
                             action="candidate",
                             rank=rank,
                             score=candidate.score,
@@ -246,7 +258,7 @@ class DiscoveryService:
                     UsageCostEvent(
                         project_id=project_id,
                         provider=self.provider.name,
-                        external_api_calls=1,
+                        external_api_calls=len(route_queries),
                     )
                 )
         return total_candidates, len(routes), filtered_candidates
@@ -603,14 +615,25 @@ class DiscoveryService:
 
     @staticmethod
     def _route_query(query: str, route: str) -> str:
+        return DiscoveryService._route_queries(query, route)[0]
+
+    @staticmethod
+    def _route_queries(query: str, route: str) -> list[str]:
         suffixes = {
             "semantic_search": "",
             "survey_search": " review survey benchmark",
             "recent_search": " recent latest",
             "seminal_search": " foundational seminal influential highly cited",
-            "cross_disciplinary_search": " interdisciplinary cross-disciplinary adjacent fields",
+            "cross_disciplinary_search": (
+                " interdisciplinary cross-disciplinary adjacent fields",
+                " interdisciplinary methods",
+                " applications in adjacent fields",
+            ),
         }
-        return f"{query}{suffixes[route]}"
+        suffix = suffixes[route]
+        if isinstance(suffix, tuple):
+            return [f"{query}{item}" for item in suffix]
+        return [f"{query}{suffix}"]
 
     def _persist_abstract(self, db, paper: Paper, candidate: DiscoveryCandidate) -> None:
         abstract = (candidate.abstract or "").strip()
