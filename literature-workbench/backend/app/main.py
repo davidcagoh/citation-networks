@@ -635,40 +635,87 @@ def create_app(
         )
         parser = "pdf-text-pypdf-v1" if source_type == "parsed_pdf" else "url-fetch-v1"
         with database.session() as db:
-            paper = Paper(
-                project_id=project_id,
-                canonical_title=value.title,
-                authors=value.authors,
-                year=value.year,
-                venue=value.venue,
-                doi=value.doi,
-                metadata_provenance={
-                    "provider": "url-fetch",
-                    "source_uri": fetched.final_uri,
-                    "requested_uri": value.source_uri,
-                    "content_type": fetched.content_type,
-                },
+            paper = next(
+                (
+                    candidate
+                    for candidate in db.scalars(
+                        select(Paper).where(Paper.project_id == project_id)
+                    )
+                    if (
+                        value.doi
+                        and candidate.doi
+                        and candidate.doi.casefold() == value.doi.casefold()
+                    )
+                    or candidate.canonical_title.casefold() == value.title.casefold()
+                ),
+                None,
             )
-            db.add(paper)
-            db.flush()
-            db.add(
-                SourceDocument(
-                    paper_id=paper.id,
-                    source_type=source_type,
-                    source_uri=fetched.final_uri,
-                    text=fetched.text,
-                    parsing_quality="complete",
-                    parser=parser,
-                )
-            )
-            db.add(
-                CorpusMembership(
+            if paper is None:
+                paper = Paper(
                     project_id=project_id,
-                    paper_id=paper.id,
-                    status="included",
-                    relevance_rationale="User supplied a public source URL",
+                    canonical_title=value.title,
+                    authors=value.authors,
+                    year=value.year,
+                    venue=value.venue,
+                    doi=value.doi,
+                    metadata_provenance={
+                        "provider": "url-fetch",
+                        "source_uri": fetched.final_uri,
+                        "requested_uri": value.source_uri,
+                        "content_type": fetched.content_type,
+                    },
+                )
+                db.add(paper)
+                db.flush()
+            else:
+                if value.doi and not paper.doi:
+                    paper.doi = value.doi
+                if value.authors and not paper.authors:
+                    paper.authors = value.authors
+                provenance = dict(paper.metadata_provenance or {})
+                provenance.setdefault("source_uri", fetched.final_uri)
+                provenance["alternate_source_uris"] = list(
+                    dict.fromkeys(
+                        [
+                            *(provenance.get("alternate_source_uris") or []),
+                            value.source_uri,
+                        ]
+                    )
+                )
+                paper.metadata_provenance = provenance
+            if db.scalar(
+                select(SourceDocument).where(
+                    SourceDocument.paper_id == paper.id,
+                    SourceDocument.source_uri == fetched.final_uri,
+                )
+            ) is None:
+                db.add(
+                    SourceDocument(
+                        paper_id=paper.id,
+                        source_type=source_type,
+                        source_uri=fetched.final_uri,
+                        text=fetched.text,
+                        parsing_quality="complete",
+                        parser=parser,
+                    )
+                )
+            membership = db.scalar(
+                select(CorpusMembership).where(
+                    CorpusMembership.project_id == project_id,
+                    CorpusMembership.paper_id == paper.id,
                 )
             )
+            if membership is None:
+                db.add(
+                    CorpusMembership(
+                        project_id=project_id,
+                        paper_id=paper.id,
+                        status="included",
+                        relevance_rationale="User supplied a public source URL",
+                    )
+                )
+            else:
+                membership.status = "included"
             db.add(
                 DiscoveryEvent(
                     project_id=project_id,
@@ -678,6 +725,11 @@ def create_app(
                     action="included",
                     rationale="Fetched public source URL",
                     provider="url-fetch",
+                )
+            )
+            db.add(
+                UsageCostEvent(
+                    project_id=project_id, provider="url-fetch", external_api_calls=1
                 )
             )
             return {
