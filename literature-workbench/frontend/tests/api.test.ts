@@ -76,18 +76,18 @@ describe("workbench API adapter", () => {
   it("expands a paper through a directional citation route", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
       project_id: "project-1", paper_id: "paper-1", direction: "backward",
-      candidate_count: 4, provider: "semantic-scholar",
+      candidate_count: 4, provider: "semantic-scholar", depth_reached: 2, stopping_reason: "depth_limit_reached",
     }));
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(createWorkbenchApi("http://api").expandCitations("project-1", "paper-1", "backward", 10))
       .resolves.toEqual({
         project_id: "project-1", paper_id: "paper-1", direction: "backward",
-        candidate_count: 4, provider: "semantic-scholar",
+        candidate_count: 4, provider: "semantic-scholar", depth_reached: 2, stopping_reason: "depth_limit_reached",
       });
     expect(fetchMock).toHaveBeenCalledWith("http://api/projects/project-1/runs/citation-expansion", expect.objectContaining({
       method: "POST",
-      body: JSON.stringify({ paper_id: "paper-1", direction: "backward", limit: 10 }),
+      body: JSON.stringify({ paper_id: "paper-1", direction: "backward", limit: 10, depth: 1, max_papers: 100 }),
     }));
   });
 

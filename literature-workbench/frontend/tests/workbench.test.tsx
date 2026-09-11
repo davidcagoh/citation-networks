@@ -64,7 +64,7 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
     approveStructure: vi.fn().mockResolvedValue({ id: "run-1", status: "completed" }),
     importZotero: vi.fn().mockResolvedValue({ project_id: "project-1", imported_count: 0, item_count: 0 }),
     exportZotero: vi.fn().mockResolvedValue({ project_id: "project-1", exported_count: 0 }),
-    expandCitations: vi.fn().mockResolvedValue({ project_id: "project-1", paper_id: "paper-1", direction: "backward", candidate_count: 0, provider: "fake-search" }),
+    expandCitations: vi.fn().mockResolvedValue({ project_id: "project-1", paper_id: "paper-1", direction: "backward", candidate_count: 0, provider: "fake-search", depth_reached: 1, stopping_reason: "depth_limit_reached" }),
     livingUpdate: vi.fn().mockResolvedValue({ project_id: "project-1", mode: "sufficient", candidate_count: 0, new_paper_count: 0, route_count: 1, last_updated_at: "2026-09-10T12:00:00+00:00" }),
     approveProvider: vi.fn().mockResolvedValue({ id: "approval-1", project_id: "project-1", provider: "paid-search", approved: true, approved_by: "David Goh", justification: "Licensed index.", non_replicable_reason: "Unavailable through public APIs.", approved_at: "2026-09-10T12:00:00+00:00" }),
     updateReviewSentence: vi.fn().mockResolvedValue({ id: "sentence-1", section_title: "Mechanisms", text: "Revised prose.", substantive: true, claim_id: "claim-1", evidence_span_ids: ["span-1"] }),
