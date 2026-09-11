@@ -203,6 +203,25 @@ describe("Literature Workbench", () => {
     expect(api.importZotero).toHaveBeenCalledWith("project-1", "COLLECTION", 100);
   });
 
+  it("records a paid-provider approval from Brief", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture();
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Survey agent memory.");
+    await user.type(screen.getByLabelText("Paid provider"), "paid-search");
+    await user.type(screen.getByLabelText("Approval by"), "David Goh");
+    await user.type(screen.getByLabelText("Approval justification"), "Licensed index.");
+    await user.type(screen.getByLabelText("Non-replicable reason"), "Unavailable through public APIs.");
+    await user.click(screen.getByRole("button", { name: "Record provider approval" }));
+
+    expect(api.approveProvider).toHaveBeenCalledWith("project-1", {
+      provider: "paid-search", approved_by: "David Goh", justification: "Licensed index.",
+      non_replicable_reason: "Unavailable through public APIs.",
+    });
+  });
+
   it("edits and saves the relation-backed plan", async () => {
     const user = userEvent.setup();
     const api = apiFixture({
