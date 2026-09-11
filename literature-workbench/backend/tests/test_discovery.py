@@ -33,6 +33,8 @@ class FakeCandidate:
     abstract: str
     source_uri: str
     score: float
+    citation_count: int | None = None
+    publication_date: str | None = None
 
 
 class FakeDiscoveryProvider:
@@ -54,6 +56,8 @@ class FakeDiscoveryProvider:
                 abstract="A study of memory systems.",
                 source_uri="https://example.test/paper-1",
                 score=0.91,
+                citation_count=420,
+                publication_date="2025-01-15",
             ),
             FakeCandidate(
                 external_id="paper-2",
@@ -136,6 +140,12 @@ def test_discovery_persists_candidates_and_route_provenance(tmp_path: Path) -> N
         assert corpus["coverage"]["candidates"] == 2
         assert all(item["status"] == "candidate" for item in corpus["papers"])
         assert all(item["discovery_routes"] == ["semantic_search"] for item in corpus["papers"])
+
+        with app.state.database.session() as database:
+            paper = database.scalar(select(Paper).where(Paper.doi == "10.1234/memory"))
+            assert paper is not None
+            assert paper.metadata_provenance["citation_count"] == 420
+            assert paper.metadata_provenance["publication_date"] == "2025-01-15"
 
         with app.state.database.session() as database:
             assert database.scalar(
