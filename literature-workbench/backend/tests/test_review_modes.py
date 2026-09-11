@@ -90,6 +90,24 @@ def test_project_and_run_persist_the_selected_review_mode(tmp_path: Path) -> Non
             assert run is not None and run.review_mode == "systematic"
 
 
+def test_compatibility_mode_aliases_normalize_to_canonical_contracts(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project = client.post(
+            "/projects",
+            json={"title": "Memory", "prompt": "Survey memory", "review_mode": "thorough"},
+        ).json()
+        protocol = client.get(f"/projects/{project['id']}/protocol").json()
+        assert protocol["review_mode"] == "comprehensive"
+        client.post(f"/projects/{project['id']}/fixtures/provenance-corpus")
+        run = client.post(
+            f"/projects/{project['id']}/runs/pipeline",
+            json={"review_mode": "thorough"},
+        )
+        assert run.json()["review_mode"] == "comprehensive"
+        assert run.json()["status"] == "awaiting_corpus_approval"
+
+
 def test_broader_review_runs_pause_for_corpus_approval(tmp_path: Path) -> None:
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
     with TestClient(app) as client:
