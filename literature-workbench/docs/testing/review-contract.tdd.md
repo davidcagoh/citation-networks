@@ -82,6 +82,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 64 | Unicode-safe title identity normalization keeps distinct non-Latin paper titles separate during cross-provider discovery. | `backend/tests/test_discovery.py::test_discovery_does_not_collapse_distinct_non_latin_titles` | PASS |
 | 65 | Comprehensive scope accounting includes the general, systematic/meta-analytic, and umbrella/tutorial survey query families in discovery-call estimates. | `backend/tests/test_discovery.py::test_survey_route_queries_cover_multiple_review_families`, `backend/tests/test_scope.py::test_scope_preview_returns_transparent_scope_and_budget` | PASS |
 | 66 | Coverage audits preserve exact executed query strings per route, and the Corpus UI exposes them while accepting older payloads without query metadata. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
+| 67 | Citation-network audits record every expansion attempt and count empty expansions, including co-citation requests with no available graph frontier. | `backend/tests/test_discovery.py::test_coverage_audit_records_empty_network_expansions`, `backend/tests/test_discovery.py::test_citation_expansion_persists_directional_edges_and_provenance` | PASS |
 
 ## Validation evidence
 

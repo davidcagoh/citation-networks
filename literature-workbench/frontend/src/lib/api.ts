@@ -128,7 +128,7 @@ export interface CoverageAudit {
   screening: { total: number; selected: number; unresolved_candidates: number; excluded: number };
   source_text: { selected_with_usable_text: number; selected_total: number; selected_with_full_text: number; selected_abstract_only: number };
   provider_status?: Array<{ provider: string; attempts: number; failures: number }>;
-  network: { backward_expansions: number; forward_expansions: number; co_citation_expansions: number; edges: number; papers_discovered: number };
+  network: { backward_expansions: number; forward_expansions: number; co_citation_expansions: number; edges: number; papers_discovered: number; expansion_attempts: number; empty_expansions: number };
   stopping_certificate: {
     status: "satisfied" | "incomplete";
     mode: ReviewMode;
@@ -555,6 +555,8 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
         co_citation_expansions: number(network.co_citation_expansions ?? 0, "coverage audit.network.co_citation_expansions"),
         edges: number(network.edges ?? 0, "coverage audit.network.edges"),
         papers_discovered: number(network.papers_discovered ?? 0, "coverage audit.network.papers_discovered"),
+        expansion_attempts: number(network.expansion_attempts ?? 0, "coverage audit.network.expansion_attempts"),
+        empty_expansions: number(network.empty_expansions ?? 0, "coverage audit.network.empty_expansions"),
       };
     })(),
   };

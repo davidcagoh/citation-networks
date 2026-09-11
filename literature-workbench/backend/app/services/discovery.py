@@ -678,6 +678,17 @@ class DiscoveryService:
         candidates, excluded = self._apply_cutoff(candidates, cutoff_date)
         with self.database.session() as db:
             seed = db.get(Paper, paper_id)
+            db.add(
+                DiscoveryEvent(
+                    project_id=project_id,
+                    paper_id=paper_id,
+                    route=route,
+                    query=seed.canonical_title,
+                    action="expansion",
+                    rationale=f"Started {route} expansion from {seed.canonical_title}",
+                    provider=self.provider.name,
+                )
+            )
             for rank, candidate in enumerate(excluded, start=1):
                 db.add(
                     DiscoveryEvent(
@@ -809,6 +820,17 @@ class DiscoveryService:
             )
             if seed is None:
                 raise DiscoveryProviderError("Paper not found")
+            db.add(
+                DiscoveryEvent(
+                    project_id=project_id,
+                    paper_id=paper_id,
+                    route="co_citation",
+                    query=seed.canonical_title,
+                    action="expansion",
+                    rationale=f"Started co-citation expansion from {seed.canonical_title}",
+                    provider="local-graph",
+                )
+            )
             cited_ids = set(
                 db.scalars(
                     select(CitationEdge.target_paper_id).where(

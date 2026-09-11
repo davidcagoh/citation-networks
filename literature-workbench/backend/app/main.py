@@ -1081,20 +1081,35 @@ def create_app(
                 if event.action == "candidate"
                 and event.route in {"citation_backward", "citation_forward", "co_citation"}
             ]
+            network_expansions = [
+                event
+                for event in events
+                if event.action == "expansion"
+                and event.route in {"citation_backward", "citation_forward", "co_citation"}
+            ]
+            empty_expansions = sum(
+                not any(
+                    candidate.route == expansion.route
+                    and candidate.query == expansion.query
+                    and candidate.action == "candidate"
+                    for candidate in network_events
+                )
+                for expansion in network_expansions
+            )
             network = {
                 "backward_expansions": len({
-                    (event.route, event.query)
-                    for event in network_events
+                    (event.route, event.paper_id)
+                    for event in network_expansions
                     if event.route == "citation_backward"
                 }),
                 "forward_expansions": len({
-                    (event.route, event.query)
-                    for event in network_events
+                    (event.route, event.paper_id)
+                    for event in network_expansions
                     if event.route == "citation_forward"
                 }),
                 "co_citation_expansions": len({
-                    (event.route, event.query)
-                    for event in network_events
+                    (event.route, event.paper_id)
+                    for event in network_expansions
                     if event.route == "co_citation"
                 }),
                 "edges": db.scalar(
@@ -1105,6 +1120,8 @@ def create_app(
                 "papers_discovered": len({
                     event.paper_id for event in network_events if event.paper_id is not None
                 }),
+                "expansion_attempts": len(network_expansions),
+                "empty_expansions": empty_expansions,
             }
             provider_names = set(provider_totals)
             provider_fanout_complete = len(provider_names) <= 1 or all(

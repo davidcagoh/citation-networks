@@ -24,6 +24,9 @@
    deterministic metadata tie-breakers.
    The Corpus audit preserves and displays the exact query strings used by
    each route, so a review can be reproduced or challenged at the query level.
+   Citation-network audits also record expansion attempts that returned no
+   candidates, making an empty frontier visible as evidence of saturation
+   rather than indistinguishable from an expansion that was never run.
    Broad-mode stopping certificates additionally require complete date signals
    on the recent route, citation signals on the seminal route, and at least one
    review-, survey-, or benchmark-like work from the survey route. When multiple
