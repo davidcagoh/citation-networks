@@ -75,6 +75,10 @@ class CitationExpansionRequest(BaseModel):
     limit: int = Field(default=20, ge=1, le=100)
 
 
+class LivingUpdateRequest(BaseModel):
+    limit: int = Field(default=20, ge=1, le=100)
+
+
 class PipelineRequest(BaseModel):
     review_mode: ReviewMode = "sufficient"
     max_papers: int = Field(default=50, ge=1, le=500)

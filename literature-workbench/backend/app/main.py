@@ -14,6 +14,7 @@ from app.domain import (
     CitationExpansionRequest,
     CorpusMembershipUpdate,
     DiscoveryRequest,
+    LivingUpdateRequest,
     PipelineRequest,
     ProjectCreate,
     ReviewPlanUpdate,
@@ -44,6 +45,7 @@ from app.models import (
     SynthesisClaim,
     UsageCostEvent,
     VerificationIssue,
+    utcnow,
 )
 from app.services.discovery import (
     DiscoveryProvider,
@@ -356,6 +358,52 @@ def create_app(
             "direction": value.direction,
             "candidate_count": count,
             "provider": discovery.provider.name,
+        }
+
+    @app.post("/projects/{project_id}/runs/living-update", status_code=201)
+    def living_update(project_id: str, value: LivingUpdateRequest) -> dict:
+        with database.session() as db:
+            project = db.get(Project, project_id)
+            if project is None:
+                raise HTTPException(404, "Project not found")
+            protocol = db.scalar(
+                select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
+            )
+            mode = protocol.review_mode if protocol else "sufficient"
+            routes = ["semantic_search"]
+            if mode in {"comprehensive", "systematic"}:
+                routes = ["semantic_search", "survey_search", "recent_search"]
+            before_ids = set(
+                db.scalars(select(Paper.id).where(Paper.project_id == project_id))
+            )
+        try:
+            candidate_count, route_count = discovery.search_routes(
+                project_id, project.prompt, value.limit, routes
+            )
+        except DiscoveryProviderError as exc:
+            if str(exc) == "Project not found":
+                raise HTTPException(404, str(exc)) from exc
+            raise HTTPException(502, "Discovery provider unavailable") from exc
+        updated_at = utcnow()
+        with database.session() as db:
+            protocol = db.scalar(
+                select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
+            )
+            if protocol is not None:
+                protocol.updated_at = updated_at
+                persisted_updated_at = protocol.updated_at
+            else:
+                persisted_updated_at = updated_at
+            after_ids = set(
+                db.scalars(select(Paper.id).where(Paper.project_id == project_id))
+            )
+        return {
+            "project_id": project_id,
+            "mode": mode,
+            "candidate_count": candidate_count,
+            "new_paper_count": len(after_ids - before_ids),
+            "route_count": route_count,
+            "last_updated_at": persisted_updated_at.isoformat(),
         }
 
     @app.post("/projects/{project_id}/integrations/zotero/import", status_code=201)
