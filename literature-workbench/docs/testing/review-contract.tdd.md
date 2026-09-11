@@ -72,11 +72,12 @@ This report records the implementation tranche derived from the review-engine pl
 | 54 | Auto-acquired full-text documents use a distinct full-text extractor/section identity in evidence provenance rather than being mislabeled as abstract evidence. | `backend/tests/test_sources.py::test_acquisition_fetches_eligible_discovered_full_text_links` | PASS |
 | 55 | The Corpus workflow displays the discovery request's external API-call count alongside candidate and cutoff counts. | `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 | 56 | Fetched plain-text source documents outrank abstracts during document selection and receive full-text evidence provenance in the pipeline. | `backend/tests/test_sources.py::test_fetches_public_source_url_with_provenance_and_blocks_private_targets` | PASS |
+| 57 | PRISMA `screened` counts only corpus records with an explicit screening decision and excludes unresolved candidates. | `backend/tests/test_protocol.py::test_prisma_screened_count_excludes_unresolved_candidates` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 91 passed.
+- Backend: `uv run pytest -q` → 92 passed.
 - Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.52%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.

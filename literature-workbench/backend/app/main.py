@@ -328,7 +328,10 @@ def create_app(
                     "duplicates_removed": max(
                         0, len(identification_events) - len(identified_paper_ids)
                     ),
-                    "screened": len(memberships),
+                    "screened": sum(
+                        membership.status in {"included", "pinned", "excluded"}
+                        for membership in memberships
+                    ),
                     "reports_sought": len(selected_memberships),
                     "reports_not_retrieved": sum(
                         membership.paper_id not in papers_with_text
