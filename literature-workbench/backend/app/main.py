@@ -26,6 +26,7 @@ from app.domain import (
     resource_envelope_for_mode,
 )
 from app.models import (
+    CitationEdge,
     CorpusMembership,
     DiscoveryEvent,
     EvidenceSpan,
@@ -734,6 +735,11 @@ def create_app(
                     select(ScientificRelation).where(ScientificRelation.project_id == project_id)
                 )
             )
+            citation_edges = list(
+                db.scalars(
+                    select(CitationEdge).where(CitationEdge.project_id == project_id)
+                )
+            )
             return {
                 "entities": [
                     {
@@ -758,6 +764,15 @@ def create_app(
                         "inference_level": relation.inference_level,
                     }
                     for relation in relations
+                ],
+                "citation_edges": [
+                    {
+                        "source_paper_id": edge.source_paper_id,
+                        "target_paper_id": edge.target_paper_id,
+                        "direction": edge.direction,
+                        "provider": edge.provider,
+                    }
+                    for edge in citation_edges
                 ],
             }
 
