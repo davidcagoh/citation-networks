@@ -26,6 +26,8 @@ This report records the implementation tranche derived from the review-engine pl
 | 8 | Broader review audits emit a stopping certificate with route, screening, and source checks. | `backend/tests/test_discovery.py::test_broader_coverage_audit_emits_stopping_certificate` | PASS |
 | 9 | Frontend parses stopping certificates and exposes credential-safe Zotero actions. | `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 | 10 | PRISMA reports identify, screen, include, and exclude counts from recorded events. | `backend/tests/test_protocol.py::test_prisma_report_reconciles_protocol_search_and_screening_flow` | PASS |
+| 11 | Citation expansion persists directional network edges and exposes them through the graph/client contracts. | `backend/tests/test_discovery.py::test_citation_expansion_persists_directional_edges_and_provenance`, `frontend/tests/api.test.ts` | PASS |
+| 12 | Researchers can launch backward/forward citation expansion from each corpus paper. | `frontend/tests/workbench.test.tsx` | PASS |
 
 ## Validation evidence
 
@@ -39,7 +41,7 @@ This report records the implementation tranche derived from the review-engine pl
 
 ## Known gaps
 
-- The current route families still use the configured discovery provider’s search endpoint; backward/forward/co-citation graph traversal is not implemented yet.
+- Backward and forward citation expansion are implemented; multi-hop traversal, co-citation, and stopping rules for network saturation remain future work.
 - Paid-provider approval gates are not implemented yet; Zotero import/export is available through server-side credentials.
 - Full-text acquisition remains conservative; abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint and grounded draft-generation stage are not yet implemented.
