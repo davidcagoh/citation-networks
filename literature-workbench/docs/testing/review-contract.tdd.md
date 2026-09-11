@@ -71,6 +71,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 53 | Compatibility aliases normalize to canonical review contracts at project, protocol, and pipeline boundaries, preserving comprehensive checkpoints for `thorough`. | `backend/tests/test_review_modes.py::test_compatibility_mode_aliases_normalize_to_canonical_contracts` | PASS |
 | 54 | Auto-acquired full-text documents use a distinct full-text extractor/section identity in evidence provenance rather than being mislabeled as abstract evidence. | `backend/tests/test_sources.py::test_acquisition_fetches_eligible_discovered_full_text_links` | PASS |
 | 55 | The Corpus workflow displays the discovery request's external API-call count alongside candidate and cutoff counts. | `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
+| 56 | Fetched plain-text source documents outrank abstracts during document selection and receive full-text evidence provenance in the pipeline. | `backend/tests/test_sources.py::test_fetches_public_source_url_with_provenance_and_blocks_private_targets` | PASS |
 
 ## Validation evidence
 

@@ -57,7 +57,14 @@ class RunNotAwaitingStructureApprovalError(Exception):
     """Raised when structure approval is requested for a run at another state."""
 
 
-SOURCE_TYPE_PRIORITY = {"parsed_pdf": 4, "html": 3, "text": 3, "abstract": 2, "metadata": 1}
+SOURCE_TYPE_PRIORITY = {
+    "parsed_pdf": 4,
+    "html": 3,
+    "text": 3,
+    "fetched_text": 3,
+    "abstract": 2,
+    "metadata": 1,
+}
 MAX_EVIDENCE_CHARS = 1200
 
 
@@ -158,7 +165,7 @@ class PipelineService:
                     self.source_fetcher is not None
                     and self._eligible_auto_fetch_uri(source_uri)
                     and not any(
-                        document.source_type in {"parsed_pdf", "html", "text"}
+                        document.source_type in {"parsed_pdf", "html", "text", "fetched_text"}
                         and document.text
                         for document in existing_documents
                     )
@@ -573,6 +580,7 @@ class PipelineService:
             extractor_version = "fixture-v1" if fixture_extraction else {
                 "parsed_pdf": "fulltext-heuristic-v1",
                 "html": "fulltext-heuristic-v1",
+                "fetched_text": "fulltext-heuristic-v1",
                 "text": "text-heuristic-v1",
             }.get(document.source_type, "abstract-heuristic-v1")
             evidence_section = (
