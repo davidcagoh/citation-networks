@@ -468,6 +468,30 @@ def create_app(
             )
             if plan is None:
                 raise HTTPException(404, "Review plan not found")
+            project_claim_ids = set(
+                db.scalars(select(SynthesisClaim.id).where(SynthesisClaim.project_id == project_id))
+            )
+            project_relation_ids = set(
+                db.scalars(
+                    select(ScientificRelation.id).where(
+                        ScientificRelation.project_id == project_id
+                    )
+                )
+            )
+            project_paper_ids = set(
+                db.scalars(
+                    select(CorpusMembership.paper_id).where(
+                        CorpusMembership.project_id == project_id
+                    )
+                )
+            )
+            for section in value.sections:
+                if foreign := set(section.planned_claim_ids) - project_claim_ids:
+                    raise HTTPException(422, f"Unknown claim reference: {sorted(foreign)[0]}")
+                if foreign := set(section.relation_ids) - project_relation_ids:
+                    raise HTTPException(422, f"Unknown relation reference: {sorted(foreign)[0]}")
+                if foreign := set(section.paper_ids) - project_paper_ids:
+                    raise HTTPException(422, f"Unknown paper reference: {sorted(foreign)[0]}")
             plan.title = value.title
             plan.thesis = value.thesis
             plan.organizing_principle = value.organizing_principle
