@@ -4,6 +4,7 @@ import json
 import math
 import os
 from collections.abc import Sequence
+from contextlib import suppress
 from dataclasses import dataclass
 from datetime import date
 from typing import Protocol
@@ -245,10 +246,8 @@ class DiscoveryService:
         for candidate in candidates:
             published = None
             if candidate.publication_date:
-                try:
+                with suppress(ValueError):
                     published = date.fromisoformat(candidate.publication_date)
-                except ValueError:
-                    pass
             if (published is not None and published > cutoff) or (
                 published is None
                 and candidate.year is not None

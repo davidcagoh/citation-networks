@@ -178,7 +178,10 @@ def test_discovery_enforces_protocol_cutoff_and_reports_filtered_candidates(
         ).json()["id"]
         protocol = client.put(
             f"/projects/{project_id}/protocol",
-            json={"research_questions": ["Which memory studies exist?"], "cutoff_date": "2025-12-31"},
+            json={
+                "research_questions": ["Which memory studies exist?"],
+                "cutoff_date": "2025-12-31",
+            },
         )
         assert protocol.status_code == 200
 

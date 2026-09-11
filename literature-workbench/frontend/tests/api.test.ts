@@ -282,6 +282,7 @@ describe("workbench API adapter", () => {
         project_id: "project-1",
         candidate_count: 3,
         route_count: 1,
+        filtered_count: 0,
         provider: "semantic-scholar",
         query: "agent memory",
       }))
@@ -298,6 +299,7 @@ describe("workbench API adapter", () => {
     await expect(api.runDiscovery("project-1", "agent memory", 3)).resolves.toEqual({
       candidate_count: 3,
       route_count: 1,
+      filtered_count: 0,
       provider: "semantic-scholar",
       query: "agent memory",
     });
