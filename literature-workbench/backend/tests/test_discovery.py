@@ -119,6 +119,38 @@ class ChainDiscoveryProvider(FakeDiscoveryProvider):
         ][:limit]
 
 
+class SignalOrderProvider(FakeDiscoveryProvider):
+    def search(self, query: str, limit: int) -> list[FakeCandidate]:
+        return [
+            FakeCandidate(
+                external_id="low-impact",
+                title="Recent Memory Study",
+                authors=["A. Researcher"],
+                year=2024,
+                venue="Test Venue",
+                doi=None,
+                abstract="A memory study.",
+                source_uri="https://example.test/low",
+                score=0.2,
+                citation_count=4,
+                publication_date="2024-01-01",
+            ),
+            FakeCandidate(
+                external_id="high-impact",
+                title="Foundational Memory Study",
+                authors=["B. Researcher"],
+                year=2020,
+                venue="Test Venue",
+                doi=None,
+                abstract="A foundational memory study.",
+                source_uri="https://example.test/high",
+                score=0.9,
+                citation_count=400,
+                publication_date="2020-01-01",
+            ),
+        ][:limit]
+
+
 def test_discovery_persists_candidates_and_route_provenance(tmp_path: Path) -> None:
     provider = FakeDiscoveryProvider()
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
@@ -175,6 +207,35 @@ def test_discovery_persists_candidates_and_route_provenance(tmp_path: Path) -> N
             assert usage[0].provider == "fake-search"
             assert usage[0].external_api_calls == 1
             assert usage[0].run_id is None
+
+
+def test_seminal_route_orders_candidates_by_citation_signal(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=SignalOrderProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 2, "routes": ["seminal_search"]},
+        )
+        assert response.status_code == 201
+        with app.state.database.session() as database:
+            events = list(
+                database.scalars(
+                    select(DiscoveryEvent)
+                    .where(DiscoveryEvent.project_id == project_id)
+                    .order_by(DiscoveryEvent.rank)
+                )
+            )
+            ranked_papers = {
+                paper.id: paper.canonical_title
+                for paper in database.scalars(select(Paper).where(Paper.project_id == project_id))
+            }
+            assert ranked_papers[events[0].paper_id] == "Foundational Memory Study"
+            assert events[0].rank == 1
 
 
 def test_discovery_deduplicates_same_provider_result(tmp_path: Path) -> None:
