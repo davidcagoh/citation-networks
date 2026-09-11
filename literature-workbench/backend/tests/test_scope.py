@@ -34,7 +34,7 @@ def test_scope_preview_returns_transparent_scope_and_budget(tmp_path: Path) -> N
             "estimated_total_api_calls": 198,
             "estimated_input_tokens": 36_000,
             "estimated_output_tokens": 18_000,
-            "estimated_cost_usd": 0.0,
+            "estimated_cost_usd": 0.0288,
         }
 
 

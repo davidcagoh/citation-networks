@@ -58,7 +58,7 @@ describe("workbench API adapter", () => {
         estimated_external_api_calls: 20,
         estimated_input_tokens: 5000,
         estimated_output_tokens: 2500,
-        estimated_cost_usd: 0,
+        estimated_cost_usd: 0.004,
       },
     }));
     vi.stubGlobal("fetch", fetchMock);

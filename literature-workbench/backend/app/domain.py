@@ -178,18 +178,22 @@ def normalize_review_mode(mode: ReviewMode) -> str:
 def resource_envelope_for_mode(mode: ReviewMode, max_papers: int) -> ResourceEnvelope:
     normalized_mode = normalize_review_mode(mode)
     per_paper = {
-        "sufficient": (2, 500, 250, 0.0),
-        "comprehensive": (6, 1_200, 600, 0.0),
-        "systematic": (10, 2_000, 1_000, 0.0),
+        "sufficient": (2, 500, 250),
+        "comprehensive": (6, 1_200, 600),
+        "systematic": (10, 2_000, 1_000),
     }[normalized_mode]
-    api_calls, input_tokens, output_tokens, cost = per_paper
+    api_calls, input_tokens, output_tokens = per_paper
+    estimated_cost = (
+        max_papers * input_tokens * 0.20 / 1_000_000
+        + max_papers * output_tokens * 1.20 / 1_000_000
+    )
     return ResourceEnvelope(
         mode=normalized_mode,
         max_papers=max_papers,
         max_external_api_calls=max(1, max_papers * api_calls),
         estimated_input_tokens=max_papers * input_tokens,
         estimated_output_tokens=max_papers * output_tokens,
-        estimated_cost_usd=cost,
+        estimated_cost_usd=estimated_cost,
     )
 
 

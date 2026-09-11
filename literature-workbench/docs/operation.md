@@ -121,9 +121,16 @@ an over-budget request returns HTTP 429 without contacting a provider.
 The discovery response also returns `external_api_calls`, the actual planned
 fan-out count for that request, for immediate reconciliation in clients.
 
+Scope-preview dollar estimates use the default Luna planning/writing rate
+assumption (currently $0.20 per million input tokens and $1.20 per million
+output tokens); they are projections, not a billing guarantee. Actual provider
+usage is recorded after each completed stage, and the cost screen identifies
+the provider and model used. If synthesis is disabled, the deterministic path
+incurs no model-token spend.
+
 ## Deferred extensions
 
-Model-backed structured extraction, richer relation judging, and broader
+Richer multi-object extraction, relation judging, and broader
 automated contradiction/causal-language checks are the next
 research/engineering extensions. They should preserve the same
 source URI, parser/version, evidence-span, and budget contracts.

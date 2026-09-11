@@ -87,12 +87,14 @@ This report records the implementation tranche derived from the review-engine pl
 | 69 | An optional synthesis provider may draft claim wording only after receiving exact evidence text; pipeline-owned evidence-span links remain attached and the default path remains deterministic. | `backend/tests/test_sources.py::test_configured_synthesis_provider_drafts_only_grounded_claims` | PASS |
 | 70 | The opt-in OpenAI Responses adapter sends evidence-bounded prompts with storage disabled and parses final prose without exposing credentials. | `backend/tests/test_synthesis.py::test_openai_synthesis_provider_uses_responses_api_and_records_usage` | PASS |
 | 71 | Final-prose provider calls, token usage, model identity, and calculated USD spend are persisted in the run stage and project cost ledger. | `backend/tests/test_synthesis.py::test_synthesis_usage_is_recorded_in_project_costs` | PASS |
+| 72 | Opt-in model extraction requests strict structured JSON and accepts an extracted object only when its evidence text is an exact source substring. | `backend/tests/test_synthesis.py::test_openai_extraction_uses_strict_structured_output_and_requires_grounded_span`, `backend/tests/test_synthesis.py::test_pipeline_uses_structured_extraction_when_provider_is_enabled` | PASS |
+| 73 | Scope previews estimate model-token dollars by review mode using the default Luna rate assumption, while deterministic execution remains zero model spend. | `backend/tests/test_scope.py::test_scope_preview_returns_transparent_scope_and_budget`, `frontend/tests/workbench.test.tsx` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 104 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → see latest run below; above the 80% requirement.
+- Backend: `uv run pytest -q` → 106 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.38%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.
@@ -109,5 +111,5 @@ This report records the implementation tranche derived from the review-engine pl
 - Multi-source audits distinguish complete fan-out from partial fan-out; provider failures remain a limitation rather than being presented as comprehensive coverage. Route audits also expose marginal new-paper yield and overlap as coverage diagnostics.
 - Full-text acquisition now supports explicitly requested public HTTP(S) text/HTML/PDF URLs with SSRF, redirect, size, and parser guards; richer HTML extraction remains future work. Abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Live cross-paper comparison now uses a conservative grounded overlap heuristic; richer paragraph-level generation and section-level editing remain future work.
-- Optional OpenAI Luna final-prose generation is wired through an evidence-bounded Responses adapter and its usage is ledgered; structured extraction and section-level generation remain future work.
+- Optional OpenAI Luna structured extraction and evidence-bounded final-prose generation are wired and ledgered; richer multi-object extraction and section-level generation remain future work.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.

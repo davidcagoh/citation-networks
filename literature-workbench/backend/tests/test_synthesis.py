@@ -4,7 +4,10 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app.main import create_app
-from app.services.synthesis import OpenAISynthesisProvider, SynthesisUsage
+from app.services.synthesis import (
+    OpenAISynthesisProvider,
+    SynthesisUsage,
+)
 
 
 class FakeResponse:
@@ -71,6 +74,96 @@ def test_openai_synthesis_provider_uses_responses_api_and_records_usage(monkeypa
     assert usage.external_api_calls == 1
     assert usage.cost_usd == 0.00044
     assert provider.consume_usage().external_api_calls == 0
+
+
+def test_openai_extraction_uses_strict_structured_output_and_requires_grounded_span(
+    monkeypatch,
+) -> None:
+    requests: list[dict] = []
+
+    def fake_urlopen(request, timeout):
+        requests.append(json.loads(request.data))
+        return FakeResponse(
+            {
+                "output_text": json.dumps(
+                    {
+                        "entity_type": "method",
+                        "label": "retrieval memory",
+                        "description": "Retrieval memory stores prior observations for reuse.",
+                        "evidence_text": "Retrieval memory stores prior observations for reuse.",
+                    }
+                ),
+                "usage": {"input_tokens": 40, "output_tokens": 30},
+            }
+        )
+
+    monkeypatch.setattr("app.services.synthesis.urlopen", fake_urlopen)
+    provider = OpenAISynthesisProvider(api_key="secret-not-printed")
+
+    extraction = provider.extract_evidence(
+        "Memory paper",
+        "Retrieval memory stores prior observations for reuse. It improves recall.",
+    )
+
+    assert extraction is not None
+    assert extraction.entity_type == "method"
+    assert extraction.evidence_text == "Retrieval memory stores prior observations for reuse."
+    assert requests[0]["store"] is False
+    assert requests[0]["text"]["format"]["type"] == "json_schema"
+    assert requests[0]["text"]["format"]["strict"] is True
+    assert provider.consume_usage().external_api_calls == 1
+
+
+def test_pipeline_uses_structured_extraction_when_provider_is_enabled(
+    tmp_path: Path, monkeypatch
+) -> None:
+    def fake_urlopen(request, timeout):
+        body = json.loads(request.data)
+        if "text" in body:
+            output = {
+                "entity_type": "method",
+                "label": "retrieval memory",
+                "description": "Retrieval memory stores prior observations for reuse.",
+                "evidence_text": "Retrieval memory stores prior observations for reuse.",
+            }
+        else:
+            output = "The method stores prior observations for reuse."
+        return FakeResponse(
+            {
+                "output_text": json.dumps(output) if isinstance(output, dict) else output,
+                "usage": {"input_tokens": 10, "output_tokens": 10},
+            }
+        )
+
+    monkeypatch.setattr("app.services.synthesis.urlopen", fake_urlopen)
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        synthesis_provider=OpenAISynthesisProvider(api_key="secret-not-printed"),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Review memory"}
+        ).json()["id"]
+        assert client.post(
+            f"/projects/{project_id}/sources/text",
+            json={
+                "title": "Memory Study",
+                "source_uri": "file:///memory-study",
+                "text": "Retrieval memory stores prior observations for reuse. It improves recall.",
+            },
+        ).status_code == 201
+        assert client.post(f"/projects/{project_id}/runs/pipeline").status_code == 201
+
+        corpus = client.get(f"/projects/{project_id}/corpus").json()["papers"]
+        assert corpus[0]["entity_count"] == 1
+        evidence = client.get(
+            f"/projects/{project_id}/claims/"
+            f"{client.get(f'/projects/{project_id}/review').json()['sentences'][0]['claim_id']}/evidence"
+        ).json()
+        assert evidence["claim"]["inference_level"] == "model_inference"
+        assert evidence["evidence"][0]["verbatim_text"] == (
+            "Retrieval memory stores prior observations for reuse."
+        )
 
 
 def test_opted_in_openai_provider_is_wired_without_exposing_credentials(

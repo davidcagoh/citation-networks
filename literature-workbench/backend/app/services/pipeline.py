@@ -583,6 +583,7 @@ class PipelineService:
                         "abstract-heuristic-v1",
                         "text-heuristic-v1",
                         "fulltext-heuristic-v1",
+                        "openai-structured-v1",
                     }
                     and span.id not in referenced_span_ids
                 ):
@@ -628,6 +629,19 @@ class PipelineService:
                 entity_type = "claim"
                 entity_label = paper.canonical_title
                 extraction_method = extractor_version
+                extractor = getattr(self.synthesis_provider, "extract_evidence", None)
+                if callable(extractor):
+                    structured = extractor(paper.canonical_title, document.text)
+                    if structured is not None:
+                        structured_evidence = getattr(structured, "evidence_text", "")
+                        structured_start = document.text.find(structured_evidence)
+                        if structured_start >= 0:
+                            start = structured_start
+                            evidence_text = structured_evidence
+                            entity_type = structured.entity_type
+                            entity_label = structured.label
+                            extractor_version = "openai-structured-v1"
+                            extraction_method = "openai-structured-v1"
             existing_spans = (
                 [
                     evidence_spans[span_id]
@@ -663,6 +677,7 @@ class PipelineService:
                                 "abstract-heuristic-v1",
                                 "text-heuristic-v1",
                                 "fulltext-heuristic-v1",
+                                "openai-structured-v1",
                             ]
                         ),
                     )

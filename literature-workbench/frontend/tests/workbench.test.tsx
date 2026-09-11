@@ -38,7 +38,7 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
       budget: {
         mode: "comprehensive", recommended: true, max_papers: 50, max_external_api_calls: 300,
         estimated_external_api_calls: 300, estimated_input_tokens: 60000,
-        estimated_output_tokens: 30000, estimated_cost_usd: 0,
+        estimated_output_tokens: 30000, estimated_cost_usd: 0.048,
       },
     }),
     getProtocol: vi.fn().mockResolvedValue({
