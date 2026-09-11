@@ -34,7 +34,8 @@ unsupported content, extraction failures, and sources over 5 MB are rejected.
 - Public text/HTML can be attached with `POST /projects/{id}/sources/url`.
   It is stored as a `fetched_text` or `html` `SourceDocument` after URL safety
   validation; HTML is normalized to visible body text and PDFs are parsed with
-  the versioned `pypdf` extractor before evidence extraction.
+  the versioned `pypdf` extractor before evidence extraction. DOI/title matches
+  attach to the existing canonical paper rather than creating duplicates.
 - Missing text degrades the paper and does not fabricate evidence.
 
 The current live extractor is intentionally heuristic: it selects a bounded
