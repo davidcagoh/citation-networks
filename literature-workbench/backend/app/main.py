@@ -469,6 +469,65 @@ def create_app(
                 },
             }
 
+    @app.get("/projects/{project_id}/coverage-audit")
+    def coverage_audit(project_id: str) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            memberships = list(
+                db.scalars(
+                    select(CorpusMembership).where(CorpusMembership.project_id == project_id)
+                )
+            )
+            paper_ids = [membership.paper_id for membership in memberships]
+            documents = select_preferred_documents(
+                list(db.scalars(select(SourceDocument).where(SourceDocument.paper_id.in_(paper_ids))))
+            ) if paper_ids else {}
+            events = list(
+                db.scalars(
+                    select(DiscoveryEvent)
+                    .where(DiscoveryEvent.project_id == project_id)
+                    .order_by(DiscoveryEvent.created_at, DiscoveryEvent.id)
+                )
+            )
+            executed_routes = list(dict.fromkeys(event.route for event in events))
+            selected = [
+                membership
+                for membership in memberships
+                if membership.status in {"included", "pinned"}
+            ]
+            candidates = [
+                membership for membership in memberships if membership.status == "candidate"
+            ]
+            selected_with_text = sum(
+                bool(documents.get(membership.paper_id) and documents[membership.paper_id].text)
+                for membership in selected
+            )
+            limitations: list[str] = []
+            if candidates:
+                limitations.append("candidate papers remain unscreened")
+            if selected and selected_with_text < len(selected):
+                limitations.append("selected papers lack usable source text")
+            if not executed_routes:
+                limitations.append("no discovery routes have been executed")
+            ready = bool(selected) and not limitations
+            return {
+                "project_id": project_id,
+                "checkpoint": "corpus",
+                "status": "ready_for_corpus_checkpoint" if ready else "incomplete",
+                "routes": {"executed": executed_routes, "count": len(executed_routes)},
+                "screening": {
+                    "total": len(memberships),
+                    "selected": len(selected),
+                    "unresolved_candidates": len(candidates),
+                    "excluded": sum(membership.status == "excluded" for membership in memberships),
+                },
+                "source_text": {
+                    "selected_with_usable_text": selected_with_text,
+                    "selected_total": len(selected),
+                },
+                "limitations": limitations,
+            }
+
     @app.patch("/projects/{project_id}/corpus/{paper_id}")
     def update_corpus_membership(
         project_id: str, paper_id: str, value: CorpusMembershipUpdate

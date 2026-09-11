@@ -190,7 +190,11 @@ def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> 
         ).json()["id"]
         client.post(
             f"/projects/{project_id}/runs/discovery",
-            json={"query": "agent memory", "limit": 1, "routes": ["semantic_search", "recent_search"]},
+            json={
+                "query": "agent memory",
+                "limit": 1,
+                "routes": ["semantic_search", "recent_search"],
+            },
         )
 
         audit = client.get(f"/projects/{project_id}/coverage-audit")
