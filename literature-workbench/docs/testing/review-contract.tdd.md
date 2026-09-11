@@ -45,6 +45,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 27 | Public HTTP(S) text sources can be fetched into the corpus with provenance while private targets and redirects are rejected. | `backend/tests/test_sources.py::test_fetches_public_source_url_with_provenance_and_blocks_private_targets`, frontend API/UI checks | PASS |
 | 28 | Fetched HTML is reduced to visible UTF-8 text before evidence extraction, excluding head, script, style, and template content. | `backend/tests/test_sources.py::test_fetches_public_source_url_with_provenance_and_blocks_private_targets` | PASS |
 | 29 | Fetched PDFs are bounded and converted to text with a versioned `pypdf` parser before evidence extraction. | `backend/tests/test_sources.py::test_extracts_text_from_bounded_pdf_bytes` | PASS |
+| 30 | Coverage audits report whether each executed route has publication-date and citation-count signals for its candidate papers. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, frontend API/UI contract checks | PASS |
 
 ## Validation evidence
 
