@@ -624,7 +624,11 @@ class PipelineService:
                     for source, target in zip(entities, entities[1:], strict=False)
                 }
                 if fixture_entities
-                else set()
+                else {
+                    ((source.id,), (target.id,))
+                    for source, target in zip(entities, entities[1:], strict=False)
+                    if self._share_topic_terms(source, target)
+                }
             )
             for relation in existing:
                 key = (tuple(relation.source_entity_ids), tuple(relation.target_entity_ids))
@@ -655,23 +659,64 @@ class PipelineService:
         created: list[str] = []
         for index, (source, target) in enumerate(zip(entities, entities[1:], strict=False)):
             relation = existing_by_endpoints.get(((source.id,), (target.id,)))
-            if relation is None:
+            if relation is None and ((source.id,), (target.id,)) in desired_pairs:
+                relation_type = (
+                    relation_types[index]
+                    if fixture_entities
+                    else "same_topic_different_source"
+                )
                 relation = self.provenance.add_relation(
                     ScientificRelationCreate(
                         source_entity_ids=[source.id],
                         target_entity_ids=[target.id],
-                        relation_type=relation_types[index],
+                        relation_type=relation_type,
                         evidence_span_ids=source.evidence_span_ids + target.evidence_span_ids,
-                        confidence=0.92 - index * 0.03,
+                        confidence=0.92 - index * 0.03 if fixture_entities else 0.72,
+                        inference_level=(
+                            "cross_source_synthesis"
+                            if fixture_entities
+                            else "model_inference"
+                        ),
                         justification=(
-                            f"{target.normalized_label} changes how agents handle the limitation "
-                            f"exposed by {source.normalized_label}."
+                            (
+                                f"{target.normalized_label} changes how agents handle "
+                                "the limitation "
+                                f"exposed by {source.normalized_label}."
+                            )
+                            if fixture_entities
+                            else (
+                                f"Both papers provide grounded evidence about shared topic terms; "
+                                f"compare their approaches: {source.normalized_label} and "
+                                f"{target.normalized_label}."
+                            )
                         ),
                     ),
                     project_id=project_id,
                 )
             created.append(relation.id)
         return created
+
+    @staticmethod
+    def _share_topic_terms(source: ScientificEntity, target: ScientificEntity) -> bool:
+        stopwords = {
+            "a", "an", "and", "are", "as", "by", "for", "from", "in", "of", "on",
+            "or", "the", "to", "with",
+        }
+        source_terms = {
+            term
+            for term in re.findall(
+                r"[a-z0-9]+", f"{source.normalized_label} {source.description}".lower()
+            )
+            if len(term) >= 4 and term not in stopwords
+        }
+        target_terms = {
+            term
+            for term in re.findall(
+                r"[a-z0-9]+", f"{target.normalized_label} {target.description}".lower()
+            )
+            if len(term) >= 4 and term not in stopwords
+        }
+        return bool(source_terms & target_terms)
 
     def _plan(self, project_id: str) -> list[str]:
         with self.database.session() as db:
