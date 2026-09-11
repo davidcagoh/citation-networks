@@ -14,6 +14,7 @@ from app.models import (
     ScientificRelation,
     SourceDocument,
     SynthesisClaim,
+    UsageCostEvent,
 )
 
 
@@ -100,6 +101,15 @@ def test_discovery_persists_candidates_and_route_provenance(tmp_path: Path) -> N
                 "A study of memory systems.",
                 "A follow-up study.",
             }
+            usage = list(
+                database.scalars(
+                    select(UsageCostEvent).where(UsageCostEvent.project_id == project_id)
+                )
+            )
+            assert len(usage) == 1
+            assert usage[0].provider == "fake-search"
+            assert usage[0].external_api_calls == 1
+            assert usage[0].run_id is None
 
 
 def test_discovery_deduplicates_same_provider_result(tmp_path: Path) -> None:
