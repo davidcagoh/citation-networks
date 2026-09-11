@@ -63,6 +63,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 45 | Comprehensive/systematic stopping certificates require the survey route to return at least one review-, survey-, or benchmark-like work. | `backend/tests/test_discovery.py::test_broader_coverage_audit_emits_stopping_certificate`, `backend/tests/test_discovery.py::test_broader_audit_rejects_missing_latest_and_seminal_signals` | PASS |
 | 46 | Comprehensive/systematic stopping certificates require every configured discovery provider to complete every required route; partial fan-out remains incomplete. | `backend/tests/test_discovery.py::test_comprehensive_audit_requires_all_providers_on_required_routes` | PASS |
 | 47 | Coverage audits report marginal new-paper yield and route overlap so later discovery routes can be inspected for diminishing returns. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, frontend parser/UI checks | PASS |
+| 48 | Multi-source usage accounting records one external call per provider attempt, matching the scope-preview fan-out estimate and budget enforcement. | `backend/tests/test_discovery.py::test_multi_source_search_usage_counts_each_provider_attempt` | PASS |
 
 ## Validation evidence
 

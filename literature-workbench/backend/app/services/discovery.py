@@ -446,7 +446,10 @@ class DiscoveryService:
                     UsageCostEvent(
                         project_id=project_id,
                         provider=self.provider.name,
-                        external_api_calls=len(route_queries),
+                        external_api_calls=(
+                            len(route_queries)
+                            * len(getattr(self.provider, "providers", [self.provider]))
+                        ),
                     )
                 )
         return total_candidates, len(routes), filtered_candidates
