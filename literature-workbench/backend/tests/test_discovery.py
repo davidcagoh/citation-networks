@@ -414,6 +414,48 @@ def test_discovery_deduplicates_normalized_cross_provider_identity(tmp_path: Pat
             ) == 4
 
 
+def test_discovery_does_not_collapse_distinct_non_latin_titles(tmp_path: Path) -> None:
+    class Provider:
+        def __init__(self, name: str, title: str) -> None:
+            self.name = name
+            self.title = title
+
+        def search(self, query: str, limit: int):
+            return [
+                DiscoveryCandidate(
+                    external_id=f"{self.name}-paper",
+                    title=self.title,
+                    authors=[],
+                    year=2025,
+                    venue=None,
+                    doi=None,
+                    abstract="Abstract.",
+                    source_uri=None,
+                    score=None,
+                )
+            ][:limit]
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=MultiSourceDiscoveryProvider(
+            [Provider("source-a", "量子记憶システム"), Provider("source-b", "人工知能の記憶")]
+        ),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        assert response.status_code == 201
+        assert len(client.get(f"/projects/{project_id}/corpus").json()["papers"]) == 2
+
+
 def test_discovery_can_run_multiple_named_routes_with_separate_usage_events(tmp_path: Path) -> None:
     provider = FakeDiscoveryProvider()
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
