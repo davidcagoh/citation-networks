@@ -593,6 +593,13 @@ def create_app(
                     .order_by(DiscoveryEvent.created_at, DiscoveryEvent.id)
                 )
             )
+            protocol = db.scalar(
+                select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
+            )
+            mode = protocol.review_mode if protocol else "sufficient"
+            required_routes = ["semantic_search"]
+            if mode in {"comprehensive", "systematic"}:
+                required_routes = ["semantic_search", "survey_search", "recent_search"]
             executed_routes = list(dict.fromkeys(event.route for event in events))
             selected = [
                 membership
@@ -613,7 +620,22 @@ def create_app(
                 limitations.append("selected papers lack usable source text")
             if not executed_routes:
                 limitations.append("no discovery routes have been executed")
-            ready = bool(selected) and not limitations
+            required_routes_executed = all(route in executed_routes for route in required_routes)
+            if not required_routes_executed:
+                limitations.append("required discovery routes remain unexecuted")
+            all_candidates_screened = not candidates
+            selected_sources_available = selected_with_text == len(selected)
+            stopping_certificate = {
+                "status": "satisfied" if bool(selected) and not limitations else "incomplete",
+                "mode": mode,
+                "required_routes": required_routes,
+                "checks": {
+                    "required_routes_executed": required_routes_executed,
+                    "all_candidates_screened": all_candidates_screened,
+                    "selected_sources_available": selected_sources_available,
+                },
+            }
+            ready = stopping_certificate["status"] == "satisfied"
             return {
                 "project_id": project_id,
                 "checkpoint": "corpus",
@@ -629,6 +651,7 @@ def create_app(
                     "selected_with_usable_text": selected_with_text,
                     "selected_total": len(selected),
                 },
+                "stopping_certificate": stopping_certificate,
                 "limitations": limitations,
             }
 
