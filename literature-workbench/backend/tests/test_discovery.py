@@ -588,6 +588,7 @@ def test_citation_expansion_persists_directional_edges_and_provenance(tmp_path: 
             assert edge.provider == "fake-search"
             event = database.scalar(
                 select(DiscoveryEvent).where(DiscoveryEvent.route == "citation_backward")
+                .where(DiscoveryEvent.action == "candidate")
             )
             assert event is not None
             assert event.paper_id == edge.target_paper_id
@@ -599,6 +600,8 @@ def test_citation_expansion_persists_directional_edges_and_provenance(tmp_path: 
             "co_citation_expansions": 0,
             "edges": 1,
             "papers_discovered": 1,
+            "expansion_attempts": 1,
+            "empty_expansions": 0,
         }
 
 
@@ -782,9 +785,39 @@ def test_co_citation_expansion_derives_shared_reference_neighbors(tmp_path: Path
         with app.state.database.session() as database:
             event = database.scalar(
                 select(DiscoveryEvent).where(DiscoveryEvent.route == "co_citation")
+                .where(DiscoveryEvent.action == "candidate")
             )
             assert event is not None
             assert event.paper_id == other.id
+
+
+def test_coverage_audit_records_empty_network_expansions(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=FakeDiscoveryProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        client.post(f"/projects/{project_id}/runs/discovery", json={"query": "memory", "limit": 1})
+        seed_id = client.get(f"/projects/{project_id}/corpus").json()["papers"][0]["id"]
+
+        response = client.post(
+            f"/projects/{project_id}/runs/co-citation-expansion",
+            json={"paper_id": seed_id, "limit": 10},
+        )
+
+        assert response.status_code == 201
+        assert response.json()["candidate_count"] == 0
+        assert client.get(f"/projects/{project_id}/coverage-audit").json()["network"] == {
+            "backward_expansions": 0,
+            "forward_expansions": 0,
+            "co_citation_expansions": 1,
+            "edges": 0,
+            "papers_discovered": 0,
+            "expansion_attempts": 1,
+            "empty_expansions": 1,
+        }
 
 
 def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> None:
