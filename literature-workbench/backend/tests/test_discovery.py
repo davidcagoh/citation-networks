@@ -183,6 +183,12 @@ def test_discovery_persists_candidates_and_route_provenance(tmp_path: Path) -> N
             assert paper is not None
             assert paper.metadata_provenance["citation_count"] == 420
             assert paper.metadata_provenance["publication_date"] == "2025-01-15"
+            event = database.scalar(
+                select(DiscoveryEvent).where(DiscoveryEvent.paper_id == paper.id)
+            )
+            assert event is not None
+            assert "citation_count=420" in event.rationale
+            assert "publication_date=2025-01-15" in event.rationale
 
         with app.state.database.session() as database:
             assert database.scalar(
