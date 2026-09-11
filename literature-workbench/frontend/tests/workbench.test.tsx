@@ -67,6 +67,7 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
     expandCitations: vi.fn().mockResolvedValue({ project_id: "project-1", paper_id: "paper-1", direction: "backward", candidate_count: 0, provider: "fake-search" }),
     livingUpdate: vi.fn().mockResolvedValue({ project_id: "project-1", mode: "sufficient", candidate_count: 0, new_paper_count: 0, route_count: 1, last_updated_at: "2026-09-10T12:00:00+00:00" }),
     approveProvider: vi.fn().mockResolvedValue({ id: "approval-1", project_id: "project-1", provider: "paid-search", approved: true, approved_by: "David Goh", justification: "Licensed index.", non_replicable_reason: "Unavailable through public APIs.", approved_at: "2026-09-10T12:00:00+00:00" }),
+    updateReviewSentence: vi.fn().mockResolvedValue({ id: "sentence-1", section_title: "Mechanisms", text: "Revised prose.", substantive: true, claim_id: "claim-1", evidence_span_ids: ["span-1"] }),
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
     updatePlan: vi.fn().mockImplementation(async (_projectId, _planId, plan) => ({ id: "plan-1", ...plan })),
@@ -220,6 +221,23 @@ describe("Literature Workbench", () => {
       provider: "paid-search", approved_by: "David Goh", justification: "Licensed index.",
       non_replicable_reason: "Unavailable through public APIs.",
     });
+  });
+
+  it("edits grounded review prose without replacing its claim link", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture();
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Survey agent memory.");
+    await user.click(screen.getByRole("button", { name: "Create and run fixture" }));
+    await user.click(await screen.findByRole("tab", { name: "Review" }));
+    await user.click(screen.getByRole("button", { name: "Edit sentence sentence-1" }));
+    await user.clear(screen.getByLabelText("Draft sentence"));
+    await user.type(screen.getByLabelText("Draft sentence"), "Revised prose.");
+    await user.click(screen.getByRole("button", { name: "Save sentence" }));
+
+    expect(api.updateReviewSentence).toHaveBeenCalledWith("project-1", "sentence-1", "Revised prose.");
   });
 
   it("edits and saves the relation-backed plan", async () => {

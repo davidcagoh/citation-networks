@@ -122,6 +122,17 @@ describe("workbench API adapter", () => {
     }));
   });
 
+  it("updates review prose while returning its evidence links", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      id: "sentence-1", section_title: "Mechanisms", text: "Revised prose.", substantive: true,
+      claim_id: "claim-1", citation_paper_ids: ["paper-1"], evidence_span_ids: ["span-1"],
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").updateReviewSentence("project-1", "sentence-1", "Revised prose."))
+      .resolves.toMatchObject({ text: "Revised prose.", evidence_span_ids: ["span-1"] });
+  });
+
   it("loads and updates a reproducible review protocol", async () => {
     const protocol: ReviewProtocol = {
       id: "protocol-1",
