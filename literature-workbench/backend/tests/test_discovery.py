@@ -1024,6 +1024,59 @@ def test_coverage_audit_reports_partial_multi_source_fanout(tmp_path: Path) -> N
     ]
 
 
+def test_multi_source_project_records_originating_provider_names(tmp_path: Path) -> None:
+    class StaticProvider:
+        def __init__(self, name: str, external_id: str) -> None:
+            self.name = name
+            self.external_id = external_id
+
+        def search(self, query: str, limit: int):
+            return [
+                DiscoveryCandidate(
+                    external_id=self.external_id,
+                    title=f"{self.name} study",
+                    authors=[],
+                    year=2025,
+                    venue=None,
+                    doi=None,
+                    abstract=f"Evidence from {self.name}.",
+                    source_uri=None,
+                    score=None,
+                )
+            ][:limit]
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=MultiSourceDiscoveryProvider(
+            [StaticProvider("semantic-scholar", "s2-1"), StaticProvider("openalex", "oa-1")]
+        ),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        assert response.status_code == 201
+        with app.state.database.session() as database:
+            papers = list(database.scalars(select(Paper)))
+            events = list(database.scalars(select(DiscoveryEvent)))
+
+    assert {paper.metadata_provenance["provider"] for paper in papers} == {
+        "semantic-scholar",
+        "openalex",
+    }
+    assert {event.provider for event in events if event.action == "candidate"} == {
+        "semantic-scholar",
+        "openalex",
+    }
+
+
 def test_openalex_provider_expands_forward_citations(monkeypatch) -> None:
     requests: list[str] = []
 
