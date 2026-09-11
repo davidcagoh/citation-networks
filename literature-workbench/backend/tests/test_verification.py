@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app.main import create_app
-from app.models import EvidenceSpan, Paper, SynthesisClaim, VerificationIssue
+from app.models import EvidenceSpan, Paper, ReviewSentence, SynthesisClaim, VerificationIssue
 
 
 def _completed_project(client: TestClient) -> str:
@@ -101,3 +101,44 @@ def test_verification_flags_cross_source_claim_without_relation(tmp_path: Path) 
         issue = client.get(f"/projects/{project_id}/verification").json()["issues"][0]
         assert issue["issue_type"] == "unsupported_synthesis"
         assert issue["severity"] == "medium"
+
+
+def test_verification_flags_causal_language_for_manual_review(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = _completed_project(client)
+        with app.state.database.session() as database:
+            claim = database.scalar(
+                select(SynthesisClaim).where(SynthesisClaim.project_id == project_id)
+            )
+            assert claim is not None
+            claim.text = "The method improved retrieval because it consolidated memory."
+
+        response = client.post(f"/projects/{project_id}/runs/verification")
+
+        assert response.status_code == 201
+        issues = client.get(f"/projects/{project_id}/verification").json()["issues"]
+        assert any(issue["issue_type"] == "causal_language" for issue in issues)
+
+
+def test_verification_flags_substantive_uncited_review_sentence(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = _completed_project(client)
+        with app.state.database.session() as database:
+            database.add(
+                ReviewSentence(
+                    project_id=project_id,
+                    section_title="Manual interpretation",
+                    position=999,
+                    text="This is an uncited substantive interpretation.",
+                    substantive=True,
+                    claim_id=None,
+                )
+            )
+
+        response = client.post(f"/projects/{project_id}/runs/verification")
+
+        assert response.status_code == 201
+        issues = client.get(f"/projects/{project_id}/verification").json()["issues"]
+        assert any(issue["issue_type"] == "citation_completeness" for issue in issues)

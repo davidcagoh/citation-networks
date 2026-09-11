@@ -1,9 +1,24 @@
 from __future__ import annotations
 
+import re
+
 from sqlalchemy import delete, select
 
 from app.db import Database
-from app.models import EvidenceSpan, Paper, Project, SynthesisClaim, VerificationIssue
+from app.models import (
+    EvidenceSpan,
+    Paper,
+    Project,
+    ReviewSentence,
+    SynthesisClaim,
+    VerificationIssue,
+)
+
+CAUSAL_LANGUAGE = re.compile(
+    r"\b(?:because|therefore|caused|causes|led to|leads to|resulted in|results in|"
+    r"arose from|due to|solved)\b",
+    re.IGNORECASE,
+)
 
 
 class VerificationService:
@@ -74,6 +89,42 @@ class VerificationService:
                     claim.verification_status = "flagged"
                     db.flush()
                     created.append(issue.id)
+                elif CAUSAL_LANGUAGE.search(claim.text):
+                    issue = VerificationIssue(
+                        project_id=project_id,
+                        claim_id=claim.id,
+                        issue_type="causal_language",
+                        severity="medium",
+                        message=(
+                            "Claim uses causal language; confirm that the cited evidence "
+                            "supports causation rather than only temporal or "
+                            "correlational evidence."
+                        ),
+                    )
+                    db.add(issue)
+                    claim.verification_status = "flagged"
+                    db.flush()
+                    created.append(issue.id)
                 else:
                     claim.verification_status = "grounded"
+
+            uncited = list(
+                db.scalars(
+                    select(ReviewSentence).where(
+                        ReviewSentence.project_id == project_id,
+                        ReviewSentence.substantive.is_(True),
+                        ReviewSentence.claim_id.is_(None),
+                    )
+                )
+            )
+            for _sentence in uncited:
+                issue = VerificationIssue(
+                    project_id=project_id,
+                    issue_type="citation_completeness",
+                    severity="medium",
+                    message="Substantive review sentence has no linked claim or citation.",
+                )
+                db.add(issue)
+                db.flush()
+                created.append(issue.id)
             return created

@@ -90,12 +90,14 @@ This report records the implementation tranche derived from the review-engine pl
 | 72 | Opt-in model extraction requests strict structured JSON and accepts an extracted object only when its evidence text is an exact source substring. | `backend/tests/test_synthesis.py::test_openai_extraction_uses_strict_structured_output_and_requires_grounded_span`, `backend/tests/test_synthesis.py::test_pipeline_uses_structured_extraction_when_provider_is_enabled` | PASS |
 | 73 | Scope previews estimate model-token dollars by review mode using the default Luna rate assumption, while deterministic execution remains zero model spend. | `backend/tests/test_scope.py::test_scope_preview_returns_transparent_scope_and_budget`, `frontend/tests/workbench.test.tsx` | PASS |
 | 74 | Final prose is generated after structure approval with section context and returned claim IDs, while each persisted sentence retains its own evidence links. | `backend/tests/test_synthesis.py::test_openai_section_writer_returns_claim_linked_sentences`, `backend/tests/test_synthesis.py::test_final_prose_provider_waits_for_structure_approval` | PASS |
+| 75 | Verification flags potentially unsupported causal language as a repairable, claim-linked issue. | `backend/tests/test_verification.py::test_verification_flags_causal_language_for_manual_review` | PASS |
+| 76 | Verification flags substantive review sentences that lack a claim/citation mapping. | `backend/tests/test_verification.py::test_verification_flags_substantive_uncited_review_sentence` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 108 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.26%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 110 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.34%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.
