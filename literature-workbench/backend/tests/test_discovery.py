@@ -119,6 +119,36 @@ class ChainDiscoveryProvider(FakeDiscoveryProvider):
         ][:limit]
 
 
+class CutoffCitationProvider(FakeDiscoveryProvider):
+    def related(self, external_id: str, direction: str, limit: int) -> list[FakeCandidate]:
+        return [
+            FakeCandidate(
+                external_id="before-citation-cutoff",
+                title="Earlier cited memory study",
+                authors=["Network Researcher"],
+                year=2025,
+                venue="Network Venue",
+                doi=None,
+                abstract="An earlier cited study.",
+                source_uri="https://example.test/before-citation-cutoff",
+                score=0.7,
+                publication_date="2025-12-31",
+            ),
+            FakeCandidate(
+                external_id="after-citation-cutoff",
+                title="Later cited memory study",
+                authors=["Network Researcher"],
+                year=2026,
+                venue="Network Venue",
+                doi=None,
+                abstract="A later cited study.",
+                source_uri="https://example.test/after-citation-cutoff",
+                score=0.6,
+                publication_date="2026-01-01",
+            ),
+        ][:limit]
+
+
 class SignalOrderProvider(FakeDiscoveryProvider):
     def search(self, query: str, limit: int) -> list[FakeCandidate]:
         return [
@@ -484,6 +514,41 @@ def test_multi_hop_citation_expansion_stops_at_exhausted_frontier(tmp_path: Path
         assert response.json()["candidate_count"] == 2
         assert response.json()["depth_reached"] == 2
         assert response.json()["stopping_reason"] == "frontier_exhausted"
+
+
+def test_citation_expansion_enforces_protocol_cutoff(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=CutoffCitationProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={"title": "Memory", "prompt": "Find memory systems", "review_mode": "systematic"},
+        ).json()["id"]
+        protocol = client.put(
+            f"/projects/{project_id}/protocol",
+            json={
+                "research_questions": ["Which memory studies exist?"],
+                "cutoff_date": "2025-12-31",
+            },
+        )
+        assert protocol.status_code == 200
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        seed_id = client.get(f"/projects/{project_id}/corpus").json()["papers"][0]["id"]
+
+        response = client.post(
+            f"/projects/{project_id}/runs/citation-expansion",
+            json={"paper_id": seed_id, "direction": "backward", "limit": 2},
+        )
+
+        assert response.status_code == 201
+        assert response.json()["candidate_count"] == 1
+        assert response.json()["filtered_count"] == 1
+        titles = [paper["title"] for paper in client.get(f"/projects/{project_id}/corpus").json()["papers"]]
+        assert titles == ["Memory Systems", "Earlier cited memory study"]
 
 
 def test_co_citation_expansion_derives_shared_reference_neighbors(tmp_path: Path) -> None:
