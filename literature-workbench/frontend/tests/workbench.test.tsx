@@ -113,6 +113,8 @@ describe("Literature Workbench", () => {
     }));
     expect(api.runPipeline).toHaveBeenCalledWith("project-1", { review_mode: "sufficient", max_papers: 50 });
     expect(await screen.findByText("satisfied")).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Expand backward citations for Consolidated Memory" }));
+    expect(api.expandCitations).toHaveBeenCalledWith("project-1", "paper-1", "backward", 20);
   });
 
   it("previews scope and projected budget before discovery", async () => {
