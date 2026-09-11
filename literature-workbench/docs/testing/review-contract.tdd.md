@@ -84,7 +84,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 66 | Coverage audits preserve exact executed query strings per route, and the Corpus UI exposes them while accepting older payloads without query metadata. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 | 67 | Citation-network audits record every expansion attempt and count empty expansions, including co-citation requests with no available graph frontier. | `backend/tests/test_discovery.py::test_coverage_audit_records_empty_network_expansions`, `backend/tests/test_discovery.py::test_citation_expansion_persists_directional_edges_and_provenance` | PASS |
 | 68 | Corpus network diagnostics distinguish attempted expansions from empty expansions and expose those saturation signals in the UI, with backward-compatible parsing. | `backend/tests/test_discovery.py::test_coverage_audit_records_empty_network_expansions`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
-| 69 | An optional synthesis provider may draft claim wording only after receiving exact evidence text; pipeline-owned evidence-span links remain attached and the default path remains deterministic. | `backend/tests/test_sources.py::test_configured_synthesis_provider_drafts_only_grounded_claims` | PASS |
+| 69 | An optional synthesis provider may draft final claim wording during writing only after receiving exact evidence text; pipeline-owned evidence-span links remain attached and the default path remains deterministic. | `backend/tests/test_sources.py::test_configured_synthesis_provider_drafts_only_grounded_claims`, `backend/tests/test_synthesis.py::test_final_prose_provider_waits_for_structure_approval` | PASS |
 | 70 | The opt-in OpenAI Responses adapter sends evidence-bounded prompts with storage disabled and parses final prose without exposing credentials. | `backend/tests/test_synthesis.py::test_openai_synthesis_provider_uses_responses_api_and_records_usage` | PASS |
 | 71 | Final-prose provider calls, token usage, model identity, and calculated USD spend are persisted in the run stage and project cost ledger. | `backend/tests/test_synthesis.py::test_synthesis_usage_is_recorded_in_project_costs` | PASS |
 | 72 | Opt-in model extraction requests strict structured JSON and accepts an extracted object only when its evidence text is an exact source substring. | `backend/tests/test_synthesis.py::test_openai_extraction_uses_strict_structured_output_and_requires_grounded_span`, `backend/tests/test_synthesis.py::test_pipeline_uses_structured_extraction_when_provider_is_enabled` | PASS |
@@ -93,8 +93,8 @@ This report records the implementation tranche derived from the review-engine pl
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 106 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.38%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 107 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.39%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.

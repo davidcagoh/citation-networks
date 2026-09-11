@@ -898,14 +898,6 @@ class PipelineService:
                     select(Paper).where(Paper.id.in_([entity.paper_id for entity in entities]))
                 )
             }
-            evidence_spans = {
-                span.id: span
-                for span in db.scalars(
-                    select(EvidenceSpan).where(
-                        EvidenceSpan.paper_id.in_([entity.paper_id for entity in entities])
-                    )
-                )
-            }
             entities_by_id = {entity.id: entity for entity in entities}
             incoming_relations = {relation.target_entity_ids[0]: relation for relation in relations}
             current_entity_ids = {entity.id for entity in entities}
@@ -945,20 +937,6 @@ class PipelineService:
                         for span_id in entities_by_id[entity_id].evidence_span_ids
                     )
                 )
-                provider_drafted = False
-                if self.synthesis_provider is not None:
-                    drafted = self.synthesis_provider.draft_claim(
-                        text,
-                        [
-                            evidence_spans[span_id].verbatim_text
-                            for span_id in span_ids
-                            if span_id in evidence_spans
-                        ],
-                        claim_type,
-                    )
-                    if drafted and drafted.strip():
-                        text = drafted.strip()
-                        provider_drafted = True
                 claim_relations = [incoming] if incoming else []
                 claim_entities = [entities_by_id[entity_id] for entity_id in endpoint_ids]
                 claim = claims_by_target.get(entity.id)
@@ -973,9 +951,7 @@ class PipelineService:
                 claim.contradicting_evidence_span_ids = []
                 claim.confidence = 0.94 if not claim_relations else 0.88
                 claim.inference_level = (
-                    "model_inference"
-                    if provider_drafted
-                    else "cross_source_synthesis"
+                    "cross_source_synthesis"
                     if incoming
                     else "explicit_author_statement"
                 )
@@ -1098,6 +1074,20 @@ class PipelineService:
                     )
                 )
             }
+            evidence_spans = {
+                span.id: span
+                for span in db.scalars(
+                    select(EvidenceSpan).where(
+                        EvidenceSpan.id.in_(
+                            [
+                                span_id
+                                for claim in claims.values()
+                                for span_id in claim.supporting_evidence_span_ids
+                            ]
+                        )
+                    )
+                )
+            }
             created: list[str] = []
             desired_claim_ids = {
                 claim_id for section in plan.sections for claim_id in section["planned_claim_ids"]
@@ -1119,9 +1109,24 @@ class PipelineService:
                     if sentence is None:
                         sentence = ReviewSentence(project_id=project_id, claim_id=claim.id)
                         db.add(sentence)
+                    text = claim.text
+                    if self.synthesis_provider is not None:
+                        drafted = self.synthesis_provider.draft_claim(
+                            text,
+                            [
+                                evidence_spans[span_id].verbatim_text
+                                for span_id in claim.supporting_evidence_span_ids
+                                if span_id in evidence_spans
+                            ],
+                            claim.claim_type,
+                        )
+                        if drafted and drafted.strip():
+                            text = drafted.strip()
+                            claim.text = text
+                            claim.inference_level = "model_inference"
                     sentence.section_title = section["title"]
                     sentence.position = position
-                    sentence.text = claim.text
+                    sentence.text = text
                     sentence.substantive = True
                     sentence.citation_paper_ids = paper_ids
                     sentence.evidence_span_ids = list(claim.supporting_evidence_span_ids)

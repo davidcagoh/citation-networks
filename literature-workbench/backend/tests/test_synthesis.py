@@ -166,6 +166,55 @@ def test_pipeline_uses_structured_extraction_when_provider_is_enabled(
         )
 
 
+def test_final_prose_provider_waits_for_structure_approval(tmp_path: Path) -> None:
+    class CheckpointProvider:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def draft_claim(
+            self, default_text: str, evidence_texts: list[str], claim_type: str
+        ) -> str:
+            self.calls += 1
+            return "Approved grounded prose."
+
+    provider = CheckpointProvider()
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", synthesis_provider=provider
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={
+                "title": "Memory",
+                "prompt": "Review memory",
+                "review_mode": "comprehensive",
+            },
+        ).json()["id"]
+        assert client.post(
+            f"/projects/{project_id}/sources/text",
+            json={
+                "title": "Memory Study",
+                "source_uri": "file:///memory-study",
+                "text": "A memory architecture improves retrieval quality.",
+            },
+        ).status_code == 201
+        run = client.post(
+            f"/projects/{project_id}/runs/pipeline",
+            json={"review_mode": "comprehensive"},
+        ).json()
+        assert run["status"] == "awaiting_corpus_approval"
+        run = client.post(
+            f"/projects/{project_id}/runs/{run['id']}/approve-corpus"
+        ).json()
+        assert run["status"] == "awaiting_structure_approval"
+        assert provider.calls == 0
+        run = client.post(
+            f"/projects/{project_id}/runs/{run['id']}/approve-structure"
+        ).json()
+        assert run["status"] == "completed"
+        assert provider.calls > 0
+
+
 def test_opted_in_openai_provider_is_wired_without_exposing_credentials(
     monkeypatch, tmp_path: Path
 ) -> None:

@@ -82,7 +82,8 @@ semantic model extraction. Auto-acquired paper-body evidence is labeled
 distinguishes it from abstract evidence. The fixture relation path remains
 deterministic and evidence linked.
 
-An optional `SynthesisProvider` can replace claim wording during planning. It
+An optional `SynthesisProvider` can replace claim wording during the writing
+stage, after the structure checkpoint. It
 receives the deterministic draft and exact evidence text, while the pipeline
 continues to assign evidence-span IDs and verification state. No external
 model provider is enabled by default. When explicitly enabled with
