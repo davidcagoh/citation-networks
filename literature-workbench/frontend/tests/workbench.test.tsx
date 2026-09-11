@@ -40,6 +40,16 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
         estimated_output_tokens: 30000, estimated_cost_usd: 0,
       },
     }),
+    getProtocol: vi.fn().mockResolvedValue({
+      id: "protocol-1", project_id: "project-1", review_mode: "sufficient",
+      research_questions: ["memory"], inclusion_criteria: [], exclusion_criteria: [],
+      sources: [], cutoff_date: null, update_policy: "on_demand", updated_at: "2026-09-10T00:00:00+00:00",
+    }),
+    updateProtocol: vi.fn().mockResolvedValue({
+      id: "protocol-1", project_id: "project-1", review_mode: "sufficient",
+      research_questions: ["memory"], inclusion_criteria: [], exclusion_criteria: [],
+      sources: [], cutoff_date: null, update_policy: "on_demand", updated_at: "2026-09-10T00:00:00+00:00",
+    }),
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
     updatePlan: vi.fn().mockImplementation(async (_projectId, _planId, plan) => ({ id: "plan-1", ...plan })),

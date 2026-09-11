@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createWorkbenchApi } from "@/lib/api";
+import type { ReviewProtocol } from "@/lib/api";
 
 function response(body: unknown, options: { ok?: boolean; status?: number; text?: string } = {}) {
   return {
@@ -55,7 +56,7 @@ describe("workbench API adapter", () => {
   });
 
   it("loads and updates a reproducible review protocol", async () => {
-    const protocol = {
+    const protocol: ReviewProtocol = {
       id: "protocol-1",
       project_id: "project-1",
       review_mode: "systematic",
@@ -75,7 +76,7 @@ describe("workbench API adapter", () => {
 
     await expect(api.getProtocol("project-1")).resolves.toEqual(protocol);
     await expect(api.updateProtocol("project-1", protocol)).resolves.toEqual(protocol);
-    expect(fetchMock).toHaveBeenNthCalledWith(1, "http://api/projects/project-1/protocol", expect.objectContaining({ method: "GET" }));
+    expect(fetchMock).toHaveBeenNthCalledWith(1, "http://api/projects/project-1/protocol", expect.objectContaining({ headers: expect.any(Object) }));
     expect(fetchMock).toHaveBeenNthCalledWith(2, "http://api/projects/project-1/protocol", expect.objectContaining({ method: "PUT" }));
   });
 

@@ -96,6 +96,19 @@ export interface ScopePreview {
   };
 }
 
+export interface ReviewProtocol {
+  id: string;
+  project_id: string;
+  review_mode: ReviewMode;
+  research_questions: string[];
+  inclusion_criteria: string[];
+  exclusion_criteria: string[];
+  sources: string[];
+  cutoff_date: string | null;
+  update_policy: "on_demand";
+  updated_at: string;
+}
+
 export type ReviewMode = "sufficient" | "comprehensive" | "systematic" | "quick" | "thorough";
 
 export interface WorkbenchApi {
@@ -117,6 +130,8 @@ export interface WorkbenchApi {
     doi?: string;
   }): Promise<{ project_id: string; paper_id: string; status: string; source_type: string }>;
   scopePreview(projectId: string, input?: { mode?: ReviewMode; max_papers?: number }): Promise<ScopePreview>;
+  getProtocol(projectId: string): Promise<ReviewProtocol>;
+  updateProtocol(projectId: string, protocol: Omit<ReviewProtocol, "id" | "project_id" | "updated_at"> | ReviewProtocol): Promise<ReviewProtocol>;
   runDiscovery(projectId: string, query: string, limit?: number): Promise<{
     candidate_count: number;
     provider: string;
@@ -271,6 +286,30 @@ function parseScopePreview(value: unknown): ScopePreview {
       estimated_output_tokens: number(budget.estimated_output_tokens, "scope preview.budget.estimated_output_tokens"),
       estimated_cost_usd: number(budget.estimated_cost_usd, "scope preview.budget.estimated_cost_usd"),
     },
+  };
+}
+
+function parseProtocol(value: unknown): ReviewProtocol {
+  const protocol = object(value, "review protocol");
+  const mode = string(protocol.review_mode, "review protocol.review_mode");
+  if (!(mode === "sufficient" || mode === "comprehensive" || mode === "systematic" || mode === "quick" || mode === "thorough")) {
+    throw new ShapeError("review protocol.review_mode is invalid");
+  }
+  const policy = string(protocol.update_policy, "review protocol.update_policy");
+  if (policy !== "on_demand") throw new ShapeError("review protocol.update_policy is invalid");
+  const strings = (value: unknown, label: string) => array(value, label)
+    .map((item, index) => string(item, `${label}[${index}]`));
+  return {
+    id: string(protocol.id, "review protocol.id"),
+    project_id: string(protocol.project_id, "review protocol.project_id"),
+    review_mode: mode,
+    research_questions: strings(protocol.research_questions, "review protocol.research_questions"),
+    inclusion_criteria: strings(protocol.inclusion_criteria, "review protocol.inclusion_criteria"),
+    exclusion_criteria: strings(protocol.exclusion_criteria, "review protocol.exclusion_criteria"),
+    sources: strings(protocol.sources, "review protocol.sources"),
+    cutoff_date: nullableString(protocol.cutoff_date, "review protocol.cutoff_date"),
+    update_policy: "on_demand",
+    updated_at: string(protocol.updated_at, "review protocol.updated_at"),
   };
 }
 
@@ -529,6 +568,13 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/runs/scope-preview`, parseScopePreview, {
         method: "POST",
         body: JSON.stringify(input ?? {}),
+      }),
+    getProtocol: (projectId) =>
+      request(baseUrl, `/projects/${projectId}/protocol`, parseProtocol),
+    updateProtocol: (projectId, protocol) =>
+      request(baseUrl, `/projects/${projectId}/protocol`, parseProtocol, {
+        method: "PUT",
+        body: JSON.stringify(protocol),
       }),
     runDiscovery: (projectId, query, limit = 20) =>
       request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {
