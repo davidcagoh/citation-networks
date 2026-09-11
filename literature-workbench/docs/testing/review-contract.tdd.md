@@ -28,6 +28,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 10 | PRISMA reports identify, screen, include, and exclude counts from recorded events. | `backend/tests/test_protocol.py::test_prisma_report_reconciles_protocol_search_and_screening_flow` | PASS |
 | 11 | Citation expansion persists directional network edges and exposes them through the graph/client contracts. | `backend/tests/test_discovery.py::test_citation_expansion_persists_directional_edges_and_provenance`, `frontend/tests/api.test.ts` | PASS |
 | 12 | Researchers can launch backward/forward citation expansion from each corpus paper. | `frontend/tests/workbench.test.tsx` | PASS |
+| 13 | An on-demand living update reuses the saved mode/routes, records its timestamp, and reports new papers. | `backend/tests/test_discovery.py::test_on_demand_living_update_records_timestamp_and_new_papers` | PASS |
 
 ## Validation evidence
 
@@ -45,4 +46,4 @@ This report records the implementation tranche derived from the review-engine pl
 - Paid-provider approval gates are not implemented yet; Zotero import/export is available through server-side credentials.
 - Full-text acquisition remains conservative; abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint and grounded draft-generation stage are not yet implemented.
-- Living-review updates have an on-demand protocol field, but no dedicated delta-update job/report yet.
+- Living-review updates are currently on-demand and synchronous; scheduled refresh jobs and a frontend refresh control remain future work.
