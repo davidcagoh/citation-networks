@@ -192,6 +192,30 @@ describe("workbench API adapter", () => {
       .resolves.toMatchObject({ status: "incomplete", limitations: ["candidate papers remain unscreened"] });
   });
 
+  it("loads a PRISMA flow report with deduplicated identification counts", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      project_id: "project-1", review_mode: "systematic",
+      protocol: {
+        research_questions: ["Which mechanisms work?"], inclusion_criteria: [],
+        exclusion_criteria: [], sources: ["semantic-scholar"], cutoff_date: null,
+        update_policy: "on_demand",
+      },
+      search: {
+        routes: ["semantic_search"], queries: ["memory"],
+        last_search_at: "2026-09-10T12:00:00+00:00",
+      },
+      flow: {
+        identified: 10, unique_identified: 7, duplicates_removed: 3,
+        screened: 7, reports_sought: 4, reports_not_retrieved: 1,
+        included: 3, excluded: 3,
+      },
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").getPrismaReport("project-1"))
+      .resolves.toMatchObject({ flow: { unique_identified: 7, duplicates_removed: 3 } });
+  });
+
   it("approves corpus and structure checkpoints", async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(response({ id: "run-1", status: "awaiting_structure_approval" }))
