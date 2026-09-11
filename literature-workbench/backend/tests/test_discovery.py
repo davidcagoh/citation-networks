@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 
 from app.main import create_app
+from app.services.discovery import OpenAlexProvider
 from app.models import (
     CitationEdge,
     CorpusMembership,
@@ -35,6 +36,22 @@ class FakeCandidate:
     score: float
     citation_count: int | None = None
     publication_date: str | None = None
+
+
+class FakeHTTPResponse:
+    def __init__(self, payload: dict) -> None:
+        import json
+
+        self.body = json.dumps(payload).encode()
+
+    def __enter__(self) -> "FakeHTTPResponse":
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        return None
+
+    def read(self) -> bytes:
+        return self.body
 
 
 class FakeDiscoveryProvider:
@@ -863,3 +880,43 @@ def test_pipeline_budget_gate_accounts_for_prior_provider_usage(tmp_path: Path) 
 
         assert response.status_code == 409
         assert "api calls" in response.json()["detail"].lower()
+
+
+def test_openalex_provider_maps_work_metadata_and_abstract(monkeypatch) -> None:
+    requests: list[str] = []
+
+    def fake_urlopen(request, timeout: float):
+        requests.append(request.full_url)
+        return FakeHTTPResponse(
+            {
+                "results": [
+                    {
+                        "id": "https://openalex.org/W123",
+                        "title": "A memory study",
+                        "publication_year": 2025,
+                        "publication_date": "2025-04-02",
+                        "doi": "https://doi.org/10.1234/memory",
+                        "cited_by_count": 123,
+                        "authorships": [
+                            {"author": {"display_name": "A. Researcher"}}
+                        ],
+                        "primary_location": {
+                            "landing_page_url": "https://example.test/memory"
+                        },
+                        "abstract_inverted_index": {"Memory": [0], "works": [1]},
+                    }
+                ]
+            }
+        )
+
+    monkeypatch.setattr("app.services.discovery.urlopen", fake_urlopen)
+    candidates = OpenAlexProvider(email="researcher@example.test").search("memory", 5)
+
+    assert requests and "search=memory" in requests[0]
+    assert "mailto=researcher%40example.test" in requests[0]
+    assert candidates[0].external_id == "openalex:W123"
+    assert candidates[0].doi == "10.1234/memory"
+    assert candidates[0].authors == ["A. Researcher"]
+    assert candidates[0].abstract == "Memory works"
+    assert candidates[0].citation_count == 123
+    assert candidates[0].publication_date == "2025-04-02"
