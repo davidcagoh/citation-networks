@@ -25,11 +25,12 @@ citation-networks/
 │   └── projects/                      # One small current-state page per active research workstream
 ├── archive/wiki-legacy/           # Frozen prior wiki, reference systems, and standalone utilities
 ├── zeitgeist/                     # Zeitgeist: temporal embedding, phase characterization (own repo: github.com/davidcagoh/zeitgeist)
-├── lit-review-bot/
+├── archive/lit-review-bot/       # Frozen LitDiscover engine, evaluations, and research runs
 │   ├── litdiscover/                   # LitDiscover engine (own repo: github.com/davidcagoh/litdiscover), pip installable
-│   ├── projects/                      # Research-run project folders (Zotero-backed manual pipeline surveys + LitDiscover-engine-driven runs); projects/_archive/ holds retired ones
-│   └── evals/                         # Eval infra: aps-eval/, live-survey-eval/, synergy-eval/ (own repo: github.com/davidcagoh/robust-literature-discovery); manuscript paused, archived under evals/_archive/drafts/
-└── deprecated-bot/                # Older, inactive literature-review variant (own repo: automated-lit-reviews — deleted from GitHub)
+│   ├── projects/                      # Historical research-run project folders
+│   └── evals/                         # Historical evaluation infrastructure
+├── archive/deprecated-bot/       # Older, inactive literature-review variant
+└── archive/                       # Frozen code, demos, wiki records, and references
 ```
 
 `literature-workbench/` is intentionally isolated from the legacy engines. It
@@ -49,14 +50,14 @@ active top-level workstreams.
 
 ## Setup
 
-`zeitgeist/`, `lit-review-bot/litdiscover/`, and `lit-review-bot/evals/` are each their own git
+`zeitgeist/`, `archive/lit-review-bot/litdiscover/`, and `archive/lit-review-bot/evals/` are each their own git
 repo (gitignored here, not submodules — see rationale below). After cloning `citation-networks`,
 clone them separately:
 
 ```bash
 git clone https://github.com/davidcagoh/zeitgeist.git
-git clone https://github.com/davidcagoh/litdiscover.git lit-review-bot/litdiscover
-git clone https://github.com/davidcagoh/robust-literature-discovery.git lit-review-bot/evals
+git clone https://github.com/davidcagoh/litdiscover.git archive/lit-review-bot/litdiscover
+git clone https://github.com/davidcagoh/robust-literature-discovery.git archive/lit-review-bot/evals
 ```
 
 Kept as independent repos (rather than submodules) because `litdiscover` and `zeitgeist` are both

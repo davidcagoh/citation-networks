@@ -27,6 +27,14 @@
 /archive/wiki-legacy/reference-systems/llassist/
 /archive/wiki-legacy/reference-systems/robotsearch/
 
+# Archived local-only predecessor repositories and demo artifacts.
+/archive/deprecated-bot/
+/archive/lit-review-bot/litdiscover/
+/archive/lit-review-bot/evals/
+/archive/lit-review-bot/wiki
+/archive/synthesis/
+/archive/literature-workbench-demo.webm
+
 # Obsidian vault config (personal, not project content)
 .obsidian/
 
