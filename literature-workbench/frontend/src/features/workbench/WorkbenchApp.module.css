@@ -62,6 +62,11 @@
 .secondary { border: 1px solid var(--line); border-radius: 2px; background: var(--panel); color: var(--ink); padding: 11px 16px; font: 700 12px inherit; cursor: pointer; }
 .secondary:hover { border-color: var(--moss); }
 .secondary:disabled { opacity: .6; cursor: wait; }
+.planHeader { display: flex; align-items: start; gap: 14px; }
+.planHeader .principle { flex: 1; }
+.planForm { max-width: 720px; display: grid; gap: 19px; }
+.planSectionEdit { display: grid; gap: 15px; border: 1px solid var(--line); padding: 16px; }
+.planSectionEdit legend { padding: 0 6px; color: var(--moss); font: 650 10px ui-monospace, monospace; text-transform: uppercase; letter-spacing: .08em; }
 .microcopy { color: var(--muted); font-size: 11px; }
 .error { max-width: 680px; border-left: 3px solid #a34435; background: #f6e9e4; padding: 11px 13px; color: #733327; font-size: 12px; }
 

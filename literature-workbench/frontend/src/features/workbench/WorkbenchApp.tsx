@@ -2,7 +2,7 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
-import type { ClaimEvidence, WorkbenchApi, Workspace } from "@/lib/api";
+import type { ClaimEvidence, ReviewPlan, WorkbenchApi, Workspace } from "@/lib/api";
 import styles from "./WorkbenchApp.module.css";
 
 const tabs = ["Brief", "Corpus", "Structure", "Review", "Run / Costs"] as const;
@@ -121,6 +121,27 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     }
   }
 
+  async function savePlan(plan: ReviewPlan) {
+    if (!session?.workspace.plan?.id) {
+      setError("This plan cannot be edited until it has a persisted plan id.");
+      return;
+    }
+    try {
+      const updated = await api.updatePlan(session.projectId, session.workspace.plan.id, {
+        title: plan.title,
+        thesis: plan.thesis ?? "",
+        organizing_principle: plan.organizing_principle,
+        sections: plan.sections,
+      });
+      setSession((current) => current
+        ? { ...current, workspace: { ...current.workspace, plan: updated } }
+        : current);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "The review plan could not be saved.");
+      throw caught;
+    }
+  }
+
   async function inspectClaim(claimId: string) {
     if (!session) return;
     evidenceController.current?.abort();
@@ -221,7 +242,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
               <BriefForm title={title} prompt={prompt} busy={busy} status={statusText[runState]} onTitle={setTitle} onPrompt={setPrompt} onSubmit={handleSubmit} onDiscover={handleDiscovery} />
             )}
             {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} paperCount={session?.paperCount ?? null} onScreen={screenPaper} />}
-            {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} />}
+            {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} onSave={savePlan} />}
             {activeTab === "Review" && (
               <Review workspace={session?.workspace ?? null} evidence={selectedEvidence} evidenceLoading={evidenceLoading} onInspect={inspectClaim} />
             )}
@@ -292,11 +313,65 @@ function Corpus({ workspace, paperCount, onScreen }: {
   );
 }
 
-function Structure({ workspace }: { workspace: Workspace | null }) {
+function Structure({ workspace, onSave }: {
+  workspace: Workspace | null;
+  onSave: (plan: ReviewPlan) => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [draft, setDraft] = useState<ReviewPlan | null>(null);
+
   if (!workspace?.plan) return <Empty text="The relation-backed outline appears after a successful run." />;
+  if (editing && draft) {
+    return (
+      <form className={styles.planForm} onSubmit={async (event) => {
+        event.preventDefault();
+        setSaving(true);
+        try {
+          await onSave(draft);
+          setEditing(false);
+        } finally {
+          setSaving(false);
+        }
+      }}>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="plan-title">Plan title</label>
+          <input id="plan-title" className={styles.input} value={draft.title} onChange={(event) => setDraft((current) => current ? { ...current, title: event.target.value } : current)} required />
+        </div>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="plan-thesis">Thesis</label>
+          <textarea id="plan-thesis" className={styles.textarea} value={draft.thesis ?? ""} onChange={(event) => setDraft((current) => current ? { ...current, thesis: event.target.value } : current)} required />
+        </div>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="plan-principle">Organizing principle</label>
+          <input id="plan-principle" className={styles.input} value={draft.organizing_principle} onChange={(event) => setDraft((current) => current ? { ...current, organizing_principle: event.target.value } : current)} required />
+        </div>
+        {draft.sections.map((section, index) => (
+          <fieldset className={styles.planSectionEdit} key={`section-${index}`}>
+            <legend>Section {index + 1}</legend>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor={`section-${index}-title`}>Section {index + 1} title</label>
+              <input id={`section-${index}-title`} className={styles.input} value={section.title} onChange={(event) => setDraft((current) => current ? { ...current, sections: current.sections.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item) } : current)} required />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor={`section-${index}-purpose`}>Section {index + 1} purpose</label>
+              <textarea id={`section-${index}-purpose`} className={styles.textarea} value={section.purpose} onChange={(event) => setDraft((current) => current ? { ...current, sections: current.sections.map((item, itemIndex) => itemIndex === index ? { ...item, purpose: event.target.value } : item) } : current)} required />
+            </div>
+          </fieldset>
+        ))}
+        <div className={styles.actionRow}>
+          <button className={styles.primary} type="submit" disabled={saving}>{saving ? "Saving plan…" : "Save plan"}</button>
+          <button className={styles.secondary} type="button" onClick={() => setEditing(false)} disabled={saving}>Cancel</button>
+        </div>
+      </form>
+    );
+  }
   return (
     <>
-      <div className={styles.principle}>Organizing principle · {workspace.plan.organizing_principle}</div>
+      <div className={styles.planHeader}>
+        <div className={styles.principle}>Organizing principle · {workspace.plan.organizing_principle}</div>
+        <button className={styles.secondary} type="button" onClick={() => { setDraft(workspace.plan); setEditing(true); }} disabled={!workspace.plan.id}>Edit plan</button>
+      </div>
       <div className={styles.outline}>{workspace.plan.sections.map((section, index) => (
         <article className={styles.section} key={`${section.title}-${index}`}>
           <span className={styles.sectionNo}>§ {index + 1}</span>
