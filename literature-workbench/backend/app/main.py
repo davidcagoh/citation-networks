@@ -20,6 +20,7 @@ from app.domain import (
     ProviderApprovalRequest,
     ReviewPlanUpdate,
     ReviewProtocolUpdate,
+    ReviewSentenceUpdate,
     ScopePreviewRequest,
     SourceTextRequest,
     VerificationIssueUpdate,
@@ -985,6 +986,31 @@ def create_app(
                 "severity": issue.severity,
                 "message": issue.message,
                 "status": issue.status,
+            }
+
+    @app.patch("/projects/{project_id}/review/{sentence_id}")
+    def update_review_sentence(
+        project_id: str, sentence_id: str, value: ReviewSentenceUpdate
+    ) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            sentence = db.scalar(
+                select(ReviewSentence).where(
+                    ReviewSentence.id == sentence_id,
+                    ReviewSentence.project_id == project_id,
+                )
+            )
+            if sentence is None:
+                raise HTTPException(404, "Review sentence not found")
+            sentence.text = value.text
+            return {
+                "id": sentence.id,
+                "section_title": sentence.section_title,
+                "text": sentence.text,
+                "substantive": sentence.substantive,
+                "claim_id": sentence.claim_id,
+                "citation_paper_ids": sentence.citation_paper_ids,
+                "evidence_span_ids": sentence.evidence_span_ids,
             }
 
     @app.get("/projects/{project_id}/review")

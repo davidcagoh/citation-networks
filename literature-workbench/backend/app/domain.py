@@ -94,6 +94,18 @@ class ProviderApprovalRequest(BaseModel):
         return value
 
 
+class ReviewSentenceUpdate(BaseModel):
+    text: str = Field(min_length=1, max_length=20_000)
+
+    @field_validator("text")
+    @classmethod
+    def reject_blank_text(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("must contain non-whitespace text")
+        return value
+
+
 class PipelineRequest(BaseModel):
     review_mode: ReviewMode = "sufficient"
     max_papers: int = Field(default=50, ge=1, le=500)
