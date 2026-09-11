@@ -45,6 +45,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   const [inclusionCriteria, setInclusionCriteria] = useState("");
   const [exclusionCriteria, setExclusionCriteria] = useState("");
   const [cutoffDate, setCutoffDate] = useState("");
+  const [zoteroCollectionKey, setZoteroCollectionKey] = useState("");
   const [scopePreview, setScopePreview] = useState<ScopePreview | null>(null);
   const [previewProjectId, setPreviewProjectId] = useState<string | null>(null);
   const [evidenceLoading, setEvidenceLoading] = useState(false);
@@ -181,6 +182,42 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     } catch (caught) {
       setRunState("idle");
       setError(caught instanceof Error ? caught.message : "The source could not be imported.");
+    }
+  }
+
+  async function handleZoteroImport() {
+    if (!title.trim() || !prompt.trim()) return;
+    setError(null);
+    try {
+      setRunState("creating");
+      const project = previewProjectId
+        ? { id: previewProjectId }
+        : await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
+      await persistProtocol(project.id);
+      setRunState("discovering");
+      const result = await api.importZotero(project.id, zoteroCollectionKey.trim() || undefined, 100);
+      const [workspace, audit] = await Promise.all([
+        api.getWorkspace(project.id),
+        api.getCoverageAudit(project.id),
+      ]);
+      setSession({ projectId: project.id, paperCount: result.imported_count, workspace, audit, approval: null });
+      setRunState("complete");
+      setActiveTab("Corpus");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "Zotero import could not be completed.");
+    }
+  }
+
+  async function handleZoteroExport() {
+    if (!session) return;
+    try {
+      setRunState("running");
+      await api.exportZotero(session.projectId, zoteroCollectionKey.trim() || undefined);
+      setRunState("complete");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "Zotero export could not be completed.");
     }
   }
 
@@ -416,7 +453,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             key={activeTab}
           >
             {activeTab === "Brief" && (
-              <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} preview={scopePreview} />
+              <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} zoteroCollectionKey={zoteroCollectionKey} onZoteroCollectionKey={setZoteroCollectionKey} hasSession={Boolean(session)} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} onZoteroImport={handleZoteroImport} onZoteroExport={handleZoteroExport} preview={scopePreview} />
             )}
             {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} paperCount={session?.paperCount ?? null} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} approval={session?.approval ?? null} onApprove={approveStructure} onSave={savePlan} />}
@@ -439,19 +476,21 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   );
 }
 
-function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, researchQuestions, onResearchQuestions, inclusionCriteria, onInclusionCriteria, exclusionCriteria, onExclusionCriteria, cutoffDate, onCutoffDate, busy, status, onTitle, onPrompt, onSourceText, onSubmit, onDiscover, onPreview, onImport, preview }: {
+function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, researchQuestions, onResearchQuestions, inclusionCriteria, onInclusionCriteria, exclusionCriteria, onExclusionCriteria, cutoffDate, onCutoffDate, zoteroCollectionKey, onZoteroCollectionKey, hasSession, busy, status, onTitle, onPrompt, onSourceText, onSubmit, onDiscover, onPreview, onImport, onZoteroImport, onZoteroExport, preview }: {
   title: string; prompt: string; sourceText: string; busy: boolean; status: string;
   reviewMode: ReviewMode; onReviewMode: (value: ReviewMode) => void;
   researchQuestions: string; onResearchQuestions: (value: string) => void;
   inclusionCriteria: string; onInclusionCriteria: (value: string) => void;
   exclusionCriteria: string; onExclusionCriteria: (value: string) => void;
   cutoffDate: string; onCutoffDate: (value: string) => void;
+  zoteroCollectionKey: string; onZoteroCollectionKey: (value: string) => void; hasSession: boolean;
   onTitle: (value: string) => void; onPrompt: (value: string) => void;
   onSourceText: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onDiscover: () => void;
   onPreview: () => Promise<void>;
   onImport: () => Promise<void>;
+  onZoteroImport: () => Promise<void>; onZoteroExport: () => Promise<void>;
   preview: ScopePreview | null;
 }) {
   return (
@@ -492,11 +531,17 @@ function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, resear
         <label className={styles.label} htmlFor="cutoff-date">Literature cutoff <span className={styles.hint}>Optional</span></label>
         <input id="cutoff-date" aria-label="Literature cutoff" className={styles.input} type="date" value={cutoffDate} onChange={(event) => onCutoffDate(event.target.value)} />
       </div>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="zotero-collection-key">Zotero collection <span className={styles.hint}>Optional collection key</span></label>
+        <input id="zotero-collection-key" aria-label="Zotero collection key" className={styles.input} value={zoteroCollectionKey} onChange={(event) => onZoteroCollectionKey(event.target.value)} placeholder="e.g. ABC123" />
+      </div>
       <div className={styles.actionRow}>
         <button className={styles.primary} type="submit" disabled={busy}>{busy ? status : "Create and run fixture"}</button>
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onPreview}>Preview scope</button>
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onDiscover}>Discover papers</button>
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim() || !sourceText.trim()} onClick={onImport}>Import source text</button>
+        <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onZoteroImport}>Import Zotero collection</button>
+        {hasSession && <button className={styles.secondary} type="button" disabled={busy} onClick={onZoteroExport}>Export selected to Zotero</button>}
         <span className={styles.microcopy}>Local fixture or live provider-backed discovery</span>
       </div>
       {preview && <section className={styles.planHeader} aria-label="Scope preview">
