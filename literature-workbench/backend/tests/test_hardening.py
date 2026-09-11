@@ -40,7 +40,7 @@ def test_cors_allows_only_configured_exact_origins(tmp_path: Path, monkeypatch) 
             "/projects",
             headers={
                 "Origin": "http://127.0.0.1:3100",
-                "Access-Control-Request-Method": "PATCH",
+                "Access-Control-Request-Method": "PUT",
                 "Access-Control-Request-Headers": "content-type",
             },
         )
@@ -53,7 +53,7 @@ def test_cors_allows_only_configured_exact_origins(tmp_path: Path, monkeypatch) 
         )
 
     assert allowed.headers["access-control-allow-origin"] == "http://127.0.0.1:3100"
-    assert "PATCH" in allowed.headers["access-control-allow-methods"]
+    assert "PUT" in allowed.headers["access-control-allow-methods"]
     assert "access-control-allow-origin" not in rejected.headers
 
 PROJECT_TABLES = [
