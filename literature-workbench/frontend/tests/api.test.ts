@@ -54,6 +54,31 @@ describe("workbench API adapter", () => {
     }));
   });
 
+  it("loads and updates a reproducible review protocol", async () => {
+    const protocol = {
+      id: "protocol-1",
+      project_id: "project-1",
+      review_mode: "systematic",
+      research_questions: ["Which mechanisms improve retrieval?"],
+      inclusion_criteria: ["Primary studies"],
+      exclusion_criteria: ["Opinion pieces"],
+      sources: ["zotero", "openalex"],
+      cutoff_date: "2026-09-10",
+      update_policy: "on_demand",
+      updated_at: "2026-09-10T12:00:00+00:00",
+    };
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(response(protocol))
+      .mockResolvedValueOnce(response(protocol));
+    vi.stubGlobal("fetch", fetchMock);
+    const api = createWorkbenchApi("http://api");
+
+    await expect(api.getProtocol("project-1")).resolves.toEqual(protocol);
+    await expect(api.updateProtocol("project-1", protocol)).resolves.toEqual(protocol);
+    expect(fetchMock).toHaveBeenNthCalledWith(1, "http://api/projects/project-1/protocol", expect.objectContaining({ method: "GET" }));
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "http://api/projects/project-1/protocol", expect.objectContaining({ method: "PUT" }));
+  });
+
   it("runs idempotent acquisition for discovered papers", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
       project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0,
