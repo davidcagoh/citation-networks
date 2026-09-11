@@ -5,7 +5,16 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 
 from app.main import create_app
-from app.models import CorpusMembership, DiscoveryEvent, Paper
+from app.models import (
+    CorpusMembership,
+    DiscoveryEvent,
+    EvidenceSpan,
+    Paper,
+    ReviewSentence,
+    ScientificRelation,
+    SourceDocument,
+    SynthesisClaim,
+)
 
 
 @dataclass(frozen=True)
@@ -83,6 +92,14 @@ def test_discovery_persists_candidates_and_route_provenance(tmp_path: Path) -> N
                     DiscoveryEvent.project_id == project_id
                 )
             ) == 2
+            documents = list(database.scalars(select(SourceDocument)))
+            assert len(documents) == 2
+            assert {document.source_type for document in documents} == {"abstract"}
+            assert {document.parser for document in documents} == {"fake-search-abstract-v1"}
+            assert {document.text for document in documents} == {
+                "A study of memory systems.",
+                "A follow-up study.",
+            }
 
 
 def test_discovery_deduplicates_same_provider_result(tmp_path: Path) -> None:
@@ -127,3 +144,49 @@ def test_discovery_validates_query_and_limit(tmp_path: Path) -> None:
         assert client.post(path, json={"query": " ", "limit": 10}).status_code == 422
         assert client.post(path, json={"query": "memory", "limit": 0}).status_code == 422
         assert client.post(path, json={"query": "memory", "limit": 101}).status_code == 422
+
+
+def test_discovered_abstract_can_flow_to_grounded_review(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=FakeDiscoveryProvider(),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "agent memory", "limit": 1},
+        )
+        paper_id = client.get(f"/projects/{project_id}/corpus").json()["papers"][0]["id"]
+        assert client.patch(
+            f"/projects/{project_id}/corpus/{paper_id}",
+            json={"status": "included"},
+        ).status_code == 200
+
+        response = client.post(f"/projects/{project_id}/runs/pipeline")
+        assert response.status_code == 201
+        assert response.json()["status"] == "completed"
+
+        with app.state.database.session() as database:
+            assert database.scalar(
+                select(func.count()).select_from(EvidenceSpan).where(
+                    EvidenceSpan.paper_id == paper_id
+                )
+            ) == 1
+            assert database.scalar(
+                select(func.count()).select_from(SynthesisClaim).where(
+                    SynthesisClaim.project_id == project_id
+                )
+            ) == 1
+            sentence = database.scalar(
+                select(ReviewSentence).where(ReviewSentence.project_id == project_id)
+            )
+            assert sentence is not None
+            assert sentence.text == "A study of memory systems."
+            assert database.scalar(
+                select(func.count()).select_from(ScientificRelation).where(
+                    ScientificRelation.project_id == project_id
+                )
+            ) == 0
