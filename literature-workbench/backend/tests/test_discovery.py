@@ -210,3 +210,30 @@ def test_pipeline_requires_an_included_or_pinned_paper(tmp_path: Path) -> None:
 
         assert response.status_code == 409
         assert "Include or pin" in response.json()["detail"]
+
+
+def test_acquisition_reports_provider_abstracts_idempotently(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=FakeDiscoveryProvider(),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "agent memory", "limit": 2},
+        )
+
+        first = client.post(f"/projects/{project_id}/runs/acquisition")
+        second = client.post(f"/projects/{project_id}/runs/acquisition")
+
+        assert first.status_code == 201
+        assert first.json() == {
+            "project_id": project_id,
+            "paper_count": 2,
+            "available_count": 2,
+            "degraded_count": 0,
+        }
+        assert second.json() == first.json()
