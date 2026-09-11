@@ -54,6 +54,7 @@ from app.services.pipeline import (
     PipelineService,
     ProjectNotFoundError,
     RunNotAwaitingCorpusApprovalError,
+    RunNotAwaitingStructureApprovalError,
     RunNotResumableError,
     select_preferred_documents,
 )
@@ -390,6 +391,15 @@ def create_app(
         except ProjectNotFoundError as exc:
             raise HTTPException(404, str(exc)) from exc
         except RunNotAwaitingCorpusApprovalError as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.post("/projects/{project_id}/runs/{run_id}/approve-structure", status_code=201)
+    def approve_structure(project_id: str, run_id: str) -> dict:
+        try:
+            return _run_json(pipeline.approve_structure(project_id, run_id))
+        except ProjectNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except RunNotAwaitingStructureApprovalError as exc:
             raise HTTPException(409, str(exc)) from exc
 
     @app.get("/projects/{project_id}/corpus")

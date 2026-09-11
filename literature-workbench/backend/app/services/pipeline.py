@@ -48,6 +48,10 @@ class RunNotAwaitingCorpusApprovalError(Exception):
     """Raised when corpus approval is requested for a run at another state."""
 
 
+class RunNotAwaitingStructureApprovalError(Exception):
+    """Raised when structure approval is requested for a run at another state."""
+
+
 SOURCE_TYPE_PRIORITY = {"parsed_pdf": 4, "html": 3, "text": 3, "abstract": 2, "metadata": 1}
 MAX_EVIDENCE_CHARS = 1200
 
@@ -250,6 +254,27 @@ class PipelineService:
             run.status = "running"
         return self._run_stages(run_id, project_id, start_position=0, existing_stages={})
 
+    def approve_structure(self, project_id: str, run_id: str) -> Run:
+        with self.database.session() as db:
+            self._require_project(db, project_id)
+            run = db.get(Run, run_id)
+            if run is None or run.project_id != project_id:
+                raise ProjectNotFoundError("run not found")
+            if run.status != "awaiting_structure_approval":
+                raise RunNotAwaitingStructureApprovalError(
+                    "Run is not awaiting structure approval"
+                )
+            stages = list(
+                db.scalars(
+                    select(StageRun).where(StageRun.run_id == run_id).order_by(StageRun.position)
+                )
+            )
+            existing_stages = {stage.position: stage.id for stage in stages}
+            run.status = "running"
+        return self._run_stages(
+            run_id, project_id, start_position=3, existing_stages=existing_stages
+        )
+
     def resume(self, project_id: str, run_id: str) -> Run:
         with self.database.session() as db:
             self._require_project(db, project_id)
@@ -303,6 +328,13 @@ class PipelineService:
                     action,
                     stage_id=existing_stages.get(position),
                 )
+                if name == "planning":
+                    with self.database.session() as db:
+                        persisted = db.get(Run, run_id)
+                        if persisted and persisted.review_mode in {"comprehensive", "systematic"}:
+                            persisted.status = "awaiting_structure_approval"
+                            db.flush()
+                            return persisted
                 if name == "writing":
                     self.verification.verify(project_id)
             with self.database.session() as db:
