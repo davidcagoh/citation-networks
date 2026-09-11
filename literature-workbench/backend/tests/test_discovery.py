@@ -91,6 +91,30 @@ class PaidDiscoveryProvider(FakeDiscoveryProvider):
     requires_approval = True
 
 
+class ChainDiscoveryProvider(FakeDiscoveryProvider):
+    def related(self, external_id: str, direction: str, limit: int) -> list[FakeCandidate]:
+        candidates = {
+            "paper-1": "paper-3",
+            "paper-3": "paper-4",
+        }
+        next_id = candidates.get(external_id)
+        if next_id is None:
+            return []
+        return [
+            FakeCandidate(
+                external_id=next_id,
+                title=f"Memory Study {next_id}",
+                authors=["Network Researcher"],
+                year=2022,
+                venue="Network Venue",
+                doi=None,
+                abstract=f"Abstract for {next_id}.",
+                source_uri=f"https://example.test/{next_id}",
+                score=0.5,
+            )
+        ][:limit]
+
+
 def test_discovery_persists_candidates_and_route_provenance(tmp_path: Path) -> None:
     provider = FakeDiscoveryProvider()
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
@@ -313,6 +337,31 @@ def test_paid_provider_requires_explicit_non_replicable_approval(tmp_path: Path)
             record = database.scalar(select(ProviderApproval))
             assert record is not None
             assert record.provider == "paid-search"
+
+
+def test_multi_hop_citation_expansion_stops_at_exhausted_frontier(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=ChainDiscoveryProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        seed_id = client.get(f"/projects/{project_id}/corpus").json()["papers"][0]["id"]
+
+        response = client.post(
+            f"/projects/{project_id}/runs/citation-expansion",
+            json={"paper_id": seed_id, "direction": "backward", "limit": 10, "depth": 3},
+        )
+
+        assert response.status_code == 201
+        assert response.json()["candidate_count"] == 2
+        assert response.json()["depth_reached"] == 2
+        assert response.json()["stopping_reason"] == "frontier_exhausted"
 
 
 def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> None:
