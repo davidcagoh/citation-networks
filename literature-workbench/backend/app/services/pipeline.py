@@ -160,7 +160,13 @@ class PipelineService:
                         parsing_quality="complete" if record["text"] else "degraded",
                     )
                 )
-                db.add(CorpusMembership(project_id=project_id, paper_id=paper.id))
+                db.add(
+                    CorpusMembership(
+                        project_id=project_id,
+                        paper_id=paper.id,
+                        coverage_cluster="regression-fixture",
+                    )
+                )
             return len(fixture)
 
     def acquire(self, project_id: str) -> dict[str, int | str]:

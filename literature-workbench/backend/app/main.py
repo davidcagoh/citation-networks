@@ -671,6 +671,7 @@ def create_app(
                     paper_id=paper.id,
                     status="included",
                     relevance_rationale="User supplied source",
+                    coverage_cluster="seed",
                 )
             )
             db.add(
@@ -792,6 +793,7 @@ def create_app(
                         paper_id=paper.id,
                         status="included",
                         relevance_rationale="User supplied a public source URL",
+                        coverage_cluster="seed",
                     )
                 )
             else:

@@ -14,6 +14,7 @@ export interface Paper {
   status?: "candidate" | "included" | "excluded" | "pinned";
   relevance_score?: number;
   relevance_rationale?: string;
+  coverage_cluster?: string;
   discovery_routes?: string[];
   entity_count?: number;
   extraction_status?: "not_run" | "fixture" | "heuristic" | "structured" | "mixed";
@@ -747,6 +748,7 @@ function parsePaper(value: unknown, index: number): Paper {
     ...(paper.status === undefined ? {} : { status: string(paper.status, `${label}.status`) as Paper["status"] }),
     ...(paper.relevance_score === undefined ? {} : { relevance_score: number(paper.relevance_score, `${label}.relevance_score`) }),
     ...(paper.relevance_rationale === undefined ? {} : { relevance_rationale: string(paper.relevance_rationale, `${label}.relevance_rationale`) }),
+    ...(paper.coverage_cluster === undefined ? {} : { coverage_cluster: string(paper.coverage_cluster, `${label}.coverage_cluster`) }),
     ...(paper.discovery_routes === undefined ? {} : { discovery_routes: array(paper.discovery_routes, `${label}.discovery_routes`).map((route, routeIndex) => string(route, `${label}.discovery_routes[${routeIndex}]`)) }),
     ...(entityCount === undefined ? {} : { entity_count: number(entityCount, `${label}.entity_count`) }),
     ...(paper.extraction_status === undefined

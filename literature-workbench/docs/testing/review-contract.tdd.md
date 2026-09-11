@@ -100,12 +100,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 82 | Verification flags live claims whose newest supporting paper trails the corpus publication-date frontier by at least three years. | `backend/tests/test_verification.py::test_verification_flags_claims_behind_corpus_date_frontier` | PASS |
 | 83 | Verification surfaces inferred contrasting relations as competing evidence-span links and a targeted contradiction-review issue. | `backend/tests/test_verification.py::test_verification_surfaces_contrasting_relation_evidence` | PASS |
 | 84 | Corpus records and the UI expose extraction status (`not_run`, `fixture`, `heuristic`, `structured`, or `mixed`) alongside entity counts. | `frontend/tests/api.test.ts`, `backend/tests/test_synthesis.py::test_pipeline_persists_multiple_structured_entities_per_paper` | PASS |
+| 85 | Corpus memberships use topic-neutral coverage clusters for seeds, discovery routes, citation networks, and regression fixtures; the API and Corpus UI expose the provenance cluster without the former topic-specific default. | `backend/tests/test_sources.py::test_ingests_user_supplied_full_text_with_provenance`, `frontend/tests/api.test.ts` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
 - Backend: `uv run pytest -q` → 118 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.09%, above the 80% requirement.
+- Backend coverage: `uv run pytest -q --cov=app --cov-report=term-missing` → 86.04%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.

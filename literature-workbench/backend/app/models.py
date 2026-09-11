@@ -97,7 +97,7 @@ class CorpusMembership(Base):
     status: Mapped[str] = mapped_column(String(30), default="included")
     relevance_score: Mapped[float] = mapped_column(Float, default=1.0)
     relevance_rationale: Mapped[str] = mapped_column(Text, default="Bundled acceptance fixture")
-    coverage_cluster: Mapped[str] = mapped_column(String(100), default="agent-memory")
+    coverage_cluster: Mapped[str] = mapped_column(String(100), default="unassigned")
 
 
 class DiscoveryEvent(Base):

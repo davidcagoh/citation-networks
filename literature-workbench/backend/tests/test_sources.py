@@ -81,6 +81,7 @@ def test_ingests_user_supplied_full_text_with_provenance(tmp_path: Path) -> None
         corpus = client.get(f"/projects/{project_id}/corpus").json()
         assert corpus["papers"][0]["id"] == paper_id
         assert corpus["papers"][0]["document_status"] == "complete"
+        assert corpus["papers"][0]["coverage_cluster"] == "seed"
 
         run = client.post(f"/projects/{project_id}/runs/pipeline")
         assert run.status_code == 201

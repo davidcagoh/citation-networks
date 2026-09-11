@@ -435,6 +435,7 @@ class DiscoveryService:
                                 status="candidate",
                                 relevance_score=self._relevance_score(candidate, query, route),
                                 relevance_rationale=self._rationale(candidate, route),
+                                coverage_cluster=route.removesuffix("_search"),
                             )
                         )
                     membership = db.scalar(
@@ -448,6 +449,8 @@ class DiscoveryService:
                         if score > membership.relevance_score:
                             membership.relevance_score = score
                             membership.relevance_rationale = self._rationale(candidate, route)
+                        if membership.coverage_cluster == "unassigned":
+                            membership.coverage_cluster = route.removesuffix("_search")
                     self._update_provider_signals(paper, candidate)
                     self._persist_abstract(db, paper, candidate)
                     db.add(
@@ -733,8 +736,9 @@ class DiscoveryService:
                             status="candidate",
                             relevance_score=candidate.score or 0.0,
                             relevance_rationale=f"Found by {route} citation expansion",
+                            coverage_cluster=f"{route}-network",
                         )
-                        )
+                    )
                 self._update_provider_signals(related, candidate)
                 source_id, target_id = (
                     (seed.id, related.id) if direction == "backward" else (related.id, seed.id)

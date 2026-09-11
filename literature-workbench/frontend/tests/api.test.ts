@@ -487,6 +487,7 @@ describe("workbench API adapter", () => {
               title: "Paper",
               year: 2025,
               document_status: "complete",
+              coverage_cluster: "methods",
               entity_count: 2,
               extraction_status: "structured",
             }] }
@@ -505,6 +506,7 @@ describe("workbench API adapter", () => {
     const workspace = await createWorkbenchApi("http://api").getWorkspace("project-1");
     expect(workspace.plan?.title).toBe("Direct");
     expect(workspace.corpus.papers[0].extraction_status).toBe("structured");
+    expect(workspace.corpus.papers[0].coverage_cluster).toBe("methods");
     expect(workspace.costs.stages).toEqual([]);
     expect(fetchMock).toHaveBeenCalledTimes(5);
   });
