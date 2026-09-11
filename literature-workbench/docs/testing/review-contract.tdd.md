@@ -79,11 +79,12 @@ This report records the implementation tranche derived from the review-engine pl
 | 61 | Systematic-review stopping certificates require selected reports to be retrieved as full text; comprehensive surveys retain a separate abstract-only diagnostic. | `backend/tests/test_discovery.py::test_systematic_audit_requires_retrieved_reports` | PASS |
 | 62 | Survey hits rank ahead of non-survey results by review-signal strength, then citation/date signals; general routes use deterministic provider-score tie-breaking. | `backend/tests/test_discovery.py::test_survey_route_orders_review_hits_by_strength_and_citations`, `backend/tests/test_discovery.py::test_seminal_route_orders_candidates_by_citation_signal` | PASS |
 | 63 | Cross-provider records with normalized DOI or title identities collapse into one canonical corpus paper while retaining separate discovery evidence. | `backend/tests/test_discovery.py::test_discovery_deduplicates_normalized_cross_provider_identity` | PASS |
+| 64 | Unicode-safe title identity normalization keeps distinct non-Latin paper titles separate during cross-provider discovery. | `backend/tests/test_discovery.py::test_discovery_does_not_collapse_distinct_non_latin_titles` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 96 passed.
+- Backend: `uv run pytest -q` → 97 passed.
 - Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.07%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
