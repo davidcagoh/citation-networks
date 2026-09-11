@@ -10,13 +10,13 @@ and OpenAlex when those providers are reachable. Discovered papers are
 candidates until screened; including them and choosing “Build grounded review”
 creates abstract-backed evidence with explicit provenance. This live path is a
 conservative MVP: public text/HTML/PDF acquisition is available with bounded
-heuristic extraction, while model-backed semantic extraction remains opt-in
-future work.
+heuristic extraction by default, while opt-in model extraction and final-prose
+generation remain evidence-bounded and ledgered.
 
 Use “Preview scope” to see the transparent focus areas and projected provider
 call budget before discovery. The execution ledger also exposes a hard paper
-cap for each grounded-review run; discovery usage is recorded separately from
-the zero-cost local pipeline stages.
+cap for each grounded-review run; discovery and optional model usage are
+recorded separately from deterministic local pipeline stages.
 
 ## Run locally
 
@@ -57,8 +57,11 @@ npm run build
 
 The SQLite database contains plaintext research briefs, source passages, and
 generated artifacts. Keep `.data/` private and delete a project through the UI
-or API when it is no longer needed. The application never copies shared legacy
-`.env` contents. Slice 1 does not require provider credentials.
+or API when it is no longer needed. The application reads only selected
+provider settings from an explicitly configured shared env file; it never
+exposes or copies the file to the browser. Deterministic operation does not
+require provider credentials. Set `WORKBENCH_ENABLE_OPENAI_SYNTHESIS=1` to
+enable the optional OpenAI extraction and final-prose path.
 
 See [the implementation handoff](lit_review_pipeline_handoff.md) for the full
 MVP design and deferred milestones.
