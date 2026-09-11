@@ -17,6 +17,11 @@
 7. Select a review sentence to inspect the exact source passage and offsets.
 8. Export Markdown, JSON, or BibTeX from the API.
 
+For a live source, use **Fetch public source URL** in Brief with an HTTP(S)
+URL serving UTF-8 text or HTML. The server records the requested/final URL,
+content type, and parser version; private hosts, redirects, non-text content,
+and sources over 5 MB are rejected.
+
 ## Source coverage
 
 - Fixture papers provide deterministic full source text and expected evidence.
@@ -26,6 +31,9 @@
   `POST /projects/{id}/sources/text`, including a user-owned URI and paper
   metadata. It is stored as a `text` `SourceDocument` and enters the same
   pipeline.
+- Public text/HTML can be attached with `POST /projects/{id}/sources/url`.
+  It is stored as a `fetched_text` or `html` `SourceDocument` after URL safety
+  validation.
 - Missing text degrades the paper and does not fabricate evidence.
 
 The current live extractor is intentionally heuristic: it selects a bounded

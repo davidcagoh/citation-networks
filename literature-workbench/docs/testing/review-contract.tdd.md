@@ -42,12 +42,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 24 | PRISMA reporting reconciles identified records, deduplicated records, screening, retrieval, inclusion, and exclusion in the systematic-review UI. | `backend/tests/test_protocol.py::test_prisma_report_reconciles_protocol_search_and_screening_flow`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 | 25 | Live source-text papers with grounded topical overlap receive a conservative cross-paper relation and comparative synthesis claim. | `backend/tests/test_sources.py::test_live_pipeline_builds_conservative_cross_paper_relation` | PASS |
 | 26 | A project cannot create a second active pipeline while an earlier run is working or awaiting a human checkpoint. | `backend/tests/test_review_modes.py::test_pipeline_rejects_a_second_active_run_until_the_first_is_resolved` | PASS |
+| 27 | Public HTTP(S) text sources can be fetched into the corpus with provenance while private targets and redirects are rejected. | `backend/tests/test_sources.py::test_fetches_public_source_url_with_provenance_and_blocks_private_targets`, frontend API/UI checks | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
 - Backend: `uv run pytest -q` → 72 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.90%, above the 80% requirement.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 84.91%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
@@ -59,6 +60,6 @@ This report records the implementation tranche derived from the review-engine pl
 - Paid-provider approval is enforced at discovery boundaries; an approved provider adapter still must be configured before use. Zotero import/export is available through server-side credentials.
 - Zotero DOI/title deduplication prefers published records and retains alternate preprint provenance; richer edition/version reconciliation remains future work.
 - Discovery preserves provider citation-count and publication-date signals in provenance and exposes them during screening; they are importance/recency signals, not completeness guarantees.
-- Full-text acquisition remains conservative; abstract-backed evidence cannot certify subtle comparisons.
+- Full-text acquisition now supports explicitly requested public HTTP(S) text/HTML URLs with SSRF and size guards; PDF retrieval/parsing and richer HTML extraction remain future work. Abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Live cross-paper comparison now uses a conservative grounded overlap heuristic; richer paragraph-level generation and section-level editing remain future work.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.
