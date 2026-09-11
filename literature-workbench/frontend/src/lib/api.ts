@@ -147,6 +147,13 @@ export interface CitationExpansionResult {
   stopping_reason: string;
 }
 
+export interface CoCitationExpansionResult {
+  project_id: string;
+  paper_id: string;
+  candidate_count: number;
+  provider: string;
+}
+
 export interface LivingUpdateResult {
   project_id: string;
   mode: ReviewMode;
@@ -195,6 +202,7 @@ export interface WorkbenchApi {
   importZotero(projectId: string, collectionKey?: string, limit?: number): Promise<ZoteroImportResult>;
   exportZotero(projectId: string, collectionKey?: string): Promise<ZoteroExportResult>;
   expandCitations(projectId: string, paperId: string, direction: "backward" | "forward", limit?: number, depth?: number, maxPapers?: number): Promise<CitationExpansionResult>;
+  expandCoCitations(projectId: string, paperId: string, limit?: number): Promise<CoCitationExpansionResult>;
   livingUpdate(projectId: string, limit?: number): Promise<LivingUpdateResult>;
   approveProvider(projectId: string, input: Omit<ProviderApproval, "id" | "project_id" | "approved" | "approved_at">): Promise<ProviderApproval>;
   updateReviewSentence(projectId: string, sentenceId: string, text: string): Promise<ReviewSentence>;
@@ -471,6 +479,16 @@ function parseCitationExpansion(value: unknown): CitationExpansionResult {
     provider: string(result.provider, "citation expansion.provider"),
     depth_reached: number(result.depth_reached ?? 1, "citation expansion.depth_reached"),
     stopping_reason: string(result.stopping_reason ?? "depth_limit_reached", "citation expansion.stopping_reason"),
+  };
+}
+
+function parseCoCitationExpansion(value: unknown): CoCitationExpansionResult {
+  const result = object(value, "co-citation expansion");
+  return {
+    project_id: string(result.project_id, "co-citation expansion.project_id"),
+    paper_id: string(result.paper_id, "co-citation expansion.paper_id"),
+    candidate_count: number(result.candidate_count, "co-citation expansion.candidate_count"),
+    provider: string(result.provider, "co-citation expansion.provider"),
   };
 }
 
@@ -785,6 +803,11 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/runs/citation-expansion`, parseCitationExpansion, {
         method: "POST",
         body: JSON.stringify({ paper_id: paperId, direction, limit, depth, max_papers: maxPapers }),
+      }),
+    expandCoCitations: (projectId, paperId, limit = 20) =>
+      request(baseUrl, `/projects/${projectId}/runs/co-citation-expansion`, parseCoCitationExpansion, {
+        method: "POST",
+        body: JSON.stringify({ paper_id: paperId, limit }),
       }),
     livingUpdate: (projectId, limit = 20) =>
       request(baseUrl, `/projects/${projectId}/runs/living-update`, parseLivingUpdate, {

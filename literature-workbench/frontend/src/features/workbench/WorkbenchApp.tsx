@@ -317,6 +317,23 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     }
   }
 
+  async function expandCoCitations(paperId: string) {
+    if (!session) return;
+    try {
+      setRunState("discovering");
+      await api.expandCoCitations(session.projectId, paperId, 20);
+      const [workspace, audit] = await Promise.all([
+        api.getWorkspace(session.projectId),
+        api.getCoverageAudit(session.projectId),
+      ]);
+      setSession((current) => current ? { ...current, workspace, audit, paperCount: workspace.corpus.papers.length } : current);
+      setRunState("complete");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "Co-citation expansion could not be completed.");
+    }
+  }
+
   async function savePlan(plan: ReviewPlan) {
     if (!session?.workspace.plan?.id) {
       setError("This plan cannot be edited until it has a persisted plan id.");
@@ -542,7 +559,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             {activeTab === "Brief" && (
               <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} zoteroCollectionKey={zoteroCollectionKey} onZoteroCollectionKey={setZoteroCollectionKey} paidProvider={paidProvider} onPaidProvider={setPaidProvider} approvalBy={approvalBy} onApprovalBy={setApprovalBy} approvalJustification={approvalJustification} onApprovalJustification={setApprovalJustification} nonReplicableReason={nonReplicableReason} onNonReplicableReason={setNonReplicableReason} hasSession={Boolean(session)} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} onZoteroImport={handleZoteroImport} onZoteroExport={handleZoteroExport} onProviderApproval={handleProviderApproval} preview={scopePreview} />
             )}
-            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} paperCount={session?.paperCount ?? null} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} onExpand={expandCitations} onLivingUpdate={handleLivingUpdate} />}
+            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} paperCount={session?.paperCount ?? null} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} onExpand={expandCitations} onCoExpand={expandCoCitations} onLivingUpdate={handleLivingUpdate} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} approval={session?.approval ?? null} onApprove={approveStructure} onSave={savePlan} />}
             {activeTab === "Review" && (
               <Review
@@ -652,7 +669,7 @@ function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, resear
   );
 }
 
-function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen, onExpand, onLivingUpdate }: {
+function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen, onExpand, onCoExpand, onLivingUpdate }: {
   workspace: Workspace | null;
   audit: CoverageAudit | null;
   paperCount: number | null;
@@ -660,6 +677,7 @@ function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen, o
   onApprove: () => Promise<void>;
   onScreen: (paperId: string, status: "candidate" | "included" | "excluded" | "pinned") => void;
   onExpand: (paperId: string, direction: "backward" | "forward") => Promise<void>;
+  onCoExpand: (paperId: string) => Promise<void>;
   onLivingUpdate: () => Promise<void>;
 }) {
   const papers = workspace?.corpus.papers ?? [];
@@ -692,6 +710,7 @@ function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen, o
               {(paper.status ?? "included") !== "excluded" && <button type="button" onClick={() => onScreen(paper.id, "excluded")}>Exclude {paper.title}</button>}
               <button type="button" onClick={() => onExpand(paper.id, "backward")}>Expand backward citations for {paper.title}</button>
               <button type="button" onClick={() => onExpand(paper.id, "forward")}>Expand forward citations for {paper.title}</button>
+              <button type="button" onClick={() => onCoExpand(paper.id)}>Expand co-citations for {paper.title}</button>
             </td>
           </tr>
         ))}</tbody>
