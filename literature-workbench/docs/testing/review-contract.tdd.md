@@ -55,12 +55,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 37 | Cross-disciplinary discovery executes bounded adjacent-field, interdisciplinary-methods, and adjacent-application queries under one auditable route. | `backend/tests/test_discovery.py::test_cross_disciplinary_route_records_adjacent_fields_query` | PASS |
 | 38 | The default live adapter fans out across free Semantic Scholar and OpenAlex sources and marks each candidate with its provider provenance. | `backend/tests/test_discovery.py::test_openalex_provider_maps_work_metadata_and_abstract`, `backend/tests/test_discovery.py::test_multi_source_provider_merges_and_marks_provider_provenance`, `backend/tests/test_discovery.py::test_app_wires_free_multi_source_discovery_by_default` | PASS |
 | 39 | OpenAlex forward citation expansion maps citing works through the same provider adapter and provenance path. | `backend/tests/test_discovery.py::test_openalex_provider_expands_forward_citations` | PASS |
+| 40 | OpenAlex backward citation expansion follows bounded referenced-work metadata links and maps the resulting records. | `backend/tests/test_discovery.py::test_openalex_provider_expands_backward_references` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 82 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 84.83%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 83 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.24%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
