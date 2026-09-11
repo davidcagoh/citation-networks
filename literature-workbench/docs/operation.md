@@ -1,0 +1,56 @@
+# Literature Workbench operation
+
+## Supported local workflows
+
+1. Enter a project title and research brief.
+2. Use **Preview scope** to see the deterministic focus areas and projected
+   provider call budget.
+3. Either run the five-paper fixture, or choose **Discover papers** to query
+   Semantic Scholar.
+4. Screen live candidates in **Corpus**. Candidates are not sent to the
+   pipeline until they are included or pinned.
+5. Choose **Build grounded review** in **Run / Costs**. This runs idempotent
+   acquisition, provenance-preserving extraction, relation construction,
+   planning, writing, and verification.
+6. Edit the generated structure. Saving a plan validates all artifact
+   references and rewrites the review sections.
+7. Select a review sentence to inspect the exact source passage and offsets.
+8. Export Markdown, JSON, or BibTeX from the API.
+
+## Source coverage
+
+- Fixture papers provide deterministic full source text and expected evidence.
+- Live discovery persists the provider-supplied abstract as an `abstract`
+  `SourceDocument`.
+- Local full text can be attached with
+  `POST /projects/{id}/sources/text`, including a user-owned URI and paper
+  metadata. It is stored as a `text` `SourceDocument` and enters the same
+  pipeline.
+- Missing text degrades the paper and does not fabricate evidence.
+
+The current live extractor is intentionally heuristic: it selects a bounded
+first sentence and records whether it came from an abstract or imported text.
+It does not claim semantic model extraction or infer cross-paper relations for
+live sources. The fixture relation path remains deterministic and evidence
+linked.
+
+## Operational boundaries
+
+The backend is an unauthenticated loopback service. Keep it bound to
+`127.0.0.1`; the SQLite database contains research text and generated output.
+Provider credentials are read only from environment variables. Provider
+failures return a safe 502 response, while malformed or missing source text is
+represented as degraded corpus coverage.
+
+Run budgets persist on each pipeline run. The paper cap is enforced before a
+run is created; provider calls and local pipeline usage appear separately in
+the cost ledger. Runs persist stage artifacts and can be resumed after a
+failure. The JSON export includes source documents, evidence spans, relations,
+claims, review text, and discovery events.
+
+## Deferred extensions
+
+Open-access PDF/HTML retrieval, model-backed structured extraction, richer
+relation judging, and broader automated contradiction/causal-language checks
+are the next research/engineering extensions. They should preserve the same
+source URI, parser/version, evidence-span, and budget contracts.
