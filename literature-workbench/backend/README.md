@@ -16,3 +16,9 @@ Apply the persisted schema explicitly with:
 ```sh
 uv run alembic upgrade head
 ```
+
+Optional Zotero import/export reads `ZOTERO_API_KEY`, `ZOTERO_USER_ID`, and
+`ZOTERO_LIBRARY_TYPE` from the backend environment. The key is never returned
+to the browser or included in project exports. Use the integration endpoints
+`/projects/{project_id}/integrations/zotero/import` and
+`/projects/{project_id}/integrations/zotero/export`.
