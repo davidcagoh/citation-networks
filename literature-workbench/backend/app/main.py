@@ -16,6 +16,7 @@ from app.domain import (
     PipelineRequest,
     ProjectCreate,
     ReviewPlanUpdate,
+    ScopePreviewRequest,
     VerificationIssueUpdate,
 )
 from app.models import (
@@ -203,6 +204,33 @@ def create_app(
             "provider": discovery.provider.name,
             "query": value.query,
         }
+
+    @app.post("/projects/{project_id}/runs/scope-preview", status_code=201)
+    def scope_preview(project_id: str, value: ScopePreviewRequest) -> dict:
+        with database.session() as db:
+            project = db.get(Project, project_id)
+            if project is None:
+                raise HTTPException(404, "Project not found")
+            focus = [
+                "Core methods and mechanisms",
+                "Failure modes and trade-offs",
+                "Empirical evaluation",
+            ]
+            if value.mode == "quick":
+                focus = focus[:2]
+            return {
+                "project_id": project_id,
+                "scope": {
+                    "query": project.prompt,
+                    "mode": value.mode,
+                    "suggested_focus": focus,
+                },
+                "budget": {
+                    "max_papers": value.max_papers,
+                    "estimated_external_api_calls": 1,
+                    "estimated_cost_usd": 0.0,
+                },
+            }
 
     @app.post("/projects/{project_id}/runs/acquisition", status_code=201)
     def run_acquisition(project_id: str) -> dict:

@@ -81,6 +81,12 @@ export interface VerificationIssue {
   status: "open" | "resolved" | "accepted" | "dismissed";
 }
 
+export interface ScopePreview {
+  project_id: string;
+  scope: { query: string; mode: "quick" | "thorough"; suggested_focus: string[] };
+  budget: { max_papers: number; estimated_external_api_calls: number; estimated_cost_usd: number };
+}
+
 export interface WorkbenchApi {
   createProject(input: { title: string; prompt: string }): Promise<{ id: string }>;
   ingestFixture(projectId: string): Promise<{ paper_count: number }>;
@@ -90,6 +96,7 @@ export interface WorkbenchApi {
     available_count: number;
     degraded_count: number;
   }>;
+  scopePreview(projectId: string, input?: { mode?: "quick" | "thorough"; max_papers?: number }): Promise<ScopePreview>;
   runDiscovery(projectId: string, query: string, limit?: number): Promise<{
     candidate_count: number;
     provider: string;
@@ -199,6 +206,28 @@ function parseAcquisition(value: unknown): {
     paper_count: number(acquisition.paper_count, "acquisition.paper_count"),
     available_count: number(acquisition.available_count, "acquisition.available_count"),
     degraded_count: number(acquisition.degraded_count, "acquisition.degraded_count"),
+  };
+}
+
+function parseScopePreview(value: unknown): ScopePreview {
+  const preview = object(value, "scope preview");
+  const scope = object(preview.scope, "scope preview.scope");
+  const budget = object(preview.budget, "scope preview.budget");
+  const mode = string(scope.mode, "scope preview.scope.mode");
+  if (mode !== "quick" && mode !== "thorough") throw new ShapeError("scope preview.scope.mode is invalid");
+  return {
+    project_id: string(preview.project_id, "scope preview.project_id"),
+    scope: {
+      query: string(scope.query, "scope preview.scope.query"),
+      mode,
+      suggested_focus: array(scope.suggested_focus, "scope preview.scope.suggested_focus")
+        .map((item, index) => string(item, `scope preview.scope.suggested_focus[${index}]`)),
+    },
+    budget: {
+      max_papers: number(budget.max_papers, "scope preview.budget.max_papers"),
+      estimated_external_api_calls: number(budget.estimated_external_api_calls, "scope preview.budget.estimated_external_api_calls"),
+      estimated_cost_usd: number(budget.estimated_cost_usd, "scope preview.budget.estimated_cost_usd"),
+    },
   };
 }
 
@@ -448,6 +477,11 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/fixtures/provenance-corpus`, parseIngest, { method: "POST" }),
     acquire: (projectId) =>
       request(baseUrl, `/projects/${projectId}/runs/acquisition`, parseAcquisition, { method: "POST" }),
+    scopePreview: (projectId, input) =>
+      request(baseUrl, `/projects/${projectId}/runs/scope-preview`, parseScopePreview, {
+        method: "POST",
+        body: JSON.stringify(input ?? {}),
+      }),
     runDiscovery: (projectId, query, limit = 20) =>
       request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {
         method: "POST",

@@ -30,6 +30,11 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
     createProject: vi.fn().mockResolvedValue({ id: "project-1" }),
     ingestFixture: vi.fn().mockResolvedValue({ paper_count: 5 }),
     acquire: vi.fn().mockResolvedValue({ project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0 }),
+    scopePreview: vi.fn().mockResolvedValue({
+      project_id: "project-1",
+      scope: { query: "memory", mode: "thorough", suggested_focus: ["Methods"] },
+      budget: { max_papers: 50, estimated_external_api_calls: 1, estimated_cost_usd: 0 },
+    }),
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
     updatePlan: vi.fn().mockImplementation(async (_projectId, _planId, plan) => ({ id: "plan-1", ...plan })),
@@ -63,6 +68,20 @@ function deferred<T>() {
 }
 
 describe("Literature Workbench", () => {
+  it("previews scope and projected budget before discovery", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture();
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Survey agent memory.");
+    await user.click(screen.getByRole("button", { name: "Preview scope" }));
+
+    expect(await screen.findByRole("region", { name: "Scope preview" })).toBeVisible();
+    expect(screen.getByText("Methods")).toBeVisible();
+    expect(api.scopePreview).toHaveBeenCalledWith("project-1", { mode: "thorough", max_papers: 50 });
+  });
+
   it("edits and saves the relation-backed plan", async () => {
     const user = userEvent.setup();
     const api = apiFixture({

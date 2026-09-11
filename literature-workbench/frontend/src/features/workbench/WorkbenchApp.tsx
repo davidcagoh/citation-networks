@@ -2,7 +2,7 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
-import type { ClaimEvidence, ReviewPlan, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
+import type { ClaimEvidence, ReviewPlan, ScopePreview, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
 import styles from "./WorkbenchApp.module.css";
 
 const tabs = ["Brief", "Corpus", "Structure", "Review", "Run / Costs"] as const;
@@ -32,6 +32,8 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   const [selectedEvidence, setSelectedEvidence] = useState<ClaimEvidence | null>(null);
   const [verificationIssues, setVerificationIssues] = useState<VerificationIssue[]>([]);
   const [maxPapers, setMaxPapers] = useState(50);
+  const [scopePreview, setScopePreview] = useState<ScopePreview | null>(null);
+  const [previewProjectId, setPreviewProjectId] = useState<string | null>(null);
   const [evidenceLoading, setEvidenceLoading] = useState(false);
   const evidenceController = useRef<AbortController | null>(null);
   const evidenceSequence = useRef(0);
@@ -57,6 +59,8 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     setSession(null);
     setSelectedEvidence(null);
     setVerificationIssues([]);
+    setScopePreview(null);
+    setPreviewProjectId(null);
     setEvidenceLoading(false);
     try {
       setRunState("creating");
@@ -84,7 +88,9 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     setVerificationIssues([]);
     try {
       setRunState("creating");
-      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim() });
+      const project = previewProjectId
+        ? { id: previewProjectId }
+        : await api.createProject({ title: title.trim(), prompt: prompt.trim() });
       setRunState("discovering");
       const discovery = await api.runDiscovery(project.id, prompt.trim(), 20);
       const workspace = await api.getWorkspace(project.id);
@@ -95,6 +101,22 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     } catch (caught) {
       setRunState("idle");
       setError(caught instanceof Error ? caught.message : "Discovery could not be completed.");
+    }
+  }
+
+  async function handleScopePreview() {
+    if (!title.trim() || !prompt.trim()) return;
+    setError(null);
+    try {
+      setRunState("creating");
+      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim() });
+      const preview = await api.scopePreview(project.id, { mode: "thorough", max_papers: maxPapers });
+      setScopePreview(preview);
+      setPreviewProjectId(project.id);
+      setRunState("complete");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "Scope preview could not be created.");
     }
   }
 
@@ -287,7 +309,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             key={activeTab}
           >
             {activeTab === "Brief" && (
-              <BriefForm title={title} prompt={prompt} busy={busy} status={statusText[runState]} onTitle={setTitle} onPrompt={setPrompt} onSubmit={handleSubmit} onDiscover={handleDiscovery} />
+              <BriefForm title={title} prompt={prompt} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setScopePreview(null); setPreviewProjectId(null); }} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} preview={scopePreview} />
             )}
             {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} paperCount={session?.paperCount ?? null} onScreen={screenPaper} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} onSave={savePlan} />}
@@ -310,11 +332,13 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   );
 }
 
-function BriefForm({ title, prompt, busy, status, onTitle, onPrompt, onSubmit, onDiscover }: {
+function BriefForm({ title, prompt, busy, status, onTitle, onPrompt, onSubmit, onDiscover, onPreview, preview }: {
   title: string; prompt: string; busy: boolean; status: string;
   onTitle: (value: string) => void; onPrompt: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onDiscover: () => void;
+  onPreview: () => Promise<void>;
+  preview: ScopePreview | null;
 }) {
   return (
     <form className={styles.form} onSubmit={onSubmit}>
@@ -328,9 +352,15 @@ function BriefForm({ title, prompt, busy, status, onTitle, onPrompt, onSubmit, o
       </div>
       <div className={styles.actionRow}>
         <button className={styles.primary} type="submit" disabled={busy}>{busy ? status : "Create and run fixture"}</button>
+        <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onPreview}>Preview scope</button>
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onDiscover}>Discover papers</button>
-        <span className={styles.microcopy}>5 local papers · no paid model calls</span>
+        <span className={styles.microcopy}>Local fixture or live provider-backed discovery</span>
       </div>
+      {preview && <section className={styles.planHeader} aria-label="Scope preview">
+        <div><div className={styles.principle}>Scope preview · {preview.scope.mode}</div><p>{preview.scope.query}</p></div>
+        <div><strong>{preview.budget.max_papers} papers</strong><br /><span className={styles.microcopy}>{preview.budget.estimated_external_api_calls} API call · ${preview.budget.estimated_cost_usd.toFixed(2)} estimated</span></div>
+        <ul>{preview.scope.suggested_focus.map((focus) => <li key={focus}>{focus}</li>)}</ul>
+      </section>}
     </form>
   );
 }
