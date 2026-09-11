@@ -720,7 +720,66 @@ def test_broader_coverage_audit_emits_stopping_certificate(tmp_path: Path) -> No
             "required_routes_executed": True,
             "all_candidates_screened": True,
             "selected_sources_available": True,
+            "quality_signals_available": True,
         }
+
+
+def test_broader_audit_rejects_missing_latest_and_seminal_signals(tmp_path: Path) -> None:
+    class NoSignalProvider:
+        name = "no-signal"
+
+        def search(self, query: str, limit: int):
+            return [
+                DiscoveryCandidate(
+                    external_id="no-signal-1",
+                    title="Undated study",
+                    authors=[],
+                    year=None,
+                    venue=None,
+                    doi=None,
+                    abstract="Abstract.",
+                    source_uri=None,
+                    score=None,
+                )
+            ][:limit]
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=NoSignalProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={
+                "title": "Memory",
+                "prompt": "Find memory systems",
+                "review_mode": "comprehensive",
+            },
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={
+                "query": "memory",
+                "limit": 1,
+                "routes": [
+                    "semantic_search", "survey_search", "recent_search", "seminal_search",
+                    "cross_disciplinary_search",
+                ],
+            },
+        )
+        for paper in client.get(f"/projects/{project_id}/corpus").json()["papers"]:
+            client.patch(
+                f"/projects/{project_id}/corpus/{paper['id']}",
+                json={"status": "included"},
+            )
+
+        audit = client.get(f"/projects/{project_id}/coverage-audit").json()
+
+    assert audit["stopping_certificate"]["status"] == "incomplete"
+    assert audit["stopping_certificate"]["checks"]["quality_signals_available"] is False
+    assert "latest/seminal routes lack complete provider signals" in audit["limitations"]
 
 
 def test_discovery_validates_query_and_limit(tmp_path: Path) -> None:
