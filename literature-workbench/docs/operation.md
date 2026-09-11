@@ -85,7 +85,14 @@ deterministic and evidence linked.
 An optional `SynthesisProvider` can replace claim wording during planning. It
 receives the deterministic draft and exact evidence text, while the pipeline
 continues to assign evidence-span IDs and verification state. No external
-model provider is enabled by default.
+model provider is enabled by default. When explicitly enabled with
+`WORKBENCH_ENABLE_OPENAI_SYNTHESIS=1`, the bundled OpenAI Responses adapter
+uses `OPENAI_SYNTHESIS_MODEL` (default `gpt-5.6-luna`), sends `store: false`,
+and never exposes the credential to the browser. It can read the existing
+`WORKBENCH_SHARED_ENV_FILE` for the OpenAI settings, while process environment
+variables take precedence. The adapter sends exact extracted evidence as
+quoted data, and the pipeline remains responsible for evidence-span links and
+verification.
 
 ## Operational boundaries
 
@@ -116,8 +123,7 @@ fan-out count for that request, for immediate reconciliation in clients.
 
 ## Deferred extensions
 
-Model-backed structured extraction, a concrete model-backed synthesis adapter,
-richer relation judging, and broader
+Model-backed structured extraction, richer relation judging, and broader
 automated contradiction/causal-language checks are the next
 research/engineering extensions. They should preserve the same
 source URI, parser/version, evidence-span, and budget contracts.

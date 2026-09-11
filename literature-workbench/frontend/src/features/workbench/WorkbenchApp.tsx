@@ -952,8 +952,8 @@ function Costs({ workspace, status, onBuild, busy, maxPapers, onMaxPapers }: {
         <div className={styles.costMetric}><strong>{tokens.toLocaleString()}</strong><span>Tokens</span></div>
       </div>
       <div className={styles.tableRegion} role="region" aria-label="Pipeline usage by stage" tabIndex={0}>
-      <table className={styles.table}><caption className={styles.srOnly}>Pipeline usage and cost by stage</caption><thead><tr><th>Stage</th><th>Status</th><th>Calls</th><th>Input</th><th>Output</th><th>Cost</th></tr></thead>
-        <tbody>{stages.map((stage) => <tr key={stage.stage}><td className={styles.paperTitle}>{stage.stage}</td><td><span className={styles.badge}>{stage.status ?? status}</span></td><td>{stage.calls}</td><td>{stage.input_tokens}</td><td>{stage.output_tokens}</td><td>${stage.cost.toFixed(2)}</td></tr>)}</tbody>
+      <table className={styles.table}><caption className={styles.srOnly}>Pipeline usage and cost by stage</caption><thead><tr><th>Stage</th><th>Provider / model</th><th>Status</th><th>Calls</th><th>Input</th><th>Output</th><th>Cost</th></tr></thead>
+        <tbody>{stages.map((stage) => <tr key={stage.stage}><td className={styles.paperTitle}>{stage.stage}</td><td>{stage.provider} / {stage.model}</td><td><span className={styles.badge}>{stage.status ?? status}</span></td><td>{stage.calls}</td><td>{stage.input_tokens}</td><td>{stage.output_tokens}</td><td>${stage.cost.toFixed(2)}</td></tr>)}</tbody>
       </table>
       </div>
     </>

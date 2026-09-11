@@ -27,6 +27,7 @@ from app.models import (
 )
 from app.services.acquisition import SafeSourceFetcher, SourceAcquisitionError
 from app.services.provenance import ProvenanceService
+from app.services.synthesis import SynthesisUsage
 from app.services.verification import VerificationService
 
 
@@ -472,10 +473,13 @@ class PipelineService:
             stage_id = stage.id
         try:
             artifacts = action(project_id)
+            usage = self._consume_synthesis_usage()
             with self.database.session() as db:
                 stage = db.get(StageRun, stage_id)
                 assert stage is not None
                 stage.status = "completed"
+                stage.provider = usage.provider
+                stage.model = usage.model
                 stage.artifact_ids = artifacts
                 db.execute(delete(UsageCostEvent).where(UsageCostEvent.stage_run_id == stage_id))
                 db.add(
@@ -483,6 +487,11 @@ class PipelineService:
                         project_id=project_id,
                         run_id=run_id,
                         stage_run_id=stage_id,
+                        provider=usage.provider,
+                        input_tokens=usage.input_tokens,
+                        output_tokens=usage.output_tokens,
+                        external_api_calls=usage.external_api_calls,
+                        cost_usd=usage.cost_usd,
                     )
                 )
             return artifacts
@@ -493,6 +502,13 @@ class PipelineService:
                     stage.status = "failed"
                     stage.error = "Stage failed; retry is safe."
             raise
+
+    def _consume_synthesis_usage(self) -> SynthesisUsage:
+        consumer = getattr(self.synthesis_provider, "consume_usage", None)
+        if not callable(consumer):
+            return SynthesisUsage()
+        usage = consumer()
+        return usage if isinstance(usage, SynthesisUsage) else SynthesisUsage()
 
     def _extract(self, project_id: str) -> list[str]:
         created: list[str] = []

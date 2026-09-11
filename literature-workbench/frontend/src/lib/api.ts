@@ -42,6 +42,8 @@ export interface ReviewSentence {
 
 export interface StageCost {
   stage: string;
+  provider: string;
+  model: string;
   calls: number;
   input_tokens: number;
   output_tokens: number;
@@ -842,7 +844,7 @@ function parseCosts(value: unknown): { events: CostEvent[] } {
 }
 
 interface RunDetail {
-  stages: Array<{ id: string; stage: string; status: string }>;
+  stages: Array<{ id: string; stage: string; status: string; provider: string; model: string }>;
 }
 
 function parseRunDetail(value: unknown): RunDetail {
@@ -855,6 +857,8 @@ function parseRunDetail(value: unknown): RunDetail {
         id: string(stage.id, `${label}.id`),
         stage: string(stage.stage, `${label}.stage`),
         status: string(stage.status, `${label}.status`),
+        provider: stage.provider === undefined ? "deterministic-fixture" : string(stage.provider, `${label}.provider`),
+        model: stage.model === undefined ? "rules-v1" : string(stage.model, `${label}.model`),
       };
     }),
   };
@@ -1052,6 +1056,8 @@ export function createWorkbenchApi(
             ? [{
                 stage: "discovery",
                 status: "completed",
+                provider: "discovery",
+                model: "n/a",
                 calls: costResponse.events.filter((event) => event.stage_run_id === null)
                   .reduce((sum, event) => sum + event.external_api_calls, 0),
                 input_tokens: 0,
@@ -1065,6 +1071,8 @@ export function createWorkbenchApi(
           return {
             stage: stage.stage,
             status: stage.status,
+            provider: stage.provider,
+            model: stage.model,
             calls: usage.reduce((sum, event) => sum + event.external_api_calls, 0),
             input_tokens: usage.reduce((sum, event) => sum + event.input_tokens, 0),
             output_tokens: usage.reduce((sum, event) => sum + event.output_tokens, 0),

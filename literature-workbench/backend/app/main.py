@@ -79,6 +79,7 @@ from app.services.pipeline import (
     SynthesisProvider,
     select_preferred_documents,
 )
+from app.services.synthesis import OpenAISynthesisProvider
 from app.services.verification import VerificationService
 from app.services.zotero import ZoteroClient, ZoteroError, ZoteroService
 
@@ -142,6 +143,7 @@ def create_app(
         database_url or os.getenv("WORKBENCH_DATABASE_URL", "sqlite:///instance/workbench.db")
     )
     source_fetcher = source_fetcher or SafeSourceFetcher()
+    synthesis_provider = synthesis_provider or OpenAISynthesisProvider.from_environment()
     pipeline = PipelineService(database, source_fetcher, synthesis_provider)
     discovery = DiscoveryService(
         database,
