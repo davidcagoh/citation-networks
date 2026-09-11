@@ -49,6 +49,10 @@ class StructuredExtraction:
     evidence_text: str
 
 
+class SynthesisProviderError(RuntimeError):
+    """Raised when the configured model provider cannot produce a response."""
+
+
 @dataclass(frozen=True)
 class RelationJudgment:
     relation_type: str
@@ -123,8 +127,7 @@ class OpenAISynthesisProvider:
                 "Authorization": f"Bearer {self.api_key}",
             },
         )
-        with urlopen(request, timeout=self.timeout_seconds) as response:
-            payload = json.load(response)
+        payload = self._request_json(request)
         text = self._output_text(payload)
         usage = payload.get("usage", {}) if isinstance(payload, dict) else {}
         input_tokens = int(usage.get("input_tokens", 0) or 0)
@@ -182,8 +185,7 @@ class OpenAISynthesisProvider:
                 "Authorization": f"Bearer {self.api_key}",
             },
         )
-        with urlopen(request, timeout=self.timeout_seconds) as response:
-            payload = json.load(response)
+        payload = self._request_json(request)
         usage = payload.get("usage", {}) if isinstance(payload, dict) else {}
         input_tokens = int(usage.get("input_tokens", 0) or 0)
         output_tokens = int(usage.get("output_tokens", 0) or 0)
@@ -269,8 +271,7 @@ class OpenAISynthesisProvider:
                 "Authorization": f"Bearer {self.api_key}",
             },
         )
-        with urlopen(request, timeout=self.timeout_seconds) as response:
-            payload = json.load(response)
+        payload = self._request_json(request)
         usage = payload.get("usage", {}) if isinstance(payload, dict) else {}
         input_tokens = int(usage.get("input_tokens", 0) or 0)
         output_tokens = int(usage.get("output_tokens", 0) or 0)
@@ -362,8 +363,7 @@ class OpenAISynthesisProvider:
                 "Authorization": f"Bearer {self.api_key}",
             },
         )
-        with urlopen(request, timeout=self.timeout_seconds) as response:
-            payload = json.load(response)
+        payload = self._request_json(request)
         usage = payload.get("usage", {}) if isinstance(payload, dict) else {}
         input_tokens = int(usage.get("input_tokens", 0) or 0)
         output_tokens = int(usage.get("output_tokens", 0) or 0)
@@ -458,8 +458,7 @@ class OpenAISynthesisProvider:
                 "Authorization": f"Bearer {self.api_key}",
             },
         )
-        with urlopen(request, timeout=self.timeout_seconds) as response:
-            payload = json.load(response)
+        payload = self._request_json(request)
         usage = payload.get("usage", {}) if isinstance(payload, dict) else {}
         input_tokens = int(usage.get("input_tokens", 0) or 0)
         output_tokens = int(usage.get("output_tokens", 0) or 0)
@@ -506,6 +505,16 @@ class OpenAISynthesisProvider:
             + input_tokens * input_price / 1_000_000
             + output_tokens * output_price / 1_000_000,
         )
+
+    def _request_json(self, request: Request) -> dict:
+        try:
+            with urlopen(request, timeout=self.timeout_seconds) as response:
+                payload = json.load(response)
+        except (OSError, ValueError) as exc:
+            raise SynthesisProviderError("Synthesis provider request failed") from exc
+        if not isinstance(payload, dict):
+            raise SynthesisProviderError("Synthesis provider returned an invalid response")
+        return payload
 
     @staticmethod
     def _output_text(payload: object) -> str | None:

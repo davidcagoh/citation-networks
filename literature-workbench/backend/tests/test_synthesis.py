@@ -447,6 +447,34 @@ def test_opted_in_provider_can_read_shared_openai_settings_without_logging_them(
     assert provider.api_key == "shared-secret"
 
 
+def test_provider_failure_is_returned_as_safe_api_error(tmp_path: Path, monkeypatch) -> None:
+    def failing_urlopen(request, timeout):
+        raise OSError("simulated provider outage")
+
+    monkeypatch.setattr("app.services.synthesis.urlopen", failing_urlopen)
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        synthesis_provider=OpenAISynthesisProvider(api_key="secret-not-printed"),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Review memory"}
+        ).json()["id"]
+        assert client.post(
+            f"/projects/{project_id}/sources/text",
+            json={
+                "title": "Memory Study",
+                "source_uri": "file:///memory-study",
+                "text": "A memory architecture improves retrieval quality.",
+            },
+        ).status_code == 201
+
+        response = client.post(f"/projects/{project_id}/runs/pipeline")
+
+        assert response.status_code == 502
+        assert response.json()["detail"] == "Synthesis provider unavailable"
+
+
 def test_synthesis_usage_is_recorded_in_project_costs(tmp_path: Path) -> None:
     class MeteredProvider:
         model_name = "gpt-5.6-luna"

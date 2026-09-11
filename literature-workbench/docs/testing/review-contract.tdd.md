@@ -96,12 +96,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 78 | Live planning derives section lenses from extracted entity types instead of hard-coded topic-specific headings. | `backend/tests/test_planning.py::test_live_plan_uses_extracted_types_instead_of_topic_specific_headings` | PASS |
 | 79 | Bounded candidate pairs can receive typed, confidence-bearing relation judgments from the evidence-bounded provider, with deterministic fallback. | `backend/tests/test_synthesis.py::test_openai_relation_judge_returns_typed_grounded_relation`, existing live relation tests | PASS |
 | 80 | The optional final-prose provider receives the approved document in section order and returns claim-keyed prose for a coherence pass without changing provenance mappings. | `backend/tests/test_synthesis.py::test_openai_document_pass_preserves_claim_ids`, `backend/tests/test_synthesis.py::test_final_prose_provider_waits_for_structure_approval` | PASS |
+| 81 | Model-provider transport/response failures are converted to a credential-safe HTTP 502 at pipeline and checkpoint boundaries. | `backend/tests/test_synthesis.py::test_provider_failure_is_returned_as_safe_api_error` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 115 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.13%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 116 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.95%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.

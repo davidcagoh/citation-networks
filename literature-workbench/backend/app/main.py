@@ -79,7 +79,7 @@ from app.services.pipeline import (
     SynthesisProvider,
     select_preferred_documents,
 )
-from app.services.synthesis import OpenAISynthesisProvider
+from app.services.synthesis import OpenAISynthesisProvider, SynthesisProviderError
 from app.services.verification import VerificationService
 from app.services.zotero import ZoteroClient, ZoteroError, ZoteroService
 
@@ -841,6 +841,8 @@ def create_app(
             raise HTTPException(409, str(exc)) from exc
         except ActiveRunError as exc:
             raise HTTPException(409, str(exc)) from exc
+        except SynthesisProviderError as exc:
+            raise HTTPException(502, "Synthesis provider unavailable") from exc
 
     @app.post("/projects/{project_id}/runs/{run_id}/resume", status_code=201)
     def resume_pipeline(project_id: str, run_id: str) -> dict:
@@ -850,6 +852,8 @@ def create_app(
             raise HTTPException(404, str(exc)) from exc
         except RunNotResumableError as exc:
             raise HTTPException(409, str(exc)) from exc
+        except SynthesisProviderError as exc:
+            raise HTTPException(502, "Synthesis provider unavailable") from exc
 
     @app.post("/projects/{project_id}/runs/{run_id}/approve-corpus", status_code=201)
     def approve_corpus(project_id: str, run_id: str) -> dict:
@@ -859,6 +863,8 @@ def create_app(
             raise HTTPException(404, str(exc)) from exc
         except RunNotAwaitingCorpusApprovalError as exc:
             raise HTTPException(409, str(exc)) from exc
+        except SynthesisProviderError as exc:
+            raise HTTPException(502, "Synthesis provider unavailable") from exc
 
     @app.post("/projects/{project_id}/runs/{run_id}/approve-structure", status_code=201)
     def approve_structure(project_id: str, run_id: str) -> dict:
@@ -868,6 +874,8 @@ def create_app(
             raise HTTPException(404, str(exc)) from exc
         except RunNotAwaitingStructureApprovalError as exc:
             raise HTTPException(409, str(exc)) from exc
+        except SynthesisProviderError as exc:
+            raise HTTPException(502, "Synthesis provider unavailable") from exc
 
     @app.get("/projects/{project_id}/corpus")
     def get_corpus(project_id: str) -> dict:
