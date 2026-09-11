@@ -64,6 +64,7 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
     approveStructure: vi.fn().mockResolvedValue({ id: "run-1", status: "completed" }),
     importZotero: vi.fn().mockResolvedValue({ project_id: "project-1", imported_count: 0, item_count: 0 }),
     exportZotero: vi.fn().mockResolvedValue({ project_id: "project-1", exported_count: 0 }),
+    expandCitations: vi.fn().mockResolvedValue({ project_id: "project-1", paper_id: "paper-1", direction: "backward", candidate_count: 0, provider: "fake-search" }),
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
     updatePlan: vi.fn().mockImplementation(async (_projectId, _planId, plan) => ({ id: "plan-1", ...plan })),

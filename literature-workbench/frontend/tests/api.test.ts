@@ -73,6 +73,24 @@ describe("workbench API adapter", () => {
       .resolves.toMatchObject({ stopping_certificate: { status: "satisfied", mode: "comprehensive" } });
   });
 
+  it("expands a paper through a directional citation route", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      project_id: "project-1", paper_id: "paper-1", direction: "backward",
+      candidate_count: 4, provider: "semantic-scholar",
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").expandCitations("project-1", "paper-1", "backward", 10))
+      .resolves.toEqual({
+        project_id: "project-1", paper_id: "paper-1", direction: "backward",
+        candidate_count: 4, provider: "semantic-scholar",
+      });
+    expect(fetchMock).toHaveBeenCalledWith("http://api/projects/project-1/runs/citation-expansion", expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({ paper_id: "paper-1", direction: "backward", limit: 10 }),
+    }));
+  });
+
   it("loads and updates a reproducible review protocol", async () => {
     const protocol: ReviewProtocol = {
       id: "protocol-1",
