@@ -144,6 +144,15 @@ export interface CitationExpansionResult {
   provider: string;
 }
 
+export interface LivingUpdateResult {
+  project_id: string;
+  mode: ReviewMode;
+  candidate_count: number;
+  new_paper_count: number;
+  route_count: number;
+  last_updated_at: string;
+}
+
 export type ReviewMode = "sufficient" | "comprehensive" | "systematic" | "quick" | "thorough";
 export type DiscoveryRoute = "semantic_search" | "survey_search" | "recent_search";
 
@@ -172,6 +181,7 @@ export interface WorkbenchApi {
   importZotero(projectId: string, collectionKey?: string, limit?: number): Promise<ZoteroImportResult>;
   exportZotero(projectId: string, collectionKey?: string): Promise<ZoteroExportResult>;
   expandCitations(projectId: string, paperId: string, direction: "backward" | "forward", limit?: number): Promise<CitationExpansionResult>;
+  livingUpdate(projectId: string, limit?: number): Promise<LivingUpdateResult>;
   runDiscovery(projectId: string, query: string, limit?: number, routes?: DiscoveryRoute[]): Promise<{
     candidate_count: number;
     route_count: number;
@@ -443,6 +453,18 @@ function parseCitationExpansion(value: unknown): CitationExpansionResult {
     direction,
     candidate_count: number(result.candidate_count, "citation expansion.candidate_count"),
     provider: string(result.provider, "citation expansion.provider"),
+  };
+}
+
+function parseLivingUpdate(value: unknown): LivingUpdateResult {
+  const result = object(value, "living update");
+  return {
+    project_id: string(result.project_id, "living update.project_id"),
+    mode: string(result.mode, "living update.mode") as ReviewMode,
+    candidate_count: number(result.candidate_count, "living update.candidate_count"),
+    new_paper_count: number(result.new_paper_count, "living update.new_paper_count"),
+    route_count: number(result.route_count, "living update.route_count"),
+    last_updated_at: string(result.last_updated_at, "living update.last_updated_at"),
   };
 }
 
@@ -726,6 +748,11 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/runs/citation-expansion`, parseCitationExpansion, {
         method: "POST",
         body: JSON.stringify({ paper_id: paperId, direction, limit }),
+      }),
+    livingUpdate: (projectId, limit = 20) =>
+      request(baseUrl, `/projects/${projectId}/runs/living-update`, parseLivingUpdate, {
+        method: "POST",
+        body: JSON.stringify({ limit }),
       }),
     runDiscovery: (projectId, query, limit = 20, routes) =>
       request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {
