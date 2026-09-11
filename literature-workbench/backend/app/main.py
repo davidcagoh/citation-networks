@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, Response
 from sqlalchemy import func, select
 
 from app.db import Database
@@ -40,6 +41,7 @@ from app.services.discovery import (
     DiscoveryService,
     SemanticScholarProvider,
 )
+from app.services.export import ExportFormat, ProjectExporter
 from app.services.pipeline import (
     CorpusRequiredError,
     PipelineService,
@@ -100,6 +102,7 @@ def create_app(
     pipeline = PipelineService(database)
     discovery = DiscoveryService(database, discovery_provider or SemanticScholarProvider())
     verification = VerificationService(database)
+    exporter = ProjectExporter(database)
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -114,6 +117,7 @@ def create_app(
     app.state.pipeline = pipeline
     app.state.discovery = discovery
     app.state.verification = verification
+    app.state.exporter = exporter
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_allowed_origins(),
@@ -699,5 +703,15 @@ def create_app(
                     for event in events
                 ],
             }
+
+    @app.get("/projects/{project_id}/export")
+    def export_project(project_id: str, format: ExportFormat = "markdown"):
+        try:
+            exported = exporter.export(project_id, format)
+        except ValueError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        if format == "json":
+            return JSONResponse(content=exported.body)
+        return Response(content=exported.body, media_type=exported.media_type)
 
     return app
