@@ -94,6 +94,21 @@ describe("workbench API adapter", () => {
       .resolves.toMatchObject({ status: "incomplete", limitations: ["candidate papers remain unscreened"] });
   });
 
+  it("approves corpus and structure checkpoints", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(response({ id: "run-1", status: "awaiting_structure_approval" }))
+      .mockResolvedValueOnce(response({ id: "run-1", status: "completed" }));
+    vi.stubGlobal("fetch", fetchMock);
+    const api = createWorkbenchApi("http://api");
+
+    await expect(api.approveCorpus("project-1", "run-1")).resolves.toEqual({
+      id: "run-1", status: "awaiting_structure_approval",
+    });
+    await expect(api.approveStructure("project-1", "run-1")).resolves.toEqual({
+      id: "run-1", status: "completed",
+    });
+  });
+
   it("runs idempotent acquisition for discovered papers", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
       project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0,
