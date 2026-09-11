@@ -2,7 +2,7 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
-import type { ClaimEvidence, ReviewPlan, ScopePreview, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
+import type { ClaimEvidence, ReviewMode, ReviewPlan, ScopePreview, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
 import styles from "./WorkbenchApp.module.css";
 
 const tabs = ["Brief", "Corpus", "Structure", "Review", "Run / Costs"] as const;
@@ -33,6 +33,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   const [selectedEvidence, setSelectedEvidence] = useState<ClaimEvidence | null>(null);
   const [verificationIssues, setVerificationIssues] = useState<VerificationIssue[]>([]);
   const [maxPapers, setMaxPapers] = useState(50);
+  const [reviewMode, setReviewMode] = useState<ReviewMode>("sufficient");
   const [scopePreview, setScopePreview] = useState<ScopePreview | null>(null);
   const [previewProjectId, setPreviewProjectId] = useState<string | null>(null);
   const [evidenceLoading, setEvidenceLoading] = useState(false);
@@ -111,7 +112,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     try {
       setRunState("creating");
       const project = await api.createProject({ title: title.trim(), prompt: prompt.trim() });
-      const preview = await api.scopePreview(project.id, { mode: "thorough", max_papers: maxPapers });
+      const preview = await api.scopePreview(project.id, { mode: reviewMode, max_papers: maxPapers });
       setScopePreview(preview);
       setPreviewProjectId(project.id);
       setRunState("complete");
@@ -334,7 +335,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             key={activeTab}
           >
             {activeTab === "Brief" && (
-              <BriefForm title={title} prompt={prompt} sourceText={sourceText} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} preview={scopePreview} />
+              <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} preview={scopePreview} />
             )}
             {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} paperCount={session?.paperCount ?? null} onScreen={screenPaper} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} onSave={savePlan} />}
@@ -357,8 +358,9 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   );
 }
 
-function BriefForm({ title, prompt, sourceText, busy, status, onTitle, onPrompt, onSourceText, onSubmit, onDiscover, onPreview, onImport, preview }: {
+function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, busy, status, onTitle, onPrompt, onSourceText, onSubmit, onDiscover, onPreview, onImport, preview }: {
   title: string; prompt: string; sourceText: string; busy: boolean; status: string;
+  reviewMode: ReviewMode; onReviewMode: (value: ReviewMode) => void;
   onTitle: (value: string) => void; onPrompt: (value: string) => void;
   onSourceText: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -381,6 +383,14 @@ function BriefForm({ title, prompt, sourceText, busy, status, onTitle, onPrompt,
         <label className={styles.label} htmlFor="source-text">Optional source text <span className={styles.hint}>Paste one paper or excerpt</span></label>
         <textarea id="source-text" aria-label="Optional source text" className={styles.textarea} value={sourceText} onChange={(event) => onSourceText(event.target.value)} placeholder="Paste source text to run it through the provenance pipeline." />
       </div>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="review-mode">Review mode <span className={styles.hint}>Defines the coverage contract</span></label>
+        <select id="review-mode" aria-label="Review mode" className={styles.input} value={reviewMode} onChange={(event) => onReviewMode(event.target.value as ReviewMode)}>
+          <option value="sufficient">Sufficient Related Work</option>
+          <option value="comprehensive">Comprehensive Survey</option>
+          <option value="systematic">Systematic Review (PRISMA)</option>
+        </select>
+      </div>
       <div className={styles.actionRow}>
         <button className={styles.primary} type="submit" disabled={busy}>{busy ? status : "Create and run fixture"}</button>
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onPreview}>Preview scope</button>
@@ -390,7 +400,7 @@ function BriefForm({ title, prompt, sourceText, busy, status, onTitle, onPrompt,
       </div>
       {preview && <section className={styles.planHeader} aria-label="Scope preview">
         <div><div className={styles.principle}>Scope preview · {preview.scope.mode}</div><p>{preview.scope.query}</p></div>
-        <div><strong>{preview.budget.max_papers} papers</strong><br /><span className={styles.microcopy}>{preview.budget.estimated_external_api_calls} API call · ${preview.budget.estimated_cost_usd.toFixed(2)} estimated</span></div>
+        <div><strong>{preview.budget.max_papers} papers</strong><br /><span className={styles.microcopy}>{preview.budget.estimated_external_api_calls} API calls · {preview.budget.estimated_input_tokens.toLocaleString()} input tokens · ${preview.budget.estimated_cost_usd.toFixed(2)} estimated</span></div>
         <ul>{preview.scope.suggested_focus.map((focus) => <li key={focus}>{focus}</li>)}</ul>
       </section>}
     </form>

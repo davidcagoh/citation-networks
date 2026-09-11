@@ -33,8 +33,12 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
     ingestSourceText: vi.fn().mockResolvedValue({ project_id: "project-1", paper_id: "paper-1", status: "included", source_type: "text" }),
     scopePreview: vi.fn().mockResolvedValue({
       project_id: "project-1",
-      scope: { query: "memory", mode: "thorough", suggested_focus: ["Methods"] },
-      budget: { max_papers: 50, estimated_external_api_calls: 1, estimated_cost_usd: 0 },
+      scope: { query: "memory", mode: "thorough", suggested_focus: ["Methods", "PRISMA protocol and audit trail"] },
+      budget: {
+        mode: "comprehensive", recommended: true, max_papers: 50, max_external_api_calls: 300,
+        estimated_external_api_calls: 300, estimated_input_tokens: 60000,
+        estimated_output_tokens: 30000, estimated_cost_usd: 0,
+      },
     }),
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
@@ -96,7 +100,7 @@ describe("Literature Workbench", () => {
 
     expect(await screen.findByRole("region", { name: "Scope preview" })).toBeVisible();
     expect(screen.getByText("Methods")).toBeVisible();
-    expect(api.scopePreview).toHaveBeenCalledWith("project-1", { mode: "thorough", max_papers: 50 });
+    expect(api.scopePreview).toHaveBeenCalledWith("project-1", { mode: "sufficient", max_papers: 50 });
   });
 
   it("selects a review contract before previewing scope", async () => {

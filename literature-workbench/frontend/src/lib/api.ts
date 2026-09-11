@@ -83,9 +83,20 @@ export interface VerificationIssue {
 
 export interface ScopePreview {
   project_id: string;
-  scope: { query: string; mode: "quick" | "thorough"; suggested_focus: string[] };
-  budget: { max_papers: number; estimated_external_api_calls: number; estimated_cost_usd: number };
+  scope: { query: string; mode: ReviewMode; suggested_focus: string[] };
+  budget: {
+    mode: ReviewMode;
+    recommended: boolean;
+    max_papers: number;
+    max_external_api_calls: number;
+    estimated_external_api_calls: number;
+    estimated_input_tokens: number;
+    estimated_output_tokens: number;
+    estimated_cost_usd: number;
+  };
 }
+
+export type ReviewMode = "sufficient" | "comprehensive" | "systematic" | "quick" | "thorough";
 
 export interface WorkbenchApi {
   createProject(input: { title: string; prompt: string }): Promise<{ id: string }>;
@@ -105,7 +116,7 @@ export interface WorkbenchApi {
     venue?: string;
     doi?: string;
   }): Promise<{ project_id: string; paper_id: string; status: string; source_type: string }>;
-  scopePreview(projectId: string, input?: { mode?: "quick" | "thorough"; max_papers?: number }): Promise<ScopePreview>;
+  scopePreview(projectId: string, input?: { mode?: ReviewMode; max_papers?: number }): Promise<ScopePreview>;
   runDiscovery(projectId: string, query: string, limit?: number): Promise<{
     candidate_count: number;
     provider: string;
@@ -238,7 +249,9 @@ function parseScopePreview(value: unknown): ScopePreview {
   const scope = object(preview.scope, "scope preview.scope");
   const budget = object(preview.budget, "scope preview.budget");
   const mode = string(scope.mode, "scope preview.scope.mode");
-  if (mode !== "quick" && mode !== "thorough") throw new ShapeError("scope preview.scope.mode is invalid");
+  if (!(mode === "sufficient" || mode === "comprehensive" || mode === "systematic" || mode === "quick" || mode === "thorough")) {
+    throw new ShapeError("scope preview.scope.mode is invalid");
+  }
   return {
     project_id: string(preview.project_id, "scope preview.project_id"),
     scope: {
@@ -248,8 +261,13 @@ function parseScopePreview(value: unknown): ScopePreview {
         .map((item, index) => string(item, `scope preview.scope.suggested_focus[${index}]`)),
     },
     budget: {
+      mode: string(budget.mode, "scope preview.budget.mode") as ReviewMode,
+      recommended: boolean(budget.recommended, "scope preview.budget.recommended"),
       max_papers: number(budget.max_papers, "scope preview.budget.max_papers"),
+      max_external_api_calls: number(budget.max_external_api_calls, "scope preview.budget.max_external_api_calls"),
       estimated_external_api_calls: number(budget.estimated_external_api_calls, "scope preview.budget.estimated_external_api_calls"),
+      estimated_input_tokens: number(budget.estimated_input_tokens, "scope preview.budget.estimated_input_tokens"),
+      estimated_output_tokens: number(budget.estimated_output_tokens, "scope preview.budget.estimated_output_tokens"),
       estimated_cost_usd: number(budget.estimated_cost_usd, "scope preview.budget.estimated_cost_usd"),
     },
   };
