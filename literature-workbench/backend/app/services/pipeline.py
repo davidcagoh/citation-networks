@@ -25,6 +25,7 @@ from app.models import (
     UsageCostEvent,
 )
 from app.services.provenance import ProvenanceService
+from app.services.verification import VerificationService
 
 
 class ProjectNotFoundError(Exception):
@@ -80,6 +81,7 @@ class PipelineService:
     def __init__(self, database: Database) -> None:
         self.database = database
         self.provenance = ProvenanceService(database)
+        self.verification = VerificationService(database)
 
     def ingest_fixture(self, project_id: str) -> int:
         with self.database.session() as db:
@@ -258,6 +260,8 @@ class PipelineService:
                     action,
                     stage_id=existing_stages.get(position),
                 )
+                if name == "writing":
+                    self.verification.verify(project_id)
             with self.database.session() as db:
                 persisted = db.get(Run, run_id)
                 assert persisted is not None
