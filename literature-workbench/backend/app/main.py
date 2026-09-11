@@ -376,8 +376,13 @@ def create_app(
     @app.post("/projects/{project_id}/runs/citation-expansion", status_code=201)
     def expand_citations(project_id: str, value: CitationExpansionRequest) -> dict:
         try:
-            count = discovery.expand_citations(
-                project_id, value.paper_id, value.direction, value.limit
+            expansion = discovery.expand_citation_network(
+                project_id,
+                value.paper_id,
+                value.direction,
+                value.limit,
+                value.depth,
+                value.max_papers,
             )
         except DiscoveryProviderError as exc:
             message = str(exc)
@@ -392,7 +397,9 @@ def create_app(
             "project_id": project_id,
             "paper_id": value.paper_id,
             "direction": value.direction,
-            "candidate_count": count,
+            "candidate_count": expansion["candidate_count"],
+            "depth_reached": expansion["depth_reached"],
+            "stopping_reason": expansion["stopping_reason"],
             "provider": discovery.provider.name,
         }
 

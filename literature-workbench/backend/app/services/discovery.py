@@ -202,6 +202,69 @@ class DiscoveryService:
     def expand_citations(
         self, project_id: str, paper_id: str, direction: str, limit: int
     ) -> int:
+        return self.expand_citation_network(project_id, paper_id, direction, limit, 1, 100)[
+            "candidate_count"
+        ]
+
+    def expand_citation_network(
+        self,
+        project_id: str,
+        paper_id: str,
+        direction: str,
+        limit: int,
+        depth: int,
+        max_papers: int,
+    ) -> dict[str, int | str]:
+        frontier = {paper_id}
+        visited = {paper_id}
+        candidate_count = 0
+        depth_reached = 0
+        stopping_reason = "depth_limit_reached"
+        for _ in range(depth):
+            next_frontier: set[str] = set()
+            for current_id in frontier:
+                candidate_count += self._expand_one(
+                    project_id, current_id, direction, min(limit, max_papers)
+                )
+                with self.database.session() as db:
+                    edges = list(
+                        db.scalars(
+                            select(CitationEdge).where(
+                                CitationEdge.project_id == project_id,
+                                CitationEdge.direction == direction,
+                                (CitationEdge.source_paper_id == current_id)
+                                if direction == "backward"
+                                else (CitationEdge.target_paper_id == current_id),
+                            )
+                        )
+                    )
+                    next_frontier.update(
+                        edge.target_paper_id if direction == "backward" else edge.source_paper_id
+                        for edge in edges
+                    )
+            next_frontier -= visited
+            if not next_frontier:
+                stopping_reason = "frontier_exhausted"
+                break
+            depth_reached += 1
+            available = max_papers - len(visited)
+            if available <= 0:
+                stopping_reason = "max_papers_reached"
+                break
+            frontier = set(list(next_frontier)[:available])
+            visited.update(frontier)
+            if len(next_frontier) > available:
+                stopping_reason = "max_papers_reached"
+                break
+        return {
+            "candidate_count": candidate_count,
+            "depth_reached": depth_reached,
+            "stopping_reason": stopping_reason,
+        }
+
+    def _expand_one(
+        self, project_id: str, paper_id: str, direction: str, limit: int
+    ) -> int:
         with self.database.session() as db:
             seed = db.scalar(
                 select(Paper).where(Paper.id == paper_id, Paper.project_id == project_id)

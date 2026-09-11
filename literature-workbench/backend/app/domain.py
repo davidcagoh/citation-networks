@@ -73,6 +73,8 @@ class CitationExpansionRequest(BaseModel):
     paper_id: str = Field(min_length=1, max_length=100)
     direction: Literal["backward", "forward"]
     limit: int = Field(default=20, ge=1, le=100)
+    depth: int = Field(default=1, ge=1, le=3)
+    max_papers: int = Field(default=100, ge=1, le=500)
 
 
 class LivingUpdateRequest(BaseModel):
