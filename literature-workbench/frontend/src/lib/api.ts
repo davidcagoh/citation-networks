@@ -144,7 +144,7 @@ export interface PrismaReport {
     cutoff_date: string | null;
     update_policy: "on_demand";
   };
-  search: { routes: string[]; queries: string[]; last_search_at: string | null };
+  search: { routes: string[]; queries: string[]; filtered_by_cutoff: number; last_search_at: string | null };
   flow: {
     identified: number;
     unique_identified: number;
@@ -527,6 +527,7 @@ function parsePrismaReport(value: unknown): PrismaReport {
     search: {
       routes: strings(search.routes, "PRISMA report.search.routes"),
       queries: strings(search.queries, "PRISMA report.search.queries"),
+      filtered_by_cutoff: number(search.filtered_by_cutoff ?? 0, "PRISMA report.search.filtered_by_cutoff"),
       last_search_at: nullableString(search.last_search_at, "PRISMA report.search.last_search_at"),
     },
     flow: {

@@ -282,6 +282,7 @@ def create_app(
                 dict.fromkeys(event.query for event in identification_events if event.query)
             )
             routes = list(dict.fromkeys(event.route for event in identification_events))
+            filtered_by_cutoff = sum(event.action == "filtered" for event in events)
             last_search = (
                 identification_events[-1].created_at.isoformat() if identification_events else None
             )
@@ -299,6 +300,7 @@ def create_app(
                 "search": {
                     "routes": routes,
                     "queries": queries,
+                    "filtered_by_cutoff": filtered_by_cutoff,
                     "last_search_at": last_search,
                 },
                 "flow": {

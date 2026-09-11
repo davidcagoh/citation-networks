@@ -733,6 +733,7 @@ function Corpus({ workspace, audit, prisma, paperCount, approval, onApprove, onS
         <span>{prisma.flow.duplicates_removed} duplicates removed · {prisma.flow.screened} screened</span>
         <span>{prisma.flow.included} included · {prisma.flow.excluded} excluded</span>
         <span>{prisma.flow.reports_not_retrieved} reports not retrieved</span>
+        {prisma.search.filtered_by_cutoff > 0 && <span>{prisma.search.filtered_by_cutoff} records filtered by cutoff</span>}
       </section>}
       <div className={styles.tableRegion} role="region" aria-label="Corpus papers" tabIndex={0}>
       <table className={styles.table}>

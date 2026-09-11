@@ -165,10 +165,26 @@ class DiscoveryService:
             candidates = self._order_candidates(
                 self.provider.search(route_query, limit), route
             )
-            candidates, excluded_count = self._apply_cutoff(candidates, cutoff_date)
-            filtered_candidates += excluded_count
+            candidates, excluded = self._apply_cutoff(candidates, cutoff_date)
+            filtered_candidates += len(excluded)
             total_candidates += len(candidates)
             with self.database.session() as db:
+                for rank, candidate in enumerate(excluded, start=1):
+                    db.add(
+                        DiscoveryEvent(
+                            project_id=project_id,
+                            route=route,
+                            query=route_query,
+                            action="filtered",
+                            rank=rank,
+                            score=candidate.score,
+                            rationale=(
+                                f"Filtered by protocol cutoff date {cutoff_date}: "
+                                f"{candidate.title}"
+                            ),
+                            provider=self.provider.name,
+                        )
+                    )
                 for rank, candidate in enumerate(candidates, start=1):
                     paper = self._find_paper(db, project_id, candidate)
                     if paper is None:
@@ -237,12 +253,12 @@ class DiscoveryService:
     @staticmethod
     def _apply_cutoff(
         candidates: Sequence[DiscoveryCandidate], cutoff_date: str | None
-    ) -> tuple[list[DiscoveryCandidate], int]:
+    ) -> tuple[list[DiscoveryCandidate], list[DiscoveryCandidate]]:
         if cutoff_date is None:
-            return list(candidates), 0
+            return list(candidates), []
         cutoff = date.fromisoformat(cutoff_date)
         retained: list[DiscoveryCandidate] = []
-        excluded = 0
+        excluded: list[DiscoveryCandidate] = []
         for candidate in candidates:
             published = None
             if candidate.publication_date:
@@ -253,7 +269,7 @@ class DiscoveryService:
                 and candidate.year is not None
                 and candidate.year > cutoff.year
             ):
-                excluded += 1
+                excluded.append(candidate)
             else:
                 retained.append(candidate)
         return retained, excluded
