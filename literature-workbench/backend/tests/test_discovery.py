@@ -967,3 +967,34 @@ def test_app_wires_free_multi_source_discovery_by_default(tmp_path: Path) -> Non
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
 
     assert app.state.discovery.provider.name == "multi-source"
+
+
+def test_openalex_provider_expands_forward_citations(monkeypatch) -> None:
+    requests: list[str] = []
+
+    def fake_urlopen(request, timeout: float):
+        requests.append(request.full_url)
+        return FakeHTTPResponse(
+            {
+                "results": [
+                    {
+                        "id": "https://openalex.org/W456",
+                        "title": "A citing memory study",
+                        "publication_year": 2026,
+                        "publication_date": "2026-02-01",
+                        "doi": None,
+                        "cited_by_count": 2,
+                        "authorships": [],
+                        "primary_location": {},
+                        "abstract_inverted_index": None,
+                    }
+                ]
+            }
+        )
+
+    monkeypatch.setattr("app.services.discovery.urlopen", fake_urlopen)
+    candidates = OpenAlexProvider().related("openalex:W123", "forward", 1)
+
+    assert "filter=cites%3AW123" in requests[0]
+    assert candidates[0].external_id == "openalex:W456"
+    assert candidates[0].title == "A citing memory study"
