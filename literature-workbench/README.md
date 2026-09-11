@@ -4,8 +4,13 @@ Local-first research instrument for turning a supplied paper corpus into
 structured evidence, scientific relations, an explanatory review plan, and a
 claim-level inspectable review.
 
-Slice 1 is deterministic: it runs on a bundled five-paper regression fixture
-and makes no network or paid-model calls.
+The bundled five-paper regression fixture is deterministic and makes no network
+or paid-model calls. The UI also supports live discovery through Semantic
+Scholar when the provider is reachable. Discovered papers are candidates until
+screened; including them and choosing “Build grounded review” creates
+abstract-backed evidence with explicit provenance. This live path is a
+conservative MVP: full-text acquisition and model-backed semantic extraction
+are not yet enabled.
 
 ## Run locally
 
