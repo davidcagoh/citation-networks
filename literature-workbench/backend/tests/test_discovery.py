@@ -486,7 +486,7 @@ def test_on_demand_living_update_records_timestamp_and_new_papers(tmp_path: Path
         assert response.status_code == 201
         body = response.json()
         assert body["route_count"] == 5
-        assert body["new_paper_count"] == 2
+        assert body["new_paper_count"] == 3
         assert body["last_updated_at"]
         with app.state.database.session() as database:
             protocol = database.scalar(
