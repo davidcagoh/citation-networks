@@ -229,6 +229,9 @@ def create_app(
             protocol.sources = value.sources
             protocol.cutoff_date = value.cutoff_date.isoformat() if value.cutoff_date else None
             protocol.update_policy = value.update_policy
+            brief = db.scalar(select(ResearchBrief).where(ResearchBrief.project_id == project_id))
+            if brief is not None:
+                brief.review_mode = value.review_mode
             db.flush()
             return _protocol_json(protocol)
 
