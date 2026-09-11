@@ -839,6 +839,33 @@ def test_discovery_validates_query_and_limit(tmp_path: Path) -> None:
         assert client.post(path, json={"query": "memory", "limit": 101}).status_code == 422
 
 
+def test_discovery_enforces_the_requested_external_call_budget(tmp_path: Path) -> None:
+    class LocalProvider:
+        name = "local"
+
+        def search(self, query: str, limit: int):
+            return []
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=MultiSourceDiscoveryProvider(
+            [LocalProvider(), LocalProvider()]
+        ),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1, "max_external_api_calls": 1},
+        )
+    assert response.status_code == 429
+
+
 def test_discovered_abstract_can_flow_to_grounded_review(tmp_path: Path) -> None:
     app = create_app(
         f"sqlite:///{tmp_path / 'workbench.db'}",

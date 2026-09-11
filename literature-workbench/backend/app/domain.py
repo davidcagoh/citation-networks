@@ -55,6 +55,7 @@ class CorpusMembershipUpdate(BaseModel):
 class DiscoveryRequest(BaseModel):
     query: str = Field(min_length=1, max_length=500)
     limit: int = Field(default=20, ge=1, le=100)
+    max_external_api_calls: int = Field(default=100, ge=0, le=10_000)
     routes: list[DiscoveryRoute] = Field(
         default_factory=lambda: ["semantic_search"], min_length=1, max_length=5
     )
