@@ -179,6 +179,8 @@ export interface WorkbenchApi {
     max_external_api_calls?: number;
     max_cost_usd?: number;
   }): Promise<{ id: string; status: string }>;
+  approveCorpus(projectId: string, runId: string): Promise<{ id: string; status: string }>;
+  approveStructure(projectId: string, runId: string): Promise<{ id: string; status: string }>;
   getWorkspace(projectId: string, runId?: string): Promise<Workspace>;
   getClaimEvidence(projectId: string, claimId: string, signal?: AbortSignal): Promise<ClaimEvidence>;
 }
@@ -654,6 +656,14 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/runs/pipeline`, parseRun, {
         method: "POST",
         ...(budget ? { body: JSON.stringify(budget) } : {}),
+      }),
+    approveCorpus: (projectId, runId) =>
+      request(baseUrl, `/projects/${projectId}/runs/${runId}/approve-corpus`, parseRun, {
+        method: "POST",
+      }),
+    approveStructure: (projectId, runId) =>
+      request(baseUrl, `/projects/${projectId}/runs/${runId}/approve-structure`, parseRun, {
+        method: "POST",
       }),
     async getWorkspace(projectId, runId) {
       const runRequest = runId
