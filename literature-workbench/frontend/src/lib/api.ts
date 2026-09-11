@@ -140,6 +140,7 @@ export interface CoverageAudit {
       quality_signals_available: boolean;
       survey_route_has_review_hit: boolean;
       provider_fanout_complete: boolean;
+      selected_reports_retrieved: boolean;
     };
   };
   limitations: string[];
@@ -532,6 +533,7 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
           quality_signals_available: boolean(checks.quality_signals_available ?? true, "coverage audit.stopping_certificate.checks.quality_signals_available"),
           survey_route_has_review_hit: boolean(checks.survey_route_has_review_hit ?? true, "coverage audit.stopping_certificate.checks.survey_route_has_review_hit"),
           provider_fanout_complete: boolean(checks.provider_fanout_complete ?? true, "coverage audit.stopping_certificate.checks.provider_fanout_complete"),
+          selected_reports_retrieved: boolean(checks.selected_reports_retrieved ?? true, "coverage audit.stopping_certificate.checks.selected_reports_retrieved"),
         },
       };
     })(),

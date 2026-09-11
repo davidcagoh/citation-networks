@@ -1156,6 +1156,11 @@ def create_app(
                 limitations.append("survey route returned no review-like work")
             if mode in {"comprehensive", "systematic"} and not provider_fanout_complete:
                 limitations.append("required provider fan-out is incomplete")
+            selected_reports_retrieved = (
+                mode != "systematic" or selected_with_full_text == len(selected)
+            )
+            if mode == "systematic" and not selected_reports_retrieved:
+                limitations.append("systematic review has selected reports not retrieved")
             all_candidates_screened = not candidates
             selected_sources_available = selected_with_text == len(selected)
             stopping_certificate = {
@@ -1169,6 +1174,7 @@ def create_app(
                     "quality_signals_available": quality_signals_available,
                     "survey_route_has_review_hit": survey_route_has_review_hit,
                     "provider_fanout_complete": provider_fanout_complete,
+                    "selected_reports_retrieved": selected_reports_retrieved,
                 },
             }
             ready = stopping_certificate["status"] == "satisfied"

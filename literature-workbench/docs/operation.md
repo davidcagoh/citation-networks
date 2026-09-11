@@ -54,6 +54,9 @@ unsupported content, extraction failures, and sources over 5 MB are rejected.
 
 For PRISMA reporting, an abstract alone does not count as a retrieved report:
 `reports_not_retrieved` requires a usable text, HTML, or parsed-PDF document.
+The same rule gates the systematic-review corpus checkpoint; comprehensive
+survey mode reports the source-depth limitation without imposing the
+systematic retrieval gate.
 
 The current live extractor is intentionally heuristic: it selects a bounded
 first sentence and records whether it came from an abstract or imported text.
