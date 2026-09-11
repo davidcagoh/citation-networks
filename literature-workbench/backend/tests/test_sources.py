@@ -14,9 +14,15 @@ class FakeSourceFetcher:
 
     def fetch(self, source_uri: str) -> FetchedSource:
         self.urls.append(source_uri)
+        text = (
+            "<html><head><title>Ignore</title><script>bad()</script></head>"
+            "<body><h1>Fetched Study</h1><p>Memory evidence.</p></body></html>"
+            if source_uri.endswith(".html")
+            else "Fetched paper text with memory evidence."
+        )
         return FetchedSource(
-            text="Fetched paper text with memory evidence.",
-            content_type="text/plain",
+            text=text,
+            content_type="text/html" if source_uri.endswith(".html") else "text/plain",
             final_uri=source_uri,
         )
 
@@ -141,7 +147,21 @@ def test_fetches_public_source_url_with_provenance_and_blocks_private_targets(
             )
             assert source is not None
             assert source.source_uri == "https://8.8.8.8/paper.txt"
-            assert source.parser == "url-fetch-v1"
+        assert source.parser == "url-fetch-v1"
+
+        html_response = client.post(
+            f"/projects/{project_id}/sources/url",
+            json={"title": "HTML Study", "source_uri": "https://8.8.8.8/paper.html"},
+        )
+        assert html_response.status_code == 201
+        html_paper_id = html_response.json()["paper_id"]
+        with app.state.database.session() as database:
+            html_source = database.scalar(
+                select(SourceDocument).where(SourceDocument.paper_id == html_paper_id)
+            )
+            assert html_source is not None
+            assert html_source.source_type == "html"
+            assert html_source.text == "Fetched Study Memory evidence."
 
         blocked = client.post(
             f"/projects/{project_id}/sources/url",
