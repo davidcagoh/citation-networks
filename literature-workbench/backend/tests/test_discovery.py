@@ -1134,6 +1134,7 @@ def test_multi_source_search_usage_counts_each_provider_attempt(tmp_path: Path) 
             json={"query": "memory", "limit": 1},
         )
         assert response.status_code == 201
+        assert response.json()["external_api_calls"] == 2
 
     with app.state.database.session() as db:
         usage = list(db.scalars(select(UsageCostEvent)))

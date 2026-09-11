@@ -294,6 +294,7 @@ describe("workbench API adapter", () => {
         candidate_count: 3,
         route_count: 1,
         filtered_count: 0,
+        external_api_calls: 1,
         provider: "semantic-scholar",
         query: "agent memory",
       }))
@@ -311,6 +312,7 @@ describe("workbench API adapter", () => {
       candidate_count: 3,
       route_count: 1,
       filtered_count: 0,
+      external_api_calls: 1,
       provider: "semantic-scholar",
       query: "agent memory",
     });
@@ -329,7 +331,7 @@ describe("workbench API adapter", () => {
 
   it("sends explicit discovery routes for broader review contracts", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
-      project_id: "project-1", candidate_count: 10, route_count: 5,
+      project_id: "project-1", candidate_count: 10, route_count: 5, external_api_calls: 14,
       provider: "semantic-scholar", query: "agent memory",
     }));
     vi.stubGlobal("fetch", fetchMock);
