@@ -65,3 +65,25 @@ def test_plan_update_rejects_invalid_or_foreign_plan(tmp_path: Path) -> None:
         )
         assert invalid.status_code == 422
         assert foreign.status_code == 404
+
+
+def test_plan_update_rejects_artifact_ids_outside_project(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = _completed_project(client)
+        plan = client.get(f"/projects/{project_id}/plans").json()["plans"][0]
+        response = client.patch(
+            f"/projects/{project_id}/plans/{plan['id']}",
+            json={
+                "title": plan["title"],
+                "thesis": plan["thesis"],
+                "organizing_principle": plan["organizing_principle"],
+                "sections": [{
+                    **plan["sections"][0],
+                    "planned_claim_ids": ["foreign-claim"],
+                }],
+            },
+        )
+
+        assert response.status_code == 422
+        assert "claim" in response.json()["detail"]
