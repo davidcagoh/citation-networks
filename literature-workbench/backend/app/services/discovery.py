@@ -21,6 +21,7 @@ from app.models import (
     Paper,
     Project,
     ProviderApproval,
+    ReviewProtocol,
     SourceDocument,
     UsageCostEvent,
 )
@@ -360,14 +361,21 @@ class DiscoveryService:
         frontier = {paper_id}
         visited = {paper_id}
         candidate_count = 0
+        filtered_count = 0
         depth_reached = 0
         stopping_reason = "depth_limit_reached"
         for _ in range(depth):
             next_frontier: set[str] = set()
             for current_id in frontier:
-                candidate_count += self._expand_one(
-                    project_id, current_id, direction, min(limit, max_papers)
+                added, filtered = self._expand_one(
+                    project_id,
+                    current_id,
+                    direction,
+                    min(limit, max_papers),
+                    self._project_cutoff(project_id),
                 )
+                candidate_count += added
+                filtered_count += filtered
                 with self.database.session() as db:
                     edges = list(
                         db.scalars(
@@ -400,13 +408,19 @@ class DiscoveryService:
                 break
         return {
             "candidate_count": candidate_count,
+            "filtered_count": filtered_count,
             "depth_reached": depth_reached,
             "stopping_reason": stopping_reason,
         }
 
     def _expand_one(
-        self, project_id: str, paper_id: str, direction: str, limit: int
-    ) -> int:
+        self,
+        project_id: str,
+        paper_id: str,
+        direction: str,
+        limit: int,
+        cutoff_date: str | None = None,
+    ) -> tuple[int, int]:
         with self.database.session() as db:
             seed = db.scalar(
                 select(Paper).where(Paper.id == paper_id, Paper.project_id == project_id)
@@ -419,8 +433,25 @@ class DiscoveryService:
                 raise DiscoveryProviderError("Paper has no provider identifier")
         candidates = self.provider.related(external_id, direction, limit)
         route = f"citation_{direction}"
+        candidates, excluded = self._apply_cutoff(candidates, cutoff_date)
         with self.database.session() as db:
             seed = db.get(Paper, paper_id)
+            for rank, candidate in enumerate(excluded, start=1):
+                db.add(
+                    DiscoveryEvent(
+                        project_id=project_id,
+                        route=route,
+                        query=seed.canonical_title,
+                        action="filtered",
+                        rank=rank,
+                        score=candidate.score,
+                        rationale=(
+                            f"Filtered by protocol cutoff date {cutoff_date}: "
+                            f"{candidate.title}"
+                        ),
+                        provider=self.provider.name,
+                    )
+                )
             for rank, candidate in enumerate(candidates, start=1):
                 related = self._find_paper(db, project_id, candidate)
                 if related is None:
@@ -495,7 +526,14 @@ class DiscoveryService:
                     external_api_calls=1,
                 )
             )
-        return len(candidates)
+        return len(candidates), len(excluded)
+
+    def _project_cutoff(self, project_id: str) -> str | None:
+        with self.database.session() as db:
+            protocol = db.scalar(
+                select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
+            )
+            return protocol.cutoff_date if protocol else None
 
     @staticmethod
     def _update_provider_signals(paper: Paper, candidate: DiscoveryCandidate) -> None:

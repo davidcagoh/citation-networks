@@ -444,6 +444,7 @@ def create_app(
             "paper_id": value.paper_id,
             "direction": value.direction,
             "candidate_count": expansion["candidate_count"],
+            "filtered_count": expansion["filtered_count"],
             "depth_reached": expansion["depth_reached"],
             "stopping_reason": expansion["stopping_reason"],
             "provider": discovery.provider.name,

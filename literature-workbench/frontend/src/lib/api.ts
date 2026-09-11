@@ -173,6 +173,7 @@ export interface CitationExpansionResult {
   paper_id: string;
   direction: "backward" | "forward";
   candidate_count: number;
+  filtered_count?: number;
   provider: string;
   depth_reached: number;
   stopping_reason: string;
@@ -572,6 +573,7 @@ function parseCitationExpansion(value: unknown): CitationExpansionResult {
     paper_id: string(result.paper_id, "citation expansion.paper_id"),
     direction,
     candidate_count: number(result.candidate_count, "citation expansion.candidate_count"),
+    filtered_count: number(result.filtered_count ?? 0, "citation expansion.filtered_count"),
     provider: string(result.provider, "citation expansion.provider"),
     depth_reached: number(result.depth_reached ?? 1, "citation expansion.depth_reached"),
     stopping_reason: string(result.stopping_reason ?? "depth_limit_reached", "citation expansion.stopping_reason"),
