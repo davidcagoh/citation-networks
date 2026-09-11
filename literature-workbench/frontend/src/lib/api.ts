@@ -153,6 +153,17 @@ export interface LivingUpdateResult {
   last_updated_at: string;
 }
 
+export interface ProviderApproval {
+  id: string;
+  project_id: string;
+  provider: string;
+  approved: boolean;
+  approved_by: string;
+  justification: string;
+  non_replicable_reason: string;
+  approved_at: string;
+}
+
 export type ReviewMode = "sufficient" | "comprehensive" | "systematic" | "quick" | "thorough";
 export type DiscoveryRoute = "semantic_search" | "survey_search" | "recent_search";
 
@@ -182,6 +193,7 @@ export interface WorkbenchApi {
   exportZotero(projectId: string, collectionKey?: string): Promise<ZoteroExportResult>;
   expandCitations(projectId: string, paperId: string, direction: "backward" | "forward", limit?: number): Promise<CitationExpansionResult>;
   livingUpdate(projectId: string, limit?: number): Promise<LivingUpdateResult>;
+  approveProvider(projectId: string, input: Omit<ProviderApproval, "id" | "project_id" | "approved" | "approved_at">): Promise<ProviderApproval>;
   runDiscovery(projectId: string, query: string, limit?: number, routes?: DiscoveryRoute[]): Promise<{
     candidate_count: number;
     route_count: number;
@@ -465,6 +477,20 @@ function parseLivingUpdate(value: unknown): LivingUpdateResult {
     new_paper_count: number(result.new_paper_count, "living update.new_paper_count"),
     route_count: number(result.route_count, "living update.route_count"),
     last_updated_at: string(result.last_updated_at, "living update.last_updated_at"),
+  };
+}
+
+function parseProviderApproval(value: unknown): ProviderApproval {
+  const result = object(value, "provider approval");
+  return {
+    id: string(result.id, "provider approval.id"),
+    project_id: string(result.project_id, "provider approval.project_id"),
+    provider: string(result.provider, "provider approval.provider"),
+    approved: boolean(result.approved, "provider approval.approved"),
+    approved_by: string(result.approved_by, "provider approval.approved_by"),
+    justification: string(result.justification, "provider approval.justification"),
+    non_replicable_reason: string(result.non_replicable_reason, "provider approval.non_replicable_reason"),
+    approved_at: string(result.approved_at, "provider approval.approved_at"),
   };
 }
 
@@ -753,6 +779,11 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/runs/living-update`, parseLivingUpdate, {
         method: "POST",
         body: JSON.stringify({ limit }),
+      }),
+    approveProvider: (projectId, input) =>
+      request(baseUrl, `/projects/${projectId}/provider-approvals`, parseProviderApproval, {
+        method: "POST",
+        body: JSON.stringify(input),
       }),
     runDiscovery: (projectId, query, limit = 20, routes) =>
       request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {
