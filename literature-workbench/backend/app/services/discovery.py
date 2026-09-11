@@ -194,6 +194,10 @@ class OpenAlexProvider:
 
     name = "openalex"
     endpoint = "https://api.openalex.org/works"
+    select_fields = (
+        "id,title,publication_year,publication_date,doi,cited_by_count,"
+        "authorships,primary_location,abstract_inverted_index"
+    )
 
     def __init__(self, email: str | None = None, timeout_seconds: float = 20.0) -> None:
         self.email = email or os.getenv("OPENALEX_EMAIL")
@@ -203,26 +207,49 @@ class OpenAlexProvider:
         params = {
             "search": query,
             "per-page": limit,
-            "select": (
-                "id,title,publication_year,publication_date,doi,cited_by_count,"
-                "authorships,primary_location,abstract_inverted_index"
-            ),
+            "select": self.select_fields,
         }
         if self.email:
             params["mailto"] = self.email
+        payload = self._request_json(f"{self.endpoint}?{urlencode(params)}", "search")
+        return [self._candidate(item) for item in payload.get("results", []) if self._valid(item)]
+
+    def related(self, external_id: str, direction: str, limit: int) -> list[DiscoveryCandidate]:
+        work_id = external_id.removeprefix("openalex:")
+        if direction == "forward":
+            params = {
+                "filter": f"cites:{work_id}",
+                "per-page": limit,
+                "select": self.select_fields,
+            }
+            payload = self._request_json(
+                f"{self.endpoint}?{urlencode(params)}",
+                "citation expansion",
+            )
+            return [
+                self._candidate(item)
+                for item in payload.get("results", [])
+                if self._valid(item)
+            ]
+        work = self._request_json(f"{self.endpoint}/{work_id}", "citation expansion")
+        candidates = []
+        for referenced_id in (work.get("referenced_works") or [])[:limit]:
+            referenced = self._request_json(referenced_id, "citation expansion")
+            if self._valid(referenced):
+                candidates.append(self._candidate(referenced))
+        return candidates
+
+    def _request_json(self, url: str, operation: str) -> dict:
         request = Request(
-            f"{self.endpoint}?{urlencode(params)}",
+            url,
             headers={"Accept": "application/json", "User-Agent": "literature-workbench/0.1"},
         )
         try:
             with urlopen(request, timeout=self.timeout_seconds) as response:
                 payload = json.load(response)
         except Exception as exc:
-            raise DiscoveryProviderError("OpenAlex search failed") from exc
-        return [self._candidate(item) for item in payload.get("results", []) if self._valid(item)]
-
-    def related(self, external_id: str, direction: str, limit: int) -> list[DiscoveryCandidate]:
-        raise DiscoveryProviderError("OpenAlex citation expansion is not configured")
+            raise DiscoveryProviderError(f"OpenAlex {operation} failed") from exc
+        return payload if isinstance(payload, dict) else {}
 
     @staticmethod
     def _valid(item: object) -> bool:
