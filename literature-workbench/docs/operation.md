@@ -11,6 +11,8 @@
    before that date and reports the number filtered from the provider result.
    The cross-disciplinary route makes three bounded searches covering adjacent
    fields, interdisciplinary methods, and applications in adjacent fields.
+   Broad-mode stopping certificates additionally require complete date signals
+   on the recent route and citation signals on the seminal route.
 4. Screen live candidates in **Corpus**. Candidates are not sent to the
    pipeline until they are included or pinned.
 5. Choose **Build grounded review** in **Run / Costs**. This runs idempotent

@@ -58,12 +58,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 40 | OpenAlex backward citation expansion follows bounded referenced-work metadata links and maps the resulting records. | `backend/tests/test_discovery.py::test_openalex_provider_expands_backward_references` | PASS |
 | 41 | Multi-source discovery records provider attempts and exposes partial fan-out failures in the coverage audit and Corpus UI. | `backend/tests/test_discovery.py::test_coverage_audit_reports_partial_multi_source_fanout`, frontend API/UI contract checks | PASS |
 | 42 | End-to-end multi-source discovery preserves each originating provider in canonical paper metadata and candidate events. | `backend/tests/test_discovery.py::test_multi_source_project_records_originating_provider_names` | PASS |
+| 43 | Comprehensive/systematic stopping certificates require complete publication-date coverage for recent routes and citation-count coverage for seminal routes. | `backend/tests/test_discovery.py::test_broader_coverage_audit_emits_stopping_certificate`, `backend/tests/test_discovery.py::test_broader_audit_rejects_missing_latest_and_seminal_signals` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 85 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.43%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 86 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.47%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
