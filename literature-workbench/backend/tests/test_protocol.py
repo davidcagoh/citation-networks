@@ -5,10 +5,43 @@ from sqlalchemy import select
 
 from app.main import create_app
 from app.models import ResearchBrief
+from app.services.discovery import DiscoveryCandidate
+
+
+class ProtocolDiscoveryProvider:
+    name = "protocol-search"
+
+    def search(self, query: str, limit: int) -> list[DiscoveryCandidate]:
+        return [
+            DiscoveryCandidate(
+                external_id=f"{query}-1",
+                title=f"Study for {query}",
+                authors=["Researcher"],
+                year=2025,
+                venue="Test Venue",
+                doi=None,
+                abstract="Abstract.",
+                source_uri=f"https://example.test/{query}",
+                score=0.9,
+            ),
+            DiscoveryCandidate(
+                external_id=f"{query}-2",
+                title=f"Follow-up for {query}",
+                authors=["Researcher"],
+                year=2024,
+                venue="Test Venue",
+                doi=None,
+                abstract="Abstract.",
+                source_uri=f"https://example.test/{query}/2",
+                score=0.8,
+            ),
+        ][:limit]
 
 
 def test_project_protocol_is_created_and_can_be_updated(tmp_path: Path) -> None:
-    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=ProtocolDiscoveryProvider()
+    )
     with TestClient(app) as client:
         project_id = client.post(
             "/projects",
@@ -58,3 +91,36 @@ def test_protocol_requires_questions_and_valid_update_policy(tmp_path: Path) -> 
             json={"research_questions": [], "update_policy": "continuous"},
         )
         assert response.status_code == 422
+
+
+def test_prisma_report_reconciles_protocol_search_and_screening_flow(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=ProtocolDiscoveryProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={"title": "Memory", "prompt": "Survey memory", "review_mode": "systematic"},
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 2, "routes": ["semantic_search", "recent_search"]},
+        )
+        corpus = client.get(f"/projects/{project_id}/corpus").json()["papers"]
+        client.patch(
+            f"/projects/{project_id}/corpus/{corpus[0]['id']}",
+            json={"status": "included"},
+        )
+        client.patch(
+            f"/projects/{project_id}/corpus/{corpus[1]['id']}",
+            json={"status": "excluded"},
+        )
+
+        report = client.get(f"/projects/{project_id}/prisma-report")
+
+        assert report.status_code == 200
+        body = report.json()
+        assert body["review_mode"] == "systematic"
+        assert body["flow"] == {"identified": 4, "screened": 2, "included": 1, "excluded": 1}
+        assert body["search"]["routes"] == ["semantic_search", "recent_search"]
+        assert body["search"]["queries"] == ["memory", "memory recent latest"]
