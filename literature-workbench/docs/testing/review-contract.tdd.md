@@ -35,11 +35,12 @@ This report records the implementation tranche derived from the review-engine pl
 | 17 | Citation expansion supports bounded multi-hop traversal and reports a stopping reason. | `backend/tests/test_discovery.py::test_multi_hop_citation_expansion_stops_at_exhausted_frontier`, `frontend/tests/api.test.ts` | PASS |
 | 18 | Co-citation expansion derives shared-reference neighbors locally and records derivation provenance. | `backend/tests/test_discovery.py::test_co_citation_expansion_derives_shared_reference_neighbors`, `frontend/tests/workbench.test.tsx` | PASS |
 | 19 | Comprehensive/systematic discovery includes a distinct foundational/seminal route with auditable query provenance. | `backend/tests/test_discovery.py::test_seminal_route_records_foundational_query_provenance`, `frontend/tests/workbench.test.tsx` | PASS |
+| 20 | Comprehensive/systematic discovery includes an explicit adjacent-fields route for cross-disciplinary coverage. | `backend/tests/test_discovery.py::test_cross_disciplinary_route_records_adjacent_fields_query`, `frontend/tests/workbench.test.tsx` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 68 passed.
+- Backend: `uv run pytest -q` → 69 passed.
 - Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 87.20%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 45 passed.
