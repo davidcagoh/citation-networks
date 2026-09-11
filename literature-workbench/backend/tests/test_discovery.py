@@ -501,6 +501,18 @@ def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> 
             {"route": "semantic_search", "candidate_events": 1, "unique_papers": 1},
             {"route": "recent_search", "candidate_events": 1, "unique_papers": 1},
         ]
+        assert body["routes"]["signal_coverage"] == [
+            {
+                "route": "semantic_search",
+                "papers_with_publication_date": 1,
+                "papers_with_citation_count": 1,
+            },
+            {
+                "route": "recent_search",
+                "papers_with_publication_date": 1,
+                "papers_with_citation_count": 1,
+            },
+        ]
         assert body["screening"]["unresolved_candidates"] == 1
         assert "candidate papers remain unscreened" in body["limitations"]
 
