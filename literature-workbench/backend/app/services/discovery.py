@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import math
 import os
-import re
+import unicodedata
 from collections.abc import Sequence
 from contextlib import suppress
 from dataclasses import dataclass, replace
@@ -921,4 +921,5 @@ class DiscoveryService:
 
     @staticmethod
     def _normalize_title(title: str) -> str:
-        return re.sub(r"[^a-z0-9]+", "", title.casefold())
+        normalized = unicodedata.normalize("NFKC", title.casefold())
+        return "".join(character for character in normalized if character.isalnum())
