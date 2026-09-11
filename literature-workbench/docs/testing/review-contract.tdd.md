@@ -83,12 +83,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 65 | Comprehensive scope accounting includes the general, systematic/meta-analytic, and umbrella/tutorial survey query families in discovery-call estimates. | `backend/tests/test_discovery.py::test_survey_route_queries_cover_multiple_review_families`, `backend/tests/test_scope.py::test_scope_preview_returns_transparent_scope_and_budget` | PASS |
 | 66 | Coverage audits preserve exact executed query strings per route, and the Corpus UI exposes them while accepting older payloads without query metadata. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 | 67 | Citation-network audits record every expansion attempt and count empty expansions, including co-citation requests with no available graph frontier. | `backend/tests/test_discovery.py::test_coverage_audit_records_empty_network_expansions`, `backend/tests/test_discovery.py::test_citation_expansion_persists_directional_edges_and_provenance` | PASS |
+| 68 | Corpus network diagnostics distinguish attempted expansions from empty expansions and expose those saturation signals in the UI, with backward-compatible parsing. | `backend/tests/test_discovery.py::test_coverage_audit_records_empty_network_expansions`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 98 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.08%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 99 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.17%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.
