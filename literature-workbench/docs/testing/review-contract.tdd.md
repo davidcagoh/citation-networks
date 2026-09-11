@@ -68,6 +68,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 50 | Discovery requests enforce their external-call budget before any provider request is made, returning a clear 429 when the planned fan-out would exceed the cap. | `backend/tests/test_discovery.py::test_discovery_enforces_the_requested_external_call_budget` | PASS |
 | 51 | Acquisition attempts eligible discovered direct full-text links through the injected safe fetcher, records fetched/failed counts, and preserves abstract fallback. | `backend/tests/test_sources.py::test_acquisition_fetches_eligible_discovered_full_text_links` | PASS |
 | 52 | Discovery responses report actual external fan-out calls so callers can reconcile provider usage with the preview and cap. | `backend/tests/test_discovery.py::test_multi_source_search_usage_counts_each_provider_attempt`, `frontend/tests/api.test.ts` | PASS |
+| 53 | Compatibility aliases normalize to canonical review contracts at project, protocol, and pipeline boundaries, preserving comprehensive checkpoints for `thorough`. | `backend/tests/test_review_modes.py::test_compatibility_mode_aliases_normalize_to_canonical_contracts` | PASS |
 
 ## Validation evidence
 

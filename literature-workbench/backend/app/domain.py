@@ -171,11 +171,12 @@ class ResourceEnvelope(BaseModel):
     estimated_cost_usd: float = Field(default=0.0, ge=0)
 
 
+def normalize_review_mode(mode: ReviewMode) -> str:
+    return {"quick": "sufficient", "thorough": "comprehensive"}.get(mode, mode)
+
+
 def resource_envelope_for_mode(mode: ReviewMode, max_papers: int) -> ResourceEnvelope:
-    normalized_mode = {
-        "quick": "sufficient",
-        "thorough": "comprehensive",
-    }.get(mode, mode)
+    normalized_mode = normalize_review_mode(mode)
     per_paper = {
         "sufficient": (2, 500, 250, 0.0),
         "comprehensive": (6, 1_200, 600, 0.0),

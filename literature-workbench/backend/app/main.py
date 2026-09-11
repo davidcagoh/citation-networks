@@ -28,6 +28,7 @@ from app.domain import (
     VerificationIssueUpdate,
     ZoteroExportRequest,
     ZoteroImportRequest,
+    normalize_review_mode,
     resource_envelope_for_mode,
 )
 from app.models import (
@@ -199,13 +200,13 @@ def create_app(
                     project_id=project.id,
                     title=value.title,
                     prompt=value.prompt,
-                    review_mode=value.review_mode,
+                    review_mode=normalize_review_mode(value.review_mode),
                 )
             )
             db.add(
                 ReviewProtocol(
                     project_id=project.id,
-                    review_mode=value.review_mode,
+                    review_mode=normalize_review_mode(value.review_mode),
                     research_questions=[value.prompt],
                 )
             )
@@ -352,7 +353,7 @@ def create_app(
             if protocol is None:
                 protocol = ReviewProtocol(project_id=project_id)
                 db.add(protocol)
-            protocol.review_mode = value.review_mode
+            protocol.review_mode = normalize_review_mode(value.review_mode)
             protocol.research_questions = value.research_questions
             protocol.inclusion_criteria = value.inclusion_criteria
             protocol.exclusion_criteria = value.exclusion_criteria
@@ -361,7 +362,7 @@ def create_app(
             protocol.update_policy = value.update_policy
             brief = db.scalar(select(ResearchBrief).where(ResearchBrief.project_id == project_id))
             if brief is not None:
-                brief.review_mode = value.review_mode
+                brief.review_mode = normalize_review_mode(value.review_mode)
             db.flush()
             return _protocol_json(protocol)
 
@@ -802,7 +803,7 @@ def create_app(
             return _run_json(
                 pipeline.run(
                     project_id,
-                    review_mode=request.review_mode,
+                    review_mode=normalize_review_mode(request.review_mode),
                     max_papers=request.max_papers,
                     max_external_api_calls=request.max_external_api_calls,
                     max_cost_usd=request.max_cost_usd,
