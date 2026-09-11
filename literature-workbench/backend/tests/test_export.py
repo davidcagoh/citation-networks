@@ -31,6 +31,9 @@ def test_exports_markdown_json_and_bibtex(tmp_path: Path) -> None:
         assert body["project"]["title"] == "Memory"
         assert len(body["corpus"]) == 5
         assert body["review"]["sentences"]
+        assert len(body["source_documents"]) == 5
+        assert body["evidence_spans"]
+        assert body["relations"]
 
         bibtex = client.get(f"/projects/{project_id}/export?format=bibtex")
         assert bibtex.status_code == 200
