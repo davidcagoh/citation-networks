@@ -116,6 +116,12 @@ export interface CoverageAudit {
   routes: { executed: string[]; count: number };
   screening: { total: number; selected: number; unresolved_candidates: number; excluded: number };
   source_text: { selected_with_usable_text: number; selected_total: number };
+  stopping_certificate: {
+    status: "satisfied" | "incomplete";
+    mode: ReviewMode;
+    required_routes: string[];
+    checks: { required_routes_executed: boolean; all_candidates_screened: boolean; selected_sources_available: boolean };
+  };
   limitations: string[];
 }
 
@@ -368,6 +374,33 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
       selected_with_usable_text: number(sourceText.selected_with_usable_text, "coverage audit.source_text.selected_with_usable_text"),
       selected_total: number(sourceText.selected_total, "coverage audit.source_text.selected_total"),
     },
+    stopping_certificate: (() => {
+      const certificate = object(audit.stopping_certificate ?? {
+        status: "incomplete",
+        mode: "sufficient",
+        required_routes: [],
+        checks: {
+          required_routes_executed: false,
+          all_candidates_screened: false,
+          selected_sources_available: false,
+        },
+      }, "coverage audit.stopping_certificate");
+      const certificateStatus = string(certificate.status, "coverage audit.stopping_certificate.status");
+      if (certificateStatus !== "satisfied" && certificateStatus !== "incomplete") {
+        throw new ShapeError("coverage audit.stopping_certificate.status is invalid");
+      }
+      const checks = object(certificate.checks, "coverage audit.stopping_certificate.checks");
+      return {
+        status: certificateStatus,
+        mode: string(certificate.mode, "coverage audit.stopping_certificate.mode") as ReviewMode,
+        required_routes: array(certificate.required_routes, "coverage audit.stopping_certificate.required_routes").map((item, index) => string(item, `coverage audit.stopping_certificate.required_routes[${index}]`)),
+        checks: {
+          required_routes_executed: boolean(checks.required_routes_executed, "coverage audit.stopping_certificate.checks.required_routes_executed"),
+          all_candidates_screened: boolean(checks.all_candidates_screened, "coverage audit.stopping_certificate.checks.all_candidates_screened"),
+          selected_sources_available: boolean(checks.selected_sources_available, "coverage audit.stopping_certificate.checks.selected_sources_available"),
+        },
+      };
+    })(),
     limitations: array(audit.limitations, "coverage audit.limitations").map((item, index) => string(item, `coverage audit.limitations[${index}]`)),
   };
 }
