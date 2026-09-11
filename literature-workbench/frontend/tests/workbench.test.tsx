@@ -169,7 +169,7 @@ describe("Literature Workbench", () => {
 
     expect(api.runDiscovery).toHaveBeenCalledWith(
       "project-1", "Survey agent memory.", 20,
-      ["semantic_search", "survey_search", "recent_search", "seminal_search"],
+      ["semantic_search", "survey_search", "recent_search", "seminal_search", "cross_disciplinary_search"],
     );
   });
 

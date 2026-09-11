@@ -266,18 +266,18 @@ describe("workbench API adapter", () => {
 
   it("sends explicit discovery routes for broader review contracts", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
-      project_id: "project-1", candidate_count: 8, route_count: 4,
+      project_id: "project-1", candidate_count: 10, route_count: 5,
       provider: "semantic-scholar", query: "agent memory",
     }));
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(createWorkbenchApi("http://api").runDiscovery(
-      "project-1", "agent memory", 2, ["semantic_search", "survey_search", "recent_search", "seminal_search"],
-    )).resolves.toMatchObject({ candidate_count: 8, route_count: 4 });
+      "project-1", "agent memory", 2, ["semantic_search", "survey_search", "recent_search", "seminal_search", "cross_disciplinary_search"],
+    )).resolves.toMatchObject({ candidate_count: 10, route_count: 5 });
     expect(fetchMock).toHaveBeenCalledWith("http://api/projects/project-1/runs/discovery", expect.objectContaining({
       body: JSON.stringify({
         query: "agent memory", limit: 2,
-        routes: ["semantic_search", "survey_search", "recent_search", "seminal_search"],
+        routes: ["semantic_search", "survey_search", "recent_search", "seminal_search", "cross_disciplinary_search"],
       }),
     }));
   });
