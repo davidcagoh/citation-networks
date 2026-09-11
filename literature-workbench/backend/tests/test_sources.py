@@ -1,8 +1,10 @@
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 
 from app.main import create_app
+from app.models import EvidenceSpan
 
 
 def test_ingests_user_supplied_full_text_with_provenance(tmp_path: Path) -> None:
@@ -36,6 +38,12 @@ def test_ingests_user_supplied_full_text_with_provenance(tmp_path: Path) -> None
         assert review[0]["text"] == (
             "The study evaluates a memory architecture across two workloads."
         )
+        plan = client.get(f"/projects/{project_id}/plans").json()["plans"][0]
+        assert "source text" in plan["thesis"]
+        with app.state.database.session() as database:
+            span = database.scalar(select(EvidenceSpan))
+            assert span is not None
+            assert span.extractor_version == "text-heuristic-v1"
 
 
 def test_source_ingestion_rejects_blank_text_and_unknown_project(tmp_path: Path) -> None:
