@@ -91,6 +91,20 @@ describe("workbench API adapter", () => {
     }));
   });
 
+  it("runs an on-demand living update", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      project_id: "project-1", mode: "comprehensive", candidate_count: 6,
+      new_paper_count: 2, route_count: 3, last_updated_at: "2026-09-10T12:00:00+00:00",
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").livingUpdate("project-1", 50))
+      .resolves.toMatchObject({ new_paper_count: 2, route_count: 3 });
+    expect(fetchMock).toHaveBeenCalledWith("http://api/projects/project-1/runs/living-update", expect.objectContaining({
+      method: "POST", body: JSON.stringify({ limit: 50 }),
+    }));
+  });
+
   it("loads and updates a reproducible review protocol", async () => {
     const protocol: ReviewProtocol = {
       id: "protocol-1",

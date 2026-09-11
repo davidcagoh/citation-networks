@@ -65,6 +65,7 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
     importZotero: vi.fn().mockResolvedValue({ project_id: "project-1", imported_count: 0, item_count: 0 }),
     exportZotero: vi.fn().mockResolvedValue({ project_id: "project-1", exported_count: 0 }),
     expandCitations: vi.fn().mockResolvedValue({ project_id: "project-1", paper_id: "paper-1", direction: "backward", candidate_count: 0, provider: "fake-search" }),
+    livingUpdate: vi.fn().mockResolvedValue({ project_id: "project-1", mode: "sufficient", candidate_count: 0, new_paper_count: 0, route_count: 1, last_updated_at: "2026-09-10T12:00:00+00:00" }),
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
     updatePlan: vi.fn().mockImplementation(async (_projectId, _planId, plan) => ({ id: "plan-1", ...plan })),
@@ -115,6 +116,8 @@ describe("Literature Workbench", () => {
     expect(await screen.findByText("satisfied")).toBeVisible();
     await user.click(screen.getByRole("button", { name: "Expand backward citations for Consolidated Memory" }));
     expect(api.expandCitations).toHaveBeenCalledWith("project-1", "paper-1", "backward", 20);
+    await user.click(screen.getByRole("button", { name: "Refresh living review" }));
+    expect(api.livingUpdate).toHaveBeenCalledWith("project-1", 20);
   });
 
   it("previews scope and projected budget before discovery", async () => {
