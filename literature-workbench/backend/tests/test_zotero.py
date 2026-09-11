@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app.main import create_app
-from app.models import Paper
+from app.models import CorpusMembership, Paper
 
 
 class FakeZoteroClient:
@@ -135,4 +135,48 @@ def test_zotero_prefers_published_record_but_retains_preprint_provenance(tmp_pat
             "source_uri": "https://arxiv.org/abs/1234.5678",
             "title": "Preprint Memory Study",
             "zotero_key": "Z1",
+        }]
+
+
+def test_zotero_published_record_promotes_discovered_preprint(tmp_path: Path) -> None:
+    client = FakeZoteroClient()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", zotero_client=client)
+    with TestClient(app) as http:
+        project_id = http.post(
+            "/projects", json={"title": "Memory", "prompt": "Survey memory"}
+        ).json()["id"]
+        with app.state.database.session() as db:
+            paper = Paper(
+                project_id=project_id,
+                canonical_title="Preprint Memory Study",
+                authors=[],
+                year=2024,
+                venue=None,
+                doi="10.1234/memory",
+                abstract="The preprint abstract.",
+                metadata_provenance={
+                    "provider": "openalex",
+                    "source_uri": "https://arxiv.org/abs/1234.5678",
+                    "publication_status": "preprint",
+                    "alternate_records": [],
+                },
+            )
+            db.add(paper)
+            db.flush()
+            db.add(CorpusMembership(project_id=project_id, paper_id=paper.id, status="candidate"))
+
+        response = http.post(
+            f"/projects/{project_id}/integrations/zotero/import", json={"limit": 1}
+        )
+        assert response.status_code == 201
+
+    with app.state.database.session() as db:
+        paper = db.scalar(select(Paper).where(Paper.project_id == project_id))
+        assert paper is not None
+        assert paper.metadata_provenance["publication_status"] == "published"
+        assert paper.metadata_provenance["alternate_records"] == [{
+            "publication_status": "preprint",
+            "source_uri": "https://arxiv.org/abs/1234.5678",
+            "title": "Preprint Memory Study",
+            "zotero_key": None,
         }]
