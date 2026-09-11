@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
 
 from app.db import Database
-from app.domain import CorpusMembershipUpdate, ProjectCreate
+from app.domain import CorpusMembershipUpdate, DiscoveryRequest, ProjectCreate
 from app.models import (
     CorpusMembership,
     DiscoveryEvent,
@@ -26,6 +26,12 @@ from app.models import (
     StageRun,
     SynthesisClaim,
     UsageCostEvent,
+)
+from app.services.discovery import (
+    DiscoveryProvider,
+    DiscoveryProviderError,
+    DiscoveryService,
+    SemanticScholarProvider,
 )
 from app.services.pipeline import (
     CorpusRequiredError,
@@ -77,11 +83,14 @@ def _bounded_excerpt(source_text: str, span: EvidenceSpan) -> tuple[str, int]:
     return source_text[start:end], start
 
 
-def create_app(database_url: str | None = None) -> FastAPI:
+def create_app(
+    database_url: str | None = None, discovery_provider: DiscoveryProvider | None = None
+) -> FastAPI:
     database = Database(
         database_url or os.getenv("WORKBENCH_DATABASE_URL", "sqlite:///instance/workbench.db")
     )
     pipeline = PipelineService(database)
+    discovery = DiscoveryService(database, discovery_provider or SemanticScholarProvider())
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -94,6 +103,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
     app = FastAPI(title="Literature Synthesis Workbench", version="0.1.0", lifespan=lifespan)
     app.state.database = database
     app.state.pipeline = pipeline
+    app.state.discovery = discovery
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_allowed_origins(),
@@ -156,6 +166,21 @@ def create_app(database_url: str | None = None) -> FastAPI:
         except ProjectNotFoundError as exc:
             raise HTTPException(404, str(exc)) from exc
         return {"project_id": project_id, "paper_count": count, "source": "provenance-corpus"}
+
+    @app.post("/projects/{project_id}/runs/discovery", status_code=201)
+    def run_discovery(project_id: str, value: DiscoveryRequest) -> dict:
+        try:
+            count = discovery.search(project_id, value.query, value.limit)
+        except DiscoveryProviderError as exc:
+            if str(exc) == "Project not found":
+                raise HTTPException(404, str(exc)) from exc
+            raise HTTPException(502, "Discovery provider unavailable") from exc
+        return {
+            "project_id": project_id,
+            "candidate_count": count,
+            "provider": discovery.provider.name,
+            "query": value.query,
+        }
 
     @app.post("/projects/{project_id}/runs/pipeline", status_code=201)
     def run_pipeline(project_id: str) -> dict:

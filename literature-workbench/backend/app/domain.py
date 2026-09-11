@@ -41,6 +41,19 @@ class CorpusMembershipUpdate(BaseModel):
     relevance_rationale: str | None = Field(default=None, min_length=1, max_length=10_000)
 
 
+class DiscoveryRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=500)
+    limit: int = Field(default=20, ge=1, le=100)
+
+    @field_validator("query")
+    @classmethod
+    def reject_blank_query(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("must contain non-whitespace text")
+        return value
+
+
 class EvidenceSpanCreate(BaseModel):
     paper_id: str
     source_document_id: str
