@@ -6,7 +6,7 @@
 2. Use **Preview scope** to see the deterministic focus areas and projected
    provider call budget.
 3. Either run the five-paper fixture, or choose **Discover papers** to query
-   Semantic Scholar.
+   the default free multi-source adapter (Semantic Scholar and OpenAlex).
    If the saved protocol has a cutoff date, discovery retains records at or
    before that date and reports the number filtered from the provider result.
    The cross-disciplinary route makes three bounded searches covering adjacent
@@ -56,6 +56,11 @@ The backend is an unauthenticated loopback service. Keep it bound to
 Provider credentials are read only from environment variables. Provider
 failures return a safe 502 response, while malformed or missing source text is
 represented as degraded corpus coverage.
+
+The default multi-source discovery adapter fans out to Semantic Scholar and
+OpenAlex, records each result's source provider, and continues with available
+results when one source fails. OpenAlex citation traversal is not yet
+implemented; use Semantic Scholar-backed citation expansion for network routes.
 
 Run budgets persist on each pipeline run. The paper cap is enforced before a
 run is created; provider calls and local pipeline usage appear separately in

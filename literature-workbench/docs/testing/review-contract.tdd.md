@@ -53,12 +53,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 35 | PRISMA search provenance preserves cutoff-filtered records, and the systematic-review UI exposes that count. | `backend/tests/test_protocol.py::test_discovery_enforces_protocol_cutoff_and_reports_filtered_candidates`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 | 36 | Backward/forward citation expansion applies the saved protocol cutoff and reports filtered network candidates. | `backend/tests/test_discovery.py::test_citation_expansion_enforces_protocol_cutoff`, `frontend/tests/api.test.ts` | PASS |
 | 37 | Cross-disciplinary discovery executes bounded adjacent-field, interdisciplinary-methods, and adjacent-application queries under one auditable route. | `backend/tests/test_discovery.py::test_cross_disciplinary_route_records_adjacent_fields_query` | PASS |
+| 38 | The default live adapter fans out across free Semantic Scholar and OpenAlex sources and marks each candidate with its provider provenance. | `backend/tests/test_discovery.py::test_openalex_provider_maps_work_metadata_and_abstract`, `backend/tests/test_discovery.py::test_multi_source_provider_merges_and_marks_provider_provenance`, `backend/tests/test_discovery.py::test_app_wires_free_multi_source_discovery_by_default` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 78 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.16%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 81 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.01%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
@@ -71,6 +72,7 @@ This report records the implementation tranche derived from the review-engine pl
 - Zotero DOI/title deduplication prefers published records and retains alternate preprint provenance; richer edition/version reconciliation remains future work.
 - Discovery preserves provider citation-count and publication-date signals in provenance and exposes them during screening; they are importance/recency signals, not completeness guarantees.
 - Protocol cutoff dates are enforced for discovery and expose filtered counts; records with only an unknown publication date are retained and should be reviewed as a protocol limitation rather than silently discarded.
+- The default live adapter now combines Semantic Scholar and OpenAlex for search; OpenAlex citation traversal remains unavailable and is reported as an operational boundary.
 - Full-text acquisition now supports explicitly requested public HTTP(S) text/HTML/PDF URLs with SSRF, redirect, size, and parser guards; richer HTML extraction remains future work. Abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Live cross-paper comparison now uses a conservative grounded overlap heuristic; richer paragraph-level generation and section-level editing remain future work.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.

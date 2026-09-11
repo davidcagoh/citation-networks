@@ -5,10 +5,10 @@ structured evidence, scientific relations, an explanatory review plan, and a
 claim-level inspectable review.
 
 The bundled five-paper regression fixture is deterministic and makes no network
-or paid-model calls. The UI also supports live discovery through Semantic
-Scholar when the provider is reachable. Discovered papers are candidates until
-screened; including them and choosing “Build grounded review” creates
-abstract-backed evidence with explicit provenance. This live path is a
+or paid-model calls. The UI supports live discovery through Semantic Scholar
+and OpenAlex when those providers are reachable. Discovered papers are
+candidates until screened; including them and choosing “Build grounded review”
+creates abstract-backed evidence with explicit provenance. This live path is a
 conservative MVP: public text/HTML/PDF acquisition is available with bounded
 heuristic extraction, while model-backed semantic extraction remains opt-in
 future work.
