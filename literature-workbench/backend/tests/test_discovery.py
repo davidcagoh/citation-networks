@@ -181,6 +181,28 @@ def test_discovery_can_run_multiple_named_routes_with_separate_usage_events(tmp_
             assert sum(event.external_api_calls for event in usage) == 3
 
 
+def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> None:
+    provider = FakeDiscoveryProvider()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "agent memory", "limit": 1, "routes": ["semantic_search", "recent_search"]},
+        )
+
+        audit = client.get(f"/projects/{project_id}/coverage-audit")
+
+        assert audit.status_code == 200
+        body = audit.json()
+        assert body["status"] == "incomplete"
+        assert body["routes"]["executed"] == ["semantic_search", "recent_search"]
+        assert body["screening"]["unresolved_candidates"] == 1
+        assert "candidate papers remain unscreened" in body["limitations"]
+
+
 def test_discovery_validates_query_and_limit(tmp_path: Path) -> None:
     app = create_app(
         f"sqlite:///{tmp_path / 'workbench.db'}",
