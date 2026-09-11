@@ -3,7 +3,7 @@ from __future__ import annotations
 from sqlalchemy import delete, select
 
 from app.db import Database
-from app.models import EvidenceSpan, Project, SynthesisClaim, VerificationIssue
+from app.models import EvidenceSpan, Paper, Project, SynthesisClaim, VerificationIssue
 
 
 class VerificationService:
@@ -29,7 +29,12 @@ class VerificationService:
             span_ids = (
                 set(
                     db.scalars(
-                        select(EvidenceSpan.id).where(EvidenceSpan.id.in_(referenced_span_ids))
+                        select(EvidenceSpan.id)
+                        .join(Paper, Paper.id == EvidenceSpan.paper_id)
+                        .where(
+                            EvidenceSpan.id.in_(referenced_span_ids),
+                            Paper.project_id == project_id,
+                        )
                     )
                 )
                 if referenced_span_ids
