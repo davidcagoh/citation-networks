@@ -95,12 +95,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 77 | Opt-in extraction supports multiple typed objects per paper with strict structured output and exact evidence grounding. | `backend/tests/test_synthesis.py::test_openai_extraction_bundle_returns_multiple_grounded_objects`, `backend/tests/test_synthesis.py::test_pipeline_persists_multiple_structured_entities_per_paper` | PASS |
 | 78 | Live planning derives section lenses from extracted entity types instead of hard-coded topic-specific headings. | `backend/tests/test_planning.py::test_live_plan_uses_extracted_types_instead_of_topic_specific_headings` | PASS |
 | 79 | Bounded candidate pairs can receive typed, confidence-bearing relation judgments from the evidence-bounded provider, with deterministic fallback. | `backend/tests/test_synthesis.py::test_openai_relation_judge_returns_typed_grounded_relation`, existing live relation tests | PASS |
+| 80 | The optional final-prose provider receives the approved document in section order and returns claim-keyed prose for a coherence pass without changing provenance mappings. | `backend/tests/test_synthesis.py::test_openai_document_pass_preserves_claim_ids`, `backend/tests/test_synthesis.py::test_final_prose_provider_waits_for_structure_approval` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 114 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.11%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 115 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.13%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.
@@ -116,6 +117,6 @@ This report records the implementation tranche derived from the review-engine pl
 - The default live adapter combines Semantic Scholar and OpenAlex for search and citation expansion; OpenAlex backward expansion is bounded by one metadata request per referenced work.
 - Multi-source audits distinguish complete fan-out from partial fan-out; provider failures remain a limitation rather than being presented as comprehensive coverage. Route audits also expose marginal new-paper yield and overlap as coverage diagnostics.
 - Full-text acquisition now supports explicitly requested public HTTP(S) text/HTML/PDF URLs with SSRF, redirect, size, and parser guards; richer HTML extraction remains future work. Abstract-backed evidence cannot certify subtle comparisons.
-- The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Live cross-paper comparison now uses a conservative grounded overlap heuristic; richer document-level coherence and section editing remain future work.
-- Optional OpenAI Luna multi-object structured extraction, bounded relation judging, and section-context final-prose generation are wired and ledgered; document-level coherence remains future work.
+- The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Live cross-paper comparison now uses a conservative grounded overlap heuristic; richer document-level editing remains future work.
+- Optional OpenAI Luna multi-object structured extraction, bounded relation judging, and document-context final-prose generation are wired and ledgered.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.

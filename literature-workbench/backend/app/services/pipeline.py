@@ -1228,6 +1228,29 @@ class PipelineService:
                 if sentence.claim_id not in desired_claim_ids:
                     db.delete(sentence)
             position = 0
+            document_drafts: dict[str, str] = {}
+            document_writer = getattr(self.synthesis_provider, "draft_document", None)
+            if callable(document_writer):
+                document_drafts = document_writer(
+                    [
+                        {
+                            "title": section["title"],
+                            "claims": [
+                                {
+                                    "claim_id": claims[claim_id].id,
+                                    "text": claims[claim_id].text,
+                                    "evidence": [
+                                        evidence_spans[span_id].verbatim_text
+                                        for span_id in claims[claim_id].supporting_evidence_span_ids
+                                        if span_id in evidence_spans
+                                    ],
+                                }
+                                for claim_id in section["planned_claim_ids"]
+                            ],
+                        }
+                        for section in plan.sections
+                    ]
+                ) or {}
             for section in plan.sections:
                 section_drafts: dict[str, str] = {}
                 section_writer = getattr(self.synthesis_provider, "draft_section", None)
@@ -1262,7 +1285,11 @@ class PipelineService:
                         sentence = ReviewSentence(project_id=project_id, claim_id=claim.id)
                         db.add(sentence)
                     text = claim.text
-                    if claim.id in section_drafts:
+                    if claim.id in document_drafts:
+                        text = document_drafts[claim.id]
+                        claim.text = text
+                        claim.inference_level = "model_inference"
+                    elif claim.id in section_drafts:
                         text = section_drafts[claim.id]
                         claim.text = text
                         claim.inference_level = "model_inference"

@@ -390,6 +390,25 @@ class OpenAISynthesisProvider:
                 drafts[claim_id] = text.strip()
         return drafts or None
 
+    def draft_document(self, sections: list[dict[str, object]]) -> dict[str, str] | None:
+        """Run one document-context pass while preserving approved claim IDs."""
+        claims = [
+            {
+                **claim,
+                "section": section.get("title", ""),
+            }
+            for section in sections
+            for claim in section.get("claims", [])
+            if isinstance(claim, dict)
+        ]
+        if not claims:
+            return None
+        return self.draft_section(
+            "Complete review",
+            "Preserve the approved section order and improve transitions without adding evidence.",
+            claims,
+        )
+
     def judge_relation(
         self, source: dict[str, object], target: dict[str, object]
     ) -> RelationJudgment | None:

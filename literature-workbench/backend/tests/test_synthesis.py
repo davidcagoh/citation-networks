@@ -152,6 +152,34 @@ def test_openai_section_writer_returns_claim_linked_sentences(monkeypatch) -> No
     }
 
 
+def test_openai_document_pass_preserves_claim_ids(monkeypatch) -> None:
+    def fake_urlopen(request, timeout):
+        body = json.loads(request.data)
+        assert "approved section order" in body["input"]
+        return FakeResponse(
+            {
+                "output_text": json.dumps(
+                    {"sentences": [{"claim_id": "claim-1", "text": "Coherent prose."}]}
+                ),
+                "usage": {"input_tokens": 120, "output_tokens": 20},
+            }
+        )
+
+    monkeypatch.setattr("app.services.synthesis.urlopen", fake_urlopen)
+    provider = OpenAISynthesisProvider(api_key="secret-not-printed")
+
+    drafts = provider.draft_document(
+        [
+            {
+                "title": "Methods",
+                "claims": [{"claim_id": "claim-1", "text": "A", "evidence": ["E"]}],
+            }
+        ]
+    )
+
+    assert drafts == {"claim-1": "Coherent prose."}
+
+
 def test_openai_extraction_bundle_returns_multiple_grounded_objects(monkeypatch) -> None:
     def fake_urlopen(request, timeout):
         body = json.loads(request.data)
@@ -333,12 +361,21 @@ def test_final_prose_provider_waits_for_structure_approval(tmp_path: Path) -> No
     class CheckpointProvider:
         def __init__(self) -> None:
             self.calls = 0
+            self.document_calls = 0
 
         def draft_claim(
             self, default_text: str, evidence_texts: list[str], claim_type: str
         ) -> str:
             self.calls += 1
             return "Approved grounded prose."
+
+        def draft_document(self, sections: list[dict[str, object]]) -> dict[str, str]:
+            self.document_calls += 1
+            return {
+                str(claim["claim_id"]): "Approved grounded prose."
+                for section in sections
+                for claim in section["claims"]
+            }
 
     provider = CheckpointProvider()
     app = create_app(
@@ -371,11 +408,12 @@ def test_final_prose_provider_waits_for_structure_approval(tmp_path: Path) -> No
         ).json()
         assert run["status"] == "awaiting_structure_approval"
         assert provider.calls == 0
+        assert provider.document_calls == 0
         run = client.post(
             f"/projects/{project_id}/runs/{run['id']}/approve-structure"
         ).json()
         assert run["status"] == "completed"
-        assert provider.calls > 0
+        assert provider.document_calls == 1
 
 
 def test_opted_in_openai_provider_is_wired_without_exposing_credentials(
