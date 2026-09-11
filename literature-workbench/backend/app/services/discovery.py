@@ -365,6 +365,50 @@ class DiscoveryService:
         if approval is None:
             raise DiscoveryProviderError("Provider requires explicit project approval")
 
+    def expand_co_citations(self, project_id: str, paper_id: str, limit: int) -> int:
+        with self.database.session() as db:
+            seed = db.scalar(
+                select(Paper).where(Paper.id == paper_id, Paper.project_id == project_id)
+            )
+            if seed is None:
+                raise DiscoveryProviderError("Paper not found")
+            cited_ids = set(
+                db.scalars(
+                    select(CitationEdge.target_paper_id).where(
+                        CitationEdge.project_id == project_id,
+                        CitationEdge.source_paper_id == paper_id,
+                    )
+                )
+            )
+            if not cited_ids:
+                return 0
+            edges = list(
+                db.scalars(
+                    select(CitationEdge).where(
+                        CitationEdge.project_id == project_id,
+                        CitationEdge.target_paper_id.in_(cited_ids),
+                        CitationEdge.source_paper_id != paper_id,
+                    )
+                )
+            )
+            neighbor_ids = list(dict.fromkeys(edge.source_paper_id for edge in edges))[:limit]
+            for rank, neighbor_id in enumerate(neighbor_ids, start=1):
+                db.add(
+                    DiscoveryEvent(
+                        project_id=project_id,
+                        paper_id=neighbor_id,
+                        route="co_citation",
+                        query=seed.canonical_title,
+                        action="candidate",
+                        rank=rank,
+                        rationale=(
+                            f"Shares cited works with {seed.canonical_title}; derived locally"
+                        ),
+                        provider="local-graph",
+                    )
+                )
+        return len(neighbor_ids)
+
     @staticmethod
     def _route_query(query: str, route: str) -> str:
         suffixes = {

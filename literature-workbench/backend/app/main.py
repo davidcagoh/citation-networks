@@ -12,6 +12,7 @@ from sqlalchemy import func, select
 from app.db import Database
 from app.domain import (
     CitationExpansionRequest,
+    CoCitationExpansionRequest,
     CorpusMembershipUpdate,
     DiscoveryRequest,
     LivingUpdateRequest,
@@ -401,6 +402,21 @@ def create_app(
             "depth_reached": expansion["depth_reached"],
             "stopping_reason": expansion["stopping_reason"],
             "provider": discovery.provider.name,
+        }
+
+    @app.post("/projects/{project_id}/runs/co-citation-expansion", status_code=201)
+    def expand_co_citations(project_id: str, value: CoCitationExpansionRequest) -> dict:
+        try:
+            count = discovery.expand_co_citations(project_id, value.paper_id, value.limit)
+        except DiscoveryProviderError as exc:
+            if str(exc) in {"Project not found", "Paper not found"}:
+                raise HTTPException(404, str(exc)) from exc
+            raise HTTPException(502, "Citation graph unavailable") from exc
+        return {
+            "project_id": project_id,
+            "paper_id": value.paper_id,
+            "candidate_count": count,
+            "provider": "local-graph",
         }
 
     @app.post("/projects/{project_id}/runs/living-update", status_code=201)

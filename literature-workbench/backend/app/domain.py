@@ -77,6 +77,11 @@ class CitationExpansionRequest(BaseModel):
     max_papers: int = Field(default=100, ge=1, le=500)
 
 
+class CoCitationExpansionRequest(BaseModel):
+    paper_id: str = Field(min_length=1, max_length=100)
+    limit: int = Field(default=20, ge=1, le=100)
+
+
 class LivingUpdateRequest(BaseModel):
     limit: int = Field(default=20, ge=1, le=100)
 
