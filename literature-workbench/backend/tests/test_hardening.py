@@ -494,5 +494,7 @@ def test_app_has_no_import_time_instance_and_disposes_engine_on_shutdown(
     dispose = Mock(wraps=app.state.database.engine.dispose)
     app.state.database.engine.dispose = dispose
     with TestClient(app) as client:
-        assert client.get("/health").status_code == 200
+        response = client.get("/health")
+        assert response.status_code == 200
+        assert response.json() == {"status": "ok", "provider": "multi-source"}
     dispose.assert_called_once_with()
