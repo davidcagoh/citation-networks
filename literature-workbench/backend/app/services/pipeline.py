@@ -121,15 +121,20 @@ class PipelineService:
     def run(self, project_id: str) -> Run:
         with self.database.session() as db:
             self._require_project(db, project_id)
-            membership_count = len(
+            active_membership_count = len(
                 list(
                     db.scalars(
-                        select(CorpusMembership).where(CorpusMembership.project_id == project_id)
+                        select(CorpusMembership).where(
+                            CorpusMembership.project_id == project_id,
+                            CorpusMembership.status.in_(["included", "pinned"]),
+                        )
                     )
                 )
             )
-            if not membership_count:
-                raise CorpusRequiredError("Ingest a corpus before running the pipeline")
+            if not active_membership_count:
+                raise CorpusRequiredError(
+                    "Include or pin at least one paper before running the pipeline"
+                )
             run = Run(project_id=project_id)
             db.add(run)
             db.flush()
