@@ -23,6 +23,7 @@ from app.models import (
 from app.services.discovery import (
     DiscoveryCandidate,
     DiscoveryProviderError,
+    DiscoveryService,
     MultiSourceDiscoveryProvider,
     OpenAlexProvider,
 )
@@ -310,6 +311,32 @@ def test_seminal_route_orders_candidates_by_citation_signal(tmp_path: Path) -> N
             }
             assert ranked_papers[events[0].paper_id] == "Foundational Memory Study"
             assert events[0].rank == 1
+
+
+def test_survey_route_orders_review_hits_by_strength_and_citations() -> None:
+    candidates = [
+        DiscoveryCandidate(
+            external_id="review-low", title="Memory Review", authors=[], year=2025,
+            venue=None, doi=None, abstract="A review.", source_uri=None, score=0.7,
+            citation_count=10,
+        ),
+        DiscoveryCandidate(
+            external_id="review-high", title="Memory Survey and Benchmark", authors=[], year=2024,
+            venue=None, doi=None, abstract="A comprehensive survey.", source_uri=None, score=0.7,
+            citation_count=100,
+        ),
+        DiscoveryCandidate(
+            external_id="study", title="Memory Study", authors=[], year=2026,
+            venue=None, doi=None, abstract="A study.", source_uri=None, score=0.99,
+            citation_count=500,
+        ),
+    ]
+
+    ordered = DiscoveryService._order_candidates(candidates, "survey_search")
+
+    assert [candidate.external_id for candidate in ordered] == [
+        "review-high", "review-low", "study"
+    ]
 
 
 def test_discovery_deduplicates_same_provider_result(tmp_path: Path) -> None:
