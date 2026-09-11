@@ -175,7 +175,7 @@ export interface ProviderApproval {
 }
 
 export type ReviewMode = "sufficient" | "comprehensive" | "systematic" | "quick" | "thorough";
-export type DiscoveryRoute = "semantic_search" | "survey_search" | "recent_search";
+export type DiscoveryRoute = "semantic_search" | "survey_search" | "recent_search" | "seminal_search";
 
 export interface WorkbenchApi {
   createProject(input: { title: string; prompt: string; review_mode?: ReviewMode }): Promise<{ id: string }>;
