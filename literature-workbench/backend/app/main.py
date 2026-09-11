@@ -1002,6 +1002,11 @@ def create_app(
                 route_summaries.append(
                     {
                         "route": route,
+                        "queries": sorted({
+                            event.query
+                            for event in events
+                            if event.route == route and event.query
+                        }),
                         "candidate_events": sum(
                             event.route == route and event.action == "candidate"
                             for event in events

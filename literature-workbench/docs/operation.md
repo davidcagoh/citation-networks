@@ -22,6 +22,8 @@
    hits are ranked by explicit review/survey/benchmark signals before
    citation and date tie-breakers; ordinary routes use provider score and
    deterministic metadata tie-breakers.
+   The Corpus audit preserves and displays the exact query strings used by
+   each route, so a review can be reproduced or challenged at the query level.
    Broad-mode stopping certificates additionally require complete date signals
    on the recent route, citation signals on the seminal route, and at least one
    review-, survey-, or benchmark-like work from the survey route. When multiple

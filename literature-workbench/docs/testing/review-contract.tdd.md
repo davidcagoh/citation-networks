@@ -81,6 +81,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 63 | Cross-provider records with normalized DOI or title identities collapse into one canonical corpus paper while retaining separate discovery evidence. | `backend/tests/test_discovery.py::test_discovery_deduplicates_normalized_cross_provider_identity` | PASS |
 | 64 | Unicode-safe title identity normalization keeps distinct non-Latin paper titles separate during cross-provider discovery. | `backend/tests/test_discovery.py::test_discovery_does_not_collapse_distinct_non_latin_titles` | PASS |
 | 65 | Comprehensive scope accounting includes the general, systematic/meta-analytic, and umbrella/tutorial survey query families in discovery-call estimates. | `backend/tests/test_discovery.py::test_survey_route_queries_cover_multiple_review_families`, `backend/tests/test_scope.py::test_scope_preview_returns_transparent_scope_and_budget` | PASS |
+| 66 | Coverage audits preserve exact executed query strings per route, and the Corpus UI exposes them while accepting older payloads without query metadata. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 
 ## Validation evidence
 
