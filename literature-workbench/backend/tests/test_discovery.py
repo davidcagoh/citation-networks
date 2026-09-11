@@ -961,3 +961,9 @@ def test_multi_source_provider_merges_and_marks_provider_provenance() -> None:
         "semantic-scholar",
         "openalex",
     ]
+
+
+def test_app_wires_free_multi_source_discovery_by_default(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+
+    assert app.state.discovery.provider.name == "multi-source"
