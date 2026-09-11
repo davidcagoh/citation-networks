@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import Mock
 
 from fastapi.testclient import TestClient
 from sqlalchemy import select
@@ -50,6 +51,22 @@ def test_fixture_pipeline_preserves_complete_claim_provenance(tmp_path: Path) ->
             "writing",
         ]
         assert all(stage["status"] == "completed" for stage in stages)
+
+
+def test_pipeline_runs_verification_after_writing(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    app.state.pipeline.verification = Mock()
+    app.state.pipeline.verification.verify.return_value = []
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Survey memory systems"}
+        ).json()["id"]
+        client.post(f"/projects/{project_id}/fixtures/provenance-corpus")
+
+        response = client.post(f"/projects/{project_id}/runs/pipeline")
+
+        assert response.status_code == 201
+        app.state.pipeline.verification.verify.assert_called_once_with(project_id)
 
 
 def test_malformed_fixture_document_degrades_without_aborting(tmp_path: Path) -> None:
