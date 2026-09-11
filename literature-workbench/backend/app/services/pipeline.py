@@ -118,6 +118,50 @@ class PipelineService:
                 db.add(CorpusMembership(project_id=project_id, paper_id=paper.id))
             return len(fixture)
 
+    def acquire(self, project_id: str) -> dict[str, int | str]:
+        """Persist the best immediately available text for every project paper."""
+        with self.database.session() as db:
+            self._require_project(db, project_id)
+            papers = list(db.scalars(select(Paper).where(Paper.project_id == project_id)))
+            for paper in papers:
+                abstract = (paper.abstract or "").strip()
+                if not abstract:
+                    continue
+                existing = db.scalar(
+                    select(SourceDocument).where(
+                        SourceDocument.paper_id == paper.id,
+                        SourceDocument.source_type == "abstract",
+                    )
+                )
+                if existing is None:
+                    provenance = paper.metadata_provenance or {}
+                    db.add(
+                        SourceDocument(
+                            paper_id=paper.id,
+                            source_type="abstract",
+                            source_uri=provenance.get("source_uri") or f"paper://{paper.id}",
+                            text=abstract,
+                            parsing_quality="complete",
+                            parser=f"{provenance.get('provider', 'metadata')}-abstract-v1",
+                        )
+                    )
+            db.flush()
+            documents = list(
+                db.scalars(
+                    select(SourceDocument).where(
+                        SourceDocument.paper_id.in_([paper.id for paper in papers])
+                    )
+                )
+            )
+            preferred = select_preferred_documents(documents)
+            available_count = sum(bool(document.text) for document in preferred.values())
+            return {
+                "project_id": project_id,
+                "paper_count": len(papers),
+                "available_count": available_count,
+                "degraded_count": len(papers) - available_count,
+            }
+
     def run(self, project_id: str) -> Run:
         with self.database.session() as db:
             self._require_project(db, project_id)

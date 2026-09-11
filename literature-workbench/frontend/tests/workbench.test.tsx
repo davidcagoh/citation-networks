@@ -29,6 +29,7 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
   return {
     createProject: vi.fn().mockResolvedValue({ id: "project-1" }),
     ingestFixture: vi.fn().mockResolvedValue({ paper_count: 5 }),
+    acquire: vi.fn().mockResolvedValue({ project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0 }),
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
     updatePlan: vi.fn().mockImplementation(async (_projectId, _planId, plan) => ({ id: "plan-1", ...plan })),

@@ -84,6 +84,12 @@ export interface VerificationIssue {
 export interface WorkbenchApi {
   createProject(input: { title: string; prompt: string }): Promise<{ id: string }>;
   ingestFixture(projectId: string): Promise<{ paper_count: number }>;
+  acquire(projectId: string): Promise<{
+    project_id: string;
+    paper_count: number;
+    available_count: number;
+    degraded_count: number;
+  }>;
   runDiscovery(projectId: string, query: string, limit?: number): Promise<{
     candidate_count: number;
     provider: string;
@@ -175,6 +181,21 @@ function parseProject(value: unknown): Project {
 function parseIngest(value: unknown): { paper_count: number } {
   const ingest = object(value, "ingest");
   return { paper_count: number(ingest.paper_count, "ingest.paper_count") };
+}
+
+function parseAcquisition(value: unknown): {
+  project_id: string;
+  paper_count: number;
+  available_count: number;
+  degraded_count: number;
+} {
+  const acquisition = object(value, "acquisition");
+  return {
+    project_id: string(acquisition.project_id, "acquisition.project_id"),
+    paper_count: number(acquisition.paper_count, "acquisition.paper_count"),
+    available_count: number(acquisition.available_count, "acquisition.available_count"),
+    degraded_count: number(acquisition.degraded_count, "acquisition.degraded_count"),
+  };
 }
 
 function parseDiscovery(value: unknown): { candidate_count: number; provider: string; query: string } {
@@ -421,6 +442,8 @@ export function createWorkbenchApi(
       request(baseUrl, "/projects", parseProject, { method: "POST", body: JSON.stringify(input) }),
     ingestFixture: (projectId) =>
       request(baseUrl, `/projects/${projectId}/fixtures/provenance-corpus`, parseIngest, { method: "POST" }),
+    acquire: (projectId) =>
+      request(baseUrl, `/projects/${projectId}/runs/acquisition`, parseAcquisition, { method: "POST" }),
     runDiscovery: (projectId, query, limit = 20) =>
       request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {
         method: "POST",

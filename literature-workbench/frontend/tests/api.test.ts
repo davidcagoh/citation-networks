@@ -14,6 +14,18 @@ function response(body: unknown, options: { ok?: boolean; status?: number; text?
 afterEach(() => vi.unstubAllGlobals());
 
 describe("workbench API adapter", () => {
+  it("runs idempotent acquisition for discovered papers", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0,
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").acquire("project-1")).resolves.toEqual({
+      project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0,
+    });
+    expect(fetchMock).toHaveBeenCalledWith("http://api/projects/project-1/runs/acquisition", expect.objectContaining({ method: "POST" }));
+  });
+
   it("runs discovery and updates corpus screening decisions", async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(response({

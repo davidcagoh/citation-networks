@@ -163,6 +163,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     setError(null);
     try {
       setRunState("running");
+      await api.acquire(session.projectId);
       const run = await api.runPipeline(session.projectId);
       const workspace = await api.getWorkspace(session.projectId, run.id);
       setSession((current) => current ? {

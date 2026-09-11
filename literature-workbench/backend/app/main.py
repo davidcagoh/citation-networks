@@ -196,6 +196,13 @@ def create_app(
             "query": value.query,
         }
 
+    @app.post("/projects/{project_id}/runs/acquisition", status_code=201)
+    def run_acquisition(project_id: str) -> dict:
+        try:
+            return pipeline.acquire(project_id)
+        except ProjectNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+
     @app.post("/projects/{project_id}/runs/pipeline", status_code=201)
     def run_pipeline(project_id: str) -> dict:
         try:
