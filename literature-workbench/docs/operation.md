@@ -42,9 +42,10 @@ unsupported content, extraction failures, and sources over 5 MB are rejected.
 
 The current live extractor is intentionally heuristic: it selects a bounded
 first sentence and records whether it came from an abstract or imported text.
-It does not claim semantic model extraction or infer cross-paper relations for
-live sources. The fixture relation path remains deterministic and evidence
-linked.
+Live cross-paper relations use a conservative grounded topical-overlap rule;
+they are explicitly marked as model inference and should not be treated as
+semantic model extraction. The fixture relation path remains deterministic and
+evidence linked.
 
 ## Operational boundaries
 

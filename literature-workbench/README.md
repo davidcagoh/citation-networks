@@ -9,8 +9,9 @@ or paid-model calls. The UI also supports live discovery through Semantic
 Scholar when the provider is reachable. Discovered papers are candidates until
 screened; including them and choosing “Build grounded review” creates
 abstract-backed evidence with explicit provenance. This live path is a
-conservative MVP: full-text acquisition and model-backed semantic extraction
-are not yet enabled.
+conservative MVP: public text/HTML/PDF acquisition is available with bounded
+heuristic extraction, while model-backed semantic extraction remains opt-in
+future work.
 
 Use “Preview scope” to see the transparent focus areas and projected provider
 call budget before discovery. The execution ledger also exposes a hard paper
