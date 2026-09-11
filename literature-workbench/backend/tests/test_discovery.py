@@ -998,3 +998,40 @@ def test_openalex_provider_expands_forward_citations(monkeypatch) -> None:
     assert "filter=cites%3AW123" in requests[0]
     assert candidates[0].external_id == "openalex:W456"
     assert candidates[0].title == "A citing memory study"
+
+
+def test_openalex_provider_expands_backward_references(monkeypatch) -> None:
+    requests: list[str] = []
+    responses = iter(
+        [
+            FakeHTTPResponse(
+                {"referenced_works": ["https://openalex.org/W789"]}
+            ),
+            FakeHTTPResponse(
+                {
+                    "id": "https://openalex.org/W789",
+                    "title": "A referenced memory study",
+                    "publication_year": 2024,
+                    "publication_date": "2024-03-01",
+                    "doi": None,
+                    "cited_by_count": 12,
+                    "authorships": [],
+                    "primary_location": {},
+                    "abstract_inverted_index": None,
+                }
+            ),
+        ]
+    )
+
+    def fake_urlopen(request, timeout: float):
+        requests.append(request.full_url)
+        return next(responses)
+
+    monkeypatch.setattr("app.services.discovery.urlopen", fake_urlopen)
+    candidates = OpenAlexProvider().related("openalex:W123", "backward", 1)
+
+    assert requests == [
+        "https://api.openalex.org/works/W123",
+        "https://openalex.org/W789",
+    ]
+    assert candidates[0].external_id == "openalex:W789"
