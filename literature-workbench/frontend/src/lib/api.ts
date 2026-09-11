@@ -35,6 +35,7 @@ export interface ReviewSentence {
   text: string;
   substantive: boolean;
   claim_id: string | null;
+  evidence_span_ids?: string[];
 }
 
 export interface StageCost {
@@ -626,6 +627,7 @@ function parseReview(value: unknown): Workspace["review"] {
         text: string(sentence.text, `${label}.text`),
         substantive: boolean(sentence.substantive, `${label}.substantive`),
         claim_id: nullableString(sentence.claim_id, `${label}.claim_id`),
+        evidence_span_ids: array(sentence.evidence_span_ids ?? [], `${label}.evidence_span_ids`).map((item, evidenceIndex) => string(item, `${label}.evidence_span_ids[${evidenceIndex}]`)),
       };
     }),
   };
