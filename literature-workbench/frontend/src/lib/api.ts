@@ -249,6 +249,7 @@ export interface WorkbenchApi {
   runDiscovery(projectId: string, query: string, limit?: number, routes?: DiscoveryRoute[]): Promise<{
     candidate_count: number;
     route_count: number;
+    filtered_count: number;
     provider: string;
     query: string;
   }>;
