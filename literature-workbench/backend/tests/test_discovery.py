@@ -12,6 +12,7 @@ from app.models import (
     DiscoveryEvent,
     EvidenceSpan,
     Paper,
+    ProviderApproval,
     ReviewProtocol,
     ReviewSentence,
     ScientificRelation,
@@ -83,6 +84,11 @@ class FakeDiscoveryProvider:
                 score=0.7,
             )
         ][:limit]
+
+
+class PaidDiscoveryProvider(FakeDiscoveryProvider):
+    name = "paid-search"
+    requires_approval = True
 
 
 def test_discovery_persists_candidates_and_route_provenance(tmp_path: Path) -> None:
@@ -273,6 +279,40 @@ def test_on_demand_living_update_records_timestamp_and_new_papers(tmp_path: Path
             assert protocol is not None
             recorded_at = datetime.fromisoformat(body["last_updated_at"]).replace(tzinfo=None)
             assert recorded_at == protocol.updated_at
+
+
+def test_paid_provider_requires_explicit_non_replicable_approval(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=PaidDiscoveryProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        path = f"/projects/{project_id}/runs/discovery"
+
+        blocked = client.post(path, json={"query": "memory", "limit": 1})
+        assert blocked.status_code == 403
+        assert "explicit project approval" in blocked.json()["detail"]
+
+        approval = client.post(
+            f"/projects/{project_id}/provider-approvals",
+            json={
+                "provider": "paid-search",
+                "approved_by": "David Goh",
+                "justification": "Provides licensed full-text indexing.",
+                "non_replicable_reason": "The licensed index is unavailable through public APIs.",
+            },
+        )
+        assert approval.status_code == 201
+        assert approval.json()["approved"] is True
+
+        allowed = client.post(path, json={"query": "memory", "limit": 1})
+        assert allowed.status_code == 201
+        with app.state.database.session() as database:
+            record = database.scalar(select(ProviderApproval))
+            assert record is not None
+            assert record.provider == "paid-search"
 
 
 def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> None:
