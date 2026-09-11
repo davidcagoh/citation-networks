@@ -165,6 +165,29 @@ def test_prisma_report_reconciles_protocol_search_and_screening_flow(tmp_path: P
         assert body["search"]["queries"] == ["memory", "memory recent latest"]
 
 
+def test_prisma_screened_count_excludes_unresolved_candidates(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=ProtocolDiscoveryProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Survey memory"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 2},
+        )
+        paper_id = client.get(f"/projects/{project_id}/corpus").json()["papers"][0]["id"]
+        client.patch(
+            f"/projects/{project_id}/corpus/{paper_id}",
+            json={"status": "included"},
+        )
+
+        report = client.get(f"/projects/{project_id}/prisma-report").json()
+
+    assert report["flow"]["screened"] == 1
+
+
 def test_discovery_enforces_protocol_cutoff_and_reports_filtered_candidates(
     tmp_path: Path,
 ) -> None:
