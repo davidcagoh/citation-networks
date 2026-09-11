@@ -188,7 +188,11 @@ class ZoteroService:
                 "title": paper.canonical_title,
                 "zotero_key": provenance.get("zotero_key"),
             }
-            if current_record.get("zotero_key") and current_record not in alternates:
+            if (
+                current_status != "unknown"
+                or current_record.get("source_uri")
+                or current_record.get("zotero_key")
+            ) and current_record not in alternates:
                 alternates.append(current_record)
             creators = data.get("creators") or []
             authors = [
