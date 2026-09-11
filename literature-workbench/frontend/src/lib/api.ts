@@ -124,6 +124,7 @@ export interface CoverageAudit {
   };
   screening: { total: number; selected: number; unresolved_candidates: number; excluded: number };
   source_text: { selected_with_usable_text: number; selected_total: number };
+  provider_status?: Array<{ provider: string; attempts: number; failures: number }>;
   stopping_certificate: {
     status: "satisfied" | "incomplete";
     mode: ReviewMode;
@@ -507,6 +508,14 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
       };
     })(),
     limitations: array(audit.limitations, "coverage audit.limitations").map((item, index) => string(item, `coverage audit.limitations[${index}]`)),
+    provider_status: (audit.provider_status === undefined ? [] : array(audit.provider_status, "coverage audit.provider_status")).map((item, index) => {
+      const status = object(item, `coverage audit.provider_status[${index}]`);
+      return {
+        provider: string(status.provider, `coverage audit.provider_status[${index}].provider`),
+        attempts: number(status.attempts, `coverage audit.provider_status[${index}].attempts`),
+        failures: number(status.failures, `coverage audit.provider_status[${index}].failures`),
+      };
+    }),
   };
 }
 

@@ -64,6 +64,7 @@ class MultiSourceDiscoveryProvider:
 
     def __init__(self, providers: Sequence[DiscoveryProvider]) -> None:
         self.providers = list(providers)
+        self.last_attempts: list[dict[str, object]] = []
 
     @property
     def requires_approval(self) -> bool:
@@ -72,14 +73,17 @@ class MultiSourceDiscoveryProvider:
     def search(self, query: str, limit: int) -> list[DiscoveryCandidate]:
         candidates: list[DiscoveryCandidate] = []
         failures = []
+        self.last_attempts = []
         for provider in self.providers:
             try:
                 candidates.extend(
                     replace(candidate, provider_name=provider.name)
                     for candidate in provider.search(query, limit)
                 )
+                self.last_attempts.append({"provider": provider.name, "failed": False})
             except DiscoveryProviderError as exc:
                 failures.append(exc)
+                self.last_attempts.append({"provider": provider.name, "failed": True})
         if not candidates and failures:
             raise DiscoveryProviderError("All discovery providers failed") from failures[-1]
         return candidates
@@ -330,6 +334,26 @@ class DiscoveryService:
                 for candidate in self.provider.search(route_query, limit):
                     fetched_candidates.append(candidate)
                     candidate_queries[id(candidate)] = route_query
+                attempts = getattr(self.provider, "last_attempts", [])
+                if attempts:
+                    with self.database.session() as db:
+                        for attempt in attempts:
+                            provider_name = str(attempt["provider"])
+                            failed = bool(attempt["failed"])
+                            db.add(
+                                DiscoveryEvent(
+                                    project_id=project_id,
+                                    route=route,
+                                    query=route_query,
+                                    action="provider_attempt",
+                                    rationale=(
+                                        "Provider search failed"
+                                        if failed
+                                        else "Provider search completed"
+                                    ),
+                                    provider=provider_name,
+                                )
+                            )
             candidates = self._order_candidates(
                 fetched_candidates, route
             )

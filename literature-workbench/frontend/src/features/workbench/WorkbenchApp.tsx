@@ -725,6 +725,7 @@ function Corpus({ workspace, audit, prisma, paperCount, filteredCount, approval,
         <span>{audit.screening.selected}/{audit.screening.total} selected · {audit.source_text.selected_with_usable_text}/{audit.source_text.selected_total} with usable text</span>
         {(audit.routes.summaries ?? []).length > 0 && <span>Route yield · {(audit.routes.summaries ?? []).map((summary) => `${summary.route.replace("_search", "")}: ${summary.unique_papers}`).join(" · ")}</span>}
         {(audit.routes.signal_coverage ?? []).length > 0 && <span>Signal coverage · {(audit.routes.signal_coverage ?? []).map((signal) => `${signal.route.replace("_search", "")}: ${signal.papers_with_publication_date} dated / ${signal.papers_with_citation_count} cited`).join(" · ")}</span>}
+        {(audit.provider_status ?? []).some((status) => status.failures > 0) && <span>Partial provider fan-out · {(audit.provider_status ?? []).filter((status) => status.failures > 0).map((status) => `${status.provider}: ${status.failures}/${status.attempts} failed`).join(" · ")}</span>}
         {audit.limitations.length > 0 && <span>{audit.limitations.join("; ")}</span>}
         <button className={styles.secondary} type="button" onClick={onLivingUpdate}>Refresh living review</button>
         {approval === "corpus" && <button className={styles.primary} type="button" onClick={onApprove}>Approve corpus checkpoint</button>}

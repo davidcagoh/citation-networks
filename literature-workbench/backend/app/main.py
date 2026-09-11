@@ -289,6 +289,17 @@ def create_app(
             )
             routes = list(dict.fromkeys(event.route for event in identification_events))
             filtered_by_cutoff = sum(event.action == "filtered" for event in events)
+            provider_totals: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+            for event in events:
+                if event.action == "provider_attempt":
+                    provider_totals[event.provider][0] += 1
+                    provider_totals[event.provider][1] += (
+                        event.rationale == "Provider search failed"
+                    )
+            provider_status = [
+                {"provider": provider, "attempts": totals[0], "failures": totals[1]}
+                for provider, totals in provider_totals.items()
+            ]
             last_search = (
                 identification_events[-1].created_at.isoformat() if identification_events else None
             )
@@ -307,6 +318,7 @@ def create_app(
                     "routes": routes,
                     "queries": queries,
                     "filtered_by_cutoff": filtered_by_cutoff,
+                    "provider_status": provider_status,
                     "last_search_at": last_search,
                 },
                 "flow": {
@@ -988,6 +1000,17 @@ def create_app(
                 bool(documents.get(membership.paper_id) and documents[membership.paper_id].text)
                 for membership in selected
             )
+            provider_totals: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+            for event in events:
+                if event.action == "provider_attempt":
+                    provider_totals[event.provider][0] += 1
+                    provider_totals[event.provider][1] += (
+                        event.rationale == "Provider search failed"
+                    )
+            provider_status = [
+                {"provider": provider, "attempts": totals[0], "failures": totals[1]}
+                for provider, totals in provider_totals.items()
+            ]
             limitations: list[str] = []
             if candidates:
                 limitations.append("candidate papers remain unscreened")
@@ -1031,6 +1054,7 @@ def create_app(
                     "selected_with_usable_text": selected_with_text,
                     "selected_total": len(selected),
                 },
+                "provider_status": provider_status,
                 "stopping_certificate": stopping_certificate,
                 "limitations": limitations,
             }
