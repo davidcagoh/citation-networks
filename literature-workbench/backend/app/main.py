@@ -573,6 +573,12 @@ def create_app(
             if value.mode == "quick":
                 focus = focus[:2]
             envelope = resource_envelope_for_mode(value.mode, value.max_papers)
+            provider_count = len(getattr(discovery.provider, "providers", [discovery.provider]))
+            normalized_mode = {"quick": "sufficient", "thorough": "comprehensive"}.get(
+                value.mode, value.mode
+            )
+            route_query_count = 1 if normalized_mode == "sufficient" else 7
+            estimated_discovery_api_calls = route_query_count * provider_count
             return {
                 "project_id": project_id,
                 "scope": {
@@ -583,6 +589,11 @@ def create_app(
                 "budget": {
                     **envelope.model_dump(),
                     "estimated_external_api_calls": envelope.max_external_api_calls,
+                    "estimated_discovery_api_calls": estimated_discovery_api_calls,
+                    "estimated_pipeline_api_calls": envelope.max_external_api_calls,
+                    "estimated_total_api_calls": (
+                        estimated_discovery_api_calls + envelope.max_external_api_calls
+                    ),
                 },
             }
 

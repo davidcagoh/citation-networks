@@ -694,7 +694,7 @@ function BriefForm({ title, prompt, sourceText, sourceUri, reviewMode, onReviewM
       </div>
       {preview && <section className={styles.planHeader} aria-label="Scope preview">
         <div><div className={styles.principle}>Scope preview · {preview.scope.mode}</div><p>{preview.scope.query}</p></div>
-        <div><strong>{preview.budget.max_papers} papers</strong><br /><span className={styles.microcopy}>{preview.budget.estimated_external_api_calls} API calls · {preview.budget.estimated_input_tokens.toLocaleString()} input tokens · ${preview.budget.estimated_cost_usd.toFixed(2)} estimated</span></div>
+        <div><strong>{preview.budget.max_papers} papers</strong><br /><span className={styles.microcopy}>{preview.budget.estimated_total_api_calls} total API calls ({preview.budget.estimated_discovery_api_calls} discovery + {preview.budget.estimated_pipeline_api_calls} pipeline) · {preview.budget.estimated_input_tokens.toLocaleString()} input tokens · ${preview.budget.estimated_cost_usd.toFixed(2)} estimated</span></div>
         <ul>{preview.scope.suggested_focus.map((focus) => <li key={focus}>{focus}</li>)}</ul>
       </section>}
     </form>

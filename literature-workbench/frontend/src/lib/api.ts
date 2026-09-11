@@ -93,6 +93,9 @@ export interface ScopePreview {
     max_papers: number;
     max_external_api_calls: number;
     estimated_external_api_calls: number;
+    estimated_discovery_api_calls: number;
+    estimated_pipeline_api_calls: number;
+    estimated_total_api_calls: number;
     estimated_input_tokens: number;
     estimated_output_tokens: number;
     estimated_cost_usd: number;
@@ -406,6 +409,9 @@ function parseScopePreview(value: unknown): ScopePreview {
       max_papers: number(budget.max_papers, "scope preview.budget.max_papers"),
       max_external_api_calls: number(budget.max_external_api_calls, "scope preview.budget.max_external_api_calls"),
       estimated_external_api_calls: number(budget.estimated_external_api_calls, "scope preview.budget.estimated_external_api_calls"),
+      estimated_discovery_api_calls: number(budget.estimated_discovery_api_calls ?? 0, "scope preview.budget.estimated_discovery_api_calls"),
+      estimated_pipeline_api_calls: number(budget.estimated_pipeline_api_calls ?? budget.max_external_api_calls, "scope preview.budget.estimated_pipeline_api_calls"),
+      estimated_total_api_calls: number(budget.estimated_total_api_calls ?? budget.estimated_external_api_calls, "scope preview.budget.estimated_total_api_calls"),
       estimated_input_tokens: number(budget.estimated_input_tokens, "scope preview.budget.estimated_input_tokens"),
       estimated_output_tokens: number(budget.estimated_output_tokens, "scope preview.budget.estimated_output_tokens"),
       estimated_cost_usd: number(budget.estimated_cost_usd, "scope preview.budget.estimated_cost_usd"),
