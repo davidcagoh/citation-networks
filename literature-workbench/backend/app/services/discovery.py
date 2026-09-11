@@ -11,7 +11,14 @@ from urllib.request import Request, urlopen
 from sqlalchemy import select
 
 from app.db import Database
-from app.models import CorpusMembership, DiscoveryEvent, Paper, Project, SourceDocument
+from app.models import (
+    CorpusMembership,
+    DiscoveryEvent,
+    Paper,
+    Project,
+    SourceDocument,
+    UsageCostEvent,
+)
 
 
 class DiscoveryProviderError(Exception):
@@ -140,6 +147,13 @@ class DiscoveryService:
                         provider=self.provider.name,
                     )
                 )
+            db.add(
+                UsageCostEvent(
+                    project_id=project_id,
+                    provider=self.provider.name,
+                    external_api_calls=1,
+                )
+            )
             return len(candidates)
 
     def _persist_abstract(self, db, paper: Paper, candidate: DiscoveryCandidate) -> None:

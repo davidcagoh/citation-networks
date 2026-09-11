@@ -237,9 +237,11 @@ class UsageCostEvent(Base):
     project_id: Mapped[str] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"), index=True
     )
-    run_id: Mapped[str] = mapped_column(ForeignKey("runs.id", ondelete="CASCADE"), index=True)
-    stage_run_id: Mapped[str] = mapped_column(
-        ForeignKey("stage_runs.id", ondelete="CASCADE"), index=True
+    run_id: Mapped[str | None] = mapped_column(
+        ForeignKey("runs.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    stage_run_id: Mapped[str | None] = mapped_column(
+        ForeignKey("stage_runs.id", ondelete="CASCADE"), nullable=True, index=True
     )
     provider: Mapped[str] = mapped_column(String(80), default="deterministic-fixture")
     input_tokens: Mapped[int] = mapped_column(Integer, default=0)
