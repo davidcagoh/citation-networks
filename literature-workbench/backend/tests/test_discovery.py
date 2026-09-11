@@ -219,6 +219,15 @@ def test_citation_expansion_persists_directional_edges_and_provenance(tmp_path: 
 
         assert response.status_code == 201
         assert response.json()["candidate_count"] == 1
+        graph = client.get(f"/projects/{project_id}/graph").json()
+        assert graph["citation_edges"] == [
+            {
+                "source_paper_id": seed_id,
+                "target_paper_id": graph["citation_edges"][0]["target_paper_id"],
+                "direction": "backward",
+                "provider": "fake-search",
+            }
+        ]
         with app.state.database.session() as database:
             edge = database.scalar(select(CitationEdge))
             assert edge is not None
