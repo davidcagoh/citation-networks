@@ -96,6 +96,7 @@
 .evidenceMeter { color: var(--moss); font: 650 10px ui-monospace, monospace; text-transform: uppercase; }
 
 .reviewGrid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(270px, .85fr); min-height: 390px; border-top: 1px solid var(--line); }
+.reviewToolbar { display: flex; justify-content: space-between; align-items: center; padding: 0 0 14px; color: var(--muted); font: 10px ui-monospace, monospace; text-transform: uppercase; letter-spacing: .07em; }
 .prose { padding: 26px 34px 30px 0; border-right: 1px solid var(--line); }
 .prose p { margin: 0 0 17px; font: 17px/1.78 Georgia, serif; }
 .claim { border: 0; border-bottom: 2px solid #aec853; background: linear-gradient(transparent 68%, #d6ed7866 68%); color: inherit; padding: 0 1px; font: inherit; text-align: left; cursor: pointer; transition: background .15s; }
@@ -113,6 +114,10 @@
 .source h3 { margin: 0 0 4px; font: 400 15px Georgia, serif; }
 .location { color: var(--muted); font: 10px ui-monospace, monospace; }
 .quote { margin: 10px 0 0; padding: 12px; border-left: 2px solid var(--moss); background: #eae8df; font: 13px/1.55 Georgia, serif; }
+.issues { margin-top: 24px; border-top: 1px solid var(--line); }
+.issue { display: grid; gap: 7px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.issue p { margin: 0; font-size: 13px; }
+.issueStatus { margin-left: 8px; color: var(--muted); font: 10px ui-monospace, monospace; text-transform: uppercase; }
 
 .costTotal { display: flex; gap: 34px; margin-bottom: 22px; }
 .costMetric strong { display: block; font: 400 26px Georgia, serif; }

@@ -2,7 +2,7 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
-import type { ClaimEvidence, ReviewPlan, WorkbenchApi, Workspace } from "@/lib/api";
+import type { ClaimEvidence, ReviewPlan, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
 import styles from "./WorkbenchApp.module.css";
 
 const tabs = ["Brief", "Corpus", "Structure", "Review", "Run / Costs"] as const;
@@ -30,6 +30,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   const [runState, setRunState] = useState<RunState>("idle");
   const [error, setError] = useState<string | null>(null);
   const [selectedEvidence, setSelectedEvidence] = useState<ClaimEvidence | null>(null);
+  const [verificationIssues, setVerificationIssues] = useState<VerificationIssue[]>([]);
   const [evidenceLoading, setEvidenceLoading] = useState(false);
   const evidenceController = useRef<AbortController | null>(null);
   const evidenceSequence = useRef(0);
@@ -54,6 +55,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     evidenceSequence.current += 1;
     setSession(null);
     setSelectedEvidence(null);
+    setVerificationIssues([]);
     setEvidenceLoading(false);
     try {
       setRunState("creating");
@@ -64,6 +66,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       const run = await api.runPipeline(project.id);
       const nextWorkspace = await api.getWorkspace(project.id, run.id);
       setSession({ projectId: project.id, paperCount: ingest.paper_count, workspace: nextWorkspace });
+      setVerificationIssues([]);
       setRunState("complete");
       setActiveTab("Corpus");
     } catch (caught) {
@@ -77,6 +80,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     setError(null);
     setSession(null);
     setSelectedEvidence(null);
+    setVerificationIssues([]);
     try {
       setRunState("creating");
       const project = await api.createProject({ title: title.trim(), prompt: prompt.trim() });
@@ -84,6 +88,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       const discovery = await api.runDiscovery(project.id, prompt.trim(), 20);
       const workspace = await api.getWorkspace(project.id);
       setSession({ projectId: project.id, paperCount: discovery.candidate_count, workspace });
+      setVerificationIssues([]);
       setRunState("complete");
       setActiveTab("Corpus");
     } catch (caught) {
@@ -139,6 +144,27 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "The review plan could not be saved.");
       throw caught;
+    }
+  }
+
+  async function runVerification() {
+    if (!session) return;
+    try {
+      await api.runVerification(session.projectId);
+      const result = await api.getVerification(session.projectId);
+      setVerificationIssues(result.issues);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Verification could not be completed.");
+    }
+  }
+
+  async function resolveVerificationIssue(issueId: string) {
+    if (!session) return;
+    try {
+      const updated = await api.updateVerificationIssue(session.projectId, issueId, "resolved");
+      setVerificationIssues((issues) => issues.map((issue) => issue.id === issueId ? updated : issue));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Verification issue could not be resolved.");
     }
   }
 
@@ -244,7 +270,15 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} paperCount={session?.paperCount ?? null} onScreen={screenPaper} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} onSave={savePlan} />}
             {activeTab === "Review" && (
-              <Review workspace={session?.workspace ?? null} evidence={selectedEvidence} evidenceLoading={evidenceLoading} onInspect={inspectClaim} />
+              <Review
+                workspace={session?.workspace ?? null}
+                evidence={selectedEvidence}
+                evidenceLoading={evidenceLoading}
+                onInspect={inspectClaim}
+                issues={verificationIssues}
+                onVerify={runVerification}
+                onResolve={resolveVerificationIssue}
+              />
             )}
             {activeTab === "Run / Costs" && <Costs workspace={session?.workspace ?? null} status={statusText[runState]} />}
           </section>
@@ -383,24 +417,48 @@ function Structure({ workspace, onSave }: {
   );
 }
 
-function Review({ workspace, evidence, evidenceLoading, onInspect }: {
-  workspace: Workspace | null; evidence: ClaimEvidence | null; evidenceLoading: boolean; onInspect: (claimId: string) => void;
+function Review({ workspace, evidence, evidenceLoading, onInspect, issues, onVerify, onResolve }: {
+  workspace: Workspace | null;
+  evidence: ClaimEvidence | null;
+  evidenceLoading: boolean;
+  onInspect: (claimId: string) => void;
+  issues: VerificationIssue[];
+  onVerify: () => Promise<void>;
+  onResolve: (issueId: string) => Promise<void>;
 }) {
   if (!workspace) return <Empty text="Complete the fixture run to generate a grounded review." />;
   return (
-    <div className={styles.reviewGrid}>
-      <article className={styles.prose} aria-label="Generated review">
-        {workspace.review.sentences.map((sentence) => (
-          <p key={sentence.id}>{sentence.substantive && sentence.claim_id ? (
-            <button className={styles.claim} type="button" onClick={() => onInspect(sentence.claim_id!)}>{sentence.text}</button>
-          ) : sentence.text}</p>
-        ))}
-      </article>
-      <aside className={styles.inspector} aria-live="polite">
-        <div className={styles.inspectorTitle}><h2>Evidence inspector</h2>{evidence && <span className={styles.badge}>Linked</span>}</div>
-        {evidenceLoading ? <div className={styles.emptyInspector}>Tracing provenance…</div> : evidence ? <EvidenceDetail evidence={evidence} /> : <div className={styles.emptyInspector}>Select a highlighted claim<br />to inspect its source trail.</div>}
-      </aside>
-    </div>
+    <>
+      <div className={styles.reviewToolbar}>
+        <span>Grounding gate · {issues.filter((issue) => issue.status === "open").length} open issues</span>
+        <button className={styles.secondary} type="button" onClick={onVerify}>Run verification</button>
+      </div>
+      <div className={styles.reviewGrid}>
+        <article className={styles.prose} aria-label="Generated review">
+          {workspace.review.sentences.map((sentence) => (
+            <p key={sentence.id}>{sentence.substantive && sentence.claim_id ? (
+              <button className={styles.claim} type="button" onClick={() => onInspect(sentence.claim_id!)}>{sentence.text}</button>
+            ) : sentence.text}</p>
+          ))}
+        </article>
+        <aside className={styles.inspector} aria-live="polite">
+          <div className={styles.inspectorTitle}><h2>Evidence inspector</h2>{evidence && <span className={styles.badge}>Linked</span>}</div>
+          {evidenceLoading ? <div className={styles.emptyInspector}>Tracing provenance…</div> : evidence ? <EvidenceDetail evidence={evidence} /> : <div className={styles.emptyInspector}>Select a highlighted claim<br />to inspect its source trail.</div>}
+        </aside>
+      </div>
+      {issues.length > 0 && (
+        <section className={styles.issues} aria-labelledby="verification-issues-title">
+          <div className={styles.inspectorTitle}><h2 id="verification-issues-title">Verification issues</h2></div>
+          {issues.map((issue) => (
+            <article className={styles.issue} key={issue.id}>
+              <div><span className={styles.badge}>{issue.severity}</span><span className={styles.issueStatus}>{issue.status}</span></div>
+              <p>{issue.message}</p>
+              {issue.status === "open" && <button className={styles.secondary} type="button" onClick={() => onResolve(issue.id)}>Resolve issue {issue.id}</button>}
+            </article>
+          ))}
+        </section>
+      )}
+    </>
   );
 }
 
