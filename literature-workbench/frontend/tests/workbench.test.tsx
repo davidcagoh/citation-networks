@@ -105,6 +105,28 @@ describe("Literature Workbench", () => {
     expect(await screen.findByRole("heading", { name: "Edited section" })).toBeVisible();
   });
 
+  it("runs verification and resolves a surfaced issue", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture({
+      runVerification: vi.fn().mockResolvedValue({ issue_count: 1, issue_ids: ["issue-1"] }),
+      getVerification: vi.fn().mockResolvedValue({ issues: [{
+        id: "issue-1", claim_id: "claim-1", issue_type: "missing_evidence", severity: "high",
+        message: "Claim has no evidence.", status: "open",
+      }] }),
+    });
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Survey agent memory.");
+    await user.click(screen.getByRole("button", { name: "Create and run fixture" }));
+    await user.click(await screen.findByRole("tab", { name: "Review" }));
+    await user.click(screen.getByRole("button", { name: "Run verification" }));
+
+    expect(await screen.findByText("Claim has no evidence.")).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Resolve issue issue-1" }));
+    expect(api.updateVerificationIssue).toHaveBeenCalledWith("project-1", "issue-1", "resolved");
+  });
+
   it("discovers candidates and lets the user include one", async () => {
     const user = userEvent.setup();
     const api = apiFixture({
