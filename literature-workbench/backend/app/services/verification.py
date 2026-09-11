@@ -59,6 +59,21 @@ class VerificationService:
                     claim.verification_status = "flagged"
                     db.flush()
                     created.append(issue.id)
+                elif (
+                    claim.inference_level == "cross_source_synthesis"
+                    and not claim.supporting_relation_ids
+                ):
+                    issue = VerificationIssue(
+                        project_id=project_id,
+                        claim_id=claim.id,
+                        issue_type="unsupported_synthesis",
+                        severity="medium",
+                        message="Cross-source synthesis claim has no supporting relation record.",
+                    )
+                    db.add(issue)
+                    claim.verification_status = "flagged"
+                    db.flush()
+                    created.append(issue.id)
                 else:
                     claim.verification_status = "grounded"
             return created
