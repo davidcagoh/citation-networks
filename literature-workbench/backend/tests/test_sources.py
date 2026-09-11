@@ -39,7 +39,7 @@ def test_ingests_user_supplied_full_text_with_provenance(tmp_path: Path) -> None
             "The study evaluates a memory architecture across two workloads."
         )
         plan = client.get(f"/projects/{project_id}/plans").json()["plans"][0]
-        assert "source text" in plan["thesis"]
+        assert "source text" in plan["thesis"].lower()
         with app.state.database.session() as database:
             span = database.scalar(select(EvidenceSpan))
             assert span is not None

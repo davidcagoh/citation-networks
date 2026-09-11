@@ -388,7 +388,8 @@ class PipelineService:
             }
             for span in evidence_spans.values():
                 if (
-                    span.extractor_version in {"fixture-v1", "abstract-heuristic-v1"}
+                    span.extractor_version
+                    in {"fixture-v1", "abstract-heuristic-v1", "text-heuristic-v1"}
                     and span.id not in referenced_span_ids
                 ):
                     db.delete(span)
@@ -412,7 +413,15 @@ class PipelineService:
                 and paper.metadata_provenance.get("entity_type")
                 and paper.metadata_provenance.get("entity_label")
             )
-            extractor_version = "fixture-v1" if fixture_extraction else "abstract-heuristic-v1"
+            extractor_version = (
+                "fixture-v1"
+                if fixture_extraction
+                else (
+                    "text-heuristic-v1"
+                    if document.source_type == "text"
+                    else "abstract-heuristic-v1"
+                )
+            )
             if fixture_extraction:
                 start, evidence_text = self._bounded_evidence(
                     document.text, paper.metadata_provenance.get("evidence")
@@ -455,7 +464,7 @@ class PipelineService:
                     delete(EvidenceSpan).where(
                         EvidenceSpan.paper_id == paper.id,
                         EvidenceSpan.extractor_version.in_(
-                            ["fixture-v1", "abstract-heuristic-v1"]
+                            ["fixture-v1", "abstract-heuristic-v1", "text-heuristic-v1"]
                         ),
                     )
                 )
@@ -687,13 +696,20 @@ class PipelineService:
                 claims.append(claim)
 
             live_only = bool(entities) and all(
-                entity.extraction_method == "abstract-heuristic-v1" for entity in entities
+                entity.extraction_method
+                in {"abstract-heuristic-v1", "text-heuristic-v1"}
+                for entity in entities
+            )
+            source_label = (
+                "source text"
+                if any(entity.extraction_method == "text-heuristic-v1" for entity in entities)
+                else "abstract evidence"
             )
             section_metadata = (
                 [
                     (
                         "Direct findings from discovered papers",
-                        "Summarize provider-supplied abstract evidence before deeper extraction.",
+                        f"Summarize directly inspectable {source_label} before deeper extraction.",
                     )
                 ]
                 if live_only
@@ -738,8 +754,8 @@ class PipelineService:
             plan = existing_plan or ReviewPlan(project_id=project_id)
             plan.title = f"Evidence structure for {project.title}"
             plan.thesis = (
-                "The discovered literature is currently represented by directly inspectable "
-                "abstract evidence; deeper synthesis should follow source acquisition."
+                f"{source_label.capitalize()} is directly inspectable; deeper synthesis should "
+                "follow richer extraction."
                 if live_only
                 else "Agent-memory architectures evolve by responding to specific recall failures, "
                 "with each mechanism introducing a new operational trade-off."
