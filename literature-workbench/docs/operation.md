@@ -6,6 +6,11 @@
 2. Use **Preview scope** to see the deterministic focus areas and projected
    provider call budget. The preview separates discovery fan-out calls from
    pipeline-budget calls and shows their total.
+   The resource envelope is a planning and safety cap: paper count, external
+   calls, estimated input/output tokens, and estimated USD spend. The current
+   built-in workflow is local plus free-provider, so its estimated and recorded
+   USD spend is $0.00; paid providers must be explicitly approved and their
+   adapter configured before they can contribute calls.
 3. Either run the five-paper fixture, or choose **Discover papers** to query
    the default free multi-source adapter (Semantic Scholar and OpenAlex).
    If the saved protocol has a cutoff date, discovery retains records at or
