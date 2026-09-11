@@ -131,6 +131,22 @@ describe("Literature Workbench", () => {
     expect(await screen.findByText("PRISMA protocol and audit trail")).toBeVisible();
   });
 
+  it("expands discovery routes for a systematic review", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture();
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Survey agent memory.");
+    await user.selectOptions(screen.getByLabelText("Review mode"), "systematic");
+    await user.click(screen.getByRole("button", { name: "Discover papers" }));
+
+    expect(api.runDiscovery).toHaveBeenCalledWith(
+      "project-1", "Survey agent memory.", 20,
+      ["semantic_search", "survey_search", "recent_search"],
+    );
+  });
+
   it("edits and saves the relation-backed plan", async () => {
     const user = userEvent.setup();
     const api = apiFixture({
