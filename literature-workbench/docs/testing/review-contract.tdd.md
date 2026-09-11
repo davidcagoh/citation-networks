@@ -32,20 +32,21 @@ This report records the implementation tranche derived from the review-engine pl
 | 14 | Paid providers are blocked until a project records approver identity, justification, and non-replicability evidence. | `backend/tests/test_discovery.py::test_paid_provider_requires_explicit_non_replicable_approval`, `frontend/tests/api.test.ts` | PASS |
 | 15 | Generated substantive review sentences retain exact evidence-span IDs alongside paper citations. | `backend/tests/test_pipeline.py::test_fixture_pipeline_preserves_complete_claim_provenance` | PASS |
 | 16 | Researchers can edit generated prose while preserving its claim and evidence-span links. | `backend/tests/test_pipeline.py::test_grounded_review_sentence_can_be_edited_without_losing_evidence_links`, `frontend/tests/workbench.test.tsx` | PASS |
+| 17 | Citation expansion supports bounded multi-hop traversal and reports a stopping reason. | `backend/tests/test_discovery.py::test_multi_hop_citation_expansion_stops_at_exhausted_frontier`, `frontend/tests/api.test.ts` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 65 passed.
+- Backend: `uv run pytest -q` → 66 passed.
 - Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 87.20%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
-- Frontend: `npm test -- --run` → 44 passed.
+- Frontend: `npm test -- --run` → 45 passed.
 - Frontend lint: `npm run lint` → PASS.
 - Frontend types: `npx tsc --noEmit` → PASS.
 
 ## Known gaps
 
-- Backward and forward citation expansion are implemented; multi-hop traversal, co-citation, and stopping rules for network saturation remain future work.
+- Bounded backward and forward multi-hop expansion is implemented with stopping reasons; co-citation expansion and richer network-saturation heuristics remain future work.
 - Paid-provider approval is enforced at discovery boundaries; an approved provider adapter still must be configured before use. Zotero import/export is available through server-side credentials.
 - Full-text acquisition remains conservative; abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Richer paragraph-level generation and section-level editing remain future work.
