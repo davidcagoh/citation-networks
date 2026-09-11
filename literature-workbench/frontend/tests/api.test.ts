@@ -218,6 +218,7 @@ describe("workbench API adapter", () => {
       },
       search: {
         routes: ["semantic_search"], queries: ["memory"],
+        filtered_by_cutoff: 2,
         last_search_at: "2026-09-10T12:00:00+00:00",
       },
       flow: {
@@ -229,7 +230,10 @@ describe("workbench API adapter", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(createWorkbenchApi("http://api").getPrismaReport("project-1"))
-      .resolves.toMatchObject({ flow: { unique_identified: 7, duplicates_removed: 3 } });
+      .resolves.toMatchObject({
+        search: { filtered_by_cutoff: 2 },
+        flow: { unique_identified: 7, duplicates_removed: 3 },
+      });
   });
 
   it("approves corpus and structure checkpoints", async () => {
