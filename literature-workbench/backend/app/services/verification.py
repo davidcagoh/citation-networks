@@ -10,6 +10,7 @@ from app.models import (
     Paper,
     Project,
     ReviewSentence,
+    ScientificEntity,
     SynthesisClaim,
     VerificationIssue,
 )
@@ -38,6 +39,20 @@ class VerificationService:
             claims = list(
                 db.scalars(select(SynthesisClaim).where(SynthesisClaim.project_id == project_id))
             )
+            papers = {
+                paper.id: paper
+                for paper in db.scalars(select(Paper).where(Paper.project_id == project_id))
+                if paper.year is not None
+            }
+            entities = {
+                entity.id: entity
+                for entity in db.scalars(
+                    select(ScientificEntity)
+                    .join(Paper, Paper.id == ScientificEntity.paper_id)
+                    .where(Paper.project_id == project_id)
+                )
+            }
+            corpus_frontier = max((paper.year for paper in papers.values()), default=None)
             referenced_span_ids = [
                 span_id for claim in claims for span_id in claim.supporting_evidence_span_ids
             ]
@@ -105,6 +120,34 @@ class VerificationService:
                     claim.verification_status = "flagged"
                     db.flush()
                     created.append(issue.id)
+                elif corpus_frontier is not None and any(
+                    entity.extraction_method != "deterministic-fixture"
+                    for entity in entities.values()
+                ):
+                    supporting_years = [
+                        papers[entities[entity_id].paper_id].year
+                        for entity_id in claim.supporting_entity_ids
+                        if entity_id in entities
+                        and entities[entity_id].paper_id in papers
+                        and papers[entities[entity_id].paper_id].year is not None
+                    ]
+                    if supporting_years and corpus_frontier - max(supporting_years) >= 3:
+                        issue = VerificationIssue(
+                            project_id=project_id,
+                            claim_id=claim.id,
+                            issue_type="freshness",
+                            severity="low",
+                            message=(
+                                "Claim support is at least three years behind the corpus "
+                                "publication-date frontier; consider checking newer evidence."
+                            ),
+                        )
+                        db.add(issue)
+                        claim.verification_status = "flagged"
+                        db.flush()
+                        created.append(issue.id)
+                    else:
+                        claim.verification_status = "grounded"
                 else:
                     claim.verification_status = "grounded"
 

@@ -4,7 +4,14 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app.main import create_app
-from app.models import EvidenceSpan, Paper, ReviewSentence, SynthesisClaim, VerificationIssue
+from app.models import (
+    EvidenceSpan,
+    Paper,
+    ReviewSentence,
+    ScientificEntity,
+    SynthesisClaim,
+    VerificationIssue,
+)
 
 
 def _completed_project(client: TestClient) -> str:
@@ -142,3 +149,30 @@ def test_verification_flags_substantive_uncited_review_sentence(tmp_path: Path) 
         assert response.status_code == 201
         issues = client.get(f"/projects/{project_id}/verification").json()["issues"]
         assert any(issue["issue_type"] == "citation_completeness" for issue in issues)
+
+
+def test_verification_flags_claims_behind_corpus_date_frontier(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = _completed_project(client)
+        with app.state.database.session() as database:
+            papers = list(database.scalars(select(Paper).where(Paper.project_id == project_id)))
+            for paper in papers:
+                paper.year = 2020
+            papers[-1].year = 2026
+            claim = database.scalar(
+                select(SynthesisClaim).where(SynthesisClaim.project_id == project_id)
+            )
+            assert claim is not None
+            source_entity = database.get(ScientificEntity, claim.supporting_entity_ids[-1])
+            assert source_entity is not None
+            source_entity.extraction_method = "text-heuristic-v1"
+            source_paper = database.get(Paper, source_entity.paper_id)
+            assert source_paper is not None
+            source_paper.year = 2020
+
+        response = client.post(f"/projects/{project_id}/runs/verification")
+
+        assert response.status_code == 201
+        issues = client.get(f"/projects/{project_id}/verification").json()["issues"]
+        assert any(issue["issue_type"] == "freshness" for issue in issues)
