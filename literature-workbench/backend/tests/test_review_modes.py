@@ -88,3 +88,27 @@ def test_project_and_run_persist_the_selected_review_mode(tmp_path: Path) -> Non
             run = database.scalar(select(Run).where(Run.project_id == project_id))
             assert brief is not None and brief.review_mode == "systematic"
             assert run is not None and run.review_mode == "systematic"
+
+
+def test_broader_review_runs_pause_for_corpus_approval(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={"title": "Memory", "prompt": "Survey memory", "review_mode": "systematic"},
+        ).json()["id"]
+        client.post(f"/projects/{project_id}/fixtures/provenance-corpus")
+
+        pending = client.post(
+            f"/projects/{project_id}/runs/pipeline",
+            json={"review_mode": "systematic"},
+        )
+
+        assert pending.status_code == 201
+        assert pending.json()["status"] == "awaiting_corpus_approval"
+        run_id = pending.json()["id"]
+        assert client.get(f"/projects/{project_id}/runs/{run_id}").json()["stages"] == []
+
+        approved = client.post(f"/projects/{project_id}/runs/{run_id}/approve-corpus")
+        assert approved.status_code == 201
+        assert approved.json()["status"] == "completed"
