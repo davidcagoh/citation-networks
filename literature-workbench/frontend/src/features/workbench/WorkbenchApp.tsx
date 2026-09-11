@@ -7,7 +7,7 @@ import styles from "./WorkbenchApp.module.css";
 
 const tabs = ["Brief", "Corpus", "Structure", "Review", "Run / Costs"] as const;
 type Tab = (typeof tabs)[number];
-type RunState = "idle" | "creating" | "ingesting" | "running" | "complete";
+type RunState = "idle" | "creating" | "ingesting" | "discovering" | "running" | "complete";
 type Session = { projectId: string; paperCount: number; workspace: Workspace };
 
 function tabSlug(tab: Tab) {
@@ -41,6 +41,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     idle: "Ready",
     creating: "Creating project",
     ingesting: "Ingesting fixture",
+    discovering: "Discovering candidates",
     running: "Running pipeline",
     complete: "Complete",
   };
@@ -68,6 +69,55 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     } catch (caught) {
       setRunState("idle");
       setError(caught instanceof Error ? caught.message : "The fixture run could not be completed.");
+    }
+  }
+
+  async function handleDiscovery() {
+    if (!title.trim() || !prompt.trim()) return;
+    setError(null);
+    setSession(null);
+    setSelectedEvidence(null);
+    try {
+      setRunState("creating");
+      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim() });
+      setRunState("discovering");
+      const discovery = await api.runDiscovery(project.id, prompt.trim(), 20);
+      const workspace = await api.getWorkspace(project.id);
+      setSession({ projectId: project.id, paperCount: discovery.candidate_count, workspace });
+      setRunState("complete");
+      setActiveTab("Corpus");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "Discovery could not be completed.");
+    }
+  }
+
+  async function screenPaper(
+    paperId: string,
+    status: "candidate" | "included" | "excluded" | "pinned",
+  ) {
+    if (!session) return;
+    try {
+      const updated = await api.updateCorpusMembership(session.projectId, paperId, status);
+      setSession((current) => {
+        if (!current) return current;
+        return {
+          ...current,
+          workspace: {
+            ...current.workspace,
+            corpus: {
+              ...current.workspace.corpus,
+              papers: current.workspace.corpus.papers.map((paper) =>
+                paper.id === paperId
+                  ? { ...paper, status: updated.status as typeof paper.status, relevance_score: updated.relevance_score, relevance_rationale: updated.relevance_rationale }
+                  : paper,
+              ),
+            },
+          },
+        };
+      });
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Screening decision could not be saved.");
     }
   }
 
@@ -168,9 +218,9 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             key={activeTab}
           >
             {activeTab === "Brief" && (
-              <BriefForm title={title} prompt={prompt} busy={busy} status={statusText[runState]} onTitle={setTitle} onPrompt={setPrompt} onSubmit={handleSubmit} />
+              <BriefForm title={title} prompt={prompt} busy={busy} status={statusText[runState]} onTitle={setTitle} onPrompt={setPrompt} onSubmit={handleSubmit} onDiscover={handleDiscovery} />
             )}
-            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} paperCount={session?.paperCount ?? null} />}
+            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} paperCount={session?.paperCount ?? null} onScreen={screenPaper} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} />}
             {activeTab === "Review" && (
               <Review workspace={session?.workspace ?? null} evidence={selectedEvidence} evidenceLoading={evidenceLoading} onInspect={inspectClaim} />
@@ -183,10 +233,11 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   );
 }
 
-function BriefForm({ title, prompt, busy, status, onTitle, onPrompt, onSubmit }: {
+function BriefForm({ title, prompt, busy, status, onTitle, onPrompt, onSubmit, onDiscover }: {
   title: string; prompt: string; busy: boolean; status: string;
   onTitle: (value: string) => void; onPrompt: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onDiscover: () => void;
 }) {
   return (
     <form className={styles.form} onSubmit={onSubmit}>
@@ -200,13 +251,18 @@ function BriefForm({ title, prompt, busy, status, onTitle, onPrompt, onSubmit }:
       </div>
       <div className={styles.actionRow}>
         <button className={styles.primary} type="submit" disabled={busy}>{busy ? status : "Create and run fixture"}</button>
+        <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onDiscover}>Discover papers</button>
         <span className={styles.microcopy}>5 local papers · no paid model calls</span>
       </div>
     </form>
   );
 }
 
-function Corpus({ workspace, paperCount }: { workspace: Workspace | null; paperCount: number | null }) {
+function Corpus({ workspace, paperCount, onScreen }: {
+  workspace: Workspace | null;
+  paperCount: number | null;
+  onScreen: (paperId: string, status: "candidate" | "included" | "excluded" | "pinned") => void;
+}) {
   const papers = workspace?.corpus.papers ?? [];
   if (!workspace) return <Empty text="Run the fixture from Brief to populate the corpus." />;
   return (
@@ -215,12 +271,19 @@ function Corpus({ workspace, paperCount }: { workspace: Workspace | null; paperC
       <div className={styles.tableRegion} role="region" aria-label="Corpus papers" tabIndex={0}>
       <table className={styles.table}>
         <caption className={styles.srOnly}>Papers in the supplied fixture corpus</caption>
-        <thead><tr><th>Paper</th><th>Year</th><th>Source text</th><th>Entities</th></tr></thead>
+        <thead><tr><th>Paper</th><th>Year</th><th>Status</th><th>Routes</th><th>Source text</th><th>Entities</th><th><span className={styles.srOnly}>Actions</span></th></tr></thead>
         <tbody>{papers.map((paper) => (
           <tr key={paper.id}>
             <td className={styles.paperTitle}>{paper.title}</td><td>{paper.year ?? "—"}</td>
+            <td><span className={styles.badge}>{paper.status ?? "included"}</span></td>
+            <td>{paper.discovery_routes?.join(", ") || "—"}</td>
             <td><span className={`${styles.badge} ${paper.document_status === "degraded" ? styles.badgeDegraded : ""}`}>{paper.document_status}</span></td>
             <td>{paper.entity_count ?? "—"}</td>
+            <td className={styles.actions}>
+              {(paper.status ?? "included") !== "included" && <button type="button" onClick={() => onScreen(paper.id, "included")}>Include {paper.title}</button>}
+              {(paper.status ?? "included") !== "pinned" && <button type="button" onClick={() => onScreen(paper.id, "pinned")}>Pin {paper.title}</button>}
+              {(paper.status ?? "included") !== "excluded" && <button type="button" onClick={() => onScreen(paper.id, "excluded")}>Exclude {paper.title}</button>}
+            </td>
           </tr>
         ))}</tbody>
       </table>

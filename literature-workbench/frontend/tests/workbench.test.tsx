@@ -29,6 +29,8 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
   return {
     createProject: vi.fn().mockResolvedValue({ id: "project-1" }),
     ingestFixture: vi.fn().mockResolvedValue({ paper_count: 5 }),
+    runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
+    updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
     runPipeline: vi.fn().mockResolvedValue({ id: "run-1", status: "completed" }),
     getWorkspace: vi.fn().mockResolvedValue({
       project: { id: "project-1", title: "Agent memory", prompt: "Survey agent memory." },
@@ -53,6 +55,29 @@ function deferred<T>() {
 }
 
 describe("Literature Workbench", () => {
+  it("discovers candidates and lets the user include one", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture({
+      getWorkspace: vi.fn().mockResolvedValue({
+        ...(await apiFixture().getWorkspace("project-1")),
+        corpus: { papers: [
+          { id: "paper-1", title: "Candidate One", year: 2025, document_status: "degraded", status: "candidate", discovery_routes: ["semantic_search"] },
+          { id: "paper-2", title: "Candidate Two", year: 2024, document_status: "degraded", status: "candidate", discovery_routes: ["semantic_search"] },
+        ] },
+      }),
+    });
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Find memory systems.");
+    await user.click(screen.getByRole("button", { name: "Discover papers" }));
+
+    expect(await screen.findByText("Candidate One")).toBeVisible();
+    expect(api.runDiscovery).toHaveBeenCalledWith("project-1", "Find memory systems.", 20);
+    await user.click(screen.getByRole("button", { name: "Include Candidate One" }));
+    expect(api.updateCorpusMembership).toHaveBeenCalledWith("project-1", "paper-1", "included");
+  });
+
   it("runs the supplied-corpus workflow and exposes claim evidence", async () => {
     const user = userEvent.setup();
     render(<WorkbenchApp api={apiFixture()} />);

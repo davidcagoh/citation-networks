@@ -59,6 +59,9 @@
 .primary { border: 1px solid var(--moss); border-radius: 2px; background: var(--moss); color: white; padding: 11px 16px; font: 700 12px inherit; cursor: pointer; transition: transform .15s, background .15s; }
 .primary:hover { background: #1f4937; transform: translateY(-1px); }
 .primary:disabled { opacity: .6; cursor: wait; transform: none; }
+.secondary { border: 1px solid var(--line); border-radius: 2px; background: var(--panel); color: var(--ink); padding: 11px 16px; font: 700 12px inherit; cursor: pointer; }
+.secondary:hover { border-color: var(--moss); }
+.secondary:disabled { opacity: .6; cursor: wait; }
 .microcopy { color: var(--muted); font-size: 11px; }
 .error { max-width: 680px; border-left: 3px solid #a34435; background: #f6e9e4; padding: 11px 13px; color: #733327; font-size: 12px; }
 
@@ -73,6 +76,9 @@
 .table th { padding: 13px 10px; border-bottom: 1px solid var(--line); color: var(--muted); text-align: left; font: 600 10px ui-monospace, monospace; text-transform: uppercase; letter-spacing: .08em; }
 .table td { padding: 15px 10px; border-bottom: 1px solid #e3e0d7; font-size: 13px; }
 .paperTitle { font-family: Georgia, serif; font-size: 15px; }
+.actions { display: grid; gap: 5px; min-width: 130px; }
+.actions button { border: 0; padding: 2px 0; background: transparent; color: var(--moss); font: 650 10px ui-monospace, monospace; text-align: left; cursor: pointer; }
+.actions button:hover, .actions button:focus-visible { text-decoration: underline; }
 .badge { display: inline-block; border: 1px solid #bac7bd; border-radius: 999px; padding: 3px 7px; color: var(--moss); background: #edf2eb; font: 650 10px ui-monospace, monospace; text-transform: uppercase; }
 .badgeDegraded { color: #8a4a24; border-color: #d1b69f; background: #f5ece2; }
 
