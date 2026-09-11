@@ -846,6 +846,10 @@ def create_app(
                     .order_by(DiscoveryEvent.created_at, DiscoveryEvent.id)
                 )
             )
+            papers_by_id = {
+                paper.id: paper
+                for paper in db.scalars(select(Paper).where(Paper.project_id == project_id))
+            }
             protocol = db.scalar(
                 select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
             )
@@ -869,6 +873,32 @@ def create_app(
                         if event.route == route
                         and event.action == "candidate"
                         and event.paper_id is not None
+                    }),
+                }
+                for route in executed_routes
+            ]
+            signal_coverage = [
+                {
+                    "route": route,
+                    "papers_with_publication_date": len({
+                        event.paper_id
+                        for event in events
+                        if event.route == route
+                        and event.action == "candidate"
+                        and event.paper_id in papers_by_id
+                        and (papers_by_id[event.paper_id].metadata_provenance or {}).get(
+                            "publication_date"
+                        )
+                    }),
+                    "papers_with_citation_count": len({
+                        event.paper_id
+                        for event in events
+                        if event.route == route
+                        and event.action == "candidate"
+                        and event.paper_id in papers_by_id
+                        and (papers_by_id[event.paper_id].metadata_provenance or {}).get(
+                            "citation_count"
+                        ) is not None
                     }),
                 }
                 for route in executed_routes
@@ -916,6 +946,7 @@ def create_app(
                     "executed": executed_routes,
                     "count": len(executed_routes),
                     "summaries": route_summaries,
+                    "signal_coverage": signal_coverage,
                 },
                 "screening": {
                     "total": len(memberships),

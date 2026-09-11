@@ -120,6 +120,7 @@ export interface CoverageAudit {
     executed: string[];
     count: number;
     summaries: Array<{ route: string; candidate_events: number; unique_papers: number }>;
+    signal_coverage: Array<{ route: string; papers_with_publication_date: number; papers_with_citation_count: number }>;
   };
   screening: { total: number; selected: number; unresolved_candidates: number; excluded: number };
   source_text: { selected_with_usable_text: number; selected_total: number };
@@ -455,6 +456,14 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
           route: string(summary.route, `coverage audit.routes.summaries[${index}].route`),
           candidate_events: number(summary.candidate_events, `coverage audit.routes.summaries[${index}].candidate_events`),
           unique_papers: number(summary.unique_papers, `coverage audit.routes.summaries[${index}].unique_papers`),
+        };
+      }),
+      signal_coverage: (routes.signal_coverage === undefined ? [] : array(routes.signal_coverage, "coverage audit.routes.signal_coverage")).map((item, index) => {
+        const signal = object(item, `coverage audit.routes.signal_coverage[${index}]`);
+        return {
+          route: string(signal.route, `coverage audit.routes.signal_coverage[${index}].route`),
+          papers_with_publication_date: number(signal.papers_with_publication_date, `coverage audit.routes.signal_coverage[${index}].papers_with_publication_date`),
+          papers_with_citation_count: number(signal.papers_with_citation_count, `coverage audit.routes.signal_coverage[${index}].papers_with_citation_count`),
         };
       }),
     },
