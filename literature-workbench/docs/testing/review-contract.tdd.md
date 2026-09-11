@@ -121,6 +121,7 @@ This report records the implementation tranche derived from the review-engine pl
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.
 - Frontend types: `npx tsc --noEmit` → PASS.
+- Browser QA: `npm run test:e2e` → 3 passed.
 
 ## Known gaps
 
