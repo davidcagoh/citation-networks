@@ -31,6 +31,7 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
     ingestFixture: vi.fn().mockResolvedValue({ paper_count: 5 }),
     acquire: vi.fn().mockResolvedValue({ project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0 }),
     ingestSourceText: vi.fn().mockResolvedValue({ project_id: "project-1", paper_id: "paper-1", status: "included", source_type: "text" }),
+    ingestSourceUrl: vi.fn().mockResolvedValue({ project_id: "project-1", paper_id: "paper-1", status: "included", source_type: "fetched_text", source_uri: "https://8.8.8.8/paper.txt" }),
     scopePreview: vi.fn().mockResolvedValue({
       project_id: "project-1",
       scope: { query: "memory", mode: "thorough", suggested_focus: ["Methods", "PRISMA protocol and audit trail"] },

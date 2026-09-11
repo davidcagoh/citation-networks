@@ -115,7 +115,9 @@ def test_live_pipeline_builds_conservative_cross_paper_relation(tmp_path: Path) 
             assert any(claim.supporting_relation_ids for claim in claims)
 
 
-def test_fetches_public_source_url_with_provenance_and_blocks_private_targets(tmp_path: Path) -> None:
+def test_fetches_public_source_url_with_provenance_and_blocks_private_targets(
+    tmp_path: Path,
+) -> None:
     fetcher = FakeSourceFetcher()
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", source_fetcher=fetcher)
     with TestClient(app) as client:
@@ -134,7 +136,9 @@ def test_fetches_public_source_url_with_provenance_and_blocks_private_targets(tm
         assert corpus["papers"][0]["id"] == paper_id
         assert corpus["papers"][0]["source_type"] == "fetched_text"
         with app.state.database.session() as database:
-            source = database.scalar(select(SourceDocument).where(SourceDocument.paper_id == paper_id))
+            source = database.scalar(
+                select(SourceDocument).where(SourceDocument.paper_id == paper_id)
+            )
             assert source is not None
             assert source.source_uri == "https://8.8.8.8/paper.txt"
             assert source.parser == "url-fetch-v1"
