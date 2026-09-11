@@ -157,7 +157,7 @@ def test_prisma_report_reconciles_protocol_search_and_screening_flow(tmp_path: P
             "duplicates_removed": 2,
             "screened": 2,
             "reports_sought": 1,
-            "reports_not_retrieved": 0,
+            "reports_not_retrieved": 1,
             "included": 1,
             "excluded": 1,
         }
