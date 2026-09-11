@@ -595,7 +595,21 @@ def create_app(
             normalized_mode = {"quick": "sufficient", "thorough": "comprehensive"}.get(
                 value.mode, value.mode
             )
-            route_query_count = 1 if normalized_mode == "sufficient" else 7
+            preview_routes = (
+                ["semantic_search"]
+                if normalized_mode == "sufficient"
+                else [
+                    "semantic_search",
+                    "survey_search",
+                    "recent_search",
+                    "seminal_search",
+                    "cross_disciplinary_search",
+                ]
+            )
+            route_query_count = sum(
+                len(DiscoveryService._route_queries(project.prompt, route))
+                for route in preview_routes
+            )
             estimated_discovery_api_calls = route_query_count * provider_count
             return {
                 "project_id": project_id,

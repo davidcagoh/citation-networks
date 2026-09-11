@@ -854,7 +854,11 @@ class DiscoveryService:
     def _route_queries(query: str, route: str) -> list[str]:
         suffixes = {
             "semantic_search": "",
-            "survey_search": " review survey benchmark",
+            "survey_search": (
+                " review survey benchmark",
+                " systematic review meta-analysis",
+                " umbrella review tutorial",
+            ),
             "recent_search": " recent latest",
             "seminal_search": " foundational seminal influential highly cited",
             "cross_disciplinary_search": (
