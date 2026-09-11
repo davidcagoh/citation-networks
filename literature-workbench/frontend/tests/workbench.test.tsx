@@ -31,6 +31,7 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
     ingestFixture: vi.fn().mockResolvedValue({ paper_count: 5 }),
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
+    updatePlan: vi.fn().mockImplementation(async (_projectId, _planId, plan) => ({ id: "plan-1", ...plan })),
     runPipeline: vi.fn().mockResolvedValue({ id: "run-1", status: "completed" }),
     getWorkspace: vi.fn().mockResolvedValue({
       project: { id: "project-1", title: "Agent memory", prompt: "Survey agent memory." },
@@ -55,6 +56,49 @@ function deferred<T>() {
 }
 
 describe("Literature Workbench", () => {
+  it("edits and saves the relation-backed plan", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture({
+      getWorkspace: vi.fn().mockResolvedValue({
+        ...(await apiFixture().getWorkspace("project-1")),
+        plan: {
+          id: "plan-1",
+          title: "Initial plan",
+          thesis: "Initial thesis",
+          organizing_principle: "failure → response",
+          sections: [{
+            title: "Initial section",
+            purpose: "Initial purpose",
+            planned_claim_ids: ["claim-1"],
+            relation_ids: ["relation-1"],
+            paper_ids: ["paper-1"],
+          }],
+        },
+      }),
+    });
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Survey agent memory.");
+    await user.click(screen.getByRole("button", { name: "Create and run fixture" }));
+    await user.click(await screen.findByRole("tab", { name: "Structure" }));
+    await user.click(screen.getByRole("button", { name: "Edit plan" }));
+    await user.clear(screen.getByLabelText("Plan title"));
+    await user.type(screen.getByLabelText("Plan title"), "Edited plan");
+    await user.clear(screen.getByLabelText("Section 1 title"));
+    await user.type(screen.getByLabelText("Section 1 title"), "Edited section");
+    await user.click(screen.getByRole("button", { name: "Save plan" }));
+
+    expect(api.updatePlan).toHaveBeenCalledWith("project-1", "plan-1", expect.objectContaining({
+      title: "Edited plan",
+      sections: [expect.objectContaining({
+        title: "Edited section",
+        planned_claim_ids: ["claim-1"],
+      })],
+    }));
+    expect(await screen.findByRole("heading", { name: "Edited section" })).toBeVisible();
+  });
+
   it("discovers candidates and lets the user include one", async () => {
     const user = userEvent.setup();
     const api = apiFixture({
