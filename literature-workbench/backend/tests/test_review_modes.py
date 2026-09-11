@@ -117,3 +117,23 @@ def test_broader_review_runs_pause_for_corpus_approval(tmp_path: Path) -> None:
         )
         assert structure_approved.status_code == 201
         assert structure_approved.json()["status"] == "completed"
+
+
+def test_pipeline_rejects_a_second_active_run_until_the_first_is_resolved(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Survey memory", "review_mode": "systematic"}
+        ).json()["id"]
+        client.post(f"/projects/{project_id}/fixtures/provenance-corpus")
+
+        first = client.post(
+            f"/projects/{project_id}/runs/pipeline", json={"review_mode": "systematic"}
+        )
+        second = client.post(
+            f"/projects/{project_id}/runs/pipeline", json={"review_mode": "systematic"}
+        )
+
+        assert first.status_code == 201
+        assert second.status_code == 409
+        assert "active pipeline run" in second.json()["detail"]
