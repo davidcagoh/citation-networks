@@ -151,6 +151,49 @@ def test_live_pipeline_builds_conservative_cross_paper_relation(tmp_path: Path) 
             assert any(claim.supporting_relation_ids for claim in claims)
 
 
+def test_configured_synthesis_provider_drafts_only_grounded_claims(tmp_path: Path) -> None:
+    class DraftProvider:
+        def __init__(self) -> None:
+            self.calls: list[tuple[str, list[str], str]] = []
+
+        def draft_claim(
+            self, default_text: str, evidence_texts: list[str], claim_type: str
+        ) -> str:
+            self.calls.append((default_text, evidence_texts, claim_type))
+            return f"Model draft grounded in {len(evidence_texts)} evidence spans."
+
+    provider = DraftProvider()
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", synthesis_provider=provider
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Compare memory systems"}
+        ).json()["id"]
+        for title, text in [
+            ("Retrieval Memory", "A memory architecture improves retrieval quality."),
+            ("Consolidated Memory", "A memory architecture reduces retrieval interference."),
+        ]:
+            assert client.post(
+                f"/projects/{project_id}/sources/text",
+                json={
+                    "title": title,
+                    "source_uri": f"file:///{title.replace(' ', '-')}",
+                    "text": text,
+                },
+            ).status_code == 201
+
+        response = client.post(f"/projects/{project_id}/runs/pipeline")
+        assert response.status_code == 201
+        assert provider.calls
+        assert all(call[1] for call in provider.calls)
+
+        review = client.get(f"/projects/{project_id}/review").json()["sentences"]
+        assert review
+        assert all(sentence["text"].startswith("Model draft grounded") for sentence in review)
+        assert all(sentence["evidence_span_ids"] for sentence in review)
+
+
 def test_fetches_public_source_url_with_provenance_and_blocks_private_targets(
     tmp_path: Path,
 ) -> None:
