@@ -8,7 +8,14 @@ import styles from "./WorkbenchApp.module.css";
 const tabs = ["Brief", "Corpus", "Structure", "Review", "Run / Costs"] as const;
 type Tab = (typeof tabs)[number];
 type RunState = "idle" | "creating" | "ingesting" | "discovering" | "running" | "complete";
-type Session = { projectId: string; paperCount: number; workspace: Workspace; audit: CoverageAudit };
+type ApprovalGate = "corpus" | "structure" | null;
+type Session = { projectId: string; paperCount: number; workspace: Workspace; audit: CoverageAudit; runId?: string; approval: ApprovalGate };
+
+function approvalForRunStatus(status: string): ApprovalGate {
+  if (status === "awaiting_corpus_approval") return "corpus";
+  if (status === "awaiting_structure_approval") return "structure";
+  return null;
+}
 
 function tabSlug(tab: Tab) {
   return tab.toLowerCase().replaceAll(" / ", "-").replaceAll(" ", "-");
@@ -91,10 +98,11 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       const run = await api.runPipeline(project.id, { review_mode: reviewMode });
       const nextWorkspace = await api.getWorkspace(project.id, run.id);
       const audit = await api.getCoverageAudit(project.id);
-      setSession({ projectId: project.id, paperCount: ingest.paper_count, workspace: nextWorkspace, audit });
+      const approval = approvalForRunStatus(run.status);
+      setSession({ projectId: project.id, paperCount: ingest.paper_count, workspace: nextWorkspace, audit, runId: run.id, approval });
       setVerificationIssues([]);
       setRunState("complete");
-      setActiveTab("Corpus");
+      setActiveTab(approval === "structure" ? "Structure" : "Corpus");
     } catch (caught) {
       setRunState("idle");
       setError(caught instanceof Error ? caught.message : "The fixture run could not be completed.");
@@ -122,7 +130,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
         : await api.runDiscovery(project.id, prompt.trim(), 20, discoveryRoutes);
       const workspace = await api.getWorkspace(project.id);
       const audit = await api.getCoverageAudit(project.id);
-      setSession({ projectId: project.id, paperCount: discovery.candidate_count, workspace, audit });
+      setSession({ projectId: project.id, paperCount: discovery.candidate_count, workspace, audit, approval: null });
       setVerificationIssues([]);
       setRunState("complete");
       setActiveTab("Corpus");
@@ -166,9 +174,10 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       const run = await api.runPipeline(project.id, { review_mode: reviewMode, max_papers: maxPapers });
       const workspace = await api.getWorkspace(project.id, run.id);
       const audit = await api.getCoverageAudit(project.id);
-      setSession({ projectId: project.id, paperCount: workspace.corpus.papers.length, workspace, audit });
+      const approval = approvalForRunStatus(run.status);
+      setSession({ projectId: project.id, paperCount: workspace.corpus.papers.length, workspace, audit, runId: run.id, approval });
       setRunState("complete");
-      setActiveTab("Corpus");
+      setActiveTab(approval === "structure" ? "Structure" : "Corpus");
     } catch (caught) {
       setRunState("idle");
       setError(caught instanceof Error ? caught.message : "The source could not be imported.");
@@ -252,12 +261,51 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
         workspace,
         paperCount: workspace.corpus.papers.length,
         audit,
+        runId: run.id,
+        approval: approvalForRunStatus(run.status),
+      } : current);
+      setRunState("complete");
+      const approval = approvalForRunStatus(run.status);
+      setActiveTab(approval === "corpus" ? "Corpus" : approval === "structure" ? "Structure" : "Review");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "The grounded review could not be built.");
+    }
+  }
+
+  async function approveCorpus() {
+    if (!session?.runId) return;
+    try {
+      setRunState("running");
+      const run = await api.approveCorpus(session.projectId, session.runId);
+      const [workspace, audit] = await Promise.all([
+        api.getWorkspace(session.projectId, session.runId),
+        api.getCoverageAudit(session.projectId),
+      ]);
+      const approval = approvalForRunStatus(run.status);
+      setSession((current) => current ? { ...current, workspace, audit, approval } : current);
+      setRunState("complete");
+      setActiveTab(approval === "structure" ? "Structure" : "Review");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "Corpus approval could not be completed.");
+    }
+  }
+
+  async function approveStructure() {
+    if (!session?.runId) return;
+    try {
+      setRunState("running");
+      const run = await api.approveStructure(session.projectId, session.runId);
+      const workspace = await api.getWorkspace(session.projectId, session.runId);
+      setSession((current) => current ? {
+        ...current, workspace, approval: approvalForRunStatus(run.status), runId: session.runId,
       } : current);
       setRunState("complete");
       setActiveTab("Review");
     } catch (caught) {
       setRunState("idle");
-      setError(caught instanceof Error ? caught.message : "The grounded review could not be built.");
+      setError(caught instanceof Error ? caught.message : "Structure approval could not be completed.");
     }
   }
 
@@ -370,8 +418,8 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             {activeTab === "Brief" && (
               <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} preview={scopePreview} />
             )}
-            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} paperCount={session?.paperCount ?? null} onScreen={screenPaper} />}
-            {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} onSave={savePlan} />}
+            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} paperCount={session?.paperCount ?? null} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} />}
+            {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} approval={session?.approval ?? null} onApprove={approveStructure} onSave={savePlan} />}
             {activeTab === "Review" && (
               <Review
                 workspace={session?.workspace ?? null}
@@ -460,10 +508,12 @@ function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, resear
   );
 }
 
-function Corpus({ workspace, audit, paperCount, onScreen }: {
+function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen }: {
   workspace: Workspace | null;
   audit: CoverageAudit | null;
   paperCount: number | null;
+  approval: ApprovalGate;
+  onApprove: () => Promise<void>;
   onScreen: (paperId: string, status: "candidate" | "included" | "excluded" | "pinned") => void;
 }) {
   const papers = workspace?.corpus.papers ?? [];
@@ -475,6 +525,7 @@ function Corpus({ workspace, audit, paperCount, onScreen }: {
         <span>Corpus checkpoint · <strong>{audit.status === "ready_for_corpus_checkpoint" ? "ready" : "incomplete"}</strong> · {audit.routes.count} route{audit.routes.count === 1 ? "" : "s"} executed</span>
         <span>{audit.screening.selected}/{audit.screening.total} selected · {audit.source_text.selected_with_usable_text}/{audit.source_text.selected_total} with usable text</span>
         {audit.limitations.length > 0 && <span>{audit.limitations.join("; ")}</span>}
+        {approval === "corpus" && <button className={styles.primary} type="button" onClick={onApprove}>Approve corpus checkpoint</button>}
       </section>}
       <div className={styles.tableRegion} role="region" aria-label="Corpus papers" tabIndex={0}>
       <table className={styles.table}>
@@ -500,8 +551,10 @@ function Corpus({ workspace, audit, paperCount, onScreen }: {
   );
 }
 
-function Structure({ workspace, onSave }: {
+function Structure({ workspace, approval, onApprove, onSave }: {
   workspace: Workspace | null;
+  approval: ApprovalGate;
+  onApprove: () => Promise<void>;
   onSave: (plan: ReviewPlan) => Promise<void>;
 }) {
   const [editing, setEditing] = useState(false);
@@ -557,7 +610,10 @@ function Structure({ workspace, onSave }: {
     <>
       <div className={styles.planHeader}>
         <div className={styles.principle}>Organizing principle · {workspace.plan.organizing_principle}</div>
-        <button className={styles.secondary} type="button" onClick={() => { setDraft(workspace.plan); setEditing(true); }} disabled={!workspace.plan.id}>Edit plan</button>
+        <div className={styles.actionRow}>
+          {approval === "structure" && <button className={styles.primary} type="button" onClick={onApprove}>Approve structure checkpoint</button>}
+          <button className={styles.secondary} type="button" onClick={() => { setDraft(workspace.plan); setEditing(true); }} disabled={!workspace.plan.id}>Edit plan</button>
+        </div>
       </div>
       <div className={styles.outline}>{workspace.plan.sections.map((section, index) => (
         <article className={styles.section} key={`${section.title}-${index}`}>
