@@ -114,6 +114,42 @@ def test_openai_extraction_uses_strict_structured_output_and_requires_grounded_s
     assert provider.consume_usage().external_api_calls == 1
 
 
+def test_openai_section_writer_returns_claim_linked_sentences(monkeypatch) -> None:
+    def fake_urlopen(request, timeout):
+        body = json.loads(request.data)
+        assert body["text"]["format"]["name"] == "section_prose"
+        return FakeResponse(
+            {
+                "output_text": json.dumps(
+                    {
+                        "sentences": [
+                            {"claim_id": "claim-1", "text": "First grounded sentence."},
+                            {"claim_id": "claim-2", "text": "Second grounded sentence."},
+                        ]
+                    }
+                ),
+                "usage": {"input_tokens": 80, "output_tokens": 40},
+            }
+        )
+
+    monkeypatch.setattr("app.services.synthesis.urlopen", fake_urlopen)
+    provider = OpenAISynthesisProvider(api_key="secret-not-printed")
+
+    drafts = provider.draft_section(
+        "Methods",
+        "Compare the methods",
+        [
+            {"claim_id": "claim-1", "text": "A", "evidence": ["E"]},
+            {"claim_id": "claim-2", "text": "B", "evidence": ["F"]},
+        ],
+    )
+
+    assert drafts == {
+        "claim-1": "First grounded sentence.",
+        "claim-2": "Second grounded sentence.",
+    }
+
+
 def test_pipeline_uses_structured_extraction_when_provider_is_enabled(
     tmp_path: Path, monkeypatch
 ) -> None:

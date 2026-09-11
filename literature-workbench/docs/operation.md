@@ -83,7 +83,9 @@ distinguishes it from abstract evidence. The fixture relation path remains
 deterministic and evidence linked.
 
 An optional `SynthesisProvider` can replace claim wording during the writing
-stage, after the structure checkpoint. It
+stage, after the structure checkpoint. When supported, the provider receives a
+whole approved section (purpose, claims, and evidence) and returns claim-keyed
+sentences; the pipeline keeps each sentence's provenance mapping. It
 receives the deterministic draft and exact evidence text, while the pipeline
 continues to assign evidence-span IDs and verification state. No external
 model provider is enabled by default. When explicitly enabled with
@@ -131,7 +133,8 @@ incurs no model-token spend.
 
 ## Deferred extensions
 
-Richer multi-object extraction, relation judging, and broader
+Richer multi-object extraction, relation judging, document-level coherence
+passes, and broader
 automated contradiction/causal-language checks are the next
 research/engineering extensions. They should preserve the same
 source URI, parser/version, evidence-span, and budget contracts.

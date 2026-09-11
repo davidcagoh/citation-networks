@@ -89,12 +89,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 71 | Final-prose provider calls, token usage, model identity, and calculated USD spend are persisted in the run stage and project cost ledger. | `backend/tests/test_synthesis.py::test_synthesis_usage_is_recorded_in_project_costs` | PASS |
 | 72 | Opt-in model extraction requests strict structured JSON and accepts an extracted object only when its evidence text is an exact source substring. | `backend/tests/test_synthesis.py::test_openai_extraction_uses_strict_structured_output_and_requires_grounded_span`, `backend/tests/test_synthesis.py::test_pipeline_uses_structured_extraction_when_provider_is_enabled` | PASS |
 | 73 | Scope previews estimate model-token dollars by review mode using the default Luna rate assumption, while deterministic execution remains zero model spend. | `backend/tests/test_scope.py::test_scope_preview_returns_transparent_scope_and_budget`, `frontend/tests/workbench.test.tsx` | PASS |
+| 74 | Final prose is generated after structure approval with section context and returned claim IDs, while each persisted sentence retains its own evidence links. | `backend/tests/test_synthesis.py::test_openai_section_writer_returns_claim_linked_sentences`, `backend/tests/test_synthesis.py::test_final_prose_provider_waits_for_structure_approval` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 107 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.39%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 108 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.26%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.
@@ -111,5 +112,5 @@ This report records the implementation tranche derived from the review-engine pl
 - Multi-source audits distinguish complete fan-out from partial fan-out; provider failures remain a limitation rather than being presented as comprehensive coverage. Route audits also expose marginal new-paper yield and overlap as coverage diagnostics.
 - Full-text acquisition now supports explicitly requested public HTTP(S) text/HTML/PDF URLs with SSRF, redirect, size, and parser guards; richer HTML extraction remains future work. Abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Live cross-paper comparison now uses a conservative grounded overlap heuristic; richer paragraph-level generation and section-level editing remain future work.
-- Optional OpenAI Luna structured extraction and evidence-bounded final-prose generation are wired and ledgered; richer multi-object extraction and section-level generation remain future work.
+- Optional OpenAI Luna structured extraction and section-context final-prose generation are wired and ledgered; richer multi-object extraction and document-level coherence remain future work.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.

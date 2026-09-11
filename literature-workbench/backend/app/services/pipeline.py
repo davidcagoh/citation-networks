@@ -1097,6 +1097,26 @@ class PipelineService:
                     db.delete(sentence)
             position = 0
             for section in plan.sections:
+                section_drafts: dict[str, str] = {}
+                section_writer = getattr(self.synthesis_provider, "draft_section", None)
+                section_claims = [claims[claim_id] for claim_id in section["planned_claim_ids"]]
+                if callable(section_writer):
+                    section_drafts = section_writer(
+                        section["title"],
+                        section["purpose"],
+                        [
+                            {
+                                "claim_id": claim.id,
+                                "text": claim.text,
+                                "evidence": [
+                                    evidence_spans[span_id].verbatim_text
+                                    for span_id in claim.supporting_evidence_span_ids
+                                    if span_id in evidence_spans
+                                ],
+                            }
+                            for claim in section_claims
+                        ],
+                    ) or {}
                 for claim_id in section["planned_claim_ids"]:
                     claim = claims[claim_id]
                     paper_ids = list(
@@ -1110,7 +1130,11 @@ class PipelineService:
                         sentence = ReviewSentence(project_id=project_id, claim_id=claim.id)
                         db.add(sentence)
                     text = claim.text
-                    if self.synthesis_provider is not None:
+                    if claim.id in section_drafts:
+                        text = section_drafts[claim.id]
+                        claim.text = text
+                        claim.inference_level = "model_inference"
+                    elif callable(getattr(self.synthesis_provider, "draft_claim", None)):
                         drafted = self.synthesis_provider.draft_claim(
                             text,
                             [
