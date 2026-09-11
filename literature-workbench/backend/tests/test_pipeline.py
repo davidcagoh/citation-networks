@@ -70,6 +70,29 @@ def test_pipeline_runs_verification_after_writing(tmp_path: Path) -> None:
         app.state.pipeline.verification.verify.assert_called_once_with(project_id)
 
 
+def test_grounded_review_sentence_can_be_edited_without_losing_evidence_links(
+    tmp_path: Path,
+) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Survey memory systems"}
+        ).json()["id"]
+        client.post(f"/projects/{project_id}/fixtures/provenance-corpus")
+        client.post(f"/projects/{project_id}/runs/pipeline")
+        sentence = client.get(f"/projects/{project_id}/review").json()["sentences"][0]
+        assert sentence["evidence_span_ids"]
+
+        response = client.patch(
+            f"/projects/{project_id}/review/{sentence['id']}",
+            json={"text": "Revised, evidence-grounded narrative."},
+        )
+
+        assert response.status_code == 200
+        assert response.json()["text"] == "Revised, evidence-grounded narrative."
+        assert response.json()["evidence_span_ids"] == sentence["evidence_span_ids"]
+
+
 def test_malformed_fixture_document_degrades_without_aborting(tmp_path: Path) -> None:
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
     with TestClient(app) as client:
