@@ -46,12 +46,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 28 | Fetched HTML is reduced to visible UTF-8 text before evidence extraction, excluding head, script, style, and template content. | `backend/tests/test_sources.py::test_fetches_public_source_url_with_provenance_and_blocks_private_targets` | PASS |
 | 29 | Fetched PDFs are bounded and converted to text with a versioned `pypdf` parser before evidence extraction. | `backend/tests/test_sources.py::test_extracts_text_from_bounded_pdf_bytes` | PASS |
 | 30 | Coverage audits report whether each executed route has publication-date and citation-count signals for its candidate papers. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, frontend API/UI contract checks | PASS |
+| 31 | Recent, seminal, and survey routes apply deterministic publication-date, citation-count, and survey-term ordering before provenance ranks are recorded. | `backend/tests/test_discovery.py::test_seminal_route_orders_candidates_by_citation_signal` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 74 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 84.91%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 75 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 84.83%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
