@@ -40,7 +40,7 @@ This report records the implementation tranche derived from the review-engine pl
 - Backend: `uv run pytest -q` → 66 passed.
 - Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 87.20%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
-- Frontend: `npm test -- --run` → 45 passed.
+- Frontend: `npm test -- --run` → 44 passed.
 - Frontend lint: `npm run lint` → PASS.
 - Frontend types: `npx tsc --noEmit` → PASS.
 
