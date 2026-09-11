@@ -34,11 +34,12 @@ This report records the implementation tranche derived from the review-engine pl
 | 16 | Researchers can edit generated prose while preserving its claim and evidence-span links. | `backend/tests/test_pipeline.py::test_grounded_review_sentence_can_be_edited_without_losing_evidence_links`, `frontend/tests/workbench.test.tsx` | PASS |
 | 17 | Citation expansion supports bounded multi-hop traversal and reports a stopping reason. | `backend/tests/test_discovery.py::test_multi_hop_citation_expansion_stops_at_exhausted_frontier`, `frontend/tests/api.test.ts` | PASS |
 | 18 | Co-citation expansion derives shared-reference neighbors locally and records derivation provenance. | `backend/tests/test_discovery.py::test_co_citation_expansion_derives_shared_reference_neighbors`, `frontend/tests/workbench.test.tsx` | PASS |
+| 19 | Comprehensive/systematic discovery includes a distinct foundational/seminal route with auditable query provenance. | `backend/tests/test_discovery.py::test_seminal_route_records_foundational_query_provenance`, `frontend/tests/workbench.test.tsx` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 67 passed.
+- Backend: `uv run pytest -q` → 68 passed.
 - Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 87.20%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 45 passed.
@@ -47,7 +48,7 @@ This report records the implementation tranche derived from the review-engine pl
 
 ## Known gaps
 
-- Bounded backward and forward multi-hop expansion is implemented with stopping reasons; co-citation expansion and richer network-saturation heuristics remain future work.
+- Bounded backward and forward multi-hop expansion and local co-citation derivation are implemented with stopping reasons; richer network-saturation heuristics remain future work.
 - Paid-provider approval is enforced at discovery boundaries; an approved provider adapter still must be configured before use. Zotero import/export is available through server-side credentials.
 - Full-text acquisition remains conservative; abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Richer paragraph-level generation and section-level editing remain future work.
