@@ -34,10 +34,10 @@ This report records the implementation tranche derived from the review-engine pl
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 63 passed.
+- Backend: `uv run pytest -q` → 64 passed.
 - Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 87.20%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
-- Frontend: `npm test -- --run` → 40 passed.
+- Frontend: `npm test -- --run` → 41 passed.
 - Frontend lint: `npm run lint` → PASS.
 - Frontend types: `npx tsc --noEmit` → PASS.
 
