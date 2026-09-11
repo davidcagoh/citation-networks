@@ -76,11 +76,11 @@ describe("workbench API adapter", () => {
     }));
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(createWorkbenchApi("http://api").getCoverageAudit("project-1"))
-      .resolves.toMatchObject({
-        routes: { summaries: [{ route: "semantic_search", unique_papers: 3 }] },
-        stopping_certificate: { status: "satisfied", mode: "comprehensive" },
-      });
+    const audit = await createWorkbenchApi("http://api").getCoverageAudit("project-1");
+    expect(audit.routes.summaries[0]).toEqual({
+      route: "semantic_search", candidate_events: 4, unique_papers: 3,
+    });
+    expect(audit.stopping_certificate).toMatchObject({ status: "satisfied", mode: "comprehensive" });
   });
 
   it("expands a paper through a directional citation route", async () => {

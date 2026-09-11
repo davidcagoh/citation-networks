@@ -114,7 +114,11 @@ export interface CoverageAudit {
   project_id: string;
   checkpoint: "corpus";
   status: "ready_for_corpus_checkpoint" | "incomplete";
-  routes: { executed: string[]; count: number };
+  routes: {
+    executed: string[];
+    count: number;
+    summaries: Array<{ route: string; candidate_events: number; unique_papers: number }>;
+  };
   screening: { total: number; selected: number; unresolved_candidates: number; excluded: number };
   source_text: { selected_with_usable_text: number; selected_total: number };
   stopping_certificate: {
@@ -406,6 +410,14 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
     routes: {
       executed: array(routes.executed, "coverage audit.routes.executed").map((item, index) => string(item, `coverage audit.routes.executed[${index}]`)),
       count: number(routes.count, "coverage audit.routes.count"),
+      summaries: (routes.summaries === undefined ? [] : array(routes.summaries, "coverage audit.routes.summaries")).map((item, index) => {
+        const summary = object(item, `coverage audit.routes.summaries[${index}]`);
+        return {
+          route: string(summary.route, `coverage audit.routes.summaries[${index}].route`),
+          candidate_events: number(summary.candidate_events, `coverage audit.routes.summaries[${index}].candidate_events`),
+          unique_papers: number(summary.unique_papers, `coverage audit.routes.summaries[${index}].unique_papers`),
+        };
+      }),
     },
     screening: {
       total: number(screening.total, "coverage audit.screening.total"),

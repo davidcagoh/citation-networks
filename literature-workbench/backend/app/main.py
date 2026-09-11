@@ -739,6 +739,22 @@ def create_app(
                     "cross_disciplinary_search",
                 ]
             executed_routes = list(dict.fromkeys(event.route for event in events))
+            route_summaries = [
+                {
+                    "route": route,
+                    "candidate_events": sum(
+                        event.route == route and event.action == "candidate" for event in events
+                    ),
+                    "unique_papers": len({
+                        event.paper_id
+                        for event in events
+                        if event.route == route
+                        and event.action == "candidate"
+                        and event.paper_id is not None
+                    }),
+                }
+                for route in executed_routes
+            ]
             selected = [
                 membership
                 for membership in memberships
@@ -778,7 +794,11 @@ def create_app(
                 "project_id": project_id,
                 "checkpoint": "corpus",
                 "status": "ready_for_corpus_checkpoint" if ready else "incomplete",
-                "routes": {"executed": executed_routes, "count": len(executed_routes)},
+                "routes": {
+                    "executed": executed_routes,
+                    "count": len(executed_routes),
+                    "summaries": route_summaries,
+                },
                 "screening": {
                     "total": len(memberships),
                     "selected": len(selected),
