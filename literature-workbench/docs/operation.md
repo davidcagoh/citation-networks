@@ -7,6 +7,8 @@
    provider call budget.
 3. Either run the five-paper fixture, or choose **Discover papers** to query
    Semantic Scholar.
+   If the saved protocol has a cutoff date, discovery retains records at or
+   before that date and reports the number filtered from the provider result.
 4. Screen live candidates in **Corpus**. Candidates are not sent to the
    pipeline until they are included or pinned.
 5. Choose **Build grounded review** in **Run / Costs**. This runs idempotent
@@ -60,7 +62,7 @@ claims, review text, and discovery events.
 
 ## Deferred extensions
 
-Open-access PDF/HTML retrieval, model-backed structured extraction, richer
-relation judging, and broader automated contradiction/causal-language checks
-are the next research/engineering extensions. They should preserve the same
+Model-backed structured extraction, richer relation judging, and broader
+automated contradiction/causal-language checks are the next
+research/engineering extensions. They should preserve the same
 source URI, parser/version, evidence-span, and budget contracts.
