@@ -76,6 +76,7 @@ from app.services.pipeline import (
     RunNotAwaitingCorpusApprovalError,
     RunNotAwaitingStructureApprovalError,
     RunNotResumableError,
+    SynthesisProvider,
     select_preferred_documents,
 )
 from app.services.verification import VerificationService
@@ -135,12 +136,13 @@ def create_app(
     discovery_provider: DiscoveryProvider | None = None,
     zotero_client: ZoteroClient | None = None,
     source_fetcher: SafeSourceFetcher | None = None,
+    synthesis_provider: SynthesisProvider | None = None,
 ) -> FastAPI:
     database = Database(
         database_url or os.getenv("WORKBENCH_DATABASE_URL", "sqlite:///instance/workbench.db")
     )
     source_fetcher = source_fetcher or SafeSourceFetcher()
-    pipeline = PipelineService(database, source_fetcher)
+    pipeline = PipelineService(database, source_fetcher, synthesis_provider)
     discovery = DiscoveryService(
         database,
         discovery_provider

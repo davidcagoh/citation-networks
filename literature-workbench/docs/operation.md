@@ -82,6 +82,11 @@ semantic model extraction. Auto-acquired paper-body evidence is labeled
 distinguishes it from abstract evidence. The fixture relation path remains
 deterministic and evidence linked.
 
+An optional `SynthesisProvider` can replace claim wording during planning. It
+receives the deterministic draft and exact evidence text, while the pipeline
+continues to assign evidence-span IDs and verification state. No external
+model provider is enabled by default.
+
 ## Operational boundaries
 
 The backend is an unauthenticated loopback service. Keep it bound to
@@ -111,7 +116,8 @@ fan-out count for that request, for immediate reconciliation in clients.
 
 ## Deferred extensions
 
-Model-backed structured extraction, richer relation judging, and broader
+Model-backed structured extraction, a concrete model-backed synthesis adapter,
+richer relation judging, and broader
 automated contradiction/causal-language checks are the next
 research/engineering extensions. They should preserve the same
 source URI, parser/version, evidence-span, and budget contracts.

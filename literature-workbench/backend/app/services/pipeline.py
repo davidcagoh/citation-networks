@@ -4,6 +4,7 @@ import json
 import re
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Protocol
 
 from sqlalchemy import delete, func, select
 
@@ -39,6 +40,15 @@ class CorpusRequiredError(Exception):
 
 class BudgetExceededError(Exception):
     """Raised before a run would exceed its configured budget."""
+
+
+class SynthesisProvider(Protocol):
+    """Optional claim-drafting adapter; the pipeline retains evidence ownership."""
+
+    def draft_claim(
+        self, default_text: str, evidence_texts: list[str], claim_type: str
+    ) -> str | None:
+        """Return grounded prose or None to keep the deterministic draft."""
 
 
 class RunNotResumableError(Exception):
@@ -99,10 +109,14 @@ FIXTURE_PATH = (
 
 class PipelineService:
     def __init__(
-        self, database: Database, source_fetcher: SafeSourceFetcher | None = None
+        self,
+        database: Database,
+        source_fetcher: SafeSourceFetcher | None = None,
+        synthesis_provider: SynthesisProvider | None = None,
     ) -> None:
         self.database = database
         self.source_fetcher = source_fetcher
+        self.synthesis_provider = synthesis_provider
         self.provenance = ProvenanceService(database)
         self.verification = VerificationService(database)
 
@@ -853,6 +867,14 @@ class PipelineService:
                     select(Paper).where(Paper.id.in_([entity.paper_id for entity in entities]))
                 )
             }
+            evidence_spans = {
+                span.id: span
+                for span in db.scalars(
+                    select(EvidenceSpan).where(
+                        EvidenceSpan.paper_id.in_([entity.paper_id for entity in entities])
+                    )
+                )
+            }
             entities_by_id = {entity.id: entity for entity in entities}
             incoming_relations = {relation.target_entity_ids[0]: relation for relation in relations}
             current_entity_ids = {entity.id for entity in entities}
@@ -872,38 +894,59 @@ class PipelineService:
             db.flush()
             claims: list[SynthesisClaim] = []
             for entity in entities:
+                incoming = incoming_relations.get(entity.id)
+                claim_type = "comparative" if incoming else "factual"
                 text = (
                     papers[entity.paper_id].metadata_provenance.get("claim")
                     or entity.description
                 )
                 if not text:
                     continue
-                incoming = incoming_relations.get(entity.id)
-                claim_relations = [incoming] if incoming else []
                 endpoint_ids = (
                     incoming.source_entity_ids + incoming.target_entity_ids
                     if incoming
                     else [entity.id]
                 )
-                claim_entities = [entities_by_id[entity_id] for entity_id in endpoint_ids]
                 span_ids = list(
                     dict.fromkeys(
-                        span_id for entity in claim_entities for span_id in entity.evidence_span_ids
+                        span_id
+                        for entity_id in endpoint_ids
+                        for span_id in entities_by_id[entity_id].evidence_span_ids
                     )
                 )
+                provider_drafted = False
+                if self.synthesis_provider is not None:
+                    drafted = self.synthesis_provider.draft_claim(
+                        text,
+                        [
+                            evidence_spans[span_id].verbatim_text
+                            for span_id in span_ids
+                            if span_id in evidence_spans
+                        ],
+                        claim_type,
+                    )
+                    if drafted and drafted.strip():
+                        text = drafted.strip()
+                        provider_drafted = True
+                claim_relations = [incoming] if incoming else []
+                claim_entities = [entities_by_id[entity_id] for entity_id in endpoint_ids]
                 claim = claims_by_target.get(entity.id)
                 if claim is None:
                     claim = SynthesisClaim(project_id=project_id)
                     db.add(claim)
                 claim.text = text
-                claim.claim_type = "comparative" if incoming else "factual"
+                claim.claim_type = claim_type
                 claim.supporting_entity_ids = [item.id for item in claim_entities]
                 claim.supporting_relation_ids = [item.id for item in claim_relations]
                 claim.supporting_evidence_span_ids = span_ids
                 claim.contradicting_evidence_span_ids = []
                 claim.confidence = 0.94 if not claim_relations else 0.88
                 claim.inference_level = (
-                    "cross_source_synthesis" if incoming else "explicit_author_statement"
+                    "model_inference"
+                    if provider_drafted
+                    else "cross_source_synthesis"
+                    if incoming
+                    else "explicit_author_statement"
                 )
                 claim.verification_status = "grounded"
                 db.flush()
