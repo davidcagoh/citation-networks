@@ -72,6 +72,15 @@ export interface ClaimEvidence {
   }>;
 }
 
+export interface VerificationIssue {
+  id: string;
+  claim_id: string | null;
+  issue_type: string;
+  severity: string;
+  message: string;
+  status: "open" | "resolved" | "accepted" | "dismissed";
+}
+
 export interface WorkbenchApi {
   createProject(input: { title: string; prompt: string }): Promise<{ id: string }>;
   ingestFixture(projectId: string): Promise<{ paper_count: number }>;
@@ -96,6 +105,13 @@ export interface WorkbenchApi {
       sections: ReviewPlan["sections"];
     },
   ): Promise<ReviewPlan>;
+  runVerification(projectId: string): Promise<{ issue_count: number; issue_ids: string[] }>;
+  getVerification(projectId: string): Promise<{ issues: VerificationIssue[] }>;
+  updateVerificationIssue(
+    projectId: string,
+    issueId: string,
+    status: VerificationIssue["status"],
+  ): Promise<VerificationIssue>;
   runPipeline(projectId: string): Promise<{ id: string; status: string }>;
   getWorkspace(projectId: string, runId?: string): Promise<Workspace>;
   getClaimEvidence(projectId: string, claimId: string, signal?: AbortSignal): Promise<ClaimEvidence>;
@@ -180,6 +196,35 @@ function parseMembership(value: unknown): {
     status: string(membership.status, "membership.status"),
     relevance_score: number(membership.relevance_score, "membership.relevance_score"),
     relevance_rationale: string(membership.relevance_rationale, "membership.relevance_rationale"),
+  };
+}
+
+function parseVerificationRun(value: unknown): { issue_count: number; issue_ids: string[] } {
+  const run = object(value, "verification run");
+  return {
+    issue_count: number(run.issue_count, "verification run.issue_count"),
+    issue_ids: array(run.issue_ids, "verification run.issue_ids").map((id, index) => string(id, `verification run.issue_ids[${index}]`)),
+  };
+}
+
+function parseVerificationIssue(value: unknown, label: string): VerificationIssue {
+  const issue = object(value, label);
+  const claimId = issue.claim_id;
+  return {
+    id: string(issue.id, `${label}.id`),
+    claim_id: claimId === null ? null : string(claimId, `${label}.claim_id`),
+    issue_type: string(issue.issue_type, `${label}.issue_type`),
+    severity: string(issue.severity, `${label}.severity`),
+    message: string(issue.message, `${label}.message`),
+    status: string(issue.status, `${label}.status`) as VerificationIssue["status"],
+  };
+}
+
+function parseVerification(value: unknown): { issues: VerificationIssue[] } {
+  const verification = object(value, "verification");
+  return {
+    issues: array(verification.issues, "verification.issues")
+      .map((issue, index) => parseVerificationIssue(issue, `verification.issues[${index}]`)),
   };
 }
 
@@ -391,6 +436,18 @@ export function createWorkbenchApi(
         method: "PATCH",
         body: JSON.stringify(plan),
       }),
+    runVerification: (projectId) =>
+      request(baseUrl, `/projects/${projectId}/runs/verification`, parseVerificationRun, {
+        method: "POST",
+      }),
+    getVerification: (projectId) =>
+      request(baseUrl, `/projects/${projectId}/verification`, parseVerification),
+    updateVerificationIssue: (projectId, issueId, status) =>
+      request(baseUrl, `/projects/${projectId}/verification/${issueId}`, (value) =>
+        parseVerificationIssue(value, "verification issue"), {
+          method: "PATCH",
+          body: JSON.stringify({ status }),
+        }),
     runPipeline: (projectId) =>
       request(baseUrl, `/projects/${projectId}/runs/pipeline`, parseRun, { method: "POST" }),
     async getWorkspace(projectId, runId) {

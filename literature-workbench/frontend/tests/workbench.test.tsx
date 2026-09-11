@@ -32,6 +32,12 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
     updatePlan: vi.fn().mockImplementation(async (_projectId, _planId, plan) => ({ id: "plan-1", ...plan })),
+    runVerification: vi.fn().mockResolvedValue({ issue_count: 0, issue_ids: [] }),
+    getVerification: vi.fn().mockResolvedValue({ issues: [] }),
+    updateVerificationIssue: vi.fn().mockResolvedValue({
+      id: "issue-1", claim_id: "claim-1", issue_type: "missing_evidence", severity: "high",
+      message: "Claim has no evidence.", status: "resolved",
+    }),
     runPipeline: vi.fn().mockResolvedValue({ id: "run-1", status: "completed" }),
     getWorkspace: vi.fn().mockResolvedValue({
       project: { id: "project-1", title: "Agent memory", prompt: "Survey agent memory." },
