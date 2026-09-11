@@ -44,6 +44,10 @@ class RunNotResumableError(Exception):
     """Raised when a completed run is asked to resume."""
 
 
+class RunNotAwaitingCorpusApprovalError(Exception):
+    """Raised when corpus approval is requested for a run at another state."""
+
+
 SOURCE_TYPE_PRIORITY = {"parsed_pdf": 4, "html": 3, "text": 3, "abstract": 2, "metadata": 1}
 MAX_EVIDENCE_CHARS = 1200
 
@@ -227,7 +231,24 @@ class PipelineService:
             )
             db.add(run)
             db.flush()
+            if review_mode in {"comprehensive", "systematic"}:
+                run.status = "awaiting_corpus_approval"
+                db.flush()
+                return run
         return self._run_stages(run.id, project_id, start_position=0, existing_stages={})
+
+    def approve_corpus(self, project_id: str, run_id: str) -> Run:
+        with self.database.session() as db:
+            self._require_project(db, project_id)
+            run = db.get(Run, run_id)
+            if run is None or run.project_id != project_id:
+                raise ProjectNotFoundError("run not found")
+            if run.status != "awaiting_corpus_approval":
+                raise RunNotAwaitingCorpusApprovalError(
+                    "Run is not awaiting corpus approval"
+                )
+            run.status = "running"
+        return self._run_stages(run_id, project_id, start_position=0, existing_stages={})
 
     def resume(self, project_id: str, run_id: str) -> Run:
         with self.database.session() as db:
