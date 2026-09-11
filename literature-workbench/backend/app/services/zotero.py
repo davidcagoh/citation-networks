@@ -108,6 +108,8 @@ class ZoteroService:
                             "external_id": item.get("key"),
                             "source_uri": data.get("url"),
                             "zotero_key": item.get("key"),
+                            "publication_status": self._publication_status(data),
+                            "alternate_records": [],
                         },
                     )
                     db.add(paper)
@@ -117,6 +119,8 @@ class ZoteroService:
                         relevance_score=0.0, relevance_rationale="Imported from Zotero",
                     ))
                     existing = paper
+                else:
+                    self._merge_record(existing, data, item)
                 abstract = (data.get("abstractNote") or "").strip()
                 if abstract and db.scalar(select(SourceDocument).where(
                     SourceDocument.paper_id == existing.id,
@@ -134,6 +138,80 @@ class ZoteroService:
                 ))
             db.add(UsageCostEvent(project_id=project_id, provider="zotero", external_api_calls=1))
             return len(items)
+
+    @staticmethod
+    def _publication_status(data: dict) -> str:
+        item_type = str(data.get("itemType") or "").casefold()
+        source_uri = str(data.get("url") or "").casefold()
+        if item_type == "preprint" or "arxiv.org" in source_uri:
+            return "preprint"
+        if item_type in {
+            "journalarticle", "conferencepaper", "book", "booksection",
+            "report", "thesis", "patent", "magazinearticle", "newspaperarticle",
+        }:
+            return "published"
+        return "unknown"
+
+    @classmethod
+    def _record_metadata(cls, data: dict, item: dict) -> dict:
+        return {
+            "publication_status": cls._publication_status(data),
+            "source_uri": data.get("url"),
+            "title": str(data.get("title") or "").strip(),
+            "zotero_key": item.get("key"),
+        }
+
+    @staticmethod
+    def _status_rank(status: str) -> int:
+        return {"unknown": 1, "preprint": 2, "published": 3}.get(status, 1)
+
+    @classmethod
+    def _merge_record(cls, paper: Paper, data: dict, item: dict) -> None:
+        incoming = cls._record_metadata(data, item)
+        provenance = dict(paper.metadata_provenance or {})
+        current_status = str(provenance.get("publication_status") or "unknown")
+        alternates = list(provenance.get("alternate_records") or [])
+        promotes = cls._status_rank(
+            incoming["publication_status"]
+        ) > cls._status_rank(current_status)
+        if (
+            not promotes
+            and incoming not in alternates
+            and incoming.get("zotero_key") != provenance.get("zotero_key")
+        ):
+            alternates.append(incoming)
+
+        if promotes:
+            current_record = {
+                "publication_status": current_status,
+                "source_uri": provenance.get("source_uri"),
+                "title": paper.canonical_title,
+                "zotero_key": provenance.get("zotero_key"),
+            }
+            if current_record.get("zotero_key") and current_record not in alternates:
+                alternates.append(current_record)
+            creators = data.get("creators") or []
+            authors = [
+                " ".join(filter(None, [creator.get("firstName"), creator.get("lastName")])).strip()
+                for creator in creators
+                if creator.get("creatorType", "author") == "author"
+            ]
+            year_text = str(data.get("date") or "")[:4]
+            paper.canonical_title = incoming["title"] or paper.canonical_title
+            paper.authors = [author for author in authors if author] or paper.authors
+            paper.year = int(year_text) if year_text.isdigit() else paper.year
+            paper.venue = data.get("publicationTitle") or paper.venue
+            paper.doi = data.get("DOI") or paper.doi
+            paper.abstract = data.get("abstractNote") or paper.abstract
+            provenance.update({
+                "provider": "zotero",
+                "external_id": item.get("key"),
+                "source_uri": data.get("url"),
+                "zotero_key": item.get("key"),
+                "publication_status": incoming["publication_status"],
+            })
+        provenance["alternate_records"] = alternates
+        paper.metadata_provenance = provenance
 
     def export_selected(self, project_id: str, collection_key: str | None) -> int:
         with self.database.session() as db:
