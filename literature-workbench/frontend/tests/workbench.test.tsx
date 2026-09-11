@@ -54,7 +54,11 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
       project_id: "project-1", checkpoint: "corpus", status: "ready_for_corpus_checkpoint",
       routes: { executed: ["semantic_search"], count: 1 },
       screening: { total: 5, selected: 5, unresolved_candidates: 0, excluded: 0 },
-      source_text: { selected_with_usable_text: 5, selected_total: 5 }, limitations: [],
+      source_text: { selected_with_usable_text: 5, selected_total: 5 },
+      stopping_certificate: {
+        status: "satisfied", mode: "sufficient", required_routes: ["semantic_search"],
+        checks: { required_routes_executed: true, all_candidates_screened: true, selected_sources_available: true },
+      }, limitations: [],
     }),
     approveCorpus: vi.fn().mockResolvedValue({ id: "run-1", status: "awaiting_structure_approval" }),
     approveStructure: vi.fn().mockResolvedValue({ id: "run-1", status: "completed" }),
@@ -107,6 +111,7 @@ describe("Literature Workbench", () => {
       title: "Imported study", text: "The study evaluates memory.",
     }));
     expect(api.runPipeline).toHaveBeenCalledWith("project-1", { review_mode: "sufficient", max_papers: 50 });
+    expect(await screen.findByText("satisfied")).toBeVisible();
   });
 
   it("previews scope and projected budget before discovery", async () => {
