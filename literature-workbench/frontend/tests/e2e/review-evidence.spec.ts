@@ -58,3 +58,23 @@ test("previews scope and projected budget before starting a run", async ({ page 
   await expect(page.getByText("Core methods and mechanisms", { exact: true })).toBeVisible();
   await expect(page.getByText("50 papers", { exact: true })).toBeVisible();
 });
+
+test("imports local source text and opens the grounded review", async ({ page }) => {
+  const workbench = new WorkbenchPage(page);
+  await workbench.open();
+  await workbench.title.fill(`E2E imported ${Date.now()}`);
+  await workbench.brief.fill("Inspect the imported source.");
+  await page.getByLabel("Optional source text").fill(
+    "The imported study evaluates memory architecture across two workloads.",
+  );
+  await page.getByRole("button", { name: "Import source text" }).click();
+
+  await expect(page.getByText("1 papers", { exact: true })).toBeVisible();
+  await workbench.openReview();
+  await expect(
+    page.getByRole("button", {
+      name: "The imported study evaluates memory architecture across two workloads.",
+      exact: true,
+    }),
+  ).toBeVisible();
+});
