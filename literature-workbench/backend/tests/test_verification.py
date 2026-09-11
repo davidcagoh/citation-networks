@@ -9,6 +9,7 @@ from app.models import (
     Paper,
     ReviewSentence,
     ScientificEntity,
+    ScientificRelation,
     SynthesisClaim,
     VerificationIssue,
 )
@@ -176,3 +177,30 @@ def test_verification_flags_claims_behind_corpus_date_frontier(tmp_path: Path) -
         assert response.status_code == 201
         issues = client.get(f"/projects/{project_id}/verification").json()["issues"]
         assert any(issue["issue_type"] == "freshness" for issue in issues)
+
+
+def test_verification_surfaces_contrasting_relation_evidence(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = _completed_project(client)
+        with app.state.database.session() as database:
+            claim = database.scalar(
+                select(SynthesisClaim).where(SynthesisClaim.project_id == project_id)
+            )
+            relation = database.scalar(
+                select(ScientificRelation).where(ScientificRelation.project_id == project_id)
+            )
+            assert claim is not None and relation is not None
+            relation.relation_type = "contrasts_with"
+            relation.inference_level = "model_inference"
+            claim.supporting_relation_ids = [relation.id]
+
+        response = client.post(f"/projects/{project_id}/runs/verification")
+
+        assert response.status_code == 201
+        issues = client.get(f"/projects/{project_id}/verification").json()["issues"]
+        assert any(issue["issue_type"] == "contradiction_review" for issue in issues)
+        with app.state.database.session() as database:
+            persisted = database.get(SynthesisClaim, claim.id)
+            assert persisted is not None
+            assert persisted.contradicting_evidence_span_ids

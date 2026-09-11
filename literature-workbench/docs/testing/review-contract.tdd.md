@@ -98,12 +98,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 80 | The optional final-prose provider receives the approved document in section order and returns claim-keyed prose for a coherence pass without changing provenance mappings. | `backend/tests/test_synthesis.py::test_openai_document_pass_preserves_claim_ids`, `backend/tests/test_synthesis.py::test_final_prose_provider_waits_for_structure_approval` | PASS |
 | 81 | Model-provider transport/response failures are converted to a credential-safe HTTP 502 at pipeline and checkpoint boundaries. | `backend/tests/test_synthesis.py::test_provider_failure_is_returned_as_safe_api_error` | PASS |
 | 82 | Verification flags live claims whose newest supporting paper trails the corpus publication-date frontier by at least three years. | `backend/tests/test_verification.py::test_verification_flags_claims_behind_corpus_date_frontier` | PASS |
+| 83 | Verification surfaces inferred contrasting relations as competing evidence-span links and a targeted contradiction-review issue. | `backend/tests/test_verification.py::test_verification_surfaces_contrasting_relation_evidence` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 117 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.01%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 118 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.06%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.

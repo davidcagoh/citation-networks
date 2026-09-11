@@ -11,6 +11,7 @@ from app.models import (
     Project,
     ReviewSentence,
     ScientificEntity,
+    ScientificRelation,
     SynthesisClaim,
     VerificationIssue,
 )
@@ -53,6 +54,14 @@ class VerificationService:
                 )
             }
             corpus_frontier = max((paper.year for paper in papers.values()), default=None)
+            relations = {
+                relation.id: relation
+                for relation in db.scalars(
+                    select(ScientificRelation).where(
+                        ScientificRelation.project_id == project_id
+                    )
+                )
+            }
             referenced_span_ids = [
                 span_id for claim in claims for span_id in claim.supporting_evidence_span_ids
             ]
@@ -150,6 +159,40 @@ class VerificationService:
                         claim.verification_status = "grounded"
                 else:
                     claim.verification_status = "grounded"
+
+                contrasting = [
+                    relations[relation_id]
+                    for relation_id in claim.supporting_relation_ids
+                    if relation_id in relations
+                    and relations[relation_id].relation_type
+                    in {"contrasts_with", "contradicts"}
+                ]
+                claim.contradicting_evidence_span_ids = list(
+                    dict.fromkeys(
+                        span_id
+                        for relation in contrasting
+                        for span_id in relation.evidence_span_ids
+                        if span_id not in claim.supporting_evidence_span_ids
+                    )
+                )
+                if contrasting and any(
+                    relation.inference_level == "model_inference"
+                    for relation in contrasting
+                ):
+                    issue = VerificationIssue(
+                        project_id=project_id,
+                        claim_id=claim.id,
+                        issue_type="contradiction_review",
+                        severity="medium",
+                        message=(
+                            "A supporting relation is marked as contrasting; review the "
+                            "competing evidence before treating this claim as settled."
+                        ),
+                    )
+                    db.add(issue)
+                    claim.verification_status = "flagged"
+                    db.flush()
+                    created.append(issue.id)
 
             uncited = list(
                 db.scalars(
