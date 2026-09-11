@@ -50,6 +50,27 @@ describe("workbench API adapter", () => {
     }));
   });
 
+  it("updates a review plan through the typed client", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      id: "plan-1",
+      title: "Edited review",
+      thesis: "Failures motivate responses.",
+      organizing_principle: "failure → response",
+      sections: [{ title: "Failures", purpose: "Explain failures." }],
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await createWorkbenchApi("http://api").updatePlan("project-1", "plan-1", {
+      title: "Edited review",
+      thesis: "Failures motivate responses.",
+      organizing_principle: "failure → response",
+      sections: [{ title: "Failures", purpose: "Explain failures." }],
+    });
+    expect(result.title).toBe("Edited review");
+    expect(fetchMock).toHaveBeenCalledWith("http://api/projects/project-1/plans/plan-1", expect.objectContaining({
+      method: "PATCH",
+    }));
+  });
+
   it("calls mutations and forwards evidence cancellation", async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(response({ id: "project-1", title: "Memory", prompt: "Survey it" }))
