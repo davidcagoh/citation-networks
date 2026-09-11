@@ -24,6 +24,7 @@ def test_exports_markdown_json_and_bibtex(tmp_path: Path) -> None:
         assert markdown.headers["content-type"].startswith("text/markdown")
         assert "# Evidence structure for Memory" in markdown.text
         assert "## From traces to consolidation" in markdown.text
+        assert "[@lw_" in markdown.text
 
         exported_json = client.get(f"/projects/{project_id}/export?format=json")
         assert exported_json.status_code == 200
