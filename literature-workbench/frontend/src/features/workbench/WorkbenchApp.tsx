@@ -743,7 +743,7 @@ function Corpus({ workspace, audit, prisma, paperCount, filteredCount, discovery
       <div className={styles.tableRegion} role="region" aria-label="Corpus papers" tabIndex={0}>
       <table className={styles.table}>
         <caption className={styles.srOnly}>Papers in the supplied fixture corpus</caption>
-        <thead><tr><th>Paper</th><th>Year</th><th>Signals</th><th>Status</th><th>Routes</th><th>Source text</th><th>Entities</th><th><span className={styles.srOnly}>Actions</span></th></tr></thead>
+        <thead><tr><th>Paper</th><th>Year</th><th>Signals</th><th>Status</th><th>Routes</th><th>Source text</th><th>Extraction</th><th><span className={styles.srOnly}>Actions</span></th></tr></thead>
         <tbody>{papers.map((paper) => (
           <tr key={paper.id}>
             <td className={styles.paperTitle}>{paper.title}</td><td>{paper.year ?? "—"}</td>
@@ -751,7 +751,7 @@ function Corpus({ workspace, audit, prisma, paperCount, filteredCount, discovery
             <td><span className={styles.badge}>{paper.status ?? "included"}</span></td>
             <td>{paper.discovery_routes?.join(", ") || "—"}</td>
             <td><span className={`${styles.badge} ${paper.document_status === "degraded" ? styles.badgeDegraded : ""}`}>{paper.document_status}</span></td>
-            <td>{paper.entity_count ?? "—"}</td>
+            <td>{paper.extraction_status ?? "not_run"} · {paper.entity_count ?? 0} entities</td>
             <td className={styles.actions}>
               {(paper.status ?? "included") !== "included" && <button type="button" onClick={() => onScreen(paper.id, "included")}>Include {paper.title}</button>}
               {(paper.status ?? "included") !== "pinned" && <button type="button" onClick={() => onScreen(paper.id, "pinned")}>Pin {paper.title}</button>}

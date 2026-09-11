@@ -355,6 +355,7 @@ def test_pipeline_persists_multiple_structured_entities_per_paper(tmp_path: Path
 
         papers = client.get(f"/projects/{project_id}/corpus").json()["papers"]
         assert papers[0]["entity_count"] == 2
+        assert papers[0]["extraction_status"] == "structured"
 
 
 def test_final_prose_provider_waits_for_structure_approval(tmp_path: Path) -> None:

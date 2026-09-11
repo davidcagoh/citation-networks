@@ -900,6 +900,21 @@ def create_app(
                     .group_by(ScientificEntity.paper_id)
                 ).all()
             )
+            entity_methods_by_paper: dict[str, set[str]] = defaultdict(set)
+            for entity in db.scalars(
+                select(ScientificEntity).where(ScientificEntity.paper_id.in_(paper_ids))
+            ):
+                entity_methods_by_paper[entity.paper_id].add(entity.extraction_method)
+
+            def extraction_status(paper_id: str) -> str:
+                methods = entity_methods_by_paper.get(paper_id, set())
+                if not methods:
+                    return "not_run"
+                if methods == {"deterministic-fixture"}:
+                    return "fixture"
+                if any(method == "openai-structured-v1" for method in methods):
+                    return "structured" if methods == {"openai-structured-v1"} else "mixed"
+                return "heuristic"
             events_by_paper: dict[str, list[DiscoveryEvent]] = defaultdict(list)
             for event in db.scalars(
                 select(DiscoveryEvent)
@@ -923,6 +938,7 @@ def create_app(
                     "relevance_rationale": membership.relevance_rationale,
                     "coverage_cluster": membership.coverage_cluster,
                     "entity_count": entity_counts.get(paper.id, 0),
+                    "extraction_status": extraction_status(paper.id),
                     "document_status": document.parsing_quality if document else "degraded",
                     "source_type": document.source_type if document else None,
                     "discovery_routes": list(

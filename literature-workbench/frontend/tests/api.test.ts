@@ -488,6 +488,7 @@ describe("workbench API adapter", () => {
               year: 2025,
               document_status: "complete",
               entity_count: 2,
+              extraction_status: "structured",
             }] }
             : path.endsWith("/review")
               ? { sentences: [{
@@ -503,6 +504,7 @@ describe("workbench API adapter", () => {
 
     const workspace = await createWorkbenchApi("http://api").getWorkspace("project-1");
     expect(workspace.plan?.title).toBe("Direct");
+    expect(workspace.corpus.papers[0].extraction_status).toBe("structured");
     expect(workspace.costs.stages).toEqual([]);
     expect(fetchMock).toHaveBeenCalledTimes(5);
   });

@@ -16,6 +16,7 @@ export interface Paper {
   relevance_rationale?: string;
   discovery_routes?: string[];
   entity_count?: number;
+  extraction_status?: "not_run" | "fixture" | "heuristic" | "structured" | "mixed";
 }
 
 export interface ReviewPlan {
@@ -748,6 +749,9 @@ function parsePaper(value: unknown, index: number): Paper {
     ...(paper.relevance_rationale === undefined ? {} : { relevance_rationale: string(paper.relevance_rationale, `${label}.relevance_rationale`) }),
     ...(paper.discovery_routes === undefined ? {} : { discovery_routes: array(paper.discovery_routes, `${label}.discovery_routes`).map((route, routeIndex) => string(route, `${label}.discovery_routes[${routeIndex}]`)) }),
     ...(entityCount === undefined ? {} : { entity_count: number(entityCount, `${label}.entity_count`) }),
+    ...(paper.extraction_status === undefined
+      ? {}
+      : { extraction_status: string(paper.extraction_status, `${label}.extraction_status`) as Paper["extraction_status"] }),
   };
 }
 

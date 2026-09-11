@@ -99,12 +99,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 81 | Model-provider transport/response failures are converted to a credential-safe HTTP 502 at pipeline and checkpoint boundaries. | `backend/tests/test_synthesis.py::test_provider_failure_is_returned_as_safe_api_error` | PASS |
 | 82 | Verification flags live claims whose newest supporting paper trails the corpus publication-date frontier by at least three years. | `backend/tests/test_verification.py::test_verification_flags_claims_behind_corpus_date_frontier` | PASS |
 | 83 | Verification surfaces inferred contrasting relations as competing evidence-span links and a targeted contradiction-review issue. | `backend/tests/test_verification.py::test_verification_surfaces_contrasting_relation_evidence` | PASS |
+| 84 | Corpus records and the UI expose extraction status (`not_run`, `fixture`, `heuristic`, `structured`, or `mixed`) alongside entity counts. | `frontend/tests/api.test.ts`, `backend/tests/test_synthesis.py::test_pipeline_persists_multiple_structured_entities_per_paper` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
 - Backend: `uv run pytest -q` → 118 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.06%, above the 80% requirement.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.09%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.
