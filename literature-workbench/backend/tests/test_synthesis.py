@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from app.main import create_app
 from app.services.synthesis import (
     OpenAISynthesisProvider,
+    RelationJudgment,
     StructuredExtraction,
     SynthesisUsage,
 )
@@ -190,6 +191,46 @@ def test_openai_extraction_bundle_returns_multiple_grounded_objects(monkeypatch)
     assert len(objects) == 2
     assert objects[1].entity_type == "limitation"
     assert provider.consume_usage().external_api_calls == 1
+
+
+def test_openai_relation_judge_returns_typed_grounded_relation(monkeypatch) -> None:
+    def fake_urlopen(request, timeout):
+        body = json.loads(request.data)
+        assert body["text"]["format"]["name"] == "relation_judgment"
+        return FakeResponse(
+            {
+                "output_text": json.dumps(
+                    {
+                        "relation_type": "contrasts_with",
+                        "justification": "The methods use different measurement strategies.",
+                        "confidence": 0.81,
+                    }
+                ),
+                "usage": {"input_tokens": 90, "output_tokens": 30},
+            }
+        )
+
+    monkeypatch.setattr("app.services.synthesis.urlopen", fake_urlopen)
+    provider = OpenAISynthesisProvider(api_key="secret-not-printed")
+
+    judgment = provider.judge_relation(
+        {
+            "label": "method A",
+            "description": "Uses sampling.",
+            "evidence": ["Uses sampling."],
+        },
+        {
+            "label": "method B",
+            "description": "Uses compression.",
+            "evidence": ["Uses compression."],
+        },
+    )
+
+    assert judgment == RelationJudgment(
+        "contrasts_with",
+        "The methods use different measurement strategies.",
+        0.81,
+    )
 
 
 def test_pipeline_uses_structured_extraction_when_provider_is_enabled(

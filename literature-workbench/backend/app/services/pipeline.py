@@ -854,10 +854,49 @@ class PipelineService:
         for index, (source, target) in enumerate(zip(entities, entities[1:], strict=False)):
             relation = existing_by_endpoints.get(((source.id,), (target.id,)))
             if relation is None and ((source.id,), (target.id,)) in desired_pairs:
+                judgment = None
+                judge = getattr(self.synthesis_provider, "judge_relation", None)
+                if not fixture_entities and callable(judge):
+                    judgment = judge(
+                        {
+                            "label": source.normalized_label,
+                            "description": source.description,
+                            "evidence": source.evidence_span_ids,
+                        },
+                        {
+                            "label": target.normalized_label,
+                            "description": target.description,
+                            "evidence": target.evidence_span_ids,
+                        },
+                    )
                 relation_type = (
                     relation_types[index]
                     if fixture_entities
+                    else judgment.relation_type
+                    if judgment is not None
                     else "same_topic_different_source"
+                )
+                confidence = (
+                    0.92 - index * 0.03
+                    if fixture_entities
+                    else judgment.confidence
+                    if judgment is not None
+                    else 0.72
+                )
+                justification = (
+                    (
+                        f"{target.normalized_label} changes how agents handle "
+                        "the limitation "
+                        f"exposed by {source.normalized_label}."
+                    )
+                    if fixture_entities
+                    else judgment.justification
+                    if judgment is not None
+                    else (
+                        f"Both objects provide grounded evidence about shared topic terms; "
+                        f"compare their approaches: {source.normalized_label} and "
+                        f"{target.normalized_label}."
+                    )
                 )
                 relation = self.provenance.add_relation(
                     ScientificRelationCreate(
@@ -865,25 +904,13 @@ class PipelineService:
                         target_entity_ids=[target.id],
                         relation_type=relation_type,
                         evidence_span_ids=source.evidence_span_ids + target.evidence_span_ids,
-                        confidence=0.92 - index * 0.03 if fixture_entities else 0.72,
+                        confidence=confidence,
                         inference_level=(
                             "cross_source_synthesis"
                             if fixture_entities
                             else "model_inference"
                         ),
-                        justification=(
-                            (
-                                f"{target.normalized_label} changes how agents handle "
-                                "the limitation "
-                                f"exposed by {source.normalized_label}."
-                            )
-                            if fixture_entities
-                            else (
-                                f"Both papers provide grounded evidence about shared topic terms; "
-                                f"compare their approaches: {source.normalized_label} and "
-                                f"{target.normalized_label}."
-                            )
-                        ),
+                        justification=justification,
                     ),
                     project_id=project_id,
                 )

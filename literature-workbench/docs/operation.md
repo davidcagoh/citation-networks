@@ -97,6 +97,12 @@ variables take precedence. The adapter sends exact extracted evidence as
 quoted data, and the pipeline remains responsible for evidence-span links and
 verification.
 
+For live non-fixture corpora, candidate relation pairs are first selected by
+local topic overlap; an enabled synthesis provider may then judge each bounded
+pair with structured output. Relation type, justification, confidence, and
+the source/target evidence-span IDs are persisted together. A missing or
+invalid judgment falls back to the conservative local relation.
+
 ## Operational boundaries
 
 The backend is an unauthenticated loopback service. Keep it bound to
@@ -133,7 +139,7 @@ incurs no model-token spend.
 
 ## Deferred extensions
 
-Richer multi-object extraction, relation judging, document-level coherence
+Richer multi-object extraction, relation clustering, document-level coherence
 passes, and broader
 automated contradiction/causal-language checks are the next
 research/engineering extensions. They should preserve the same
