@@ -496,13 +496,15 @@ def create_app(
             plan.thesis = value.thesis
             plan.organizing_principle = value.organizing_principle
             plan.sections = [section.model_dump() for section in value.sections]
-            return {
+            updated = {
                 "id": plan.id,
                 "title": plan.title,
                 "thesis": plan.thesis,
                 "organizing_principle": plan.organizing_principle,
                 "sections": plan.sections,
             }
+        pipeline._write(project_id)
+        return updated
 
     @app.post("/projects/{project_id}/runs/verification", status_code=201)
     def run_verification(project_id: str) -> dict:
