@@ -158,6 +158,26 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     }
   }
 
+  async function buildReview() {
+    if (!session) return;
+    setError(null);
+    try {
+      setRunState("running");
+      const run = await api.runPipeline(session.projectId);
+      const workspace = await api.getWorkspace(session.projectId, run.id);
+      setSession((current) => current ? {
+        ...current,
+        workspace,
+        paperCount: workspace.corpus.papers.length,
+      } : current);
+      setRunState("complete");
+      setActiveTab("Review");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "The grounded review could not be built.");
+    }
+  }
+
   async function resolveVerificationIssue(issueId: string) {
     if (!session) return;
     try {
@@ -280,7 +300,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
                 onResolve={resolveVerificationIssue}
               />
             )}
-            {activeTab === "Run / Costs" && <Costs workspace={session?.workspace ?? null} status={statusText[runState]} />}
+            {activeTab === "Run / Costs" && <Costs workspace={session?.workspace ?? null} status={statusText[runState]} onBuild={buildReview} busy={busy} />}
           </section>
         </main>
       </div>
@@ -483,7 +503,12 @@ function EvidenceDetail({ evidence }: { evidence: ClaimEvidence }) {
   );
 }
 
-function Costs({ workspace, status }: { workspace: Workspace | null; status: string }) {
+function Costs({ workspace, status, onBuild, busy }: {
+  workspace: Workspace | null;
+  status: string;
+  onBuild: () => Promise<void>;
+  busy: boolean;
+}) {
   if (!workspace) return <Empty text="Stage usage will appear after the first pipeline run." />;
   const stages = workspace.costs.stages;
   const calls = stages.reduce((sum, stage) => sum + stage.calls, 0);
@@ -491,6 +516,12 @@ function Costs({ workspace, status }: { workspace: Workspace | null; status: str
   const cost = stages.reduce((sum, stage) => sum + stage.cost, 0);
   return (
     <>
+      <div className={styles.actionRow}>
+        <button className={styles.primary} type="button" onClick={onBuild} disabled={busy}>
+          {busy ? status : "Build grounded review"}
+        </button>
+        <span className={styles.microcopy}>Uses included and pinned papers only.</span>
+      </div>
       <div className={styles.costTotal}>
         <div className={styles.costMetric}><strong>${cost.toFixed(2)}</strong><span>Total spend</span></div>
         <div className={styles.costMetric}><strong>{calls}</strong><span>Calls</span></div>
