@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -11,6 +12,7 @@ from app.models import (
     DiscoveryEvent,
     EvidenceSpan,
     Paper,
+    ReviewProtocol,
     ReviewSentence,
     ScientificRelation,
     SourceDocument,
@@ -239,6 +241,38 @@ def test_citation_expansion_persists_directional_edges_and_provenance(tmp_path: 
             )
             assert event is not None
             assert event.paper_id == edge.target_paper_id
+
+
+def test_on_demand_living_update_records_timestamp_and_new_papers(tmp_path: Path) -> None:
+    provider = FakeDiscoveryProvider()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={
+                "title": "Memory",
+                "prompt": "Find memory systems",
+                "review_mode": "comprehensive",
+            },
+        ).json()["id"]
+
+        response = client.post(
+            f"/projects/{project_id}/runs/living-update",
+            json={"limit": 2},
+        )
+
+        assert response.status_code == 201
+        body = response.json()
+        assert body["route_count"] == 3
+        assert body["new_paper_count"] == 2
+        assert body["last_updated_at"]
+        with app.state.database.session() as database:
+            protocol = database.scalar(
+                select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
+            )
+            assert protocol is not None
+            recorded_at = datetime.fromisoformat(body["last_updated_at"]).replace(tzinfo=None)
+            assert recorded_at == protocol.updated_at
 
 
 def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> None:
