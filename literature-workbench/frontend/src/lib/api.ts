@@ -119,6 +119,17 @@ export interface CoverageAudit {
   limitations: string[];
 }
 
+export interface ZoteroImportResult {
+  project_id: string;
+  imported_count: number;
+  item_count: number;
+}
+
+export interface ZoteroExportResult {
+  project_id: string;
+  exported_count: number;
+}
+
 export type ReviewMode = "sufficient" | "comprehensive" | "systematic" | "quick" | "thorough";
 export type DiscoveryRoute = "semantic_search" | "survey_search" | "recent_search";
 
@@ -144,6 +155,8 @@ export interface WorkbenchApi {
   getProtocol(projectId: string): Promise<ReviewProtocol>;
   updateProtocol(projectId: string, protocol: Omit<ReviewProtocol, "id" | "project_id" | "updated_at"> | ReviewProtocol): Promise<ReviewProtocol>;
   getCoverageAudit(projectId: string): Promise<CoverageAudit>;
+  importZotero(projectId: string, collectionKey?: string, limit?: number): Promise<ZoteroImportResult>;
+  exportZotero(projectId: string, collectionKey?: string): Promise<ZoteroExportResult>;
   runDiscovery(projectId: string, query: string, limit?: number, routes?: DiscoveryRoute[]): Promise<{
     candidate_count: number;
     route_count: number;
@@ -356,6 +369,23 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
       selected_total: number(sourceText.selected_total, "coverage audit.source_text.selected_total"),
     },
     limitations: array(audit.limitations, "coverage audit.limitations").map((item, index) => string(item, `coverage audit.limitations[${index}]`)),
+  };
+}
+
+function parseZoteroImport(value: unknown): ZoteroImportResult {
+  const result = object(value, "Zotero import");
+  return {
+    project_id: string(result.project_id, "Zotero import.project_id"),
+    imported_count: number(result.imported_count, "Zotero import.imported_count"),
+    item_count: number(result.item_count, "Zotero import.item_count"),
+  };
+}
+
+function parseZoteroExport(value: unknown): ZoteroExportResult {
+  const result = object(value, "Zotero export");
+  return {
+    project_id: string(result.project_id, "Zotero export.project_id"),
+    exported_count: number(result.exported_count, "Zotero export.exported_count"),
   };
 }
 
@@ -625,6 +655,16 @@ export function createWorkbenchApi(
       }),
     getCoverageAudit: (projectId) =>
       request(baseUrl, `/projects/${projectId}/coverage-audit`, parseCoverageAudit),
+    importZotero: (projectId, collectionKey, limit = 100) =>
+      request(baseUrl, `/projects/${projectId}/integrations/zotero/import`, parseZoteroImport, {
+        method: "POST",
+        body: JSON.stringify({ limit, ...(collectionKey ? { collection_key: collectionKey } : {}) }),
+      }),
+    exportZotero: (projectId, collectionKey) =>
+      request(baseUrl, `/projects/${projectId}/integrations/zotero/export`, parseZoteroExport, {
+        method: "POST",
+        body: JSON.stringify(collectionKey ? { collection_key: collectionKey } : {}),
+      }),
     runDiscovery: (projectId, query, limit = 20, routes) =>
       request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {
         method: "POST",
