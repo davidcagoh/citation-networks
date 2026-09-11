@@ -105,6 +105,23 @@ describe("workbench API adapter", () => {
     }));
   });
 
+  it("submits an auditable paid-provider approval", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      id: "approval-1", project_id: "project-1", provider: "paid-search", approved: true,
+      approved_by: "David Goh", justification: "Licensed index.",
+      non_replicable_reason: "Unavailable through public APIs.", approved_at: "2026-09-10T12:00:00+00:00",
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").approveProvider("project-1", {
+      provider: "paid-search", approved_by: "David Goh", justification: "Licensed index.",
+      non_replicable_reason: "Unavailable through public APIs.",
+    })).resolves.toMatchObject({ provider: "paid-search", approved: true });
+    expect(fetchMock).toHaveBeenCalledWith("http://api/projects/project-1/provider-approvals", expect.objectContaining({
+      method: "POST",
+    }));
+  });
+
   it("loads and updates a reproducible review protocol", async () => {
     const protocol: ReviewProtocol = {
       id: "protocol-1",
