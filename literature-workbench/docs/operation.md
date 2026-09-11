@@ -4,7 +4,8 @@
 
 1. Enter a project title and research brief.
 2. Use **Preview scope** to see the deterministic focus areas and projected
-   provider call budget.
+   provider call budget. The preview separates discovery fan-out calls from
+   pipeline-budget calls and shows their total.
 3. Either run the five-paper fixture, or choose **Discover papers** to query
    the default free multi-source adapter (Semantic Scholar and OpenAlex).
    If the saved protocol has a cutoff date, discovery retains records at or
