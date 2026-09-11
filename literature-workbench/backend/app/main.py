@@ -283,7 +283,10 @@ def create_app(
                 )
             ) if identified_paper_ids else []
             papers_with_text = {
-                document.paper_id for document in source_documents if document.text
+                document.paper_id
+                for document in source_documents
+                if document.text
+                and document.source_type in {"parsed_pdf", "html", "text", "fetched_text"}
             }
             queries = list(
                 dict.fromkeys(event.query for event in identification_events if event.query)

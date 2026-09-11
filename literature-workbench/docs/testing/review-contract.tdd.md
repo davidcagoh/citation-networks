@@ -75,6 +75,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 57 | PRISMA `screened` counts only corpus records with an explicit screening decision and excludes unresolved candidates. | `backend/tests/test_protocol.py::test_prisma_screened_count_excludes_unresolved_candidates` | PASS |
 | 58 | A published Zotero record promotes a previously discovered preprint while retaining the preprint identity in alternate provenance. | `backend/tests/test_zotero.py::test_zotero_published_record_promotes_discovered_preprint` | PASS |
 | 59 | Corpus audits distinguish selected records with full text from selected records supported only by abstracts, and the UI exposes both counts. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, frontend parser/UI checks | PASS |
+| 60 | PRISMA `reports_not_retrieved` counts selected records without full-text source documents; abstract-only records are not treated as retrieved reports. | `backend/tests/test_protocol.py::test_prisma_report_reconciles_protocol_search_and_screening_flow` | PASS |
 
 ## Validation evidence
 

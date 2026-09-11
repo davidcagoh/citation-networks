@@ -52,6 +52,9 @@ unsupported content, extraction failures, and sources over 5 MB are rejected.
   attach to the existing canonical paper rather than creating duplicates.
 - Missing text degrades the paper and does not fabricate evidence.
 
+For PRISMA reporting, an abstract alone does not count as a retrieved report:
+`reports_not_retrieved` requires a usable text, HTML, or parsed-PDF document.
+
 The current live extractor is intentionally heuristic: it selects a bounded
 first sentence and records whether it came from an abstract or imported text.
 Live cross-paper relations use a conservative grounded topical-overlap rule;
