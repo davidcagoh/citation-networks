@@ -195,3 +195,6 @@ def test_discovery_enforces_protocol_cutoff_and_reports_filtered_candidates(
         assert discovery.json()["filtered_count"] == 1
         corpus = client.get(f"/projects/{project_id}/corpus").json()["papers"]
         assert [paper["title"] for paper in corpus] == ["Study before cutoff"]
+        prisma = client.get(f"/projects/{project_id}/prisma-report")
+        assert prisma.status_code == 200
+        assert prisma.json()["search"]["filtered_by_cutoff"] == 1
