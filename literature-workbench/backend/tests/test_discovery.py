@@ -237,3 +237,31 @@ def test_acquisition_reports_provider_abstracts_idempotently(tmp_path: Path) -> 
             "degraded_count": 0,
         }
         assert second.json() == first.json()
+
+
+def test_pipeline_budget_gate_prevents_oversized_runs(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=FakeDiscoveryProvider(),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "agent memory", "limit": 2},
+        )
+        for paper in client.get(f"/projects/{project_id}/corpus").json()["papers"]:
+            assert client.patch(
+                f"/projects/{project_id}/corpus/{paper['id']}",
+                json={"status": "included"},
+            ).status_code == 200
+
+        response = client.post(
+            f"/projects/{project_id}/runs/pipeline",
+            json={"max_papers": 1},
+        )
+
+        assert response.status_code == 409
+        assert "budget" in response.json()["detail"].lower()
