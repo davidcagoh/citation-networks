@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 
 from app.main import create_app
-from app.services.discovery import OpenAlexProvider
 from app.models import (
     CitationEdge,
     CorpusMembership,
@@ -20,6 +19,11 @@ from app.models import (
     SourceDocument,
     SynthesisClaim,
     UsageCostEvent,
+)
+from app.services.discovery import (
+    DiscoveryCandidate,
+    MultiSourceDiscoveryProvider,
+    OpenAlexProvider,
 )
 
 
@@ -920,3 +924,40 @@ def test_openalex_provider_maps_work_metadata_and_abstract(monkeypatch) -> None:
     assert candidates[0].abstract == "Memory works"
     assert candidates[0].citation_count == 123
     assert candidates[0].publication_date == "2025-04-02"
+
+
+def test_multi_source_provider_merges_and_marks_provider_provenance() -> None:
+    class LocalProvider:
+        def __init__(self, name: str, external_id: str) -> None:
+            self.name = name
+            self.external_id = external_id
+
+        def search(self, query: str, limit: int) -> list[DiscoveryCandidate]:
+            return [
+                DiscoveryCandidate(
+                    external_id=self.external_id,
+                    title=f"{self.name} result",
+                    authors=[],
+                    year=2025,
+                    venue=None,
+                    doi=None,
+                    abstract=None,
+                    source_uri=None,
+                    score=None,
+                )
+            ][:limit]
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    provider = MultiSourceDiscoveryProvider(
+        [LocalProvider("semantic-scholar", "s2-1"), LocalProvider("openalex", "W1")]
+    )
+
+    candidates = provider.search("memory", 5)
+
+    assert [candidate.external_id for candidate in candidates] == ["s2-1", "W1"]
+    assert [candidate.provider_name for candidate in candidates] == [
+        "semantic-scholar",
+        "openalex",
+    ]
