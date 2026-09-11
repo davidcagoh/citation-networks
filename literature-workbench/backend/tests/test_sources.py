@@ -4,7 +4,21 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app.main import create_app
-from app.models import EvidenceSpan, ScientificRelation, SynthesisClaim
+from app.models import EvidenceSpan, ScientificRelation, SourceDocument, SynthesisClaim
+from app.services.acquisition import FetchedSource
+
+
+class FakeSourceFetcher:
+    def __init__(self) -> None:
+        self.urls: list[str] = []
+
+    def fetch(self, source_uri: str) -> FetchedSource:
+        self.urls.append(source_uri)
+        return FetchedSource(
+            text="Fetched paper text with memory evidence.",
+            content_type="text/plain",
+            final_uri=source_uri,
+        )
 
 
 def test_ingests_user_supplied_full_text_with_provenance(tmp_path: Path) -> None:
@@ -99,3 +113,35 @@ def test_live_pipeline_builds_conservative_cross_paper_relation(tmp_path: Path) 
                 )
             )
             assert any(claim.supporting_relation_ids for claim in claims)
+
+
+def test_fetches_public_source_url_with_provenance_and_blocks_private_targets(tmp_path: Path) -> None:
+    fetcher = FakeSourceFetcher()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", source_fetcher=fetcher)
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Review memory"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/sources/url",
+            json={"title": "Fetched Memory Study", "source_uri": "https://8.8.8.8/paper.txt"},
+        )
+
+        assert response.status_code == 201
+        paper_id = response.json()["paper_id"]
+        assert fetcher.urls == ["https://8.8.8.8/paper.txt"]
+        corpus = client.get(f"/projects/{project_id}/corpus").json()
+        assert corpus["papers"][0]["id"] == paper_id
+        assert corpus["papers"][0]["source_type"] == "fetched_text"
+        with app.state.database.session() as database:
+            source = database.scalar(select(SourceDocument).where(SourceDocument.paper_id == paper_id))
+            assert source is not None
+            assert source.source_uri == "https://8.8.8.8/paper.txt"
+            assert source.parser == "url-fetch-v1"
+
+        blocked = client.post(
+            f"/projects/{project_id}/sources/url",
+            json={"title": "Private", "source_uri": "http://127.0.0.1/private.txt"},
+        )
+        assert blocked.status_code == 400
+        assert "public" in blocked.json()["detail"]
