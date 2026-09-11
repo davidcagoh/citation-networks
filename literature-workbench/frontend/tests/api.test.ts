@@ -14,6 +14,22 @@ function response(body: unknown, options: { ok?: boolean; status?: number; text?
 afterEach(() => vi.unstubAllGlobals());
 
 describe("workbench API adapter", () => {
+  it("loads a scope preview with a projected budget", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      project_id: "project-1",
+      scope: { query: "memory", mode: "quick", suggested_focus: ["Methods"] },
+      budget: { max_papers: 10, estimated_external_api_calls: 1, estimated_cost_usd: 0 },
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").scopePreview("project-1", { mode: "quick", max_papers: 10 }))
+      .resolves.toMatchObject({ scope: { mode: "quick" }, budget: { max_papers: 10 } });
+    expect(fetchMock).toHaveBeenCalledWith("http://api/projects/project-1/runs/scope-preview", expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({ mode: "quick", max_papers: 10 }),
+    }));
+  });
+
   it("runs idempotent acquisition for discovered papers", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
       project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0,
