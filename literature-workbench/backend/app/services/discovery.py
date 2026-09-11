@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -184,12 +185,21 @@ class DiscoveryService:
                                 project_id=project_id,
                                 paper_id=paper.id,
                                 status="candidate",
-                                relevance_score=candidate.score or 0.0,
-                                relevance_rationale=(
-                                    f"Returned by {self.provider.name} for the {route} route"
-                                ),
+                                relevance_score=self._relevance_score(candidate, query, route),
+                                relevance_rationale=self._rationale(candidate, route),
                             )
                         )
+                    membership = db.scalar(
+                        select(CorpusMembership).where(
+                            CorpusMembership.project_id == project_id,
+                            CorpusMembership.paper_id == paper.id,
+                        )
+                    )
+                    if membership is not None:
+                        score = self._relevance_score(candidate, query, route)
+                        if score > membership.relevance_score:
+                            membership.relevance_score = score
+                            membership.relevance_rationale = self._rationale(candidate, route)
                     self._update_provider_signals(paper, candidate)
                     self._persist_abstract(db, paper, candidate)
                     db.add(
@@ -201,7 +211,7 @@ class DiscoveryService:
                             action="candidate",
                             rank=rank,
                             score=candidate.score,
-                            rationale=f"Returned by {self.provider.name} for the {route} route",
+                            rationale=self._rationale(candidate, route),
                             provider=self.provider.name,
                         )
                     )
@@ -243,6 +253,43 @@ class DiscoveryService:
                 reverse=True,
             )
         return list(candidates)
+
+    @staticmethod
+    def _relevance_score(
+        candidate: DiscoveryCandidate, query: str, route: str
+    ) -> float:
+        query_terms = {
+            term for term in query.casefold().split() if len(term) >= 4
+        }
+        candidate_text = f"{candidate.title} {candidate.abstract or ''}".casefold()
+        lexical = (
+            len({term for term in query_terms if term in candidate_text}) / len(query_terms)
+            if query_terms
+            else 0.0
+        )
+        citation_signal = (
+            min(1.0, math.log1p(candidate.citation_count) / math.log1p(1000))
+            if candidate.citation_count is not None
+            else 0.0
+        )
+        route_signal = 1.0 if (
+            route == "recent_search" and candidate.publication_date
+        ) or (
+            route == "seminal_search" and candidate.citation_count is not None
+        ) else 0.0
+        derived = min(1.0, 0.65 * lexical + 0.2 * citation_signal + 0.15 * route_signal)
+        provider_score = candidate.score if candidate.score is not None else 0.0
+        return round(max(derived, min(1.0, max(0.0, provider_score))), 3)
+
+    @staticmethod
+    def _rationale(candidate: DiscoveryCandidate, route: str) -> str:
+        signals = []
+        if candidate.citation_count is not None:
+            signals.append(f"citation_count={candidate.citation_count}")
+        if candidate.publication_date:
+            signals.append(f"publication_date={candidate.publication_date}")
+        signal_text = "; ".join(signals) if signals else "no provider quality signals"
+        return f"Returned for the {route} route; {signal_text}"
 
     def expand_citations(
         self, project_id: str, paper_id: str, direction: str, limit: int
