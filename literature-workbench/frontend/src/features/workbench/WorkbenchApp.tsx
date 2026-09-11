@@ -568,6 +568,7 @@ function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen }:
       <div className={styles.statline}><strong className={styles.stat}>{paperCount ?? papers.length} papers</strong><span className={styles.statnote}>Screened corpus · provenance retained</span></div>
       {audit && <section className={styles.reviewToolbar} aria-label="Corpus checkpoint audit">
         <span>Corpus checkpoint · <strong>{audit.status === "ready_for_corpus_checkpoint" ? "ready" : "incomplete"}</strong> · {audit.routes.count} route{audit.routes.count === 1 ? "" : "s"} executed</span>
+        <span>Stopping certificate · <strong>{audit.stopping_certificate.status}</strong></span>
         <span>{audit.screening.selected}/{audit.screening.total} selected · {audit.source_text.selected_with_usable_text}/{audit.source_text.selected_total} with usable text</span>
         {audit.limitations.length > 0 && <span>{audit.limitations.join("; ")}</span>}
         {approval === "corpus" && <button className={styles.primary} type="button" onClick={onApprove}>Approve corpus checkpoint</button>}
