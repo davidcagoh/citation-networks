@@ -711,6 +711,12 @@ def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> 
         ]
         assert body["screening"]["unresolved_candidates"] == 1
         assert "candidate papers remain unscreened" in body["limitations"]
+        assert body["source_text"] == {
+            "selected_with_usable_text": 0,
+            "selected_total": 0,
+            "selected_with_full_text": 0,
+            "selected_abstract_only": 0,
+        }
 
 
 def test_broader_coverage_audit_emits_stopping_certificate(tmp_path: Path) -> None:
