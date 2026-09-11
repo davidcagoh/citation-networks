@@ -79,6 +79,21 @@ class LivingUpdateRequest(BaseModel):
     limit: int = Field(default=20, ge=1, le=100)
 
 
+class ProviderApprovalRequest(BaseModel):
+    provider: str = Field(min_length=1, max_length=80)
+    approved_by: str = Field(min_length=1, max_length=200)
+    justification: str = Field(min_length=1, max_length=10_000)
+    non_replicable_reason: str = Field(min_length=1, max_length=10_000)
+
+    @field_validator("provider", "approved_by", "justification", "non_replicable_reason")
+    @classmethod
+    def reject_blank_text(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("must contain non-whitespace text")
+        return value
+
+
 class PipelineRequest(BaseModel):
     review_mode: ReviewMode = "sufficient"
     max_papers: int = Field(default=50, ge=1, le=500)

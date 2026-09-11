@@ -17,6 +17,7 @@ from app.models import (
     DiscoveryEvent,
     Paper,
     Project,
+    ProviderApproval,
     SourceDocument,
     UsageCostEvent,
 )
@@ -138,6 +139,7 @@ class DiscoveryService:
         with self.database.session() as db:
             if db.get(Project, project_id) is None:
                 raise DiscoveryProviderError("Project not found")
+            self._ensure_provider_approved(db, project_id)
         total_candidates = 0
         for route in routes:
             route_query = self._route_query(query, route)
@@ -206,6 +208,7 @@ class DiscoveryService:
             )
             if seed is None:
                 raise DiscoveryProviderError("Paper not found")
+            self._ensure_provider_approved(db, project_id)
             external_id = (seed.metadata_provenance or {}).get("external_id")
             if not external_id:
                 raise DiscoveryProviderError("Paper has no provider identifier")
@@ -285,6 +288,19 @@ class DiscoveryService:
                 )
             )
         return len(candidates)
+
+    def _ensure_provider_approved(self, db, project_id: str) -> None:
+        if not getattr(self.provider, "requires_approval", False):
+            return
+        approval = db.scalar(
+            select(ProviderApproval).where(
+                ProviderApproval.project_id == project_id,
+                ProviderApproval.provider == self.provider.name,
+                ProviderApproval.approved.is_(True),
+            )
+        )
+        if approval is None:
+            raise DiscoveryProviderError("Provider requires explicit project approval")
 
     @staticmethod
     def _route_query(query: str, route: str) -> str:

@@ -58,6 +58,20 @@ class ReviewProtocol(Base):
     updated_at: Mapped[datetime] = mapped_column(default=utcnow, onupdate=utcnow)
 
 
+class ProviderApproval(Base):
+    __tablename__ = "provider_approvals"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), index=True
+    )
+    provider: Mapped[str] = mapped_column(String(80))
+    approved: Mapped[bool] = mapped_column(Boolean, default=True)
+    approved_by: Mapped[str] = mapped_column(String(200))
+    justification: Mapped[str] = mapped_column(Text)
+    non_replicable_reason: Mapped[str] = mapped_column(Text)
+    approved_at: Mapped[datetime] = mapped_column(default=utcnow)
+
+
 class Paper(Base):
     __tablename__ = "papers"
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)

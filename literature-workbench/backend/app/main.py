@@ -17,6 +17,7 @@ from app.domain import (
     LivingUpdateRequest,
     PipelineRequest,
     ProjectCreate,
+    ProviderApprovalRequest,
     ReviewPlanUpdate,
     ReviewProtocolUpdate,
     ScopePreviewRequest,
@@ -33,6 +34,7 @@ from app.models import (
     EvidenceSpan,
     Paper,
     Project,
+    ProviderApproval,
     ResearchBrief,
     ReviewPlan,
     ReviewProtocol,
@@ -330,6 +332,8 @@ def create_app(
         except DiscoveryProviderError as exc:
             if str(exc) == "Project not found":
                 raise HTTPException(404, str(exc)) from exc
+            if str(exc) == "Provider requires explicit project approval":
+                raise HTTPException(403, str(exc)) from exc
             raise HTTPException(502, "Discovery provider unavailable") from exc
         return {
             "project_id": project_id,
@@ -338,6 +342,35 @@ def create_app(
             "provider": discovery.provider.name,
             "query": value.query,
         }
+
+    @app.post("/projects/{project_id}/provider-approvals", status_code=201)
+    def approve_provider(project_id: str, value: ProviderApprovalRequest) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            approval = db.scalar(
+                select(ProviderApproval).where(
+                    ProviderApproval.project_id == project_id,
+                    ProviderApproval.provider == value.provider,
+                )
+            )
+            if approval is None:
+                approval = ProviderApproval(project_id=project_id, provider=value.provider)
+                db.add(approval)
+            approval.approved = True
+            approval.approved_by = value.approved_by
+            approval.justification = value.justification
+            approval.non_replicable_reason = value.non_replicable_reason
+            db.flush()
+            return {
+                "id": approval.id,
+                "project_id": project_id,
+                "provider": approval.provider,
+                "approved": approval.approved,
+                "approved_by": approval.approved_by,
+                "justification": approval.justification,
+                "non_replicable_reason": approval.non_replicable_reason,
+                "approved_at": approval.approved_at.isoformat(),
+            }
 
     @app.post("/projects/{project_id}/runs/citation-expansion", status_code=201)
     def expand_citations(project_id: str, value: CitationExpansionRequest) -> dict:
@@ -351,6 +384,8 @@ def create_app(
                 raise HTTPException(404, message) from exc
             if message == "Paper has no provider identifier":
                 raise HTTPException(422, message) from exc
+            if message == "Provider requires explicit project approval":
+                raise HTTPException(403, message) from exc
             raise HTTPException(502, "Discovery provider unavailable") from exc
         return {
             "project_id": project_id,
@@ -383,6 +418,8 @@ def create_app(
         except DiscoveryProviderError as exc:
             if str(exc) == "Project not found":
                 raise HTTPException(404, str(exc)) from exc
+            if str(exc) == "Provider requires explicit project approval":
+                raise HTTPException(403, str(exc)) from exc
             raise HTTPException(502, "Discovery provider unavailable") from exc
         updated_at = utcnow()
         with database.session() as db:
