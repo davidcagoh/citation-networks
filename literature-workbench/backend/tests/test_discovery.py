@@ -424,6 +424,56 @@ def test_discovery_deduplicates_normalized_cross_provider_identity(tmp_path: Pat
             ) == 4
 
 
+def test_discovery_promotes_published_record_over_preprint(tmp_path: Path) -> None:
+    class Provider:
+        def __init__(self, name: str, title: str, source_uri: str) -> None:
+            self.name = name
+            self.title = title
+            self.source_uri = source_uri
+
+        def search(self, query: str, limit: int):
+            return [
+                DiscoveryCandidate(
+                    external_id=f"{self.name}-paper",
+                    title=self.title,
+                    authors=["Researcher"],
+                    year=2025,
+                    venue="Journal" if "publisher" in self.source_uri else None,
+                    doi="10.1234/shared",
+                    abstract=f"{self.title} abstract.",
+                    source_uri=self.source_uri,
+                    score=0.9 if "arxiv" in self.source_uri else 0.8,
+                )
+            ][:limit]
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=MultiSourceDiscoveryProvider([
+            Provider("preprint-source", "Preprint Study", "https://arxiv.org/abs/1234.5678"),
+            Provider("publisher-source", "Published Study", "https://publisher.example/study"),
+        ]),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory studies"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        assert response.status_code == 201
+
+    with app.state.database.session() as database:
+        paper = database.scalar(select(Paper).where(Paper.project_id == project_id))
+        assert paper is not None
+        assert paper.canonical_title == "Published Study"
+        assert paper.metadata_provenance["publication_status"] == "published"
+        assert paper.metadata_provenance["alternate_records"][0]["title"] == "Preprint Study"
+
+
 def test_discovery_does_not_collapse_distinct_non_latin_titles(tmp_path: Path) -> None:
     class Provider:
         def __init__(self, name: str, title: str) -> None:

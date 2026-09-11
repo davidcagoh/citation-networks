@@ -424,6 +424,8 @@ class DiscoveryService:
                                 "source_uri": candidate.source_uri,
                                 "citation_count": candidate.citation_count,
                                 "publication_date": candidate.publication_date,
+                                "publication_status": self._publication_status(candidate),
+                                "alternate_records": [],
                             },
                         )
                         db.add(paper)
@@ -719,13 +721,15 @@ class DiscoveryService:
                         venue=candidate.venue,
                         doi=candidate.doi,
                         abstract=candidate.abstract,
-                        metadata_provenance={
-                            "provider": self._candidate_provider(candidate),
-                            "external_id": candidate.external_id,
-                            "source_uri": candidate.source_uri,
-                            "citation_count": candidate.citation_count,
-                            "publication_date": candidate.publication_date,
-                        },
+                            metadata_provenance={
+                                "provider": self._candidate_provider(candidate),
+                                "external_id": candidate.external_id,
+                                "source_uri": candidate.source_uri,
+                                "citation_count": candidate.citation_count,
+                                "publication_date": candidate.publication_date,
+                                "publication_status": self._publication_status(candidate),
+                                "alternate_records": [],
+                            },
                     )
                     db.add(related)
                     db.flush()
@@ -793,8 +797,63 @@ class DiscoveryService:
             return protocol.cutoff_date if protocol else None
 
     @staticmethod
-    def _update_provider_signals(paper: Paper, candidate: DiscoveryCandidate) -> None:
+    def _publication_status(candidate: DiscoveryCandidate) -> str:
+        source_uri = (candidate.source_uri or "").casefold()
+        if "arxiv.org" in source_uri or "preprint" in source_uri:
+            return "preprint"
+        if candidate.venue:
+            return "published"
+        return "unknown"
+
+    @staticmethod
+    def _publication_status_rank(status: str) -> int:
+        return {"unknown": 1, "preprint": 2, "published": 3}.get(status, 1)
+
+    def _update_provider_signals(self, paper: Paper, candidate: DiscoveryCandidate) -> None:
         provenance = dict(paper.metadata_provenance or {})
+        incoming_status = self._publication_status(candidate)
+        current_status = str(provenance.get("publication_status") or "unknown")
+        incoming_record = {
+            "publication_status": incoming_status,
+            "provider": self._candidate_provider(candidate),
+            "external_id": candidate.external_id,
+            "source_uri": candidate.source_uri,
+            "title": candidate.title,
+        }
+        alternates = list(provenance.get("alternate_records") or [])
+        if self._publication_status_rank(incoming_status) > self._publication_status_rank(
+            current_status
+        ):
+            current_record = {
+                "publication_status": current_status,
+                "provider": provenance.get("provider"),
+                "external_id": provenance.get("external_id"),
+                "source_uri": provenance.get("source_uri"),
+                "title": paper.canonical_title,
+            }
+            if current_status != "unknown" and current_record not in alternates:
+                alternates.append(current_record)
+            paper.canonical_title = candidate.title or paper.canonical_title
+            paper.authors = candidate.authors or paper.authors
+            paper.year = candidate.year or paper.year
+            paper.venue = candidate.venue or paper.venue
+            paper.doi = candidate.doi or paper.doi
+            paper.abstract = candidate.abstract or paper.abstract
+            provenance.update({
+                "provider": self._candidate_provider(candidate),
+                "external_id": candidate.external_id,
+                "source_uri": candidate.source_uri,
+                "publication_status": incoming_status,
+            })
+        elif incoming_record != {
+            "publication_status": current_status,
+            "provider": provenance.get("provider"),
+            "external_id": provenance.get("external_id"),
+            "source_uri": provenance.get("source_uri"),
+            "title": paper.canonical_title,
+        } and incoming_record not in alternates:
+            alternates.append(incoming_record)
+        provenance["alternate_records"] = alternates
         if candidate.citation_count is not None:
             provenance["citation_count"] = candidate.citation_count
         if candidate.publication_date:

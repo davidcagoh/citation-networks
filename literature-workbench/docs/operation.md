@@ -23,7 +23,9 @@
    systematic reviews/meta-analyses, and umbrella/tutorial reviews. Survey
    hits are ranked by explicit review/survey/benchmark signals before
    citation and date tie-breakers; ordinary routes use provider score and
-   deterministic metadata tie-breakers.
+   deterministic metadata tie-breakers. When DOI/title identities collide,
+   published records become canonical over arXiv/preprint records while the
+   alternate identity remains in provenance.
    The Corpus audit preserves and displays the exact query strings used by
    each route, so a review can be reproduced or challenged at the query level.
    Citation-network audits also record expansion attempts that returned no
