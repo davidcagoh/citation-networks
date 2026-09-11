@@ -133,6 +133,16 @@ describe("workbench API adapter", () => {
       .resolves.toMatchObject({ text: "Revised prose.", evidence_span_ids: ["span-1"] });
   });
 
+  it("expands co-citation neighbors from the local graph", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      project_id: "project-1", paper_id: "paper-1", candidate_count: 3, provider: "local-graph",
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").expandCoCitations("project-1", "paper-1", 10))
+      .resolves.toEqual({ project_id: "project-1", paper_id: "paper-1", candidate_count: 3, provider: "local-graph" });
+  });
+
   it("loads and updates a reproducible review protocol", async () => {
     const protocol: ReviewProtocol = {
       id: "protocol-1",
