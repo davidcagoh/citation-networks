@@ -33,7 +33,7 @@ and sources over 5 MB are rejected.
   pipeline.
 - Public text/HTML can be attached with `POST /projects/{id}/sources/url`.
   It is stored as a `fetched_text` or `html` `SourceDocument` after URL safety
-  validation.
+  validation; HTML is normalized to visible body text before extraction.
 - Missing text degrades the paper and does not fabricate evidence.
 
 The current live extractor is intentionally heuristic: it selects a bounded
