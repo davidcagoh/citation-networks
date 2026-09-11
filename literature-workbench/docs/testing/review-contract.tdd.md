@@ -60,12 +60,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 42 | End-to-end multi-source discovery preserves each originating provider in canonical paper metadata and candidate events. | `backend/tests/test_discovery.py::test_multi_source_project_records_originating_provider_names` | PASS |
 | 43 | Comprehensive/systematic stopping certificates require complete publication-date coverage for recent routes and citation-count coverage for seminal routes. | `backend/tests/test_discovery.py::test_broader_coverage_audit_emits_stopping_certificate`, `backend/tests/test_discovery.py::test_broader_audit_rejects_missing_latest_and_seminal_signals` | PASS |
 | 44 | Scope preview separates discovery fan-out calls, pipeline-budget calls, and their total, reflecting mode and provider count. | `backend/tests/test_scope.py::test_scope_preview_returns_transparent_scope_and_budget`, frontend scope-preview UI/type checks | PASS |
+| 45 | Comprehensive/systematic stopping certificates require the survey route to return at least one review-, survey-, or benchmark-like work. | `backend/tests/test_discovery.py::test_broader_coverage_audit_emits_stopping_certificate`, `backend/tests/test_discovery.py::test_broader_audit_rejects_missing_latest_and_seminal_signals` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
 - Backend: `uv run pytest -q` → 86 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.49%, above the 80% requirement.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.52%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
