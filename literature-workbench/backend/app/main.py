@@ -180,7 +180,7 @@ def create_app(
 
     @app.get("/health")
     def health() -> dict:
-        return {"status": "ok", "provider": "deterministic-fixture"}
+        return {"status": "ok", "provider": discovery.provider.name}
 
     @app.get("/projects")
     def list_projects() -> dict:
