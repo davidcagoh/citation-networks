@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 
 from app.main import create_app
 from app.models import (
+    CitationEdge,
     CorpusMembership,
     DiscoveryEvent,
     EvidenceSpan,
@@ -62,6 +63,23 @@ class FakeDiscoveryProvider:
                 source_uri="https://example.test/paper-2",
                 score=0.82,
             ),
+        ][:limit]
+
+    def related(self, external_id: str, direction: str, limit: int) -> list[FakeCandidate]:
+        assert external_id == "paper-1"
+        assert direction in {"backward", "forward"}
+        return [
+            FakeCandidate(
+                external_id="paper-3",
+                title="Earlier Memory Systems",
+                authors=["C. Researcher"],
+                year=2023,
+                venue="Prior Venue",
+                doi="10.1234/earlier-memory",
+                abstract="An earlier study.",
+                source_uri="https://example.test/paper-3",
+                score=0.7,
+            )
         ][:limit]
 
 
@@ -179,6 +197,39 @@ def test_discovery_can_run_multiple_named_routes_with_separate_usage_events(tmp_
             )
             assert len(usage) == 3
             assert sum(event.external_api_calls for event in usage) == 3
+
+
+def test_citation_expansion_persists_directional_edges_and_provenance(tmp_path: Path) -> None:
+    provider = FakeDiscoveryProvider()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        seed_id = client.get(f"/projects/{project_id}/corpus").json()["papers"][0]["id"]
+
+        response = client.post(
+            f"/projects/{project_id}/runs/citation-expansion",
+            json={"paper_id": seed_id, "direction": "backward", "limit": 10},
+        )
+
+        assert response.status_code == 201
+        assert response.json()["candidate_count"] == 1
+        with app.state.database.session() as database:
+            edge = database.scalar(select(CitationEdge))
+            assert edge is not None
+            assert edge.source_paper_id != edge.target_paper_id
+            assert edge.direction == "backward"
+            assert edge.provider == "fake-search"
+            event = database.scalar(
+                select(DiscoveryEvent).where(DiscoveryEvent.route == "citation_backward")
+            )
+            assert event is not None
+            assert event.paper_id == edge.target_paper_id
 
 
 def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> None:
