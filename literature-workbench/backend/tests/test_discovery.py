@@ -140,8 +140,11 @@ def test_discovery_persists_candidates_and_route_provenance(tmp_path: Path) -> N
         assert corpus["coverage"]["candidates"] == 2
         assert all(item["status"] == "candidate" for item in corpus["papers"])
         assert all(item["discovery_routes"] == ["semantic_search"] for item in corpus["papers"])
-        assert corpus["papers"][0]["citation_count"] == 420
-        assert corpus["papers"][0]["publication_date"] == "2025-01-15"
+        cited_paper = next(
+            paper for paper in corpus["papers"] if paper["title"] == "Memory Systems"
+        )
+        assert cited_paper["citation_count"] == 420
+        assert cited_paper["publication_date"] == "2025-01-15"
 
         with app.state.database.session() as database:
             paper = database.scalar(select(Paper).where(Paper.doi == "10.1234/memory"))
