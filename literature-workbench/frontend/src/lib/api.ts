@@ -368,7 +368,7 @@ function parseReview(value: unknown): Workspace["review"] {
 }
 
 interface CostEvent {
-  stage_run_id: string;
+  stage_run_id: string | null;
   input_tokens: number;
   output_tokens: number;
   external_api_calls: number;
@@ -382,7 +382,7 @@ function parseCosts(value: unknown): { events: CostEvent[] } {
       const label = `costs.events[${index}]`;
       const event = object(eventValue, label);
       return {
-        stage_run_id: string(event.stage_run_id, `${label}.stage_run_id`),
+        stage_run_id: event.stage_run_id === null ? null : string(event.stage_run_id, `${label}.stage_run_id`),
         input_tokens: number(event.input_tokens, `${label}.input_tokens`),
         output_tokens: number(event.output_tokens, `${label}.output_tokens`),
         external_api_calls: number(event.external_api_calls, `${label}.external_api_calls`),
@@ -534,7 +534,20 @@ export function createWorkbenchApi(
         ? (planResponse.plans.at(-1) ?? null)
         : planResponse;
       const costs = {
-        stages: run.stages.map((stage) => {
+        stages: [
+          ...(costResponse.events.some((event) => event.stage_run_id === null)
+            ? [{
+                stage: "discovery",
+                status: "completed",
+                calls: costResponse.events.filter((event) => event.stage_run_id === null)
+                  .reduce((sum, event) => sum + event.external_api_calls, 0),
+                input_tokens: 0,
+                output_tokens: 0,
+                cost: costResponse.events.filter((event) => event.stage_run_id === null)
+                  .reduce((sum, event) => sum + event.cost_usd, 0),
+              }]
+            : []),
+          ...run.stages.map((stage) => {
           const usage = costResponse.events.filter((event) => event.stage_run_id === stage.id);
           return {
             stage: stage.stage,
@@ -544,7 +557,8 @@ export function createWorkbenchApi(
             output_tokens: usage.reduce((sum, event) => sum + event.output_tokens, 0),
             cost: usage.reduce((sum, event) => sum + event.cost_usd, 0),
           };
-        }),
+          }),
+        ],
       };
       return { project, corpus, plan, review, costs };
     },
