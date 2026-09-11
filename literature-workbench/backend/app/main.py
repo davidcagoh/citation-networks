@@ -432,7 +432,8 @@ def create_app(
             routes = ["semantic_search"]
             if mode in {"comprehensive", "systematic"}:
                 routes = [
-                    "semantic_search", "survey_search", "recent_search", "seminal_search"
+                    "semantic_search", "survey_search", "recent_search", "seminal_search",
+                    "cross_disciplinary_search",
                 ]
             before_ids = set(
                 db.scalars(select(Paper.id).where(Paper.project_id == project_id))
@@ -734,7 +735,8 @@ def create_app(
             required_routes = ["semantic_search"]
             if mode in {"comprehensive", "systematic"}:
                 required_routes = [
-                    "semantic_search", "survey_search", "recent_search", "seminal_search"
+                    "semantic_search", "survey_search", "recent_search", "seminal_search",
+                    "cross_disciplinary_search",
                 ]
             executed_routes = list(dict.fromkeys(event.route for event in events))
             selected = [

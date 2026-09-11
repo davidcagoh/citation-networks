@@ -416,6 +416,7 @@ class DiscoveryService:
             "survey_search": " review survey benchmark",
             "recent_search": " recent latest",
             "seminal_search": " foundational seminal influential highly cited",
+            "cross_disciplinary_search": " interdisciplinary cross-disciplinary adjacent fields",
         }
         return f"{query}{suffixes[route]}"
 
