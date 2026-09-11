@@ -22,6 +22,7 @@ from app.models import (
 )
 from app.services.discovery import (
     DiscoveryCandidate,
+    DiscoveryProviderError,
     MultiSourceDiscoveryProvider,
     OpenAlexProvider,
 )
@@ -967,6 +968,60 @@ def test_app_wires_free_multi_source_discovery_by_default(tmp_path: Path) -> Non
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
 
     assert app.state.discovery.provider.name == "multi-source"
+
+
+def test_coverage_audit_reports_partial_multi_source_fanout(tmp_path: Path) -> None:
+    class FailingProvider:
+        name = "unavailable-source"
+
+        def search(self, query: str, limit: int):
+            raise DiscoveryProviderError("provider unavailable")
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    class HealthyProvider:
+        name = "available-source"
+
+        def search(self, query: str, limit: int):
+            return [
+                DiscoveryCandidate(
+                    external_id="available-1",
+                    title="Available result",
+                    authors=[],
+                    year=2025,
+                    venue=None,
+                    doi=None,
+                    abstract="Abstract.",
+                    source_uri=None,
+                    score=None,
+                )
+            ][:limit]
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    provider = MultiSourceDiscoveryProvider([FailingProvider(), HealthyProvider()])
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        assert response.status_code == 201
+
+        audit = client.get(f"/projects/{project_id}/coverage-audit")
+
+    assert audit.status_code == 200
+    assert audit.json()["provider_status"] == [
+        {"provider": "unavailable-source", "attempts": 1, "failures": 1},
+        {"provider": "available-source", "attempts": 1, "failures": 0},
+    ]
 
 
 def test_openalex_provider_expands_forward_citations(monkeypatch) -> None:
