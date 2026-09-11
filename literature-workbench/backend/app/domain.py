@@ -23,7 +23,9 @@ EntityType = Literal[
 ]
 
 ReviewMode = Literal["sufficient", "comprehensive", "systematic", "quick", "thorough"]
-DiscoveryRoute = Literal["semantic_search", "survey_search", "recent_search"]
+DiscoveryRoute = Literal[
+    "semantic_search", "survey_search", "recent_search", "seminal_search"
+]
 
 
 class ProjectCreate(BaseModel):
@@ -50,7 +52,7 @@ class DiscoveryRequest(BaseModel):
     query: str = Field(min_length=1, max_length=500)
     limit: int = Field(default=20, ge=1, le=100)
     routes: list[DiscoveryRoute] = Field(
-        default_factory=lambda: ["semantic_search"], min_length=1, max_length=3
+        default_factory=lambda: ["semantic_search"], min_length=1, max_length=4
     )
 
     @field_validator("query")

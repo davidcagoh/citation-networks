@@ -415,6 +415,7 @@ class DiscoveryService:
             "semantic_search": "",
             "survey_search": " review survey benchmark",
             "recent_search": " recent latest",
+            "seminal_search": " foundational seminal influential highly cited",
         }
         return f"{query}{suffixes[route]}"
 

@@ -431,7 +431,9 @@ def create_app(
             mode = protocol.review_mode if protocol else "sufficient"
             routes = ["semantic_search"]
             if mode in {"comprehensive", "systematic"}:
-                routes = ["semantic_search", "survey_search", "recent_search"]
+                routes = [
+                    "semantic_search", "survey_search", "recent_search", "seminal_search"
+                ]
             before_ids = set(
                 db.scalars(select(Paper.id).where(Paper.project_id == project_id))
             )
@@ -731,7 +733,9 @@ def create_app(
             mode = protocol.review_mode if protocol else "sufficient"
             required_routes = ["semantic_search"]
             if mode in {"comprehensive", "systematic"}:
-                required_routes = ["semantic_search", "survey_search", "recent_search"]
+                required_routes = [
+                    "semantic_search", "survey_search", "recent_search", "seminal_search"
+                ]
             executed_routes = list(dict.fromkeys(event.route for event in events))
             selected = [
                 membership
