@@ -15,8 +15,8 @@ function tabSlug(tab: Tab) {
 }
 
 const pageCopy: Record<Tab, { kicker: string; title: string; lede: string }> = {
-  Brief: { kicker: "01 / Research brief", title: "Frame the inquiry.", lede: "Define the question, then run a deterministic five-paper corpus through extraction, relation mapping, planning, and grounded writing." },
-  Corpus: { kicker: "02 / Source collection", title: "Inspect the corpus.", lede: "Every source stays connected to its document status and extracted scientific entities." },
+  Brief: { kicker: "01 / Research brief", title: "Frame the inquiry.", lede: "Run a local fixture for a repeatable baseline, or discover live candidates and choose what belongs in the review." },
+  Corpus: { kicker: "02 / Source collection", title: "Inspect the corpus.", lede: "Screen candidates by route and source availability before building an evidence-grounded review." },
   Structure: { kicker: "03 / Synthesis architecture", title: "See the argument take shape.", lede: "The outline organizes evidence by relationships and trade-offs—not a paper-by-paper inventory." },
   Review: { kicker: "04 / Grounded review", title: "Read through the evidence.", lede: "Highlighted claims are inspectable. Select one to trace it to exact source text and character offsets." },
   "Run / Costs": { kicker: "05 / Execution ledger", title: "Audit the run.", lede: "Stage-level call and token accounting makes the deterministic workflow transparent." },
@@ -238,7 +238,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     <div className={styles.shell}>
       <header className={styles.topbar}>
         <div className={styles.brand}><span className={styles.mark}>LW</span> Literature Workbench</div>
-        <div className={styles.version}>Local provenance edition · Slice 01</div>
+        <div className={styles.version}>Local provenance edition · MVP</div>
       </header>
       <div className={styles.layout}>
         <aside className={styles.sidebar}>
@@ -342,7 +342,7 @@ function Corpus({ workspace, paperCount, onScreen }: {
   if (!workspace) return <Empty text="Run the fixture from Brief to populate the corpus." />;
   return (
     <>
-      <div className={styles.statline}><strong className={styles.stat}>{paperCount ?? papers.length} papers</strong><span className={styles.statnote}>Supplied corpus · deterministic provenance fixture</span></div>
+      <div className={styles.statline}><strong className={styles.stat}>{paperCount ?? papers.length} papers</strong><span className={styles.statnote}>Screened corpus · provenance retained</span></div>
       <div className={styles.tableRegion} role="region" aria-label="Corpus papers" tabIndex={0}>
       <table className={styles.table}>
         <caption className={styles.srOnly}>Papers in the supplied fixture corpus</caption>
