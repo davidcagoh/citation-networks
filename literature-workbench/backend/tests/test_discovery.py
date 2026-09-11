@@ -140,6 +140,47 @@ def test_discovery_deduplicates_same_provider_result(tmp_path: Path) -> None:
             ) == 4
 
 
+def test_discovery_can_run_multiple_named_routes_with_separate_usage_events(tmp_path: Path) -> None:
+    provider = FakeDiscoveryProvider()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={
+                "query": "agent memory",
+                "limit": 1,
+                "routes": ["semantic_search", "survey_search", "recent_search"],
+            },
+        )
+
+        assert response.status_code == 201
+        assert response.json()["route_count"] == 3
+        assert len(provider.queries) == 3
+        with app.state.database.session() as database:
+            events = list(
+                database.scalars(
+                    select(DiscoveryEvent)
+                    .where(DiscoveryEvent.project_id == project_id)
+                    .order_by(DiscoveryEvent.created_at, DiscoveryEvent.id)
+                )
+            )
+            assert [event.route for event in events] == [
+                "semantic_search",
+                "survey_search",
+                "recent_search",
+            ]
+            usage = list(
+                database.scalars(
+                    select(UsageCostEvent).where(UsageCostEvent.project_id == project_id)
+                )
+            )
+            assert len(usage) == 3
+            assert sum(event.external_api_calls for event in usage) == 3
+
+
 def test_discovery_validates_query_and_limit(tmp_path: Path) -> None:
     app = create_app(
         f"sqlite:///{tmp_path / 'workbench.db'}",
