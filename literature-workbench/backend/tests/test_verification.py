@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app.main import create_app
-from app.models import SynthesisClaim, VerificationIssue
+from app.models import EvidenceSpan, Paper, SynthesisClaim, VerificationIssue
 
 
 def _completed_project(client: TestClient) -> str:
@@ -57,3 +57,26 @@ def test_verification_flags_unsupported_claim_and_allows_resolution(tmp_path: Pa
             assert database.scalar(
                 select(VerificationIssue.status).where(VerificationIssue.id == issue["id"])
             ) == "resolved"
+
+
+def test_verification_rejects_evidence_from_another_project(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        first = _completed_project(client)
+        second = _completed_project(client)
+        with app.state.database.session() as database:
+            foreign_span = database.scalar(
+                select(EvidenceSpan)
+                .join(Paper, Paper.id == EvidenceSpan.paper_id)
+                .where(Paper.project_id == second)
+            )
+            claim = database.scalar(
+                select(SynthesisClaim).where(SynthesisClaim.project_id == first)
+            )
+            assert foreign_span is not None and claim is not None
+            assert foreign_span is not None
+            claim.supporting_evidence_span_ids = [foreign_span.id]
+
+        response = client.post(f"/projects/{first}/runs/verification")
+        assert response.status_code == 201
+        assert response.json()["issue_count"] == 1
