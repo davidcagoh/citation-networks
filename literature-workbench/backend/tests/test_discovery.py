@@ -1055,6 +1055,53 @@ def test_multi_source_provider_merges_and_marks_provider_provenance() -> None:
     ]
 
 
+def test_multi_source_search_usage_counts_each_provider_attempt(tmp_path: Path) -> None:
+    class LocalProvider:
+        def __init__(self, name: str) -> None:
+            self.name = name
+
+        def search(self, query: str, limit: int):
+            return [
+                DiscoveryCandidate(
+                    external_id=f"{self.name}-1",
+                    title=f"{self.name} result",
+                    authors=[],
+                    year=2025,
+                    venue=None,
+                    doi=None,
+                    abstract="Abstract.",
+                    source_uri=None,
+                    score=None,
+                    citation_count=1,
+                    publication_date="2025-01-01",
+                )
+            ][:limit]
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=MultiSourceDiscoveryProvider(
+            [LocalProvider("source-a"), LocalProvider("source-b")]
+        ),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        assert response.status_code == 201
+
+    with app.state.database.session() as db:
+        usage = list(db.scalars(select(UsageCostEvent)))
+    assert len(usage) == 1
+    assert usage[0].external_api_calls == 2
+
+
 def test_app_wires_free_multi_source_discovery_by_default(tmp_path: Path) -> None:
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
 
