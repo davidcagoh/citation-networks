@@ -71,6 +71,28 @@ describe("workbench API adapter", () => {
     }));
   });
 
+  it("runs verification and changes an issue status", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(response({ project_id: "project-1", issue_count: 1, issue_ids: ["issue-1"] }))
+      .mockResolvedValueOnce(response({ project_id: "project-1", issues: [{
+        id: "issue-1", claim_id: "claim-1", issue_type: "missing_evidence", severity: "high",
+        message: "Claim has no evidence.", status: "open",
+      }] }))
+      .mockResolvedValueOnce(response({
+        id: "issue-1", claim_id: "claim-1", issue_type: "missing_evidence", severity: "high",
+        message: "Claim has no evidence.", status: "resolved",
+      }));
+    vi.stubGlobal("fetch", fetchMock);
+    const api = createWorkbenchApi("http://api");
+
+    await expect(api.runVerification("project-1")).resolves.toEqual({ issue_count: 1, issue_ids: ["issue-1"] });
+    await expect(api.getVerification("project-1")).resolves.toMatchObject({
+      issues: [expect.objectContaining({ id: "issue-1", status: "open" })],
+    });
+    await expect(api.updateVerificationIssue("project-1", "issue-1", "resolved"))
+      .resolves.toMatchObject({ id: "issue-1", status: "resolved" });
+  });
+
   it("calls mutations and forwards evidence cancellation", async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(response({ id: "project-1", title: "Memory", prompt: "Survey it" }))
