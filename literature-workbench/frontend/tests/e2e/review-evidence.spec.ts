@@ -46,3 +46,15 @@ test("creates a fixture review and traces a synthesized claim to exact evidence"
 
   await page.screenshot({ path: `${artifacts}/review-evidence.png`, fullPage: true });
 });
+
+test("previews scope and projected budget before starting a run", async ({ page }) => {
+  const workbench = new WorkbenchPage(page);
+  await workbench.open();
+  await workbench.title.fill(`E2E scope ${Date.now()}`);
+  await workbench.brief.fill("Survey memory systems for persistent agents.");
+  await page.getByRole("button", { name: "Preview scope" }).click();
+
+  await expect(page.getByRole("region", { name: "Scope preview" })).toBeVisible();
+  await expect(page.getByText("Core methods and mechanisms", { exact: true })).toBeVisible();
+  await expect(page.getByText("50 papers", { exact: true })).toBeVisible();
+});
