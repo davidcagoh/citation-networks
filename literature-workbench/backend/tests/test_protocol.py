@@ -38,6 +38,36 @@ class ProtocolDiscoveryProvider:
         ][:limit]
 
 
+class CutoffDiscoveryProvider(ProtocolDiscoveryProvider):
+    def search(self, query: str, limit: int) -> list[DiscoveryCandidate]:
+        return [
+            DiscoveryCandidate(
+                external_id="before-cutoff",
+                title="Study before cutoff",
+                authors=["Researcher"],
+                year=2025,
+                venue="Test Venue",
+                doi=None,
+                abstract="Abstract.",
+                source_uri="https://example.test/before-cutoff",
+                score=0.9,
+                publication_date="2025-12-31",
+            ),
+            DiscoveryCandidate(
+                external_id="after-cutoff",
+                title="Study after cutoff",
+                authors=["Researcher"],
+                year=2026,
+                venue="Test Venue",
+                doi=None,
+                abstract="Abstract.",
+                source_uri="https://example.test/after-cutoff",
+                score=0.8,
+                publication_date="2026-01-01",
+            ),
+        ][:limit]
+
+
 def test_project_protocol_is_created_and_can_be_updated(tmp_path: Path) -> None:
     app = create_app(
         f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=ProtocolDiscoveryProvider()
@@ -133,3 +163,32 @@ def test_prisma_report_reconciles_protocol_search_and_screening_flow(tmp_path: P
         }
         assert body["search"]["routes"] == ["semantic_search", "recent_search"]
         assert body["search"]["queries"] == ["memory", "memory recent latest"]
+
+
+def test_discovery_enforces_protocol_cutoff_and_reports_filtered_candidates(
+    tmp_path: Path,
+) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=CutoffDiscoveryProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={"title": "Memory", "prompt": "Survey memory", "review_mode": "systematic"},
+        ).json()["id"]
+        protocol = client.put(
+            f"/projects/{project_id}/protocol",
+            json={"research_questions": ["Which memory studies exist?"], "cutoff_date": "2025-12-31"},
+        )
+        assert protocol.status_code == 200
+
+        discovery = client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 2, "routes": ["semantic_search"]},
+        )
+
+        assert discovery.status_code == 201
+        assert discovery.json()["candidate_count"] == 1
+        assert discovery.json()["filtered_count"] == 1
+        corpus = client.get(f"/projects/{project_id}/corpus").json()["papers"]
+        assert [paper["title"] for paper in corpus] == ["Study before cutoff"]
