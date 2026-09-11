@@ -17,9 +17,17 @@ export interface Paper {
 }
 
 export interface ReviewPlan {
+  id?: string;
   title: string;
+  thesis?: string;
   organizing_principle: string;
-  sections: Array<{ title: string; purpose: string }>;
+  sections: Array<{
+    title: string;
+    purpose: string;
+    planned_claim_ids?: string[];
+    relation_ids?: string[];
+    paper_ids?: string[];
+  }>;
 }
 
 export interface ReviewSentence {
@@ -78,6 +86,16 @@ export interface WorkbenchApi {
     status: "candidate" | "included" | "excluded" | "pinned",
     relevance_rationale?: string,
   ): Promise<{ status: string; relevance_score: number; relevance_rationale: string }>;
+  updatePlan(
+    projectId: string,
+    planId: string,
+    plan: {
+      title: string;
+      thesis: string;
+      organizing_principle: string;
+      sections: ReviewPlan["sections"];
+    },
+  ): Promise<ReviewPlan>;
   runPipeline(projectId: string): Promise<{ id: string; status: string }>;
   getWorkspace(projectId: string, runId?: string): Promise<Workspace>;
   getClaimEvidence(projectId: string, claimId: string, signal?: AbortSignal): Promise<ClaimEvidence>;
@@ -196,14 +214,31 @@ function parseCorpus(value: unknown): Workspace["corpus"] {
 function parsePlan(value: unknown, label = "plan"): ReviewPlan {
   const plan = object(value, label);
   return {
+    ...(plan.id === undefined ? {} : { id: string(plan.id, `${label}.id`) }),
     title: string(plan.title, `${label}.title`),
+    ...(plan.thesis === undefined ? {} : { thesis: string(plan.thesis, `${label}.thesis`) }),
     organizing_principle: string(plan.organizing_principle, `${label}.organizing_principle`),
     sections: array(plan.sections, `${label}.sections`).map((sectionValue, index) => {
       const sectionLabel = `${label}.sections[${index}]`;
       const section = object(sectionValue, sectionLabel);
-      return {
+      const parsed = {
         title: string(section.title, `${sectionLabel}.title`),
         purpose: string(section.purpose, `${sectionLabel}.purpose`),
+      };
+      return {
+        ...parsed,
+        ...(section.planned_claim_ids === undefined ? {} : {
+          planned_claim_ids: array(section.planned_claim_ids, `${sectionLabel}.planned_claim_ids`)
+            .map((claimId, claimIndex) => string(claimId, `${sectionLabel}.planned_claim_ids[${claimIndex}]`)),
+        }),
+        ...(section.relation_ids === undefined ? {} : {
+          relation_ids: array(section.relation_ids, `${sectionLabel}.relation_ids`)
+            .map((relationId, relationIndex) => string(relationId, `${sectionLabel}.relation_ids[${relationIndex}]`)),
+        }),
+        ...(section.paper_ids === undefined ? {} : {
+          paper_ids: array(section.paper_ids, `${sectionLabel}.paper_ids`)
+            .map((paperId, paperIndex) => string(paperId, `${sectionLabel}.paper_ids[${paperIndex}]`)),
+        }),
       };
     }),
   };
@@ -350,6 +385,11 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/corpus/${paperId}`, parseMembership, {
         method: "PATCH",
         body: JSON.stringify({ status, ...(relevance_rationale ? { relevance_rationale } : {}) }),
+      }),
+    updatePlan: (projectId, planId, plan) =>
+      request(baseUrl, `/projects/${projectId}/plans/${planId}`, parsePlan, {
+        method: "PATCH",
+        body: JSON.stringify(plan),
       }),
     runPipeline: (projectId) =>
       request(baseUrl, `/projects/${projectId}/runs/pipeline`, parseRun, { method: "POST" }),
