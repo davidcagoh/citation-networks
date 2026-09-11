@@ -50,12 +50,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 32 | URL acquisition deduplicates existing DOI/title identities and attaches repeat source fetches to the canonical corpus paper. | `backend/tests/test_sources.py::test_url_ingestion_deduplicates_existing_paper_identity` | PASS |
 | 33 | Candidate screening records a transparent relevance rationale and derives a bounded fallback score from query overlap and available route signals. | `backend/tests/test_discovery.py::test_discovery_persists_candidates_and_route_provenance` | PASS |
 | 34 | Discovery enforces the saved protocol cutoff date, retains only records at or before it, and reports how many provider candidates were filtered. | `backend/tests/test_protocol.py::test_discovery_enforces_protocol_cutoff_and_reports_filtered_candidates` | PASS |
+| 35 | PRISMA search provenance preserves cutoff-filtered records, and the systematic-review UI exposes that count. | `backend/tests/test_protocol.py::test_discovery_enforces_protocol_cutoff_and_reports_filtered_candidates`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
 - Backend: `uv run pytest -q` → 77 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.02%, above the 80% requirement.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.09%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
