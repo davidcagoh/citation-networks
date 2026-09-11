@@ -58,7 +58,14 @@ describe("workbench API adapter", () => {
   it("parses the stopping certificate from a corpus audit", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
       project_id: "project-1", checkpoint: "corpus", status: "ready_for_corpus_checkpoint",
-      routes: { executed: ["semantic_search", "survey_search", "recent_search"], count: 3 },
+      routes: {
+        executed: ["semantic_search", "survey_search", "recent_search"], count: 3,
+        summaries: [
+          { route: "semantic_search", candidate_events: 4, unique_papers: 3 },
+          { route: "survey_search", candidate_events: 2, unique_papers: 2 },
+          { route: "recent_search", candidate_events: 3, unique_papers: 2 },
+        ],
+      },
       screening: { total: 2, selected: 2, unresolved_candidates: 0, excluded: 0 },
       source_text: { selected_with_usable_text: 2, selected_total: 2 }, limitations: [],
       stopping_certificate: {
@@ -70,7 +77,10 @@ describe("workbench API adapter", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(createWorkbenchApi("http://api").getCoverageAudit("project-1"))
-      .resolves.toMatchObject({ stopping_certificate: { status: "satisfied", mode: "comprehensive" } });
+      .resolves.toMatchObject({
+        routes: { summaries: [{ route: "semantic_search", unique_papers: 3 }] },
+        stopping_certificate: { status: "satisfied", mode: "comprehensive" },
+      });
   });
 
   it("expands a paper through a directional citation route", async () => {
