@@ -370,6 +370,9 @@ function parseAcquisition(value: unknown): {
   paper_count: number;
   available_count: number;
   degraded_count: number;
+  attempted_count: number;
+  fetched_count: number;
+  failed_count: number;
 } {
   const acquisition = object(value, "acquisition");
   return {
@@ -377,6 +380,9 @@ function parseAcquisition(value: unknown): {
     paper_count: number(acquisition.paper_count, "acquisition.paper_count"),
     available_count: number(acquisition.available_count, "acquisition.available_count"),
     degraded_count: number(acquisition.degraded_count, "acquisition.degraded_count"),
+    attempted_count: number(acquisition.attempted_count ?? 0, "acquisition.attempted_count"),
+    fetched_count: number(acquisition.fetched_count ?? 0, "acquisition.fetched_count"),
+    failed_count: number(acquisition.failed_count ?? 0, "acquisition.failed_count"),
   };
 }
 

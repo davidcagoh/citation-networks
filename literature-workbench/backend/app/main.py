@@ -138,7 +138,8 @@ def create_app(
     database = Database(
         database_url or os.getenv("WORKBENCH_DATABASE_URL", "sqlite:///instance/workbench.db")
     )
-    pipeline = PipelineService(database)
+    source_fetcher = source_fetcher or SafeSourceFetcher()
+    pipeline = PipelineService(database, source_fetcher)
     discovery = DiscoveryService(
         database,
         discovery_provider
@@ -147,8 +148,6 @@ def create_app(
     verification = VerificationService(database)
     exporter = ProjectExporter(database)
     zotero = ZoteroService(database, zotero_client or ZoteroClient())
-    source_fetcher = source_fetcher or SafeSourceFetcher()
-
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
         database.create_schema()

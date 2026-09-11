@@ -24,6 +24,7 @@ from app.models import (
     SynthesisClaim,
     UsageCostEvent,
 )
+from app.services.acquisition import SafeSourceFetcher, SourceAcquisitionError
 from app.services.provenance import ProvenanceService
 from app.services.verification import VerificationService
 
@@ -90,8 +91,11 @@ FIXTURE_PATH = (
 
 
 class PipelineService:
-    def __init__(self, database: Database) -> None:
+    def __init__(
+        self, database: Database, source_fetcher: SafeSourceFetcher | None = None
+    ) -> None:
         self.database = database
+        self.source_fetcher = source_fetcher
         self.provenance = ProvenanceService(database)
         self.verification = VerificationService(database)
 
@@ -138,10 +142,49 @@ class PipelineService:
 
     def acquire(self, project_id: str) -> dict[str, int | str]:
         """Persist the best immediately available text for every project paper."""
+        fetched_count = 0
+        attempted_count = 0
+        failed_count = 0
         with self.database.session() as db:
             self._require_project(db, project_id)
             papers = list(db.scalars(select(Paper).where(Paper.project_id == project_id)))
             for paper in papers:
+                provenance = paper.metadata_provenance or {}
+                source_uri = provenance.get("source_uri")
+                existing_documents = list(
+                    db.scalars(select(SourceDocument).where(SourceDocument.paper_id == paper.id))
+                )
+                if (
+                    self.source_fetcher is not None
+                    and self._eligible_auto_fetch_uri(source_uri)
+                    and not any(
+                        document.source_type in {"parsed_pdf", "html", "text"}
+                        and document.text
+                        for document in existing_documents
+                    )
+                ):
+                    attempted_count += 1
+                    try:
+                        fetched = self.source_fetcher.fetch(source_uri)
+                    except SourceAcquisitionError:
+                        failed_count += 1
+                    else:
+                        source_type = {
+                            "application/pdf": "parsed_pdf",
+                            "text/html": "html",
+                            "application/xhtml+xml": "html",
+                        }.get(fetched.content_type, "text")
+                        db.add(
+                            SourceDocument(
+                                paper_id=paper.id,
+                                source_type=source_type,
+                                source_uri=fetched.final_uri,
+                                text=fetched.text,
+                                parsing_quality="complete",
+                                parser="auto-url-fetch-v1",
+                            )
+                        )
+                        fetched_count += 1
                 abstract = (paper.abstract or "").strip()
                 if not abstract:
                     continue
@@ -178,7 +221,21 @@ class PipelineService:
                 "paper_count": len(papers),
                 "available_count": available_count,
                 "degraded_count": len(papers) - available_count,
+                "attempted_count": attempted_count,
+                "fetched_count": fetched_count,
+                "failed_count": failed_count,
             }
+
+    @staticmethod
+    def _eligible_auto_fetch_uri(source_uri: object) -> bool:
+        if not isinstance(source_uri, str):
+            return False
+        lowered = source_uri.casefold()
+        path = lowered.split("?", 1)[0]
+        return lowered.startswith(("http://", "https://")) and (
+            any(path.endswith(extension) for extension in (".pdf", ".html", ".htm", ".txt"))
+            or "/pdf/" in lowered
+        )
 
     def run(
         self,

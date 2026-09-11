@@ -37,6 +37,10 @@ unsupported content, extraction failures, and sources over 5 MB are rejected.
 - Fixture papers provide deterministic full source text and expected evidence.
 - Live discovery persists the provider-supplied abstract as an `abstract`
   `SourceDocument`.
+- Build-time acquisition also attempts discovered direct `.pdf`, `.html`, and
+  `.txt` links through the same safe fetcher. It records attempted, fetched,
+  and failed counts; failed acquisition keeps the abstract fallback and marks
+  the resulting source coverage as limited.
 - Local full text can be attached with
   `POST /projects/{id}/sources/text`, including a user-owned URI and paper
   metadata. It is stored as a `text` `SourceDocument` and enters the same
