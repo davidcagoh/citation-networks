@@ -93,12 +93,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 75 | Verification flags potentially unsupported causal language as a repairable, claim-linked issue. | `backend/tests/test_verification.py::test_verification_flags_causal_language_for_manual_review` | PASS |
 | 76 | Verification flags substantive review sentences that lack a claim/citation mapping. | `backend/tests/test_verification.py::test_verification_flags_substantive_uncited_review_sentence` | PASS |
 | 77 | Opt-in extraction supports multiple typed objects per paper with strict structured output and exact evidence grounding. | `backend/tests/test_synthesis.py::test_openai_extraction_bundle_returns_multiple_grounded_objects`, `backend/tests/test_synthesis.py::test_pipeline_persists_multiple_structured_entities_per_paper` | PASS |
+| 78 | Live planning derives section lenses from extracted entity types instead of hard-coded topic-specific headings. | `backend/tests/test_planning.py::test_live_plan_uses_extracted_types_instead_of_topic_specific_headings` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 112 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.32%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 113 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 86.23%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.

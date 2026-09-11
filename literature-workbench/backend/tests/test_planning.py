@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app.main import create_app
+from app.services.synthesis import StructuredExtraction
 
 
 def _completed_project(client: TestClient) -> str:
@@ -108,3 +109,51 @@ def test_plan_edit_rewrites_review_sections(tmp_path: Path) -> None:
         review = client.get(f"/projects/{project_id}/review").json()["sentences"]
         assert review
         assert all(sentence["section_title"] == "Edited section" for sentence in review)
+
+
+def test_live_plan_uses_extracted_types_instead_of_topic_specific_headings(
+    tmp_path: Path,
+) -> None:
+    class QuantumExtractor:
+        def extract_evidence_bundle(self, paper_title: str, source_text: str):
+            return [
+                StructuredExtraction(
+                    "method",
+                    "quantum measurement",
+                    "The method improves measurement sensitivity.",
+                    "The method improves measurement sensitivity",
+                ),
+                StructuredExtraction(
+                    "limitation",
+                    "noise",
+                    "Noise limits measurement quality.",
+                    "noise limitation",
+                ),
+            ]
+
+        def draft_claim(self, default_text: str, evidence_texts: list[str], claim_type: str):
+            return default_text
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", synthesis_provider=QuantumExtractor()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={"title": "Quantum sensing", "prompt": "Survey quantum sensing methods"},
+        ).json()["id"]
+        assert client.post(
+            f"/projects/{project_id}/sources/text",
+            json={
+                "title": "Quantum sensing study",
+                "source_uri": "file:///quantum-sensing",
+                "text": "The method improves measurement sensitivity but has a noise limitation.",
+            },
+        ).status_code == 201
+        assert client.post(f"/projects/{project_id}/runs/pipeline").status_code == 201
+
+        plan = client.get(f"/projects/{project_id}/plans").json()["plans"][0]
+        assert "memory" not in plan["title"].lower()
+        assert plan["organizing_principle"] == "problem → mechanism → evidence → trade-off"
+        assert any(section["title"] == "Methods and mechanisms" for section in plan["sections"])
+        assert plan["sections"]

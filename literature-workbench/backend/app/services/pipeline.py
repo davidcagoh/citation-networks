@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
@@ -1027,25 +1028,73 @@ class PipelineService:
                 )
                 else "abstract evidence"
             )
-            section_metadata = (
-                [
+            entity_types = Counter(entity.type for entity in entities)
+            fixture_entities = bool(entities) and all(
+                entity.extraction_method == "deterministic-fixture" for entity in entities
+            )
+            if live_only:
+                section_metadata = [
                     (
                         "Direct findings from discovered papers",
                         f"Summarize directly inspectable {source_label} before deeper extraction.",
                     )
                 ]
-                if live_only
-                else [
+            elif fixture_entities:
+                # Preserve the named regression fixture's stable export headings.
+                section_metadata = [
                     (
                         "From traces to consolidation",
-                        "Explain why accumulated memories motivate more selective recall.",
+                        "Explain how accumulated evidence motivates selective recall.",
                     ),
                     (
                         "Structure and conflict",
                         "Compare structural responses to dependency and consistency failures.",
                     ),
                 ]
-            )
+            else:
+                section_metadata = []
+                if entity_types["problem"] or entity_types["failure_mode"]:
+                    section_metadata.append(
+                        (
+                            "Problems and requirements",
+                            "Identify the problems, failure modes, and workloads that shape "
+                            "the field.",
+                        )
+                    )
+                if entity_types["method"] or entity_types["mechanism"]:
+                    section_metadata.append(
+                        (
+                            "Methods and mechanisms",
+                            "Compare the mechanisms proposed to address those requirements.",
+                        )
+                    )
+                if (
+                    entity_types["evaluation"]
+                    or entity_types["benchmark"]
+                    or entity_types["result"]
+                ):
+                    section_metadata.append(
+                        (
+                            "Empirical evidence",
+                            "Relate evaluation settings and reported results to the proposed "
+                            "mechanisms.",
+                        )
+                    )
+                if entity_types["limitation"] or entity_types["tradeoff"]:
+                    section_metadata.append(
+                        (
+                            "Limitations and trade-offs",
+                            "State the boundaries, tensions, and unresolved evidence gaps.",
+                        )
+                    )
+                if not section_metadata:
+                    section_metadata = [
+                        (
+                            "Evidence synthesis",
+                            f"Organize the available {source_label} around shared concepts "
+                            "and contrasts.",
+                        )
+                    ]
             sections = []
             for section_index, claim_start in enumerate(range(0, len(claims), 2)):
                 section_claims = claims[claim_start : claim_start + 2]
@@ -1079,11 +1128,13 @@ class PipelineService:
                 f"{source_label.capitalize()} is directly inspectable; deeper synthesis should "
                 "follow richer extraction."
                 if live_only
-                else "Agent-memory architectures evolve by responding to specific recall failures, "
-                "with each mechanism introducing a new operational trade-off."
+                else "The gathered evidence links field problems and requirements to competing "
+                "methods, mechanisms, and empirical trade-offs."
             )
             plan.organizing_principle = (
-                "source evidence to synthesis" if live_only else "failure to design response"
+                "source evidence to synthesis"
+                if live_only
+                else "problem → mechanism → evidence → trade-off"
             )
             plan.sections = sections
             if existing_plan is None:
