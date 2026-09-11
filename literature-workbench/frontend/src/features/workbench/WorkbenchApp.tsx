@@ -2,13 +2,13 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
-import type { ClaimEvidence, DiscoveryRoute, ReviewMode, ReviewPlan, ScopePreview, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
+import type { ClaimEvidence, CoverageAudit, DiscoveryRoute, ReviewMode, ReviewPlan, ScopePreview, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
 import styles from "./WorkbenchApp.module.css";
 
 const tabs = ["Brief", "Corpus", "Structure", "Review", "Run / Costs"] as const;
 type Tab = (typeof tabs)[number];
 type RunState = "idle" | "creating" | "ingesting" | "discovering" | "running" | "complete";
-type Session = { projectId: string; paperCount: number; workspace: Workspace };
+type Session = { projectId: string; paperCount: number; workspace: Workspace; audit: CoverageAudit };
 
 function tabSlug(tab: Tab) {
   return tab.toLowerCase().replaceAll(" / ", "-").replaceAll(" ", "-");
@@ -90,7 +90,8 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       setRunState("running");
       const run = await api.runPipeline(project.id, { review_mode: reviewMode });
       const nextWorkspace = await api.getWorkspace(project.id, run.id);
-      setSession({ projectId: project.id, paperCount: ingest.paper_count, workspace: nextWorkspace });
+      const audit = await api.getCoverageAudit(project.id);
+      setSession({ projectId: project.id, paperCount: ingest.paper_count, workspace: nextWorkspace, audit });
       setVerificationIssues([]);
       setRunState("complete");
       setActiveTab("Corpus");
@@ -120,7 +121,8 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
         ? await api.runDiscovery(project.id, prompt.trim(), 20)
         : await api.runDiscovery(project.id, prompt.trim(), 20, discoveryRoutes);
       const workspace = await api.getWorkspace(project.id);
-      setSession({ projectId: project.id, paperCount: discovery.candidate_count, workspace });
+      const audit = await api.getCoverageAudit(project.id);
+      setSession({ projectId: project.id, paperCount: discovery.candidate_count, workspace, audit });
       setVerificationIssues([]);
       setRunState("complete");
       setActiveTab("Corpus");
@@ -163,7 +165,8 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       await api.acquire(project.id);
       const run = await api.runPipeline(project.id, { review_mode: reviewMode, max_papers: maxPapers });
       const workspace = await api.getWorkspace(project.id, run.id);
-      setSession({ projectId: project.id, paperCount: workspace.corpus.papers.length, workspace });
+      const audit = await api.getCoverageAudit(project.id);
+      setSession({ projectId: project.id, paperCount: workspace.corpus.papers.length, workspace, audit });
       setRunState("complete");
       setActiveTab("Corpus");
     } catch (caught) {
@@ -179,6 +182,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     if (!session) return;
     try {
       const updated = await api.updateCorpusMembership(session.projectId, paperId, status);
+      const audit = await api.getCoverageAudit(session.projectId);
       setSession((current) => {
         if (!current) return current;
         return {
@@ -194,6 +198,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
               ),
             },
           },
+          audit,
         };
       });
     } catch (caught) {
@@ -241,10 +246,12 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       await api.acquire(session.projectId);
       const run = await api.runPipeline(session.projectId, { review_mode: reviewMode, max_papers: maxPapers });
       const workspace = await api.getWorkspace(session.projectId, run.id);
+      const audit = await api.getCoverageAudit(session.projectId);
       setSession((current) => current ? {
         ...current,
         workspace,
         paperCount: workspace.corpus.papers.length,
+        audit,
       } : current);
       setRunState("complete");
       setActiveTab("Review");
@@ -363,7 +370,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             {activeTab === "Brief" && (
               <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} preview={scopePreview} />
             )}
-            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} paperCount={session?.paperCount ?? null} onScreen={screenPaper} />}
+            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} paperCount={session?.paperCount ?? null} onScreen={screenPaper} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} onSave={savePlan} />}
             {activeTab === "Review" && (
               <Review
@@ -453,8 +460,9 @@ function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, resear
   );
 }
 
-function Corpus({ workspace, paperCount, onScreen }: {
+function Corpus({ workspace, audit, paperCount, onScreen }: {
   workspace: Workspace | null;
+  audit: CoverageAudit | null;
   paperCount: number | null;
   onScreen: (paperId: string, status: "candidate" | "included" | "excluded" | "pinned") => void;
 }) {
@@ -463,6 +471,11 @@ function Corpus({ workspace, paperCount, onScreen }: {
   return (
     <>
       <div className={styles.statline}><strong className={styles.stat}>{paperCount ?? papers.length} papers</strong><span className={styles.statnote}>Screened corpus · provenance retained</span></div>
+      {audit && <section className={styles.reviewToolbar} aria-label="Corpus checkpoint audit">
+        <span>Corpus checkpoint · <strong>{audit.status === "ready_for_corpus_checkpoint" ? "ready" : "incomplete"}</strong> · {audit.routes.count} route{audit.routes.count === 1 ? "" : "s"} executed</span>
+        <span>{audit.screening.selected}/{audit.screening.total} selected · {audit.source_text.selected_with_usable_text}/{audit.source_text.selected_total} with usable text</span>
+        {audit.limitations.length > 0 && <span>{audit.limitations.join("; ")}</span>}
+      </section>}
       <div className={styles.tableRegion} role="region" aria-label="Corpus papers" tabIndex={0}>
       <table className={styles.table}>
         <caption className={styles.srOnly}>Papers in the supplied fixture corpus</caption>
