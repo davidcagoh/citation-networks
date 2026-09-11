@@ -26,6 +26,7 @@ from app.models import (
     StageRun,
     SynthesisClaim,
     UsageCostEvent,
+    VerificationIssue,
 )
 from app.services.pipeline import PipelineService
 from app.services.provenance import ProvenanceService
@@ -39,18 +40,20 @@ def test_cors_allows_only_configured_exact_origins(tmp_path: Path, monkeypatch) 
             "/projects",
             headers={
                 "Origin": "http://127.0.0.1:3100",
-                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Method": "PATCH",
+                "Access-Control-Request-Headers": "content-type",
             },
         )
         rejected = client.options(
             "/projects",
             headers={
                 "Origin": "http://evil.invalid",
-                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Method": "PATCH",
             },
         )
 
     assert allowed.headers["access-control-allow-origin"] == "http://127.0.0.1:3100"
+    assert "PATCH" in allowed.headers["access-control-allow-methods"]
     assert "access-control-allow-origin" not in rejected.headers
 
 PROJECT_TABLES = [
@@ -69,6 +72,7 @@ PROJECT_TABLES = [
     Run,
     StageRun,
     UsageCostEvent,
+    VerificationIssue,
 ]
 
 
