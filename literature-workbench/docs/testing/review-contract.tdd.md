@@ -74,11 +74,12 @@ This report records the implementation tranche derived from the review-engine pl
 | 56 | Fetched plain-text source documents outrank abstracts during document selection and receive full-text evidence provenance in the pipeline. | `backend/tests/test_sources.py::test_fetches_public_source_url_with_provenance_and_blocks_private_targets` | PASS |
 | 57 | PRISMA `screened` counts only corpus records with an explicit screening decision and excludes unresolved candidates. | `backend/tests/test_protocol.py::test_prisma_screened_count_excludes_unresolved_candidates` | PASS |
 | 58 | A published Zotero record promotes a previously discovered preprint while retaining the preprint identity in alternate provenance. | `backend/tests/test_zotero.py::test_zotero_published_record_promotes_discovered_preprint` | PASS |
+| 59 | Corpus audits distinguish selected records with full text from selected records supported only by abstracts, and the UI exposes both counts. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, frontend parser/UI checks | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 92 passed.
+- Backend: `uv run pytest -q` → 93 passed.
 - Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.52%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.

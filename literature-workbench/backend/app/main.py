@@ -1033,6 +1033,15 @@ def create_app(
                 bool(documents.get(membership.paper_id) and documents[membership.paper_id].text)
                 for membership in selected
             )
+            selected_with_full_text = sum(
+                bool(
+                    documents.get(membership.paper_id)
+                    and documents[membership.paper_id].text
+                    and documents[membership.paper_id].source_type
+                    in {"parsed_pdf", "html", "text", "fetched_text"}
+                )
+                for membership in selected
+            )
             provider_totals: dict[str, list[int]] = defaultdict(lambda: [0, 0])
             for event in events:
                 if event.action == "provider_attempt":
@@ -1179,6 +1188,8 @@ def create_app(
                 "source_text": {
                     "selected_with_usable_text": selected_with_text,
                     "selected_total": len(selected),
+                    "selected_with_full_text": selected_with_full_text,
+                    "selected_abstract_only": selected_with_text - selected_with_full_text,
                 },
                 "provider_status": provider_status,
                 "network": network,

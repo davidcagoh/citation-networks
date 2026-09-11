@@ -126,7 +126,7 @@ export interface CoverageAudit {
     signal_coverage: Array<{ route: string; papers_with_publication_date: number; papers_with_citation_count: number }>;
   };
   screening: { total: number; selected: number; unresolved_candidates: number; excluded: number };
-  source_text: { selected_with_usable_text: number; selected_total: number };
+  source_text: { selected_with_usable_text: number; selected_total: number; selected_with_full_text: number; selected_abstract_only: number };
   provider_status?: Array<{ provider: string; attempts: number; failures: number }>;
   network: { backward_expansions: number; forward_expansions: number; co_citation_expansions: number; edges: number; papers_discovered: number };
   stopping_certificate: {
@@ -502,6 +502,8 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
     source_text: {
       selected_with_usable_text: number(sourceText.selected_with_usable_text, "coverage audit.source_text.selected_with_usable_text"),
       selected_total: number(sourceText.selected_total, "coverage audit.source_text.selected_total"),
+      selected_with_full_text: number(sourceText.selected_with_full_text ?? sourceText.selected_with_usable_text, "coverage audit.source_text.selected_with_full_text"),
+      selected_abstract_only: number(sourceText.selected_abstract_only ?? 0, "coverage audit.source_text.selected_abstract_only"),
     },
     stopping_certificate: (() => {
       const certificate = object(audit.stopping_certificate ?? {
