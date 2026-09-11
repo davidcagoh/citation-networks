@@ -364,6 +364,62 @@ def test_multi_hop_citation_expansion_stops_at_exhausted_frontier(tmp_path: Path
         assert response.json()["stopping_reason"] == "frontier_exhausted"
 
 
+def test_co_citation_expansion_derives_shared_reference_neighbors(tmp_path: Path) -> None:
+    provider = FakeDiscoveryProvider()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        seed_id = client.get(f"/projects/{project_id}/corpus").json()["papers"][0]["id"]
+        client.post(
+            f"/projects/{project_id}/runs/citation-expansion",
+            json={"paper_id": seed_id, "direction": "backward", "limit": 1},
+        )
+        with app.state.database.session() as database:
+            seed_edge = database.scalar(select(CitationEdge))
+            assert seed_edge is not None
+            other = Paper(
+                project_id=project_id,
+                canonical_title="Another Co-citing Study",
+                authors=["D. Researcher"],
+                year=2024,
+                metadata_provenance={"external_id": "paper-4"},
+            )
+            database.add(other)
+            database.flush()
+            database.add(
+                CorpusMembership(project_id=project_id, paper_id=other.id, status="candidate")
+            )
+            database.add(
+                CitationEdge(
+                    project_id=project_id,
+                    source_paper_id=other.id,
+                    target_paper_id=seed_edge.target_paper_id,
+                    direction="backward",
+                    provider="fake-search",
+                )
+            )
+
+        response = client.post(
+            f"/projects/{project_id}/runs/co-citation-expansion",
+            json={"paper_id": seed_id, "limit": 10},
+        )
+
+        assert response.status_code == 201
+        assert response.json()["candidate_count"] == 1
+        with app.state.database.session() as database:
+            event = database.scalar(
+                select(DiscoveryEvent).where(DiscoveryEvent.route == "co_citation")
+            )
+            assert event is not None
+            assert event.paper_id == other.id
+
+
 def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> None:
     provider = FakeDiscoveryProvider()
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
