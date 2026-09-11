@@ -223,16 +223,40 @@ class ProjectExporter:
         for section in plan["sections"] if plan else []:
             lines.extend([f"## {section['title']}", "", section["purpose"], ""])
             for sentence in sentences_by_section.get(section["title"], []):
-                lines.extend([sentence["text"], ""])
+                citations = " ".join(
+                    f"[@{ProjectExporter._citation_key(paper_id)}]"
+                    for paper_id in sentence["citation_paper_ids"]
+                )
+                lines.extend([f"{sentence['text']} {citations}".rstrip(), ""])
         if not sentences_by_section and payload["review"]["sentences"]:
-            lines.extend([sentence["text"] for sentence in payload["review"]["sentences"]])
+            lines.extend(
+                [
+                    ProjectExporter._sentence_line(sentence)
+                    for sentence in payload["review"]["sentences"]
+                ]
+            )
             lines.append("")
         lines.extend(["## Sources", ""])
         for paper in payload["corpus"]:
             authors = ", ".join(paper["authors"])
             year = paper["year"] or "n.d."
-            lines.append(f"- {authors} ({year}). {paper['title']}.")
+            lines.append(
+                f"- [@{ProjectExporter._citation_key(paper['id'])}] {authors} ({year}). "
+                f"{paper['title']}."
+            )
         return "\n".join(lines)
+
+    @staticmethod
+    def _sentence_line(sentence: dict) -> str:
+        citations = " ".join(
+            f"[@{ProjectExporter._citation_key(paper_id)}]"
+            for paper_id in sentence["citation_paper_ids"]
+        )
+        return f"{sentence['text']} {citations}".rstrip()
+
+    @staticmethod
+    def _citation_key(paper_id: str) -> str:
+        return f"lw_{paper_id[:8]}"
 
     @staticmethod
     def _bibtex(papers: list[dict]) -> str:
