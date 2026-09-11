@@ -109,6 +109,23 @@ describe("workbench API adapter", () => {
     });
   });
 
+  it("imports from and exports to Zotero", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(response({ project_id: "project-1", imported_count: 2, item_count: 2 }))
+      .mockResolvedValueOnce(response({ project_id: "project-1", exported_count: 1 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const api = createWorkbenchApi("http://api");
+
+    await expect(api.importZotero("project-1", "COLLECTION", 2)).resolves.toEqual({
+      project_id: "project-1", imported_count: 2, item_count: 2,
+    });
+    await expect(api.exportZotero("project-1", "COLLECTION")).resolves.toEqual({
+      project_id: "project-1", exported_count: 1,
+    });
+    expect(fetchMock).toHaveBeenNthCalledWith(1, "http://api/projects/project-1/integrations/zotero/import", expect.objectContaining({ method: "POST" }));
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "http://api/projects/project-1/integrations/zotero/export", expect.objectContaining({ method: "POST" }));
+  });
+
   it("runs idempotent acquisition for discovered papers", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
       project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0,
