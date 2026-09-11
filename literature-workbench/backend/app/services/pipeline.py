@@ -497,6 +497,7 @@ class PipelineService:
         try:
             artifacts = action(project_id)
             usage = self._consume_synthesis_usage()
+            budget_error: str | None = None
             with self.database.session() as db:
                 stage = db.get(StageRun, stage_id)
                 assert stage is not None
@@ -517,6 +518,34 @@ class PipelineService:
                         cost_usd=usage.cost_usd,
                     )
                 )
+                db.flush()
+                run = db.get(Run, run_id)
+                assert run is not None
+                used_api_calls = db.scalar(
+                    select(func.coalesce(func.sum(UsageCostEvent.external_api_calls), 0)).where(
+                        UsageCostEvent.project_id == project_id
+                    )
+                )
+                used_cost_usd = db.scalar(
+                    select(func.coalesce(func.sum(UsageCostEvent.cost_usd), 0.0)).where(
+                        UsageCostEvent.project_id == project_id
+                    )
+                )
+                if used_api_calls > run.max_external_api_calls:
+                    budget_error = (
+                        f"Run exceeded the configured API-call budget of "
+                        f"{run.max_external_api_calls}"
+                    )
+                elif used_cost_usd > run.max_cost_usd:
+                    budget_error = (
+                        f"Run exceeded the configured cost budget of "
+                        f"${run.max_cost_usd:.2f}"
+                    )
+                if budget_error:
+                    stage.status = "failed"
+                    stage.error = "Run budget exceeded after usage was recorded."
+            if budget_error:
+                raise BudgetExceededError(budget_error)
             return artifacts
         except Exception:
             with self.database.session() as db:

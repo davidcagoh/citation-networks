@@ -2,8 +2,10 @@ import json
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 
 from app.main import create_app
+from app.models import Run, UsageCostEvent
 from app.services.synthesis import (
     OpenAISynthesisProvider,
     RelationJudgment,
@@ -524,3 +526,57 @@ def test_synthesis_usage_is_recorded_in_project_costs(tmp_path: Path) -> None:
         assert costs["external_api_calls"] == 1
         assert costs["total_cost_usd"] == 0.00005
         assert any(event["provider"] == "openai" for event in costs["events"])
+
+
+def test_pipeline_stops_and_ledger_preserves_spend_when_stage_exceeds_budget(
+    tmp_path: Path,
+) -> None:
+    class OverBudgetProvider:
+        model_name = "gpt-5.6-luna"
+
+        def extract_evidence(self, paper_title: str, source_text: str):
+            return None
+
+        def consume_usage(self) -> SynthesisUsage:
+            return SynthesisUsage(
+                provider="openai",
+                model=self.model_name,
+                input_tokens=100,
+                output_tokens=25,
+                external_api_calls=1,
+                cost_usd=0.01,
+            )
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", synthesis_provider=OverBudgetProvider()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Review memory"}
+        ).json()["id"]
+        assert client.post(
+            f"/projects/{project_id}/sources/text",
+            json={
+                "title": "Memory Study",
+                "source_uri": "file:///memory-study",
+                "text": "A memory architecture improves retrieval quality.",
+            },
+        ).status_code == 201
+
+        response = client.post(
+            f"/projects/{project_id}/runs/pipeline",
+            json={"max_cost_usd": 0},
+        )
+
+        assert response.status_code == 409
+        assert "budget" in response.json()["detail"].lower()
+        costs = client.get(f"/projects/{project_id}/costs").json()
+        assert costs["total_cost_usd"] == 0.01
+
+    with app.state.database.session() as database:
+        run = database.scalar(select(Run).where(Run.project_id == project_id))
+        event = database.scalar(
+            select(UsageCostEvent).where(UsageCostEvent.project_id == project_id)
+        )
+        assert run is not None and run.status == "failed"
+        assert event is not None and event.cost_usd == 0.01

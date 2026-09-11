@@ -110,12 +110,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 92 | The rendered browser workflow can preview mode-specific budget, import a source, build a fixture review, and trace a synthesized claim to exact evidence. | `frontend/tests/e2e/review-evidence.spec.ts` | PASS |
 | 93 | Sufficient Related Work launches both semantic and cross-disciplinary discovery, and its preview/audit/refresh contracts use the same two-route baseline. | `backend/tests/test_scope.py::test_sufficient_scope_includes_cross_disciplinary_launch_route`, `frontend/tests/workbench.test.tsx` | PASS |
 | 94 | Cross-provider discovery promotes a published DOI/title match over a first-seen arXiv/preprint record while retaining the alternate record in provenance. | `backend/tests/test_discovery.py::test_discovery_promotes_published_record_over_preprint` | PASS |
+| 95 | Pipeline-stage usage is persisted before enforcing the run API/cost caps; an in-run overage fails the stage/run safely and leaves the actual spend in the ledger. | `backend/tests/test_synthesis.py::test_pipeline_stops_and_ledger_preserves_spend_when_stage_exceeds_budget` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 121 passed.
-- Backend coverage: `uv run pytest -q --cov=app --cov-report=term` → 86.39%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 123 passed.
+- Backend coverage: `uv run pytest -q --cov=app --cov-report=term` → 86.46%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.

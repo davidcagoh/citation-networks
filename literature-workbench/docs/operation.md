@@ -130,8 +130,9 @@ work.
 
 Run budgets persist on each pipeline run. The paper cap is enforced before a
 run is created; provider calls and local pipeline usage appear separately in
-the cost ledger. Runs persist stage artifacts and can be resumed after a
-failure. The JSON export includes source documents, evidence spans, relations,
+the cost ledger. Stage usage is recorded before an API/cost overage stops the
+run, so failed attempts remain auditable. Runs persist stage artifacts and can
+be resumed after a failure. The JSON export includes source documents, evidence spans, relations,
 claims, review text, discovery events, the saved protocol, corpus metadata and
 coverage provenance, plus run budgets, stage statuses, and usage/cost events.
 
