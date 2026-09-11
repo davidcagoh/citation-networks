@@ -207,6 +207,48 @@ def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> 
         assert "candidate papers remain unscreened" in body["limitations"]
 
 
+def test_broader_coverage_audit_emits_stopping_certificate(tmp_path: Path) -> None:
+    provider = FakeDiscoveryProvider()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={
+                "title": "Memory",
+                "prompt": "Find memory systems",
+                "review_mode": "comprehensive",
+            },
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={
+                "query": "agent memory",
+                "limit": 1,
+                "routes": ["semantic_search", "survey_search", "recent_search"],
+            },
+        )
+        corpus = client.get(f"/projects/{project_id}/corpus").json()["papers"]
+        for paper in corpus:
+            client.patch(
+                f"/projects/{project_id}/corpus/{paper['id']}",
+                json={"status": "included", "relevance_rationale": "In scope"},
+            )
+
+        audit = client.get(f"/projects/{project_id}/coverage-audit").json()
+
+        assert audit["stopping_certificate"]["status"] == "satisfied"
+        assert audit["stopping_certificate"]["required_routes"] == [
+            "semantic_search",
+            "survey_search",
+            "recent_search",
+        ]
+        assert audit["stopping_certificate"]["checks"] == {
+            "required_routes_executed": True,
+            "all_candidates_screened": True,
+            "selected_sources_available": True,
+        }
+
+
 def test_discovery_validates_query_and_limit(tmp_path: Path) -> None:
     app = create_app(
         f"sqlite:///{tmp_path / 'workbench.db'}",
