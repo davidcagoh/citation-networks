@@ -108,12 +108,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 90 | JSON project export includes run budgets, stage artifacts/statuses, provider/model identity, and persisted usage/cost events so model spend is auditable after export. | `backend/tests/test_export.py::test_exports_markdown_json_and_bibtex` | PASS |
 | 91 | Fixture ingestion records each bundled record as a PRISMA-identifiable source event and preserves its full-text/degraded retrieval state for systematic reporting. | `backend/tests/test_protocol.py::test_prisma_report_counts_bundled_fixture_identification` | PASS |
 | 92 | The rendered browser workflow can preview mode-specific budget, import a source, build a fixture review, and trace a synthesized claim to exact evidence. | `frontend/tests/e2e/review-evidence.spec.ts` | PASS |
+| 93 | Sufficient Related Work launches both semantic and cross-disciplinary discovery, and its preview/audit/refresh contracts use the same two-route baseline. | `backend/tests/test_scope.py::test_sufficient_scope_includes_cross_disciplinary_launch_route`, `frontend/tests/workbench.test.tsx` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 119 passed.
-- Backend coverage: `uv run pytest -q --cov=app --cov-report=term` → 86.19%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 121 passed.
+- Backend coverage: `uv run pytest -q --cov=app --cov-report=term` → 86.27%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.

@@ -57,7 +57,7 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
       screening: { total: 5, selected: 5, unresolved_candidates: 0, excluded: 0 },
       source_text: { selected_with_usable_text: 5, selected_total: 5 },
       stopping_certificate: {
-        status: "satisfied", mode: "sufficient", required_routes: ["semantic_search"],
+        status: "satisfied", mode: "sufficient", required_routes: ["semantic_search", "cross_disciplinary_search"],
         checks: { required_routes_executed: true, all_candidates_screened: true, selected_sources_available: true },
       }, limitations: [],
     }),
@@ -334,7 +334,9 @@ describe("Literature Workbench", () => {
     await user.click(screen.getByRole("button", { name: "Discover papers" }));
 
     expect(await screen.findByText("Candidate One")).toBeVisible();
-    expect(api.runDiscovery).toHaveBeenCalledWith("project-1", "Find memory systems.", 20);
+    expect(api.runDiscovery).toHaveBeenCalledWith(
+      "project-1", "Find memory systems.", 20, ["semantic_search", "cross_disciplinary_search"],
+    );
     await user.click(screen.getByRole("button", { name: "Include Candidate One" }));
     expect(api.updateCorpusMembership).toHaveBeenCalledWith("project-1", "paper-1", "included");
   });

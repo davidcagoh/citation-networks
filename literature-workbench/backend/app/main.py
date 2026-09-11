@@ -515,7 +515,7 @@ def create_app(
                 select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
             )
             mode = protocol.review_mode if protocol else "sufficient"
-            routes = ["semantic_search"]
+            routes = ["semantic_search", "cross_disciplinary_search"]
             if mode in {"comprehensive", "systematic"}:
                 routes = [
                     "semantic_search", "survey_search", "recent_search", "seminal_search",
@@ -600,7 +600,7 @@ def create_app(
                 value.mode, value.mode
             )
             preview_routes = (
-                ["semantic_search"]
+                ["semantic_search", "cross_disciplinary_search"]
                 if normalized_mode == "sufficient"
                 else [
                     "semantic_search",
@@ -1012,7 +1012,7 @@ def create_app(
                 select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
             )
             mode = protocol.review_mode if protocol else "sufficient"
-            required_routes = ["semantic_search"]
+            required_routes = ["semantic_search", "cross_disciplinary_search"]
             if mode in {"comprehensive", "systematic"}:
                 required_routes = [
                     "semantic_search", "survey_search", "recent_search", "seminal_search",

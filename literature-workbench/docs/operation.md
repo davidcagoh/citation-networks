@@ -15,8 +15,10 @@
    the default free multi-source adapter (Semantic Scholar and OpenAlex).
    If the saved protocol has a cutoff date, discovery retains records at or
    before that date and reports the number filtered from the provider result.
-   The cross-disciplinary route makes three bounded searches covering adjacent
-   fields, interdisciplinary methods, and applications in adjacent fields.
+   Sufficient mode starts with semantic search plus three bounded
+   cross-disciplinary searches covering adjacent fields, interdisciplinary
+   methods, and applications in adjacent fields; broader modes add survey,
+   recent, and seminal routes.
    The survey route makes separate bounded searches for general reviews,
    systematic reviews/meta-analyses, and umbrella/tutorial reviews. Survey
    hits are ranked by explicit review/survey/benchmark signals before

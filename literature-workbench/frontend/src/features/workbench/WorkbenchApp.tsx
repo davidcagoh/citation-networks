@@ -130,11 +130,9 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       await persistProtocol(project.id);
       setRunState("discovering");
       const discoveryRoutes: DiscoveryRoute[] = reviewMode === "sufficient"
-        ? ["semantic_search"]
+        ? ["semantic_search", "cross_disciplinary_search"]
         : ["semantic_search", "survey_search", "recent_search", "seminal_search", "cross_disciplinary_search"];
-      const discovery = reviewMode === "sufficient"
-        ? await api.runDiscovery(project.id, prompt.trim(), 20)
-        : await api.runDiscovery(project.id, prompt.trim(), 20, discoveryRoutes);
+      const discovery = await api.runDiscovery(project.id, prompt.trim(), 20, discoveryRoutes);
       const workspace = await api.getWorkspace(project.id);
       const audit = await api.getCoverageAudit(project.id);
       const prisma = reviewMode === "systematic" ? await api.getPrismaReport(project.id) : undefined;

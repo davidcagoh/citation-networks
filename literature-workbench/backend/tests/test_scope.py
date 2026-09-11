@@ -43,3 +43,18 @@ def test_scope_preview_rejects_unknown_project(tmp_path: Path) -> None:
     with TestClient(app) as client:
         response = client.post("/projects/missing/runs/scope-preview", json={})
         assert response.status_code == 404
+
+
+def test_sufficient_scope_includes_cross_disciplinary_launch_route(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Survey memory systems"}
+        ).json()["id"]
+        response = client.post(
+            f"/projects/{project_id}/runs/scope-preview",
+            json={"mode": "sufficient", "max_papers": 1},
+        )
+
+    assert response.status_code == 201
+    assert response.json()["budget"]["estimated_discovery_api_calls"] == 8
