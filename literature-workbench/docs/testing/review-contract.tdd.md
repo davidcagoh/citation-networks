@@ -29,6 +29,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 11 | Citation expansion persists directional network edges and exposes them through the graph/client contracts. | `backend/tests/test_discovery.py::test_citation_expansion_persists_directional_edges_and_provenance`, `frontend/tests/api.test.ts` | PASS |
 | 12 | Researchers can launch backward/forward citation expansion from each corpus paper. | `frontend/tests/workbench.test.tsx` | PASS |
 | 13 | An on-demand living update reuses the saved mode/routes, records its timestamp, and reports new papers. | `backend/tests/test_discovery.py::test_on_demand_living_update_records_timestamp_and_new_papers` | PASS |
+| 14 | Paid providers are blocked until a project records approver identity, justification, and non-replicability evidence. | `backend/tests/test_discovery.py::test_paid_provider_requires_explicit_non_replicable_approval`, `frontend/tests/api.test.ts` | PASS |
 
 ## Validation evidence
 
@@ -43,7 +44,7 @@ This report records the implementation tranche derived from the review-engine pl
 ## Known gaps
 
 - Backward and forward citation expansion are implemented; multi-hop traversal, co-citation, and stopping rules for network saturation remain future work.
-- Paid-provider approval gates are not implemented yet; Zotero import/export is available through server-side credentials.
+- Paid-provider approval is enforced at discovery boundaries; an approved provider adapter still must be configured before use. Zotero import/export is available through server-side credentials.
 - Full-text acquisition remains conservative; abstract-backed evidence cannot certify subtle comparisons.
 - The narrative checkpoint and grounded draft-generation stage are not yet implemented.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs and a frontend refresh control remain future work.
