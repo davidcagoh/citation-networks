@@ -2,7 +2,7 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
-import type { ClaimEvidence, ReviewMode, ReviewPlan, ScopePreview, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
+import type { ClaimEvidence, DiscoveryRoute, ReviewMode, ReviewPlan, ScopePreview, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
 import styles from "./WorkbenchApp.module.css";
 
 const tabs = ["Brief", "Corpus", "Structure", "Review", "Run / Costs"] as const;
@@ -113,7 +113,12 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
         : await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
       await persistProtocol(project.id);
       setRunState("discovering");
-      const discovery = await api.runDiscovery(project.id, prompt.trim(), 20);
+      const discoveryRoutes: DiscoveryRoute[] = reviewMode === "sufficient"
+        ? ["semantic_search"]
+        : ["semantic_search", "survey_search", "recent_search"];
+      const discovery = reviewMode === "sufficient"
+        ? await api.runDiscovery(project.id, prompt.trim(), 20)
+        : await api.runDiscovery(project.id, prompt.trim(), 20, discoveryRoutes);
       const workspace = await api.getWorkspace(project.id);
       setSession({ projectId: project.id, paperCount: discovery.candidate_count, workspace });
       setVerificationIssues([]);

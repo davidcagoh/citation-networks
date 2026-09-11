@@ -97,6 +97,7 @@ describe("workbench API adapter", () => {
       .mockResolvedValueOnce(response({
         project_id: "project-1",
         candidate_count: 3,
+        route_count: 1,
         provider: "semantic-scholar",
         query: "agent memory",
       }))
@@ -112,6 +113,7 @@ describe("workbench API adapter", () => {
 
     await expect(api.runDiscovery("project-1", "agent memory", 3)).resolves.toEqual({
       candidate_count: 3,
+      route_count: 1,
       provider: "semantic-scholar",
       query: "agent memory",
     });

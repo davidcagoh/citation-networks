@@ -110,6 +110,7 @@ export interface ReviewProtocol {
 }
 
 export type ReviewMode = "sufficient" | "comprehensive" | "systematic" | "quick" | "thorough";
+export type DiscoveryRoute = "semantic_search" | "survey_search" | "recent_search";
 
 export interface WorkbenchApi {
   createProject(input: { title: string; prompt: string; review_mode?: ReviewMode }): Promise<{ id: string }>;
@@ -132,8 +133,9 @@ export interface WorkbenchApi {
   scopePreview(projectId: string, input?: { mode?: ReviewMode; max_papers?: number }): Promise<ScopePreview>;
   getProtocol(projectId: string): Promise<ReviewProtocol>;
   updateProtocol(projectId: string, protocol: Omit<ReviewProtocol, "id" | "project_id" | "updated_at"> | ReviewProtocol): Promise<ReviewProtocol>;
-  runDiscovery(projectId: string, query: string, limit?: number): Promise<{
+  runDiscovery(projectId: string, query: string, limit?: number, routes?: DiscoveryRoute[]): Promise<{
     candidate_count: number;
+    route_count: number;
     provider: string;
     query: string;
   }>;
@@ -313,10 +315,11 @@ function parseProtocol(value: unknown): ReviewProtocol {
   };
 }
 
-function parseDiscovery(value: unknown): { candidate_count: number; provider: string; query: string } {
+function parseDiscovery(value: unknown): { candidate_count: number; route_count: number; provider: string; query: string } {
   const discovery = object(value, "discovery");
   return {
     candidate_count: number(discovery.candidate_count, "discovery.candidate_count"),
+    route_count: number(discovery.route_count ?? 1, "discovery.route_count"),
     provider: string(discovery.provider, "discovery.provider"),
     query: string(discovery.query, "discovery.query"),
   };
@@ -576,10 +579,10 @@ export function createWorkbenchApi(
         method: "PUT",
         body: JSON.stringify(protocol),
       }),
-    runDiscovery: (projectId, query, limit = 20) =>
+    runDiscovery: (projectId, query, limit = 20, routes) =>
       request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {
         method: "POST",
-        body: JSON.stringify({ query, limit }),
+        body: JSON.stringify({ query, limit, ...(routes ? { routes } : {}) }),
       }),
     updateCorpusMembership: (projectId, paperId, status, relevance_rationale) =>
       request(baseUrl, `/projects/${projectId}/corpus/${paperId}`, parseMembership, {
