@@ -56,6 +56,8 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
       screening: { total: 5, selected: 5, unresolved_candidates: 0, excluded: 0 },
       source_text: { selected_with_usable_text: 5, selected_total: 5 }, limitations: [],
     }),
+    approveCorpus: vi.fn().mockResolvedValue({ id: "run-1", status: "awaiting_structure_approval" }),
+    approveStructure: vi.fn().mockResolvedValue({ id: "run-1", status: "completed" }),
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
     updatePlan: vi.fn().mockImplementation(async (_projectId, _planId, plan) => ({ id: "plan-1", ...plan })),
@@ -151,6 +153,27 @@ describe("Literature Workbench", () => {
       "project-1", "Survey agent memory.", 20,
       ["semantic_search", "survey_search", "recent_search"],
     );
+  });
+
+  it("walks a systematic run through both human approval gates", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture();
+    vi.mocked(api.runPipeline)
+      .mockResolvedValueOnce({ id: "run-1", status: "awaiting_corpus_approval" });
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Survey agent memory.");
+    await user.selectOptions(screen.getByLabelText("Review mode"), "systematic");
+    await user.click(screen.getByRole("button", { name: "Create and run fixture" }));
+
+    expect(await screen.findByRole("button", { name: "Approve corpus checkpoint" })).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Approve corpus checkpoint" }));
+    expect(await screen.findByRole("button", { name: "Approve structure checkpoint" })).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Approve structure checkpoint" }));
+    expect(await screen.findByRole("tab", { name: "Review" })).toHaveAttribute("aria-selected", "true");
+    expect(api.approveCorpus).toHaveBeenCalledWith("project-1", "run-1");
+    expect(api.approveStructure).toHaveBeenCalledWith("project-1", "run-1");
   });
 
   it("edits and saves the relation-backed plan", async () => {
