@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
 
 from app.db import Database
-from app.domain import CorpusMembershipUpdate, DiscoveryRequest, ProjectCreate
+from app.domain import CorpusMembershipUpdate, DiscoveryRequest, ProjectCreate, ReviewPlanUpdate
 from app.models import (
     CorpusMembership,
     DiscoveryEvent,
@@ -387,6 +387,30 @@ def create_app(
                     }
                     for plan in plans
                 ]
+            }
+
+    @app.patch("/projects/{project_id}/plans/{plan_id}")
+    def update_plan(project_id: str, plan_id: str, value: ReviewPlanUpdate) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            plan = db.scalar(
+                select(ReviewPlan).where(
+                    ReviewPlan.id == plan_id,
+                    ReviewPlan.project_id == project_id,
+                )
+            )
+            if plan is None:
+                raise HTTPException(404, "Review plan not found")
+            plan.title = value.title
+            plan.thesis = value.thesis
+            plan.organizing_principle = value.organizing_principle
+            plan.sections = [section.model_dump() for section in value.sections]
+            return {
+                "id": plan.id,
+                "title": plan.title,
+                "thesis": plan.thesis,
+                "organizing_principle": plan.organizing_principle,
+                "sections": plan.sections,
             }
 
     @app.get("/projects/{project_id}/review")

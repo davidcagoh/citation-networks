@@ -40,7 +40,8 @@ def test_plan_can_be_edited_without_rerunning_extraction(tmp_path: Path) -> None
         assert response.status_code == 200
         assert response.json()["title"] == "Edited review"
         assert response.json()["sections"][0]["title"] == "Failure modes"
-        assert client.get(f"/projects/{project_id}/plans").json()["plans"][0]["title"] == "Edited review"
+        persisted = client.get(f"/projects/{project_id}/plans").json()["plans"][0]
+        assert persisted["title"] == "Edited review"
 
 
 def test_plan_update_rejects_invalid_or_foreign_plan(tmp_path: Path) -> None:
@@ -55,7 +56,12 @@ def test_plan_update_rejects_invalid_or_foreign_plan(tmp_path: Path) -> None:
         )
         foreign = client.patch(
             f"/projects/{second_project}/plans/{plan['id']}",
-            json={"title": "x", "thesis": "x", "organizing_principle": "x", "sections": []},
+            json={
+                "title": "x",
+                "thesis": "x",
+                "organizing_principle": "x",
+                "sections": [{"title": "x", "purpose": "x"}],
+            },
         )
         assert invalid.status_code == 422
         assert foreign.status_code == 404

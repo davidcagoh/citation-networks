@@ -54,6 +54,21 @@ class DiscoveryRequest(BaseModel):
         return value
 
 
+class PlanSection(BaseModel):
+    title: str = Field(min_length=1, max_length=300)
+    purpose: str = Field(min_length=1, max_length=10_000)
+    planned_claim_ids: list[str] = Field(default_factory=list)
+    relation_ids: list[str] = Field(default_factory=list)
+    paper_ids: list[str] = Field(default_factory=list)
+
+
+class ReviewPlanUpdate(BaseModel):
+    title: str = Field(min_length=1, max_length=300)
+    thesis: str = Field(min_length=1, max_length=20_000)
+    organizing_principle: str = Field(min_length=1, max_length=200)
+    sections: list[PlanSection] = Field(min_length=1, max_length=50)
+
+
 class EvidenceSpanCreate(BaseModel):
     paper_id: str
     source_document_id: str
