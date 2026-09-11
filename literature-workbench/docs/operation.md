@@ -18,9 +18,9 @@
 8. Export Markdown, JSON, or BibTeX from the API.
 
 For a live source, use **Fetch public source URL** in Brief with an HTTP(S)
-URL serving UTF-8 text or HTML. The server records the requested/final URL,
-content type, and parser version; private hosts, redirects, non-text content,
-and sources over 5 MB are rejected.
+URL serving UTF-8 text, HTML, or a text-extractable PDF. The server records the
+requested/final URL, content type, and parser version; private hosts, redirects,
+unsupported content, extraction failures, and sources over 5 MB are rejected.
 
 ## Source coverage
 
@@ -33,7 +33,8 @@ and sources over 5 MB are rejected.
   pipeline.
 - Public text/HTML can be attached with `POST /projects/{id}/sources/url`.
   It is stored as a `fetched_text` or `html` `SourceDocument` after URL safety
-  validation; HTML is normalized to visible body text before extraction.
+  validation; HTML is normalized to visible body text and PDFs are parsed with
+  the versioned `pypdf` extractor before evidence extraction.
 - Missing text degrades the paper and does not fabricate evidence.
 
 The current live extractor is intentionally heuristic: it selects a bounded
