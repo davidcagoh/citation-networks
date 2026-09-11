@@ -59,8 +59,9 @@ represented as degraded corpus coverage.
 
 The default multi-source discovery adapter fans out to Semantic Scholar and
 OpenAlex, records each result's source provider, and continues with available
-results when one source fails. OpenAlex citation traversal is not yet
-implemented; use Semantic Scholar-backed citation expansion for network routes.
+results when one source fails. Both providers support citation expansion;
+OpenAlex backward expansion is bounded by one metadata request per referenced
+work.
 
 Run budgets persist on each pipeline run. The paper cap is enforced before a
 run is created; provider calls and local pipeline usage appear separately in
