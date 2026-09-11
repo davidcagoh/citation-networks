@@ -57,6 +57,7 @@ from app.services.acquisition import (
     SourceAcquisitionError,
 )
 from app.services.discovery import (
+    DiscoveryBudgetExceededError,
     DiscoveryProvider,
     DiscoveryProviderError,
     DiscoveryService,
@@ -391,7 +392,12 @@ def create_app(
             cutoff_date = protocol.cutoff_date if protocol else None
         try:
             count, route_count, filtered_count = discovery.search_routes(
-                project_id, value.query, value.limit, value.routes, cutoff_date
+                project_id,
+                value.query,
+                value.limit,
+                value.routes,
+                cutoff_date,
+                value.max_external_api_calls,
             )
         except DiscoveryProviderError as exc:
             if str(exc) == "Project not found":
@@ -399,6 +405,8 @@ def create_app(
             if str(exc) == "Provider requires explicit project approval":
                 raise HTTPException(403, str(exc)) from exc
             raise HTTPException(502, "Discovery provider unavailable") from exc
+        except DiscoveryBudgetExceededError as exc:
+            raise HTTPException(429, str(exc)) from exc
         return {
             "project_id": project_id,
             "candidate_count": count,

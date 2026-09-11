@@ -11,7 +11,7 @@ from typing import Protocol
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.db import Database
 from app.models import (
@@ -29,6 +29,10 @@ from app.models import (
 
 class DiscoveryProviderError(Exception):
     """Raised when an external discovery provider cannot return results."""
+
+
+class DiscoveryBudgetExceededError(Exception):
+    """Raised before discovery would exceed its requested external-call budget."""
 
 
 @dataclass(frozen=True)
@@ -322,11 +326,27 @@ class DiscoveryService:
         limit: int,
         routes: Sequence[str],
         cutoff_date: str | None = None,
+        max_external_api_calls: int | None = None,
     ) -> tuple[int, int, int]:
         with self.database.session() as db:
             if db.get(Project, project_id) is None:
                 raise DiscoveryProviderError("Project not found")
             self._ensure_provider_approved(db, project_id)
+            if max_external_api_calls is not None:
+                planned_calls = sum(
+                    len(self._route_queries(query, route))
+                    for route in routes
+                ) * len(getattr(self.provider, "providers", [self.provider]))
+                used_calls = db.scalar(
+                    select(func.coalesce(func.sum(UsageCostEvent.external_api_calls), 0)).where(
+                        UsageCostEvent.project_id == project_id
+                    )
+                )
+                if used_calls + planned_calls > max_external_api_calls:
+                    raise DiscoveryBudgetExceededError(
+                        f"Discovery needs {planned_calls} calls, but only "
+                        f"{max_external_api_calls - used_calls} remain"
+                    )
         total_candidates = 0
         filtered_candidates = 0
         for route in routes:

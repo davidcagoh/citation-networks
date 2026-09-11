@@ -75,6 +75,11 @@ the cost ledger. Runs persist stage artifacts and can be resumed after a
 failure. The JSON export includes source documents, evidence spans, relations,
 claims, review text, and discovery events.
 
+Discovery also enforces the request's external-call cap before fan-out begins
+(100 calls by default for the API request). A multi-source request consumes one
+call per configured provider per route query, matching scope-preview estimates;
+an over-budget request returns HTTP 429 without contacting a provider.
+
 ## Deferred extensions
 
 Model-backed structured extraction, richer relation judging, and broader
