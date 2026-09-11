@@ -275,3 +275,30 @@ def test_pipeline_budget_gate_prevents_oversized_runs(tmp_path: Path) -> None:
 
         assert response.status_code == 409
         assert "budget" in response.json()["detail"].lower()
+
+
+def test_pipeline_budget_gate_accounts_for_prior_provider_usage(tmp_path: Path) -> None:
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=FakeDiscoveryProvider(),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Find memory systems"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "agent memory", "limit": 1},
+        )
+        paper_id = client.get(f"/projects/{project_id}/corpus").json()["papers"][0]["id"]
+        client.patch(
+            f"/projects/{project_id}/corpus/{paper_id}", json={"status": "included"}
+        )
+
+        response = client.post(
+            f"/projects/{project_id}/runs/pipeline",
+            json={"max_external_api_calls": 0},
+        )
+
+        assert response.status_code == 409
+        assert "api calls" in response.json()["detail"].lower()

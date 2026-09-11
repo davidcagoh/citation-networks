@@ -5,7 +5,7 @@ import re
 from datetime import UTC, datetime
 from pathlib import Path
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 
 from app.db import Database
 from app.domain import EvidenceSpanCreate, ScientificEntityCreate, ScientificRelationCreate
@@ -196,6 +196,26 @@ class PipelineService:
                 raise BudgetExceededError(
                     f"Run budget allows {max_papers} papers, but "
                     f"{active_membership_count} are selected"
+                )
+            used_api_calls = db.scalar(
+                select(func.coalesce(func.sum(UsageCostEvent.external_api_calls), 0)).where(
+                    UsageCostEvent.project_id == project_id
+                )
+            )
+            used_cost_usd = db.scalar(
+                select(func.coalesce(func.sum(UsageCostEvent.cost_usd), 0.0)).where(
+                    UsageCostEvent.project_id == project_id
+                )
+            )
+            if used_api_calls > max_external_api_calls:
+                raise BudgetExceededError(
+                    f"Run budget allows {max_external_api_calls} API calls, but "
+                    f"{used_api_calls} are already recorded"
+                )
+            if used_cost_usd > max_cost_usd:
+                raise BudgetExceededError(
+                    f"Run budget allows ${max_cost_usd:.2f}, but "
+                    f"${used_cost_usd:.2f} is already recorded"
                 )
             run = Run(
                 project_id=project_id,
