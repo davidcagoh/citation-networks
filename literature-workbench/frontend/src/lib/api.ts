@@ -143,6 +143,8 @@ export interface CitationExpansionResult {
   direction: "backward" | "forward";
   candidate_count: number;
   provider: string;
+  depth_reached: number;
+  stopping_reason: string;
 }
 
 export interface LivingUpdateResult {
@@ -192,7 +194,7 @@ export interface WorkbenchApi {
   getCoverageAudit(projectId: string): Promise<CoverageAudit>;
   importZotero(projectId: string, collectionKey?: string, limit?: number): Promise<ZoteroImportResult>;
   exportZotero(projectId: string, collectionKey?: string): Promise<ZoteroExportResult>;
-  expandCitations(projectId: string, paperId: string, direction: "backward" | "forward", limit?: number): Promise<CitationExpansionResult>;
+  expandCitations(projectId: string, paperId: string, direction: "backward" | "forward", limit?: number, depth?: number, maxPapers?: number): Promise<CitationExpansionResult>;
   livingUpdate(projectId: string, limit?: number): Promise<LivingUpdateResult>;
   approveProvider(projectId: string, input: Omit<ProviderApproval, "id" | "project_id" | "approved" | "approved_at">): Promise<ProviderApproval>;
   updateReviewSentence(projectId: string, sentenceId: string, text: string): Promise<ReviewSentence>;
@@ -467,6 +469,8 @@ function parseCitationExpansion(value: unknown): CitationExpansionResult {
     direction,
     candidate_count: number(result.candidate_count, "citation expansion.candidate_count"),
     provider: string(result.provider, "citation expansion.provider"),
+    depth_reached: number(result.depth_reached ?? 1, "citation expansion.depth_reached"),
+    stopping_reason: string(result.stopping_reason ?? "depth_limit_reached", "citation expansion.stopping_reason"),
   };
 }
 
@@ -777,10 +781,10 @@ export function createWorkbenchApi(
         method: "POST",
         body: JSON.stringify(collectionKey ? { collection_key: collectionKey } : {}),
       }),
-    expandCitations: (projectId, paperId, direction, limit = 20) =>
+    expandCitations: (projectId, paperId, direction, limit = 20, depth = 1, maxPapers = 100) =>
       request(baseUrl, `/projects/${projectId}/runs/citation-expansion`, parseCitationExpansion, {
         method: "POST",
-        body: JSON.stringify({ paper_id: paperId, direction, limit }),
+        body: JSON.stringify({ paper_id: paperId, direction, limit, depth, max_papers: maxPapers }),
       }),
     livingUpdate: (projectId, limit = 20) =>
       request(baseUrl, `/projects/${projectId}/runs/living-update`, parseLivingUpdate, {
