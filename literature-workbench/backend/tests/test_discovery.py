@@ -379,7 +379,9 @@ def test_cross_disciplinary_route_records_adjacent_fields_query(tmp_path: Path) 
 
         assert response.status_code == 201
         assert provider.queries == [
-            ("agent memory interdisciplinary cross-disciplinary adjacent fields", 1)
+            ("agent memory interdisciplinary cross-disciplinary adjacent fields", 1),
+            ("agent memory interdisciplinary methods", 1),
+            ("agent memory applications in adjacent fields", 1),
         ]
 
 
