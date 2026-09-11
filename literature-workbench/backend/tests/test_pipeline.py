@@ -28,6 +28,7 @@ def test_fixture_pipeline_preserves_complete_claim_provenance(tmp_path: Path) ->
         substantive = [sentence for sentence in review["sentences"] if sentence["substantive"]]
         assert substantive
         assert sum(bool(sentence["claim_id"]) for sentence in substantive) / len(substantive) >= 0.9
+        assert all(sentence["evidence_span_ids"] for sentence in substantive)
 
         evidence = client.get(
             f"/projects/{project['id']}/claims/{substantive[0]['claim_id']}/evidence"
