@@ -251,6 +251,24 @@ def create_app(
                 )
             )
             identification_events = [event for event in events if event.action == "candidate"]
+            identified_paper_ids = {
+                event.paper_id for event in identification_events if event.paper_id is not None
+            }
+            selected_memberships = [
+                membership
+                for membership in memberships
+                if membership.status in {"included", "pinned"}
+            ]
+            source_documents = list(
+                db.scalars(
+                    select(SourceDocument).where(
+                        SourceDocument.paper_id.in_(identified_paper_ids)
+                    )
+                )
+            ) if identified_paper_ids else []
+            papers_with_text = {
+                document.paper_id for document in source_documents if document.text
+            }
             queries = list(
                 dict.fromkeys(event.query for event in identification_events if event.query)
             )
@@ -276,7 +294,16 @@ def create_app(
                 },
                 "flow": {
                     "identified": len(identification_events),
+                    "unique_identified": len(identified_paper_ids),
+                    "duplicates_removed": max(
+                        0, len(identification_events) - len(identified_paper_ids)
+                    ),
                     "screened": len(memberships),
+                    "reports_sought": len(selected_memberships),
+                    "reports_not_retrieved": sum(
+                        membership.paper_id not in papers_with_text
+                        for membership in selected_memberships
+                    ),
                     "included": sum(
                         membership.status in {"included", "pinned"} for membership in memberships
                     ),

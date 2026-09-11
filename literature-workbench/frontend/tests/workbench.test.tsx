@@ -60,6 +60,12 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
         checks: { required_routes_executed: true, all_candidates_screened: true, selected_sources_available: true },
       }, limitations: [],
     }),
+    getPrismaReport: vi.fn().mockResolvedValue({
+      project_id: "project-1", review_mode: "systematic",
+      protocol: { research_questions: ["memory"], inclusion_criteria: [], exclusion_criteria: [], sources: [], cutoff_date: null, update_policy: "on_demand" },
+      search: { routes: ["semantic_search"], queries: ["memory"], last_search_at: null },
+      flow: { identified: 0, unique_identified: 0, duplicates_removed: 0, screened: 0, reports_sought: 0, reports_not_retrieved: 0, included: 0, excluded: 0 },
+    }),
     approveCorpus: vi.fn().mockResolvedValue({ id: "run-1", status: "awaiting_structure_approval" }),
     approveStructure: vi.fn().mockResolvedValue({ id: "run-1", status: "completed" }),
     importZotero: vi.fn().mockResolvedValue({ project_id: "project-1", imported_count: 0, item_count: 0 }),

@@ -132,6 +132,30 @@ export interface CoverageAudit {
   limitations: string[];
 }
 
+export interface PrismaReport {
+  project_id: string;
+  review_mode: ReviewMode;
+  protocol: {
+    research_questions: string[];
+    inclusion_criteria: string[];
+    exclusion_criteria: string[];
+    sources: string[];
+    cutoff_date: string | null;
+    update_policy: "on_demand";
+  };
+  search: { routes: string[]; queries: string[]; last_search_at: string | null };
+  flow: {
+    identified: number;
+    unique_identified: number;
+    duplicates_removed: number;
+    screened: number;
+    reports_sought: number;
+    reports_not_retrieved: number;
+    included: number;
+    excluded: number;
+  };
+}
+
 export interface ZoteroImportResult {
   project_id: string;
   imported_count: number;
@@ -205,6 +229,7 @@ export interface WorkbenchApi {
   getProtocol(projectId: string): Promise<ReviewProtocol>;
   updateProtocol(projectId: string, protocol: Omit<ReviewProtocol, "id" | "project_id" | "updated_at"> | ReviewProtocol): Promise<ReviewProtocol>;
   getCoverageAudit(projectId: string): Promise<CoverageAudit>;
+  getPrismaReport(projectId: string): Promise<PrismaReport>;
   importZotero(projectId: string, collectionKey?: string, limit?: number): Promise<ZoteroImportResult>;
   exportZotero(projectId: string, collectionKey?: string): Promise<ZoteroExportResult>;
   expandCitations(projectId: string, paperId: string, direction: "backward" | "forward", limit?: number, depth?: number, maxPapers?: number): Promise<CitationExpansionResult>;
@@ -297,6 +322,10 @@ function boolean(value: unknown, label: string): boolean {
 function nullableString(value: unknown, label: string): string | null {
   if (value === null) return null;
   return string(value, label);
+}
+
+function strings(value: unknown, label: string): string[] {
+  return array(value, label).map((item, index) => string(item, `${label}[${index}]`));
 }
 
 function parseProject(value: unknown): Project {
@@ -459,6 +488,40 @@ function parseCoverageAudit(value: unknown): CoverageAudit {
       };
     })(),
     limitations: array(audit.limitations, "coverage audit.limitations").map((item, index) => string(item, `coverage audit.limitations[${index}]`)),
+  };
+}
+
+function parsePrismaReport(value: unknown): PrismaReport {
+  const report = object(value, "PRISMA report");
+  const protocol = object(report.protocol, "PRISMA report.protocol");
+  const search = object(report.search, "PRISMA report.search");
+  const flow = object(report.flow, "PRISMA report.flow");
+  return {
+    project_id: string(report.project_id, "PRISMA report.project_id"),
+    review_mode: string(report.review_mode, "PRISMA report.review_mode") as ReviewMode,
+    protocol: {
+      research_questions: strings(protocol.research_questions, "PRISMA report.protocol.research_questions"),
+      inclusion_criteria: strings(protocol.inclusion_criteria, "PRISMA report.protocol.inclusion_criteria"),
+      exclusion_criteria: strings(protocol.exclusion_criteria, "PRISMA report.protocol.exclusion_criteria"),
+      sources: strings(protocol.sources, "PRISMA report.protocol.sources"),
+      cutoff_date: nullableString(protocol.cutoff_date, "PRISMA report.protocol.cutoff_date"),
+      update_policy: "on_demand",
+    },
+    search: {
+      routes: strings(search.routes, "PRISMA report.search.routes"),
+      queries: strings(search.queries, "PRISMA report.search.queries"),
+      last_search_at: nullableString(search.last_search_at, "PRISMA report.search.last_search_at"),
+    },
+    flow: {
+      identified: number(flow.identified, "PRISMA report.flow.identified"),
+      unique_identified: number(flow.unique_identified, "PRISMA report.flow.unique_identified"),
+      duplicates_removed: number(flow.duplicates_removed, "PRISMA report.flow.duplicates_removed"),
+      screened: number(flow.screened, "PRISMA report.flow.screened"),
+      reports_sought: number(flow.reports_sought, "PRISMA report.flow.reports_sought"),
+      reports_not_retrieved: number(flow.reports_not_retrieved, "PRISMA report.flow.reports_not_retrieved"),
+      included: number(flow.included, "PRISMA report.flow.included"),
+      excluded: number(flow.excluded, "PRISMA report.flow.excluded"),
+    },
   };
 }
 
@@ -807,6 +870,8 @@ export function createWorkbenchApi(
       }),
     getCoverageAudit: (projectId) =>
       request(baseUrl, `/projects/${projectId}/coverage-audit`, parseCoverageAudit),
+    getPrismaReport: (projectId) =>
+      request(baseUrl, `/projects/${projectId}/prisma-report`, parsePrismaReport),
     importZotero: (projectId, collectionKey, limit = 100) =>
       request(baseUrl, `/projects/${projectId}/integrations/zotero/import`, parseZoteroImport, {
         method: "POST",

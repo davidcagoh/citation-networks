@@ -2,14 +2,14 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
-import type { ClaimEvidence, CoverageAudit, DiscoveryRoute, ReviewMode, ReviewPlan, ScopePreview, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
+import type { ClaimEvidence, CoverageAudit, DiscoveryRoute, PrismaReport, ReviewMode, ReviewPlan, ScopePreview, VerificationIssue, WorkbenchApi, Workspace } from "@/lib/api";
 import styles from "./WorkbenchApp.module.css";
 
 const tabs = ["Brief", "Corpus", "Structure", "Review", "Run / Costs"] as const;
 type Tab = (typeof tabs)[number];
 type RunState = "idle" | "creating" | "ingesting" | "discovering" | "running" | "complete";
 type ApprovalGate = "corpus" | "structure" | null;
-type Session = { projectId: string; paperCount: number; workspace: Workspace; audit: CoverageAudit; runId?: string; approval: ApprovalGate };
+type Session = { projectId: string; paperCount: number; workspace: Workspace; audit: CoverageAudit; prisma?: PrismaReport; runId?: string; approval: ApprovalGate };
 
 function approvalForRunStatus(status: string): ApprovalGate {
   if (status === "awaiting_corpus_approval") return "corpus";
@@ -103,8 +103,9 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       const run = await api.runPipeline(project.id, { review_mode: reviewMode });
       const nextWorkspace = await api.getWorkspace(project.id, run.id);
       const audit = await api.getCoverageAudit(project.id);
+      const prisma = reviewMode === "systematic" ? await api.getPrismaReport(project.id) : undefined;
       const approval = approvalForRunStatus(run.status);
-      setSession({ projectId: project.id, paperCount: ingest.paper_count, workspace: nextWorkspace, audit, runId: run.id, approval });
+      setSession({ projectId: project.id, paperCount: ingest.paper_count, workspace: nextWorkspace, audit, prisma, runId: run.id, approval });
       setVerificationIssues([]);
       setRunState("complete");
       setActiveTab(approval === "structure" ? "Structure" : "Corpus");
@@ -135,7 +136,8 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
         : await api.runDiscovery(project.id, prompt.trim(), 20, discoveryRoutes);
       const workspace = await api.getWorkspace(project.id);
       const audit = await api.getCoverageAudit(project.id);
-      setSession({ projectId: project.id, paperCount: discovery.candidate_count, workspace, audit, approval: null });
+      const prisma = reviewMode === "systematic" ? await api.getPrismaReport(project.id) : undefined;
+      setSession({ projectId: project.id, paperCount: discovery.candidate_count, workspace, audit, prisma, approval: null });
       setVerificationIssues([]);
       setRunState("complete");
       setActiveTab("Corpus");
@@ -559,7 +561,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             {activeTab === "Brief" && (
               <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} zoteroCollectionKey={zoteroCollectionKey} onZoteroCollectionKey={setZoteroCollectionKey} paidProvider={paidProvider} onPaidProvider={setPaidProvider} approvalBy={approvalBy} onApprovalBy={setApprovalBy} approvalJustification={approvalJustification} onApprovalJustification={setApprovalJustification} nonReplicableReason={nonReplicableReason} onNonReplicableReason={setNonReplicableReason} hasSession={Boolean(session)} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} onZoteroImport={handleZoteroImport} onZoteroExport={handleZoteroExport} onProviderApproval={handleProviderApproval} preview={scopePreview} />
             )}
-            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} paperCount={session?.paperCount ?? null} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} onExpand={expandCitations} onCoExpand={expandCoCitations} onLivingUpdate={handleLivingUpdate} />}
+            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} prisma={session?.prisma} paperCount={session?.paperCount ?? null} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} onExpand={expandCitations} onCoExpand={expandCoCitations} onLivingUpdate={handleLivingUpdate} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} approval={session?.approval ?? null} onApprove={approveStructure} onSave={savePlan} />}
             {activeTab === "Review" && (
               <Review
@@ -669,9 +671,10 @@ function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, resear
   );
 }
 
-function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen, onExpand, onCoExpand, onLivingUpdate }: {
+function Corpus({ workspace, audit, prisma, paperCount, approval, onApprove, onScreen, onExpand, onCoExpand, onLivingUpdate }: {
   workspace: Workspace | null;
   audit: CoverageAudit | null;
+  prisma?: PrismaReport;
   paperCount: number | null;
   approval: ApprovalGate;
   onApprove: () => Promise<void>;
@@ -693,6 +696,12 @@ function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen, o
         {audit.limitations.length > 0 && <span>{audit.limitations.join("; ")}</span>}
         <button className={styles.secondary} type="button" onClick={onLivingUpdate}>Refresh living review</button>
         {approval === "corpus" && <button className={styles.primary} type="button" onClick={onApprove}>Approve corpus checkpoint</button>}
+      </section>}
+      {prisma && <section className={styles.reviewToolbar} aria-label="PRISMA flow report">
+        <span>PRISMA flow · {prisma.flow.unique_identified} unique records from {prisma.flow.identified} identified</span>
+        <span>{prisma.flow.duplicates_removed} duplicates removed · {prisma.flow.screened} screened</span>
+        <span>{prisma.flow.included} included · {prisma.flow.excluded} excluded</span>
+        <span>{prisma.flow.reports_not_retrieved} reports not retrieved</span>
       </section>}
       <div className={styles.tableRegion} role="region" aria-label="Corpus papers" tabIndex={0}>
       <table className={styles.table}>
