@@ -48,12 +48,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 30 | Coverage audits report whether each executed route has publication-date and citation-count signals for its candidate papers. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, frontend API/UI contract checks | PASS |
 | 31 | Recent, seminal, and survey routes apply deterministic publication-date, citation-count, and survey-term ordering before provenance ranks are recorded. | `backend/tests/test_discovery.py::test_seminal_route_orders_candidates_by_citation_signal` | PASS |
 | 32 | URL acquisition deduplicates existing DOI/title identities and attaches repeat source fetches to the canonical corpus paper. | `backend/tests/test_sources.py::test_url_ingestion_deduplicates_existing_paper_identity` | PASS |
+| 33 | Candidate screening records a transparent relevance rationale and derives a bounded fallback score from query overlap and available route signals. | `backend/tests/test_discovery.py::test_discovery_persists_candidates_and_route_provenance` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
 - Backend: `uv run pytest -q` → 76 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 84.82%, above the 80% requirement.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 84.86%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
