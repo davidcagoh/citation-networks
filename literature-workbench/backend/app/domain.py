@@ -209,6 +209,23 @@ class SourceTextRequest(BaseModel):
         return value
 
 
+class SourceUrlRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=500)
+    source_uri: str = Field(min_length=1, max_length=500)
+    authors: list[str] = Field(default_factory=list, max_length=100)
+    year: int | None = Field(default=None, ge=1, le=3000)
+    venue: str | None = Field(default=None, max_length=250)
+    doi: str | None = Field(default=None, max_length=250)
+
+    @field_validator("title", "source_uri")
+    @classmethod
+    def reject_blank_url_fields(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("must contain non-whitespace text")
+        return value
+
+
 class PlanSection(BaseModel):
     title: str = Field(min_length=1, max_length=300)
     purpose: str = Field(min_length=1, max_length=10_000)

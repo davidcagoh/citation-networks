@@ -34,6 +34,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   const [title, setTitle] = useState("");
   const [prompt, setPrompt] = useState("");
   const [sourceText, setSourceText] = useState("");
+  const [sourceUri, setSourceUri] = useState("");
   const [session, setSession] = useState<Session | null>(null);
   const [runState, setRunState] = useState<RunState>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -188,6 +189,29 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     } catch (caught) {
       setRunState("idle");
       setError(caught instanceof Error ? caught.message : "The source could not be imported.");
+    }
+  }
+
+  async function handleImportSourceUrl() {
+    if (!title.trim() || !prompt.trim() || !sourceUri.trim()) return;
+    setError(null);
+    try {
+      setRunState("creating");
+      const project = await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
+      await persistProtocol(project.id);
+      await api.ingestSourceUrl(project.id, { title: title.trim(), source_uri: sourceUri.trim() });
+      setRunState("running");
+      const run = await api.runPipeline(project.id, { review_mode: reviewMode, max_papers: maxPapers });
+      const workspace = await api.getWorkspace(project.id, run.id);
+      const audit = await api.getCoverageAudit(project.id);
+      const prisma = reviewMode === "systematic" ? await api.getPrismaReport(project.id) : undefined;
+      const approval = approvalForRunStatus(run.status);
+      setSession({ projectId: project.id, paperCount: workspace.corpus.papers.length, workspace, audit, prisma, runId: run.id, approval });
+      setRunState("complete");
+      setActiveTab(approval === "structure" ? "Structure" : "Corpus");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "The source URL could not be imported.");
     }
   }
 
@@ -559,7 +583,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             key={activeTab}
           >
             {activeTab === "Brief" && (
-              <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} zoteroCollectionKey={zoteroCollectionKey} onZoteroCollectionKey={setZoteroCollectionKey} paidProvider={paidProvider} onPaidProvider={setPaidProvider} approvalBy={approvalBy} onApprovalBy={setApprovalBy} approvalJustification={approvalJustification} onApprovalJustification={setApprovalJustification} nonReplicableReason={nonReplicableReason} onNonReplicableReason={setNonReplicableReason} hasSession={Boolean(session)} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} onZoteroImport={handleZoteroImport} onZoteroExport={handleZoteroExport} onProviderApproval={handleProviderApproval} preview={scopePreview} />
+              <BriefForm title={title} prompt={prompt} sourceText={sourceText} sourceUri={sourceUri} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} zoteroCollectionKey={zoteroCollectionKey} onZoteroCollectionKey={setZoteroCollectionKey} paidProvider={paidProvider} onPaidProvider={setPaidProvider} approvalBy={approvalBy} onApprovalBy={setApprovalBy} approvalJustification={approvalJustification} onApprovalJustification={setApprovalJustification} nonReplicableReason={nonReplicableReason} onNonReplicableReason={setNonReplicableReason} hasSession={Boolean(session)} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSourceUri={setSourceUri} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} onImportUrl={handleImportSourceUrl} onZoteroImport={handleZoteroImport} onZoteroExport={handleZoteroExport} onProviderApproval={handleProviderApproval} preview={scopePreview} />
             )}
             {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} prisma={session?.prisma} paperCount={session?.paperCount ?? null} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} onExpand={expandCitations} onCoExpand={expandCoCitations} onLivingUpdate={handleLivingUpdate} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} approval={session?.approval ?? null} onApprove={approveStructure} onSave={savePlan} />}
@@ -583,8 +607,8 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   );
 }
 
-function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, researchQuestions, onResearchQuestions, inclusionCriteria, onInclusionCriteria, exclusionCriteria, onExclusionCriteria, cutoffDate, onCutoffDate, zoteroCollectionKey, onZoteroCollectionKey, paidProvider, onPaidProvider, approvalBy, onApprovalBy, approvalJustification, onApprovalJustification, nonReplicableReason, onNonReplicableReason, hasSession, busy, status, onTitle, onPrompt, onSourceText, onSubmit, onDiscover, onPreview, onImport, onZoteroImport, onZoteroExport, onProviderApproval, preview }: {
-  title: string; prompt: string; sourceText: string; busy: boolean; status: string;
+function BriefForm({ title, prompt, sourceText, sourceUri, reviewMode, onReviewMode, researchQuestions, onResearchQuestions, inclusionCriteria, onInclusionCriteria, exclusionCriteria, onExclusionCriteria, cutoffDate, onCutoffDate, zoteroCollectionKey, onZoteroCollectionKey, paidProvider, onPaidProvider, approvalBy, onApprovalBy, approvalJustification, onApprovalJustification, nonReplicableReason, onNonReplicableReason, hasSession, busy, status, onTitle, onPrompt, onSourceText, onSourceUri, onSubmit, onDiscover, onPreview, onImport, onImportUrl, onZoteroImport, onZoteroExport, onProviderApproval, preview }: {
+  title: string; prompt: string; sourceText: string; sourceUri: string; busy: boolean; status: string;
   reviewMode: ReviewMode; onReviewMode: (value: ReviewMode) => void;
   researchQuestions: string; onResearchQuestions: (value: string) => void;
   inclusionCriteria: string; onInclusionCriteria: (value: string) => void;
@@ -595,10 +619,11 @@ function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, resear
   approvalJustification: string; onApprovalJustification: (value: string) => void; nonReplicableReason: string; onNonReplicableReason: (value: string) => void;
   onTitle: (value: string) => void; onPrompt: (value: string) => void;
   onSourceText: (value: string) => void;
+  onSourceUri: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onDiscover: () => void;
   onPreview: () => Promise<void>;
-  onImport: () => Promise<void>;
+  onImport: () => Promise<void>; onImportUrl: () => Promise<void>;
   onZoteroImport: () => Promise<void>; onZoteroExport: () => Promise<void>;
   onProviderApproval: () => Promise<void>;
   preview: ScopePreview | null;
@@ -616,6 +641,10 @@ function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, resear
       <div className={styles.field}>
         <label className={styles.label} htmlFor="source-text">Optional source text <span className={styles.hint}>Paste one paper or excerpt</span></label>
         <textarea id="source-text" aria-label="Optional source text" className={styles.textarea} value={sourceText} onChange={(event) => onSourceText(event.target.value)} placeholder="Paste source text to run it through the provenance pipeline." />
+      </div>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="source-uri">Public source URL <span className={styles.hint}>HTTP(S) text or HTML; private hosts blocked</span></label>
+        <input id="source-uri" aria-label="Public source URL" className={styles.input} type="url" value={sourceUri} onChange={(event) => onSourceUri(event.target.value)} placeholder="https://example.org/paper.html" />
       </div>
       <div className={styles.field}>
         <label className={styles.label} htmlFor="review-mode">Review mode <span className={styles.hint}>Defines the coverage contract</span></label>
@@ -657,6 +686,7 @@ function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, resear
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onPreview}>Preview scope</button>
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onDiscover}>Discover papers</button>
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim() || !sourceText.trim()} onClick={onImport}>Import source text</button>
+        <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim() || !sourceUri.trim()} onClick={onImportUrl}>Fetch public source URL</button>
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim()} onClick={onZoteroImport}>Import Zotero collection</button>
         {hasSession && <button className={styles.secondary} type="button" disabled={busy} onClick={onZoteroExport}>Export selected to Zotero</button>}
         <button className={styles.secondary} type="button" disabled={busy || !title.trim() || !prompt.trim() || !paidProvider.trim() || !approvalBy.trim() || !approvalJustification.trim() || !nonReplicableReason.trim()} onClick={onProviderApproval}>Record provider approval</button>

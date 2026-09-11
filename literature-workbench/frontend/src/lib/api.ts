@@ -225,6 +225,14 @@ export interface WorkbenchApi {
     venue?: string;
     doi?: string;
   }): Promise<{ project_id: string; paper_id: string; status: string; source_type: string }>;
+  ingestSourceUrl(projectId: string, input: {
+    title: string;
+    source_uri: string;
+    authors?: string[];
+    year?: number;
+    venue?: string;
+    doi?: string;
+  }): Promise<{ project_id: string; paper_id: string; status: string; source_type: string; source_uri?: string }>;
   scopePreview(projectId: string, input?: { mode?: ReviewMode; max_papers?: number }): Promise<ScopePreview>;
   getProtocol(projectId: string): Promise<ReviewProtocol>;
   updateProtocol(projectId: string, protocol: Omit<ReviewProtocol, "id" | "project_id" | "updated_at"> | ReviewProtocol): Promise<ReviewProtocol>;
@@ -853,6 +861,11 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/runs/acquisition`, parseAcquisition, { method: "POST" }),
     ingestSourceText: (projectId, input) =>
       request(baseUrl, `/projects/${projectId}/sources/text`, parseSourceText, {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
+    ingestSourceUrl: (projectId, input) =>
+      request(baseUrl, `/projects/${projectId}/sources/url`, parseSourceText, {
         method: "POST",
         body: JSON.stringify(input),
       }),

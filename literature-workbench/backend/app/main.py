@@ -24,6 +24,7 @@ from app.domain import (
     ReviewSentenceUpdate,
     ScopePreviewRequest,
     SourceTextRequest,
+    SourceUrlRequest,
     VerificationIssueUpdate,
     ZoteroExportRequest,
     ZoteroImportRequest,
@@ -50,6 +51,10 @@ from app.models import (
     UsageCostEvent,
     VerificationIssue,
     utcnow,
+)
+from app.services.acquisition import (
+    SafeSourceFetcher,
+    SourceAcquisitionError,
 )
 from app.services.discovery import (
     DiscoveryProvider,
@@ -125,6 +130,7 @@ def create_app(
     database_url: str | None = None,
     discovery_provider: DiscoveryProvider | None = None,
     zotero_client: ZoteroClient | None = None,
+    source_fetcher: SafeSourceFetcher | None = None,
 ) -> FastAPI:
     database = Database(
         database_url or os.getenv("WORKBENCH_DATABASE_URL", "sqlite:///instance/workbench.db")
@@ -134,6 +140,7 @@ def create_app(
     verification = VerificationService(database)
     exporter = ProjectExporter(database)
     zotero = ZoteroService(database, zotero_client or ZoteroClient())
+    source_fetcher = source_fetcher or SafeSourceFetcher()
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -150,6 +157,7 @@ def create_app(
     app.state.verification = verification
     app.state.exporter = exporter
     app.state.zotero = zotero
+    app.state.source_fetcher = source_fetcher
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_allowed_origins(),
@@ -600,6 +608,72 @@ def create_app(
                 "paper_id": paper.id,
                 "status": "included",
                 "source_type": "text",
+            }
+
+    @app.post("/projects/{project_id}/sources/url", status_code=201)
+    def ingest_source_url(project_id: str, value: SourceUrlRequest) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+        try:
+            SafeSourceFetcher.validate_public_url(value.source_uri)
+            fetched = source_fetcher.fetch(value.source_uri)
+        except SourceAcquisitionError as exc:
+            if "public" in str(exc) or "HTTP(S)" in str(exc):
+                raise HTTPException(400, str(exc)) from exc
+            raise HTTPException(502, "Source URL unavailable") from exc
+        source_type = "fetched_text" if fetched.content_type == "text/plain" else "html"
+        with database.session() as db:
+            paper = Paper(
+                project_id=project_id,
+                canonical_title=value.title,
+                authors=value.authors,
+                year=value.year,
+                venue=value.venue,
+                doi=value.doi,
+                metadata_provenance={
+                    "provider": "url-fetch",
+                    "source_uri": fetched.final_uri,
+                    "requested_uri": value.source_uri,
+                    "content_type": fetched.content_type,
+                },
+            )
+            db.add(paper)
+            db.flush()
+            db.add(
+                SourceDocument(
+                    paper_id=paper.id,
+                    source_type=source_type,
+                    source_uri=fetched.final_uri,
+                    text=fetched.text,
+                    parsing_quality="complete",
+                    parser="url-fetch-v1",
+                )
+            )
+            db.add(
+                CorpusMembership(
+                    project_id=project_id,
+                    paper_id=paper.id,
+                    status="included",
+                    relevance_rationale="User supplied a public source URL",
+                )
+            )
+            db.add(
+                DiscoveryEvent(
+                    project_id=project_id,
+                    paper_id=paper.id,
+                    route="source_url",
+                    query=value.source_uri,
+                    action="included",
+                    rationale="Fetched public source URL",
+                    provider="url-fetch",
+                )
+            )
+            return {
+                "project_id": project_id,
+                "paper_id": paper.id,
+                "status": "included",
+                "source_type": source_type,
+                "source_uri": fetched.final_uri,
             }
 
     @app.post("/projects/{project_id}/runs/pipeline", status_code=201)
