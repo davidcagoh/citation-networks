@@ -121,6 +121,15 @@ def test_prisma_report_reconciles_protocol_search_and_screening_flow(tmp_path: P
         assert report.status_code == 200
         body = report.json()
         assert body["review_mode"] == "systematic"
-        assert body["flow"] == {"identified": 4, "screened": 2, "included": 1, "excluded": 1}
+        assert body["flow"] == {
+            "identified": 4,
+            "unique_identified": 2,
+            "duplicates_removed": 2,
+            "screened": 2,
+            "reports_sought": 1,
+            "reports_not_retrieved": 0,
+            "included": 1,
+            "excluded": 1,
+        }
         assert body["search"]["routes"] == ["semantic_search", "recent_search"]
         assert body["search"]["queries"] == ["memory", "memory recent latest"]
