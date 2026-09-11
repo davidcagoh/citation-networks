@@ -1040,6 +1040,22 @@ def create_app(
                 for route, signal_field in signal_requirements.items()
                 if mode in {"comprehensive", "systematic"} and route in executed_routes
             )
+            survey_route_has_review_hit = (
+                mode not in {"comprehensive", "systematic"}
+                or any(
+                    event.route == "survey_search"
+                    and event.action == "candidate"
+                    and event.paper_id in papers_by_id
+                    and any(
+                        term in (
+                            f"{papers_by_id[event.paper_id].canonical_title} "
+                            f"{papers_by_id[event.paper_id].abstract or ''}"
+                        ).casefold()
+                        for term in ("survey", "review", "benchmark")
+                    )
+                    for event in events
+                )
+            )
             limitations: list[str] = []
             if candidates:
                 limitations.append("candidate papers remain unscreened")
@@ -1052,6 +1068,8 @@ def create_app(
                 limitations.append("required discovery routes remain unexecuted")
             if mode in {"comprehensive", "systematic"} and not quality_signals_available:
                 limitations.append("latest/seminal routes lack complete provider signals")
+            if mode in {"comprehensive", "systematic"} and not survey_route_has_review_hit:
+                limitations.append("survey route returned no review-like work")
             all_candidates_screened = not candidates
             selected_sources_available = selected_with_text == len(selected)
             stopping_certificate = {
@@ -1063,6 +1081,7 @@ def create_app(
                     "all_candidates_screened": all_candidates_screened,
                     "selected_sources_available": selected_sources_available,
                     "quality_signals_available": quality_signals_available,
+                    "survey_route_has_review_hit": survey_route_has_review_hit,
                 },
             }
             ready = stopping_certificate["status"] == "satisfied"
