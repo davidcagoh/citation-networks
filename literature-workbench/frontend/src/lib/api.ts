@@ -109,6 +109,16 @@ export interface ReviewProtocol {
   updated_at: string;
 }
 
+export interface CoverageAudit {
+  project_id: string;
+  checkpoint: "corpus";
+  status: "ready_for_corpus_checkpoint" | "incomplete";
+  routes: { executed: string[]; count: number };
+  screening: { total: number; selected: number; unresolved_candidates: number; excluded: number };
+  source_text: { selected_with_usable_text: number; selected_total: number };
+  limitations: string[];
+}
+
 export type ReviewMode = "sufficient" | "comprehensive" | "systematic" | "quick" | "thorough";
 export type DiscoveryRoute = "semantic_search" | "survey_search" | "recent_search";
 
@@ -133,6 +143,7 @@ export interface WorkbenchApi {
   scopePreview(projectId: string, input?: { mode?: ReviewMode; max_papers?: number }): Promise<ScopePreview>;
   getProtocol(projectId: string): Promise<ReviewProtocol>;
   updateProtocol(projectId: string, protocol: Omit<ReviewProtocol, "id" | "project_id" | "updated_at"> | ReviewProtocol): Promise<ReviewProtocol>;
+  getCoverageAudit(projectId: string): Promise<CoverageAudit>;
   runDiscovery(projectId: string, query: string, limit?: number, routes?: DiscoveryRoute[]): Promise<{
     candidate_count: number;
     route_count: number;
@@ -312,6 +323,37 @@ function parseProtocol(value: unknown): ReviewProtocol {
     cutoff_date: nullableString(protocol.cutoff_date, "review protocol.cutoff_date"),
     update_policy: "on_demand",
     updated_at: string(protocol.updated_at, "review protocol.updated_at"),
+  };
+}
+
+function parseCoverageAudit(value: unknown): CoverageAudit {
+  const audit = object(value, "coverage audit");
+  const status = string(audit.status, "coverage audit.status");
+  if (status !== "ready_for_corpus_checkpoint" && status !== "incomplete") {
+    throw new ShapeError("coverage audit.status is invalid");
+  }
+  const routes = object(audit.routes, "coverage audit.routes");
+  const screening = object(audit.screening, "coverage audit.screening");
+  const sourceText = object(audit.source_text, "coverage audit.source_text");
+  return {
+    project_id: string(audit.project_id, "coverage audit.project_id"),
+    checkpoint: "corpus",
+    status,
+    routes: {
+      executed: array(routes.executed, "coverage audit.routes.executed").map((item, index) => string(item, `coverage audit.routes.executed[${index}]`)),
+      count: number(routes.count, "coverage audit.routes.count"),
+    },
+    screening: {
+      total: number(screening.total, "coverage audit.screening.total"),
+      selected: number(screening.selected, "coverage audit.screening.selected"),
+      unresolved_candidates: number(screening.unresolved_candidates, "coverage audit.screening.unresolved_candidates"),
+      excluded: number(screening.excluded, "coverage audit.screening.excluded"),
+    },
+    source_text: {
+      selected_with_usable_text: number(sourceText.selected_with_usable_text, "coverage audit.source_text.selected_with_usable_text"),
+      selected_total: number(sourceText.selected_total, "coverage audit.source_text.selected_total"),
+    },
+    limitations: array(audit.limitations, "coverage audit.limitations").map((item, index) => string(item, `coverage audit.limitations[${index}]`)),
   };
 }
 
@@ -579,6 +621,8 @@ export function createWorkbenchApi(
         method: "PUT",
         body: JSON.stringify(protocol),
       }),
+    getCoverageAudit: (projectId) =>
+      request(baseUrl, `/projects/${projectId}/coverage-audit`, parseCoverageAudit),
     runDiscovery: (projectId, query, limit = 20, routes) =>
       request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {
         method: "POST",

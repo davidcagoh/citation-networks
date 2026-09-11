@@ -50,6 +50,12 @@ function apiFixture(overrides: Partial<WorkbenchApi> = {}): WorkbenchApi {
       research_questions: ["memory"], inclusion_criteria: [], exclusion_criteria: [],
       sources: [], cutoff_date: null, update_policy: "on_demand", updated_at: "2026-09-10T00:00:00+00:00",
     }),
+    getCoverageAudit: vi.fn().mockResolvedValue({
+      project_id: "project-1", checkpoint: "corpus", status: "ready_for_corpus_checkpoint",
+      routes: { executed: ["semantic_search"], count: 1 },
+      screening: { total: 5, selected: 5, unresolved_candidates: 0, excluded: 0 },
+      source_text: { selected_with_usable_text: 5, selected_total: 5 }, limitations: [],
+    }),
     runDiscovery: vi.fn().mockResolvedValue({ candidate_count: 2, provider: "fake-search", query: "memory" }),
     updateCorpusMembership: vi.fn().mockResolvedValue({ status: "included", relevance_score: 0.9, relevance_rationale: "User included" }),
     updatePlan: vi.fn().mockImplementation(async (_projectId, _planId, plan) => ({ id: "plan-1", ...plan })),
