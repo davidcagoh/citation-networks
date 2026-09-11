@@ -87,3 +87,24 @@ def test_plan_update_rejects_artifact_ids_outside_project(tmp_path: Path) -> Non
 
         assert response.status_code == 422
         assert "claim" in response.json()["detail"]
+
+
+def test_plan_edit_rewrites_review_sections(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = _completed_project(client)
+        plan = client.get(f"/projects/{project_id}/plans").json()["plans"][0]
+        response = client.patch(
+            f"/projects/{project_id}/plans/{plan['id']}",
+            json={
+                "title": plan["title"],
+                "thesis": plan["thesis"],
+                "organizing_principle": plan["organizing_principle"],
+                "sections": [{**plan["sections"][0], "title": "Edited section"}],
+            },
+        )
+
+        assert response.status_code == 200
+        review = client.get(f"/projects/{project_id}/review").json()["sentences"]
+        assert review
+        assert all(sentence["section_title"] == "Edited section" for sentence in review)
