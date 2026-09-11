@@ -101,12 +101,15 @@ This report records the implementation tranche derived from the review-engine pl
 | 83 | Verification surfaces inferred contrasting relations as competing evidence-span links and a targeted contradiction-review issue. | `backend/tests/test_verification.py::test_verification_surfaces_contrasting_relation_evidence` | PASS |
 | 84 | Corpus records and the UI expose extraction status (`not_run`, `fixture`, `heuristic`, `structured`, or `mixed`) alongside entity counts. | `frontend/tests/api.test.ts`, `backend/tests/test_synthesis.py::test_pipeline_persists_multiple_structured_entities_per_paper` | PASS |
 | 85 | Corpus memberships use topic-neutral coverage clusters for seeds, discovery routes, citation networks, and regression fixtures; the API and Corpus UI expose the provenance cluster without the former topic-specific default. | `backend/tests/test_sources.py::test_ingests_user_supplied_full_text_with_provenance`, `frontend/tests/api.test.ts` | PASS |
+| 86 | Live relation construction compares all bounded topical-overlap pairs rather than only adjacent papers, and the narrative planner groups multi-object claims by available evidence lens without crashing on a sparse lens. | `backend/tests/test_sources.py::test_live_relation_builder_compares_non_adjacent_topical_papers`, `backend/tests/test_planning.py::test_live_plan_uses_extracted_types_instead_of_topic_specific_headings` | PASS |
+| 87 | Zotero-originated corpus records carry explicit Zotero coverage provenance while retaining the published-record preference and alternate-version metadata contract. | `backend/tests/test_zotero.py::test_zotero_import_and_export_round_trip_selected_metadata` | PASS |
+| 88 | Scope preview displays both estimated input and output token counts, alongside discovery/pipeline call counts and projected spend, so mode trade-offs are visible before execution. | `frontend/tests/workbench.test.tsx::previews scope and projected budget before discovery`, `backend/tests/test_scope.py::test_scope_preview_returns_transparent_scope_and_budget` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 118 passed.
-- Backend coverage: `uv run pytest -q --cov=app --cov-report=term-missing` → 86.04%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 119 passed.
+- Backend coverage: `uv run pytest -q --cov=app --cov-report=term` → 86.19%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 47 passed.
 - Frontend lint: `npm run lint` → PASS.

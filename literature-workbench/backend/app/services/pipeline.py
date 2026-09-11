@@ -4,6 +4,7 @@ import json
 import re
 from collections import Counter
 from datetime import UTC, datetime
+from itertools import combinations
 from pathlib import Path
 from typing import Protocol
 
@@ -78,6 +79,7 @@ SOURCE_TYPE_PRIORITY = {
     "metadata": 1,
 }
 MAX_EVIDENCE_CHARS = 1200
+MAX_RELATION_PAIRS = 100
 
 
 def select_preferred_documents(
@@ -818,18 +820,25 @@ class PipelineService:
             fixture_entities = all(
                 entity.extraction_method == "deterministic-fixture" for entity in entities
             )
-            desired_pairs = (
-                {
-                    ((source.id,), (target.id,))
-                    for source, target in zip(entities, entities[1:], strict=False)
-                }
+            relation_pairs = (
+                list(zip(entities, entities[1:], strict=False))
                 if fixture_entities
-                else {
-                    ((source.id,), (target.id,))
-                    for source, target in zip(entities, entities[1:], strict=False)
-                    if self._share_topic_terms(source, target)
-                }
+                else sorted(
+                    (
+                        (source, target)
+                        for source, target in combinations(entities, 2)
+                        if self._share_topic_terms(source, target)
+                    ),
+                    key=lambda pair: (
+                        -self._topic_overlap_score(*pair),
+                        pair[0].paper_id,
+                        pair[1].paper_id,
+                    ),
+                )[:MAX_RELATION_PAIRS]
             )
+            desired_pairs = {
+                ((source.id,), (target.id,)) for source, target in relation_pairs
+            }
             for relation in existing:
                 key = (tuple(relation.source_entity_ids), tuple(relation.target_entity_ids))
                 if key not in desired_pairs:
@@ -857,7 +866,7 @@ class PipelineService:
             else:
                 existing_by_endpoints[key] = relation
         created: list[str] = []
-        for index, (source, target) in enumerate(zip(entities, entities[1:], strict=False)):
+        for index, (source, target) in enumerate(relation_pairs):
             relation = existing_by_endpoints.get(((source.id,), (target.id,)))
             if relation is None and ((source.id,), (target.id,)) in desired_pairs:
                 judgment = None
@@ -925,6 +934,10 @@ class PipelineService:
 
     @staticmethod
     def _share_topic_terms(source: ScientificEntity, target: ScientificEntity) -> bool:
+        return PipelineService._topic_overlap_score(source, target) > 0
+
+    @staticmethod
+    def _topic_overlap_score(source: ScientificEntity, target: ScientificEntity) -> int:
         stopwords = {
             "a", "an", "and", "are", "as", "by", "for", "from", "in", "of", "on",
             "or", "the", "to", "with",
@@ -943,7 +956,7 @@ class PipelineService:
             )
             if len(term) >= 4 and term not in stopwords
         }
-        return bool(source_terms & target_terms)
+        return len(source_terms & target_terms)
 
     def _plan(self, project_id: str) -> list[str]:
         with self.database.session() as db:
@@ -1128,10 +1141,54 @@ class PipelineService:
                             "and contrasts.",
                         )
                     ]
+            if fixture_entities:
+                section_groups = [
+                    (
+                        section_metadata[min(index, len(section_metadata) - 1)],
+                        claims[start : start + 2],
+                    )
+                    for index, start in enumerate(range(0, len(claims), 2))
+                ]
+            else:
+                metadata_by_title = dict(section_metadata)
+                claims_by_section: dict[str, list[SynthesisClaim]] = {
+                    title: [] for title, _purpose in section_metadata
+                }
+                type_to_title = {
+                    "problem": "Problems and requirements",
+                    "research_question": "Problems and requirements",
+                    "failure_mode": "Problems and requirements",
+                    "workload": "Problems and requirements",
+                    "assumption": "Problems and requirements",
+                    "method": "Methods and mechanisms",
+                    "mechanism": "Methods and mechanisms",
+                    "architectural_primitive": "Methods and mechanisms",
+                    "capability": "Methods and mechanisms",
+                    "rationale": "Methods and mechanisms",
+                    "evaluation": "Empirical evidence",
+                    "benchmark": "Empirical evidence",
+                    "result": "Empirical evidence",
+                    "limitation": "Limitations and trade-offs",
+                    "tradeoff": "Limitations and trade-offs",
+                }
+                for claim in claims:
+                    target_id = claim.supporting_entity_ids[-1]
+                    target_type = entities_by_id[target_id].type
+                    preferred_title = type_to_title.get(target_type, section_metadata[0][0])
+                    title = (
+                        preferred_title
+                        if preferred_title in metadata_by_title
+                        else section_metadata[0][0]
+                    )
+                    claims_by_section[title].append(claim)
+                section_groups = [
+                    ((title, metadata_by_title[title]), grouped_claims)
+                    for title, _purpose in section_metadata
+                    if (grouped_claims := claims_by_section[title])
+                ]
+
             sections = []
-            for section_index, claim_start in enumerate(range(0, len(claims), 2)):
-                section_claims = claims[claim_start : claim_start + 2]
-                title, purpose = section_metadata[min(section_index, 1)]
+            for (title, purpose), section_claims in section_groups:
                 relation_ids = list(
                     dict.fromkeys(
                         relation_id

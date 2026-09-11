@@ -4,9 +4,17 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app.main import create_app
-from app.models import EvidenceSpan, ScientificRelation, SourceDocument, SynthesisClaim
+from app.models import (
+    EvidenceSpan,
+    Paper,
+    ScientificEntity,
+    ScientificRelation,
+    SourceDocument,
+    SynthesisClaim,
+)
 from app.services.acquisition import FetchedSource, SafeSourceFetcher
 from app.services.discovery import DiscoveryCandidate
+from app.services.synthesis import StructuredExtraction
 
 
 def minimal_pdf(text: str) -> bytes:
@@ -150,6 +158,71 @@ def test_live_pipeline_builds_conservative_cross_paper_relation(tmp_path: Path) 
                 )
             )
             assert any(claim.supporting_relation_ids for claim in claims)
+
+
+def test_live_relation_builder_compares_non_adjacent_topical_papers(tmp_path: Path) -> None:
+    class SparseExtractor:
+        def extract_evidence(self, paper_title: str, source_text: str):
+            if paper_title == "Alpha":
+                return StructuredExtraction(
+                    "method", "shared retrieval", "Shared retrieval improves alpha.",
+                    "Shared retrieval improves alpha.",
+                )
+            if paper_title == "Beta":
+                return StructuredExtraction(
+                    "method", "beta routing", "Beta routing handles routing.",
+                    "Beta routing handles routing.",
+                )
+            return StructuredExtraction(
+                "method", "shared retrieval", "Shared retrieval improves gamma.",
+                "Shared retrieval improves gamma.",
+            )
+
+        def draft_claim(self, default_text: str, evidence_texts: list[str], claim_type: str):
+            return default_text
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}", synthesis_provider=SparseExtractor()
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Retrieval", "prompt": "Compare retrieval methods"}
+        ).json()["id"]
+        for title in ("Alpha", "Beta", "Gamma"):
+            assert client.post(
+                f"/projects/{project_id}/sources/text",
+                json={
+                    "title": title,
+                    "source_uri": f"file:///{title.casefold()}",
+                    "text": f"{title} source text.",
+                },
+            ).status_code == 201
+
+        assert client.post(f"/projects/{project_id}/runs/pipeline").status_code == 201
+        with app.state.database.session() as database:
+            relations = list(
+                database.scalars(
+                    select(ScientificRelation).where(
+                        ScientificRelation.project_id == project_id
+                    )
+                )
+            )
+            entities = {
+                entity.id: entity
+                for entity in database.scalars(select(ScientificEntity))
+            }
+            papers = {
+                paper.id: paper.canonical_title
+                for paper in database.scalars(select(Paper))
+            }
+            assert any(
+                {
+                    papers[entities[relation.source_entity_ids[0]].paper_id],
+                    papers[entities[relation.target_entity_ids[0]].paper_id],
+                }
+                == {"Alpha", "Gamma"}
+                for relation in relations
+            )
 
 
 def test_configured_synthesis_provider_drafts_only_grounded_claims(tmp_path: Path) -> None:

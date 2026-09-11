@@ -98,11 +98,15 @@ variables take precedence. The adapter sends exact extracted evidence as
 quoted data, and the pipeline remains responsible for evidence-span links and
 verification.
 
-For live non-fixture corpora, candidate relation pairs are first selected by
-local topic overlap; an enabled synthesis provider may then judge each bounded
-pair with structured output. Relation type, justification, confidence, and
+For live non-fixture corpora, candidate relation pairs are selected from all
+bounded paper pairs with local topic overlap, ranked by overlap strength rather
+than limited to adjacent papers; an enabled synthesis provider may then judge
+each pair with structured output. Relation type, justification, confidence, and
 the source/target evidence-span IDs are persisted together. A missing or
-invalid judgment falls back to the conservative local relation.
+invalid judgment falls back to the conservative local relation. Narrative
+sections are assigned by extracted evidence lens (problems, mechanisms,
+empirical evidence, or limitations) and retain chronological paper order within
+each lens.
 
 ## Operational boundaries
 
@@ -140,8 +144,7 @@ incurs no model-token spend.
 
 ## Deferred extensions
 
-Richer multi-object extraction, relation clustering, document-level coherence
-passes, and broader
-automated contradiction/causal-language checks are the next
-research/engineering extensions. They should preserve the same
-source URI, parser/version, evidence-span, and budget contracts.
+Richer relation clustering and saturation heuristics, more nuanced HTML
+extraction, edition/version reconciliation, and background scheduling remain
+extensions. They should preserve the same source URI, parser/version,
+evidence-span, and budget contracts.

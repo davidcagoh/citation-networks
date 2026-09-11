@@ -117,6 +117,7 @@ class ZoteroService:
                     db.add(CorpusMembership(
                         project_id=project_id, paper_id=paper.id, status="candidate",
                         relevance_score=0.0, relevance_rationale="Imported from Zotero",
+                        coverage_cluster="zotero",
                     ))
                     existing = paper
                 else:

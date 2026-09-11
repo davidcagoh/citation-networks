@@ -143,6 +143,7 @@ describe("Literature Workbench", () => {
 
     expect(await screen.findByRole("region", { name: "Scope preview" })).toBeVisible();
     expect(screen.getByText("Methods")).toBeVisible();
+    expect(screen.getByText(/30,000 output tokens/)).toBeVisible();
     expect(api.scopePreview).toHaveBeenCalledWith("project-1", { mode: "sufficient", max_papers: 50 });
     expect(api.updateProtocol).toHaveBeenCalledWith("project-1", expect.objectContaining({
       review_mode: "sufficient",

@@ -84,6 +84,7 @@ def test_zotero_import_and_export_round_trip_selected_metadata(tmp_path: Path) -
         assert imported.json() == {"project_id": project_id, "imported_count": 1, "item_count": 1}
         paper = http.get(f"/projects/{project_id}/corpus").json()["papers"][0]
         assert paper["title"] == "Imported Memory Study"
+        assert paper["coverage_cluster"] == "zotero"
         assert http.patch(
             f"/projects/{project_id}/corpus/{paper['id']}", json={"status": "included"}
         ).status_code == 200
