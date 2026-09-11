@@ -955,6 +955,9 @@ def test_acquisition_reports_provider_abstracts_idempotently(tmp_path: Path) -> 
             "paper_count": 2,
             "available_count": 2,
             "degraded_count": 0,
+            "attempted_count": 0,
+            "fetched_count": 0,
+            "failed_count": 0,
         }
         assert second.json() == first.json()
 

@@ -6,6 +6,7 @@ from sqlalchemy import select
 from app.main import create_app
 from app.models import EvidenceSpan, ScientificRelation, SourceDocument, SynthesisClaim
 from app.services.acquisition import FetchedSource, SafeSourceFetcher
+from app.services.discovery import DiscoveryCandidate
 
 
 def minimal_pdf(text: str) -> bytes:
@@ -177,6 +178,51 @@ def test_fetches_public_source_url_with_provenance_and_blocks_private_targets(
             assert source is not None
             assert source.source_uri == "https://8.8.8.8/paper.txt"
         assert source.parser == "url-fetch-v1"
+
+
+def test_acquisition_fetches_eligible_discovered_full_text_links(tmp_path: Path) -> None:
+    class DiscoveryFixture:
+        name = "fixture-provider"
+
+        def search(self, query: str, limit: int):
+            return [
+                DiscoveryCandidate(
+                    external_id="fixture-paper",
+                    title="Discovered Study",
+                    authors=["Researcher"],
+                    year=2025,
+                    venue="Venue",
+                    doi=None,
+                    abstract="Abstract fallback.",
+                    source_uri="https://example.test/discovered.html",
+                    score=0.9,
+                )
+            ][:limit]
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    fetcher = FakeSourceFetcher()
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=DiscoveryFixture(),
+        source_fetcher=fetcher,
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects", json={"title": "Memory", "prompt": "Review memory"}
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={"query": "memory", "limit": 1},
+        )
+        response = client.post(f"/projects/{project_id}/runs/acquisition")
+
+        assert response.status_code == 201
+        assert response.json()["fetched_count"] == 1
+        assert fetcher.urls == ["https://example.test/discovered.html"]
+        corpus = client.get(f"/projects/{project_id}/corpus").json()
+        assert corpus["papers"][0]["source_type"] == "html"
 
         html_response = client.post(
             f"/projects/{project_id}/sources/url",
