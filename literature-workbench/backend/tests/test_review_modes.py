@@ -123,7 +123,12 @@ def test_pipeline_rejects_a_second_active_run_until_the_first_is_resolved(tmp_pa
     app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
     with TestClient(app) as client:
         project_id = client.post(
-            "/projects", json={"title": "Memory", "prompt": "Survey memory", "review_mode": "systematic"}
+            "/projects",
+            json={
+                "title": "Memory",
+                "prompt": "Survey memory",
+                "review_mode": "systematic",
+            },
         ).json()["id"]
         client.post(f"/projects/{project_id}/fixtures/provenance-corpus")
 
