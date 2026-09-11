@@ -812,6 +812,7 @@ def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> 
         assert body["routes"]["summaries"] == [
             {
                 "route": "semantic_search",
+                "queries": ["agent memory"],
                 "candidate_events": 1,
                 "unique_papers": 1,
                 "new_unique_papers": 1,
@@ -819,6 +820,7 @@ def test_coverage_audit_explains_corpus_checkpoint_readiness(tmp_path: Path) -> 
             },
             {
                 "route": "recent_search",
+                "queries": ["agent memory recent latest"],
                 "candidate_events": 1,
                 "unique_papers": 1,
                 "new_unique_papers": 0,
