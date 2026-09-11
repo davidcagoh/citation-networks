@@ -30,14 +30,15 @@ This report records the implementation tranche derived from the review-engine pl
 | 12 | Researchers can launch backward/forward citation expansion from each corpus paper. | `frontend/tests/workbench.test.tsx` | PASS |
 | 13 | An on-demand living update reuses the saved mode/routes, records its timestamp, and reports new papers. | `backend/tests/test_discovery.py::test_on_demand_living_update_records_timestamp_and_new_papers` | PASS |
 | 14 | Paid providers are blocked until a project records approver identity, justification, and non-replicability evidence. | `backend/tests/test_discovery.py::test_paid_provider_requires_explicit_non_replicable_approval`, `frontend/tests/api.test.ts` | PASS |
+| 15 | Generated substantive review sentences retain exact evidence-span IDs alongside paper citations. | `backend/tests/test_pipeline.py::test_fixture_pipeline_preserves_complete_claim_provenance` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 64 passed.
+- Backend: `uv run pytest -q` → 65 passed.
 - Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 87.20%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
-- Frontend: `npm test -- --run` → 41 passed.
+- Frontend: `npm test -- --run` → 42 passed.
 - Frontend lint: `npm run lint` → PASS.
 - Frontend types: `npx tsc --noEmit` → PASS.
 
@@ -46,5 +47,5 @@ This report records the implementation tranche derived from the review-engine pl
 - Backward and forward citation expansion are implemented; multi-hop traversal, co-citation, and stopping rules for network saturation remain future work.
 - Paid-provider approval is enforced at discovery boundaries; an approved provider adapter still must be configured before use. Zotero import/export is available through server-side credentials.
 - Full-text acquisition remains conservative; abstract-backed evidence cannot certify subtle comparisons.
-- The narrative checkpoint and grounded draft-generation stage are not yet implemented.
-- Living-review updates are currently on-demand and synchronous; scheduled refresh jobs and a frontend refresh control remain future work.
+- The narrative checkpoint exists for broader modes; richer paragraph-level drafting and editing remain future work. Generated substantive sentences now carry exact evidence-span links.
+- Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.
