@@ -12,6 +12,9 @@
    before that date and reports the number filtered from the provider result.
    The cross-disciplinary route makes three bounded searches covering adjacent
    fields, interdisciplinary methods, and applications in adjacent fields.
+   Survey hits are ranked by explicit review/survey/benchmark signals before
+   citation and date tie-breakers; ordinary routes use provider score and
+   deterministic metadata tie-breakers.
    Broad-mode stopping certificates additionally require complete date signals
    on the recent route, citation signals on the seminal route, and at least one
    review-, survey-, or benchmark-like work from the survey route. When multiple

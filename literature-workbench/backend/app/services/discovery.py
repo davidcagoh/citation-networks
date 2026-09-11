@@ -505,28 +505,46 @@ class DiscoveryService:
         if route == "recent_search":
             return sorted(
                 candidates,
-                key=lambda candidate: candidate.publication_date
-                or (str(candidate.year) if candidate.year is not None else ""),
+                key=lambda candidate: (
+                    candidate.publication_date
+                    or (str(candidate.year) if candidate.year is not None else ""),
+                    candidate.title.casefold(),
+                ),
                 reverse=True,
             )
         if route == "seminal_search":
             return sorted(
                 candidates,
-                key=lambda candidate: candidate.citation_count
-                if candidate.citation_count is not None
-                else -1,
+                key=lambda candidate: (
+                    candidate.citation_count if candidate.citation_count is not None else -1,
+                    candidate.score if candidate.score is not None else -1.0,
+                    candidate.title.casefold(),
+                ),
                 reverse=True,
             )
         if route == "survey_search":
             return sorted(
                 candidates,
-                key=lambda candidate: any(
-                    term in f"{candidate.title} {candidate.abstract or ''}".casefold()
-                    for term in ("survey", "review", "benchmark")
+                key=lambda candidate: (
+                    sum(
+                        term in f"{candidate.title} {candidate.abstract or ''}".casefold()
+                        for term in ("survey", "review", "benchmark")
+                    ),
+                    candidate.citation_count if candidate.citation_count is not None else -1,
+                    candidate.publication_date or "",
+                    candidate.title.casefold(),
                 ),
                 reverse=True,
             )
-        return list(candidates)
+        return sorted(
+            candidates,
+            key=lambda candidate: (
+                candidate.score if candidate.score is not None else -1.0,
+                candidate.citation_count if candidate.citation_count is not None else -1,
+                candidate.title.casefold(),
+            ),
+            reverse=True,
+        )
 
     @staticmethod
     def _relevance_score(
