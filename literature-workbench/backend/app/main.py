@@ -17,6 +17,7 @@ from app.domain import (
     ProjectCreate,
     ReviewPlanUpdate,
     ScopePreviewRequest,
+    SourceTextRequest,
     VerificationIssueUpdate,
 )
 from app.models import (
@@ -238,6 +239,56 @@ def create_app(
             return pipeline.acquire(project_id)
         except ProjectNotFoundError as exc:
             raise HTTPException(404, str(exc)) from exc
+
+    @app.post("/projects/{project_id}/sources/text", status_code=201)
+    def ingest_source_text(project_id: str, value: SourceTextRequest) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            paper = Paper(
+                project_id=project_id,
+                canonical_title=value.title,
+                authors=value.authors,
+                year=value.year,
+                venue=value.venue,
+                doi=value.doi,
+                metadata_provenance={"provider": "user", "source_uri": value.source_uri},
+            )
+            db.add(paper)
+            db.flush()
+            db.add(
+                SourceDocument(
+                    paper_id=paper.id,
+                    source_type="text",
+                    source_uri=value.source_uri,
+                    text=value.text,
+                    parsing_quality="complete",
+                    parser="user-text-v1",
+                )
+            )
+            db.add(
+                CorpusMembership(
+                    project_id=project_id,
+                    paper_id=paper.id,
+                    status="included",
+                    relevance_rationale="User supplied source",
+                )
+            )
+            db.add(
+                DiscoveryEvent(
+                    project_id=project_id,
+                    paper_id=paper.id,
+                    route="seed",
+                    action="included",
+                    rationale="User supplied source text",
+                    provider="user",
+                )
+            )
+            return {
+                "project_id": project_id,
+                "paper_id": paper.id,
+                "status": "included",
+                "source_type": "text",
+            }
 
     @app.post("/projects/{project_id}/runs/pipeline", status_code=201)
     def run_pipeline(project_id: str, value: PipelineRequest | None = None) -> dict:

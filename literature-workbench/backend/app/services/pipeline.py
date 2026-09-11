@@ -44,7 +44,7 @@ class RunNotResumableError(Exception):
     """Raised when a completed run is asked to resume."""
 
 
-SOURCE_TYPE_PRIORITY = {"parsed_pdf": 4, "html": 3, "abstract": 2, "metadata": 1}
+SOURCE_TYPE_PRIORITY = {"parsed_pdf": 4, "html": 3, "text": 3, "abstract": 2, "metadata": 1}
 MAX_EVIDENCE_CHARS = 1200
 
 

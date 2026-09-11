@@ -33,7 +33,9 @@ def test_ingests_user_supplied_full_text_with_provenance(tmp_path: Path) -> None
         run = client.post(f"/projects/{project_id}/runs/pipeline")
         assert run.status_code == 201
         review = client.get(f"/projects/{project_id}/review").json()["sentences"]
-        assert review[0]["text"] == "The study evaluates a memory architecture across two workloads."
+        assert review[0]["text"] == (
+            "The study evaluates a memory architecture across two workloads."
+        )
 
 
 def test_source_ingestion_rejects_blank_text_and_unknown_project(tmp_path: Path) -> None:
