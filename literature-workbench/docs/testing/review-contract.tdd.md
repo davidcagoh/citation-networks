@@ -40,12 +40,13 @@ This report records the implementation tranche derived from the review-engine pl
 | 22 | Corpus audits expose candidate yield and unique-paper yield for every executed discovery route. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, `frontend/tests/api.test.ts` | PASS |
 | 23 | Discovery preserves provider citation-count and publication-date signals through the API and screening UI. | `backend/tests/test_discovery.py::test_discovery_persists_candidates_and_route_provenance`, frontend type/lint checks | PASS |
 | 24 | PRISMA reporting reconciles identified records, deduplicated records, screening, retrieval, inclusion, and exclusion in the systematic-review UI. | `backend/tests/test_protocol.py::test_prisma_report_reconciles_protocol_search_and_screening_flow`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
+| 25 | Live source-text papers with grounded topical overlap receive a conservative cross-paper relation and comparative synthesis claim. | `backend/tests/test_sources.py::test_live_pipeline_builds_conservative_cross_paper_relation` | PASS |
 
 ## Validation evidence
 
 - RED checkpoints were created before each production implementation slice.
-- Backend: `uv run pytest -q` → 70 passed.
-- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.68%, above the 80% requirement.
+- Backend: `uv run pytest -q` → 71 passed.
+- Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.85%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
 - Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
@@ -58,5 +59,5 @@ This report records the implementation tranche derived from the review-engine pl
 - Zotero DOI/title deduplication prefers published records and retains alternate preprint provenance; richer edition/version reconciliation remains future work.
 - Discovery preserves provider citation-count and publication-date signals in provenance and exposes them during screening; they are importance/recency signals, not completeness guarantees.
 - Full-text acquisition remains conservative; abstract-backed evidence cannot certify subtle comparisons.
-- The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Richer paragraph-level generation and section-level editing remain future work.
+- The narrative checkpoint exists for broader modes; generated prose is now editable with claim/evidence links preserved. Live cross-paper comparison now uses a conservative grounded overlap heuristic; richer paragraph-level generation and section-level editing remain future work.
 - Living-review updates are currently on-demand and synchronous; scheduled refresh jobs remain future work.
