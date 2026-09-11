@@ -178,6 +178,19 @@ describe("Literature Workbench", () => {
     expect(api.approveStructure).toHaveBeenCalledWith("project-1", "run-1");
   });
 
+  it("imports a Zotero collection from Brief", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture();
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Survey agent memory.");
+    await user.type(screen.getByLabelText("Zotero collection key"), "COLLECTION");
+    await user.click(screen.getByRole("button", { name: "Import Zotero collection" }));
+
+    expect(api.importZotero).toHaveBeenCalledWith("project-1", "COLLECTION", 100);
+  });
+
   it("edits and saves the relation-backed plan", async () => {
     const user = userEvent.setup();
     const api = apiFixture({
