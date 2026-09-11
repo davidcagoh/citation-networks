@@ -2,7 +2,6 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 from sqlalchemy import select
-from sqlalchemy import select
 
 from app.main import create_app
 from app.models import EvidenceSpan, ScientificRelation, SynthesisClaim
@@ -76,7 +75,11 @@ def test_live_pipeline_builds_conservative_cross_paper_relation(tmp_path: Path) 
         ]:
             assert client.post(
                 f"/projects/{project_id}/sources/text",
-                json={"title": title, "source_uri": f"file:///{title.replace(' ', '-')}", "text": text},
+                json={
+                    "title": title,
+                    "source_uri": f"file:///{title.replace(' ', '-')}",
+                    "text": text,
+                },
             ).status_code == 201
 
         response = client.post(f"/projects/{project_id}/runs/pipeline")
@@ -91,6 +94,8 @@ def test_live_pipeline_builds_conservative_cross_paper_relation(tmp_path: Path) 
             assert relation.inference_level == "model_inference"
             assert relation.evidence_span_ids
             claims = list(
-                database.scalars(select(SynthesisClaim).where(SynthesisClaim.project_id == project_id))
+                database.scalars(
+                    select(SynthesisClaim).where(SynthesisClaim.project_id == project_id)
+                )
             )
             assert any(claim.supporting_relation_ids for claim in claims)
