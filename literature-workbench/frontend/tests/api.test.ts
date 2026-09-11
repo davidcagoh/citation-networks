@@ -33,7 +33,16 @@ describe("workbench API adapter", () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
       project_id: "project-1",
       scope: { query: "memory", mode: "quick", suggested_focus: ["Methods"] },
-      budget: { max_papers: 10, estimated_external_api_calls: 1, estimated_cost_usd: 0 },
+      budget: {
+        mode: "sufficient",
+        recommended: true,
+        max_papers: 10,
+        max_external_api_calls: 20,
+        estimated_external_api_calls: 20,
+        estimated_input_tokens: 5000,
+        estimated_output_tokens: 2500,
+        estimated_cost_usd: 0,
+      },
     }));
     vi.stubGlobal("fetch", fetchMock);
 

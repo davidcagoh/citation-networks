@@ -99,6 +99,20 @@ describe("Literature Workbench", () => {
     expect(api.scopePreview).toHaveBeenCalledWith("project-1", { mode: "thorough", max_papers: 50 });
   });
 
+  it("selects a review contract before previewing scope", async () => {
+    const user = userEvent.setup();
+    const api = apiFixture();
+    render(<WorkbenchApp api={api} />);
+
+    await user.type(screen.getByLabelText("Project title"), "Agent memory");
+    await user.type(screen.getByLabelText("Research brief"), "Survey agent memory.");
+    await user.selectOptions(screen.getByLabelText("Review mode"), "systematic");
+    await user.click(screen.getByRole("button", { name: "Preview scope" }));
+
+    expect(api.scopePreview).toHaveBeenCalledWith("project-1", { mode: "systematic", max_papers: 50 });
+    expect(await screen.findByText("PRISMA protocol and audit trail")).toBeVisible();
+  });
+
   it("edits and saves the relation-backed plan", async () => {
     const user = userEvent.setup();
     const api = apiFixture({
