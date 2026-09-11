@@ -1029,6 +1029,37 @@ def create_app(
                 {"provider": provider, "attempts": totals[0], "failures": totals[1]}
                 for provider, totals in provider_totals.items()
             ]
+            network_events = [
+                event
+                for event in events
+                if event.action == "candidate"
+                and event.route in {"citation_backward", "citation_forward", "co_citation"}
+            ]
+            network = {
+                "backward_expansions": len({
+                    (event.route, event.query)
+                    for event in network_events
+                    if event.route == "citation_backward"
+                }),
+                "forward_expansions": len({
+                    (event.route, event.query)
+                    for event in network_events
+                    if event.route == "citation_forward"
+                }),
+                "co_citation_expansions": len({
+                    (event.route, event.query)
+                    for event in network_events
+                    if event.route == "co_citation"
+                }),
+                "edges": db.scalar(
+                    select(func.count(CitationEdge.id)).where(
+                        CitationEdge.project_id == project_id
+                    )
+                ),
+                "papers_discovered": len({
+                    event.paper_id for event in network_events if event.paper_id is not None
+                }),
+            }
             provider_names = set(provider_totals)
             provider_fanout_complete = len(provider_names) <= 1 or all(
                 any(
@@ -1135,6 +1166,7 @@ def create_app(
                     "selected_total": len(selected),
                 },
                 "provider_status": provider_status,
+                "network": network,
                 "stopping_certificate": stopping_certificate,
                 "limitations": limitations,
             }

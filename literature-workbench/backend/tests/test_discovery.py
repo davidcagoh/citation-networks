@@ -464,6 +464,15 @@ def test_citation_expansion_persists_directional_edges_and_provenance(tmp_path: 
             assert event is not None
             assert event.paper_id == edge.target_paper_id
 
+        audit = client.get(f"/projects/{project_id}/coverage-audit").json()
+        assert audit["network"] == {
+            "backward_expansions": 1,
+            "forward_expansions": 0,
+            "co_citation_expansions": 0,
+            "edges": 1,
+            "papers_discovered": 1,
+        }
+
 
 def test_on_demand_living_update_records_timestamp_and_new_papers(tmp_path: Path) -> None:
     provider = FakeDiscoveryProvider()

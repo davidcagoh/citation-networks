@@ -84,6 +84,7 @@ describe("workbench API adapter", () => {
       },
       screening: { total: 2, selected: 2, unresolved_candidates: 0, excluded: 0 },
       source_text: { selected_with_usable_text: 2, selected_total: 2 }, limitations: [],
+      network: { backward_expansions: 1, forward_expansions: 0, co_citation_expansions: 0, edges: 1, papers_discovered: 1 },
       stopping_certificate: {
         status: "satisfied", mode: "comprehensive",
         required_routes: ["semantic_search", "survey_search", "recent_search"],
@@ -99,6 +100,7 @@ describe("workbench API adapter", () => {
     });
     expect(audit.stopping_certificate).toMatchObject({ status: "satisfied", mode: "comprehensive" });
     expect(audit.stopping_certificate.checks.provider_fanout_complete).toBe(false);
+    expect(audit.network.edges).toBe(1);
   });
 
   it("expands a paper through a directional citation route", async () => {
