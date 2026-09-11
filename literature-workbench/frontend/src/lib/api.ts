@@ -136,6 +136,14 @@ export interface ZoteroExportResult {
   exported_count: number;
 }
 
+export interface CitationExpansionResult {
+  project_id: string;
+  paper_id: string;
+  direction: "backward" | "forward";
+  candidate_count: number;
+  provider: string;
+}
+
 export type ReviewMode = "sufficient" | "comprehensive" | "systematic" | "quick" | "thorough";
 export type DiscoveryRoute = "semantic_search" | "survey_search" | "recent_search";
 
@@ -163,6 +171,7 @@ export interface WorkbenchApi {
   getCoverageAudit(projectId: string): Promise<CoverageAudit>;
   importZotero(projectId: string, collectionKey?: string, limit?: number): Promise<ZoteroImportResult>;
   exportZotero(projectId: string, collectionKey?: string): Promise<ZoteroExportResult>;
+  expandCitations(projectId: string, paperId: string, direction: "backward" | "forward", limit?: number): Promise<CitationExpansionResult>;
   runDiscovery(projectId: string, query: string, limit?: number, routes?: DiscoveryRoute[]): Promise<{
     candidate_count: number;
     route_count: number;
@@ -419,6 +428,21 @@ function parseZoteroExport(value: unknown): ZoteroExportResult {
   return {
     project_id: string(result.project_id, "Zotero export.project_id"),
     exported_count: number(result.exported_count, "Zotero export.exported_count"),
+  };
+}
+
+function parseCitationExpansion(value: unknown): CitationExpansionResult {
+  const result = object(value, "citation expansion");
+  const direction = string(result.direction, "citation expansion.direction");
+  if (direction !== "backward" && direction !== "forward") {
+    throw new ShapeError("citation expansion.direction is invalid");
+  }
+  return {
+    project_id: string(result.project_id, "citation expansion.project_id"),
+    paper_id: string(result.paper_id, "citation expansion.paper_id"),
+    direction,
+    candidate_count: number(result.candidate_count, "citation expansion.candidate_count"),
+    provider: string(result.provider, "citation expansion.provider"),
   };
 }
 
@@ -697,6 +721,11 @@ export function createWorkbenchApi(
       request(baseUrl, `/projects/${projectId}/integrations/zotero/export`, parseZoteroExport, {
         method: "POST",
         body: JSON.stringify(collectionKey ? { collection_key: collectionKey } : {}),
+      }),
+    expandCitations: (projectId, paperId, direction, limit = 20) =>
+      request(baseUrl, `/projects/${projectId}/runs/citation-expansion`, parseCitationExpansion, {
+        method: "POST",
+        body: JSON.stringify({ paper_id: paperId, direction, limit }),
       }),
     runDiscovery: (projectId, query, limit = 20, routes) =>
       request(baseUrl, `/projects/${projectId}/runs/discovery`, parseDiscovery, {
