@@ -541,7 +541,12 @@ class PipelineService:
             for span in evidence_spans.values():
                 if (
                     span.extractor_version
-                    in {"fixture-v1", "abstract-heuristic-v1", "text-heuristic-v1"}
+                    in {
+                        "fixture-v1",
+                        "abstract-heuristic-v1",
+                        "text-heuristic-v1",
+                        "fulltext-heuristic-v1",
+                    }
                     and span.id not in referenced_span_ids
                 ):
                     db.delete(span)
@@ -565,14 +570,13 @@ class PipelineService:
                 and paper.metadata_provenance.get("entity_type")
                 and paper.metadata_provenance.get("entity_label")
             )
-            extractor_version = (
-                "fixture-v1"
-                if fixture_extraction
-                else (
-                    "text-heuristic-v1"
-                    if document.source_type == "text"
-                    else "abstract-heuristic-v1"
-                )
+            extractor_version = "fixture-v1" if fixture_extraction else {
+                "parsed_pdf": "fulltext-heuristic-v1",
+                "html": "fulltext-heuristic-v1",
+                "text": "text-heuristic-v1",
+            }.get(document.source_type, "abstract-heuristic-v1")
+            evidence_section = (
+                "full_text" if extractor_version == "fulltext-heuristic-v1" else "abstract"
             )
             if fixture_extraction:
                 start, evidence_text = self._bounded_evidence(
@@ -616,7 +620,12 @@ class PipelineService:
                     delete(EvidenceSpan).where(
                         EvidenceSpan.paper_id == paper.id,
                         EvidenceSpan.extractor_version.in_(
-                            ["fixture-v1", "abstract-heuristic-v1", "text-heuristic-v1"]
+                            [
+                                "fixture-v1",
+                                "abstract-heuristic-v1",
+                                "text-heuristic-v1",
+                                "fulltext-heuristic-v1",
+                            ]
                         ),
                     )
                 )
@@ -624,7 +633,7 @@ class PipelineService:
                 EvidenceSpanCreate(
                     paper_id=paper.id,
                     source_document_id=document.id,
-                    section="abstract",
+                    section=evidence_section,
                     start_offset=start,
                     end_offset=start + len(evidence_text),
                     verbatim_text=evidence_text,
@@ -894,12 +903,16 @@ class PipelineService:
 
             live_only = bool(entities) and all(
                 entity.extraction_method
-                in {"abstract-heuristic-v1", "text-heuristic-v1"}
+                in {"abstract-heuristic-v1", "text-heuristic-v1", "fulltext-heuristic-v1"}
                 for entity in entities
             )
             source_label = (
                 "source text"
-                if any(entity.extraction_method == "text-heuristic-v1" for entity in entities)
+                if any(
+                    entity.extraction_method
+                    in {"text-heuristic-v1", "fulltext-heuristic-v1"}
+                    for entity in entities
+                )
                 else "abstract evidence"
             )
             section_metadata = (
