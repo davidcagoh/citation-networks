@@ -738,6 +738,7 @@ def test_broader_coverage_audit_emits_stopping_certificate(tmp_path: Path) -> No
             "selected_sources_available": True,
             "quality_signals_available": True,
             "survey_route_has_review_hit": True,
+            "provider_fanout_complete": True,
         }
 
 
@@ -1100,6 +1101,72 @@ def test_coverage_audit_reports_partial_multi_source_fanout(tmp_path: Path) -> N
         {"provider": "unavailable-source", "attempts": 1, "failures": 1},
         {"provider": "available-source", "attempts": 1, "failures": 0},
     ]
+
+
+def test_comprehensive_audit_requires_all_providers_on_required_routes(tmp_path: Path) -> None:
+    class FailingProvider:
+        name = "unavailable-source"
+
+        def search(self, query: str, limit: int):
+            raise DiscoveryProviderError("provider unavailable")
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    class HealthyProvider:
+        name = "available-source"
+
+        def search(self, query: str, limit: int):
+            return [
+                DiscoveryCandidate(
+                    external_id=f"available-{query}",
+                    title="Review of memory systems" if "survey" in query else "Memory study",
+                    authors=[],
+                    year=2025,
+                    venue=None,
+                    doi=None,
+                    abstract="A review of memory systems." if "survey" in query else "Abstract.",
+                    source_uri=None,
+                    score=None,
+                    citation_count=10,
+                    publication_date="2025-01-01",
+                )
+            ][:limit]
+
+        def related(self, external_id: str, direction: str, limit: int):
+            return []
+
+    app = create_app(
+        f"sqlite:///{tmp_path / 'workbench.db'}",
+        discovery_provider=MultiSourceDiscoveryProvider(
+            [FailingProvider(), HealthyProvider()]
+        ),
+    )
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={
+                "title": "Memory",
+                "prompt": "Find memory systems",
+                "review_mode": "comprehensive",
+            },
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={
+                "query": "memory",
+                "limit": 1,
+                "routes": [
+                    "semantic_search", "survey_search", "recent_search", "seminal_search",
+                    "cross_disciplinary_search",
+                ],
+            },
+        )
+
+        audit = client.get(f"/projects/{project_id}/coverage-audit").json()
+
+    assert audit["stopping_certificate"]["checks"]["provider_fanout_complete"] is False
+    assert "required provider fan-out is incomplete" in audit["limitations"]
 
 
 def test_multi_source_project_records_originating_provider_names(tmp_path: Path) -> None:
