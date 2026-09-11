@@ -252,6 +252,23 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     }
   }
 
+  async function expandCitations(paperId: string, direction: "backward" | "forward") {
+    if (!session) return;
+    try {
+      setRunState("discovering");
+      await api.expandCitations(session.projectId, paperId, direction, 20);
+      const [workspace, audit] = await Promise.all([
+        api.getWorkspace(session.projectId),
+        api.getCoverageAudit(session.projectId),
+      ]);
+      setSession((current) => current ? { ...current, workspace, audit, paperCount: workspace.corpus.papers.length } : current);
+      setRunState("complete");
+    } catch (caught) {
+      setRunState("idle");
+      setError(caught instanceof Error ? caught.message : "Citation expansion could not be completed.");
+    }
+  }
+
   async function savePlan(plan: ReviewPlan) {
     if (!session?.workspace.plan?.id) {
       setError("This plan cannot be edited until it has a persisted plan id.");
@@ -455,7 +472,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             {activeTab === "Brief" && (
               <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} zoteroCollectionKey={zoteroCollectionKey} onZoteroCollectionKey={setZoteroCollectionKey} hasSession={Boolean(session)} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} onZoteroImport={handleZoteroImport} onZoteroExport={handleZoteroExport} preview={scopePreview} />
             )}
-            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} paperCount={session?.paperCount ?? null} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} />}
+            {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} audit={session?.audit ?? null} paperCount={session?.paperCount ?? null} approval={session?.approval ?? null} onApprove={approveCorpus} onScreen={screenPaper} onExpand={expandCitations} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} approval={session?.approval ?? null} onApprove={approveStructure} onSave={savePlan} />}
             {activeTab === "Review" && (
               <Review
@@ -553,13 +570,14 @@ function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, resear
   );
 }
 
-function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen }: {
+function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen, onExpand }: {
   workspace: Workspace | null;
   audit: CoverageAudit | null;
   paperCount: number | null;
   approval: ApprovalGate;
   onApprove: () => Promise<void>;
   onScreen: (paperId: string, status: "candidate" | "included" | "excluded" | "pinned") => void;
+  onExpand: (paperId: string, direction: "backward" | "forward") => Promise<void>;
 }) {
   const papers = workspace?.corpus.papers ?? [];
   if (!workspace) return <Empty text="Run the fixture from Brief to populate the corpus." />;
@@ -588,6 +606,8 @@ function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen }:
               {(paper.status ?? "included") !== "included" && <button type="button" onClick={() => onScreen(paper.id, "included")}>Include {paper.title}</button>}
               {(paper.status ?? "included") !== "pinned" && <button type="button" onClick={() => onScreen(paper.id, "pinned")}>Pin {paper.title}</button>}
               {(paper.status ?? "included") !== "excluded" && <button type="button" onClick={() => onScreen(paper.id, "excluded")}>Exclude {paper.title}</button>}
+              <button type="button" onClick={() => onExpand(paper.id, "backward")}>Expand backward citations for {paper.title}</button>
+              <button type="button" onClick={() => onExpand(paper.id, "forward")}>Expand forward citations for {paper.title}</button>
             </td>
           </tr>
         ))}</tbody>
