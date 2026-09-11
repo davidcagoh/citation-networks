@@ -659,6 +659,8 @@ def create_app(
                     "canonical_title": paper.canonical_title,
                     "authors": paper.authors,
                     "year": paper.year,
+                    "publication_date": (paper.metadata_provenance or {}).get("publication_date"),
+                    "citation_count": (paper.metadata_provenance or {}).get("citation_count"),
                     "venue": paper.venue,
                     "status": membership.status,
                     "relevance_score": membership.relevance_score,

@@ -697,10 +697,11 @@ function Corpus({ workspace, audit, paperCount, approval, onApprove, onScreen, o
       <div className={styles.tableRegion} role="region" aria-label="Corpus papers" tabIndex={0}>
       <table className={styles.table}>
         <caption className={styles.srOnly}>Papers in the supplied fixture corpus</caption>
-        <thead><tr><th>Paper</th><th>Year</th><th>Status</th><th>Routes</th><th>Source text</th><th>Entities</th><th><span className={styles.srOnly}>Actions</span></th></tr></thead>
+        <thead><tr><th>Paper</th><th>Year</th><th>Signals</th><th>Status</th><th>Routes</th><th>Source text</th><th>Entities</th><th><span className={styles.srOnly}>Actions</span></th></tr></thead>
         <tbody>{papers.map((paper) => (
           <tr key={paper.id}>
             <td className={styles.paperTitle}>{paper.title}</td><td>{paper.year ?? "—"}</td>
+            <td>{paper.citation_count === null || paper.citation_count === undefined ? "—" : `${paper.citation_count} citations`}{paper.publication_date ? ` · ${paper.publication_date}` : ""}</td>
             <td><span className={styles.badge}>{paper.status ?? "included"}</span></td>
             <td>{paper.discovery_routes?.join(", ") || "—"}</td>
             <td><span className={`${styles.badge} ${paper.document_status === "degraded" ? styles.badgeDegraded : ""}`}>{paper.document_status}</span></td>

@@ -8,6 +8,8 @@ export interface Paper {
   id: string;
   title: string;
   year: number | null;
+  publication_date?: string | null;
+  citation_count?: number | null;
   document_status: string;
   status?: "candidate" | "included" | "excluded" | "pinned";
   relevance_score?: number;
@@ -592,10 +594,14 @@ function parsePaper(value: unknown, index: number): Paper {
   const paper = object(value, label);
   const year = paper.year === null ? null : number(paper.year, `${label}.year`);
   const entityCount = paper.entity_count;
+  const publicationDate = paper.publication_date;
+  const citationCount = paper.citation_count;
   return {
     id: string(paper.id, `${label}.id`),
     title: string(paper.title, `${label}.title`),
     year,
+    ...(publicationDate === undefined ? {} : { publication_date: publicationDate === null ? null : string(publicationDate, `${label}.publication_date`) }),
+    ...(citationCount === undefined ? {} : { citation_count: citationCount === null ? null : number(citationCount, `${label}.citation_count`) }),
     document_status: string(paper.document_status, `${label}.document_status`),
     ...(paper.status === undefined ? {} : { status: string(paper.status, `${label}.status`) as Paper["status"] }),
     ...(paper.relevance_score === undefined ? {} : { relevance_score: number(paper.relevance_score, `${label}.relevance_score`) }),

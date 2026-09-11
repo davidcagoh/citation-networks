@@ -38,6 +38,8 @@ class DiscoveryCandidate:
     abstract: str | None
     source_uri: str | None
     score: float | None
+    citation_count: int | None = None
+    publication_date: str | None = None
 
 
 class DiscoveryProvider(Protocol):
@@ -63,7 +65,10 @@ class SemanticScholarProvider:
             {
                 "query": query,
                 "limit": limit,
-                "fields": "paperId,title,authors,year,venue,externalIds,abstract,url",
+                "fields": (
+                    "paperId,title,authors,year,venue,externalIds,abstract,url,"
+                    "citationCount,publicationDate"
+                ),
             }
         )
         headers = {"Accept": "application/json", "User-Agent": "literature-workbench/0.1"}
@@ -82,7 +87,10 @@ class SemanticScholarProvider:
         params = urlencode(
             {
                 "limit": limit,
-                "fields": "paperId,title,authors,year,venue,externalIds,abstract,url",
+                "fields": (
+                    "paperId,title,authors,year,venue,externalIds,abstract,url,"
+                    "citationCount,publicationDate"
+                ),
             }
         )
         headers = {"Accept": "application/json", "User-Agent": "literature-workbench/0.1"}
@@ -122,6 +130,8 @@ class SemanticScholarProvider:
             abstract=item.get("abstract"),
             source_uri=item.get("url"),
             score=None,
+            citation_count=item.get("citationCount"),
+            publication_date=item.get("publicationDate"),
         )
 
 
@@ -161,6 +171,8 @@ class DiscoveryService:
                                 "provider": self.provider.name,
                                 "external_id": candidate.external_id,
                                 "source_uri": candidate.source_uri,
+                                "citation_count": candidate.citation_count,
+                                "publication_date": candidate.publication_date,
                             },
                         )
                         db.add(paper)
@@ -176,6 +188,7 @@ class DiscoveryService:
                                 ),
                             )
                         )
+                    self._update_provider_signals(paper, candidate)
                     self._persist_abstract(db, paper, candidate)
                     db.add(
                         DiscoveryEvent(
@@ -294,6 +307,8 @@ class DiscoveryService:
                             "provider": self.provider.name,
                             "external_id": candidate.external_id,
                             "source_uri": candidate.source_uri,
+                            "citation_count": candidate.citation_count,
+                            "publication_date": candidate.publication_date,
                         },
                     )
                     db.add(related)
@@ -306,7 +321,8 @@ class DiscoveryService:
                             relevance_score=candidate.score or 0.0,
                             relevance_rationale=f"Found by {route} citation expansion",
                         )
-                    )
+                        )
+                self._update_provider_signals(related, candidate)
                 source_id, target_id = (
                     (seed.id, related.id) if direction == "backward" else (related.id, seed.id)
                 )
@@ -351,6 +367,15 @@ class DiscoveryService:
                 )
             )
         return len(candidates)
+
+    @staticmethod
+    def _update_provider_signals(paper: Paper, candidate: DiscoveryCandidate) -> None:
+        provenance = dict(paper.metadata_provenance or {})
+        if candidate.citation_count is not None:
+            provenance["citation_count"] = candidate.citation_count
+        if candidate.publication_date:
+            provenance["publication_date"] = candidate.publication_date
+        paper.metadata_provenance = provenance
 
     def _ensure_provider_approved(self, db, project_id: str) -> None:
         if not getattr(self.provider, "requires_approval", False):
