@@ -14,6 +14,42 @@ function response(body: unknown, options: { ok?: boolean; status?: number; text?
 afterEach(() => vi.unstubAllGlobals());
 
 describe("workbench API adapter", () => {
+  it("runs discovery and updates corpus screening decisions", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(response({
+        project_id: "project-1",
+        candidate_count: 3,
+        provider: "semantic-scholar",
+        query: "agent memory",
+      }))
+      .mockResolvedValueOnce(response({
+        project_id: "project-1",
+        paper_id: "paper-1",
+        status: "pinned",
+        relevance_score: 0.95,
+        relevance_rationale: "Core paper",
+      }));
+    vi.stubGlobal("fetch", fetchMock);
+    const api = createWorkbenchApi("http://api");
+
+    await expect(api.runDiscovery("project-1", "agent memory", 3)).resolves.toEqual({
+      candidate_count: 3,
+      provider: "semantic-scholar",
+      query: "agent memory",
+    });
+    await expect(api.updateCorpusMembership("project-1", "paper-1", "pinned", "Core paper"))
+      .resolves.toEqual({ status: "pinned", relevance_score: 0.95, relevance_rationale: "Core paper" });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(1, "http://api/projects/project-1/runs/discovery", expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({ query: "agent memory", limit: 3 }),
+    }));
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "http://api/projects/project-1/corpus/paper-1", expect.objectContaining({
+      method: "PATCH",
+      body: JSON.stringify({ status: "pinned", relevance_rationale: "Core paper" }),
+    }));
+  });
+
   it("calls mutations and forwards evidence cancellation", async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(response({ id: "project-1", title: "Memory", prompt: "Survey it" }))
