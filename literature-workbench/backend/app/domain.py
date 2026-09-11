@@ -23,6 +23,7 @@ EntityType = Literal[
 ]
 
 ReviewMode = Literal["sufficient", "comprehensive", "systematic", "quick", "thorough"]
+DiscoveryRoute = Literal["semantic_search", "survey_search", "recent_search"]
 
 
 class ProjectCreate(BaseModel):
@@ -48,6 +49,9 @@ class CorpusMembershipUpdate(BaseModel):
 class DiscoveryRequest(BaseModel):
     query: str = Field(min_length=1, max_length=500)
     limit: int = Field(default=20, ge=1, le=100)
+    routes: list[DiscoveryRoute] = Field(
+        default_factory=lambda: ["semantic_search"], min_length=1, max_length=3
+    )
 
     @field_validator("query")
     @classmethod
@@ -56,6 +60,13 @@ class DiscoveryRequest(BaseModel):
         if not value:
             raise ValueError("must contain non-whitespace text")
         return value
+
+    @field_validator("routes")
+    @classmethod
+    def reject_duplicate_routes(cls, values: list[DiscoveryRoute]) -> list[DiscoveryRoute]:
+        if len(values) != len(set(values)):
+            raise ValueError("routes must not contain duplicates")
+        return values
 
 
 class PipelineRequest(BaseModel):

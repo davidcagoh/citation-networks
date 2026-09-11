@@ -98,63 +98,81 @@ class DiscoveryService:
         self.provider = provider
 
     def search(self, project_id: str, query: str, limit: int) -> int:
+        return self.search_routes(project_id, query, limit, ["semantic_search"])[0]
+
+    def search_routes(
+        self, project_id: str, query: str, limit: int, routes: Sequence[str]
+    ) -> tuple[int, int]:
         with self.database.session() as db:
             if db.get(Project, project_id) is None:
                 raise DiscoveryProviderError("Project not found")
-        candidates = self.provider.search(query, limit)
-        with self.database.session() as db:
-            for rank, candidate in enumerate(candidates, start=1):
-                paper = self._find_paper(db, project_id, candidate)
-                if paper is None:
-                    paper = Paper(
-                        project_id=project_id,
-                        canonical_title=candidate.title,
-                        authors=candidate.authors,
-                        year=candidate.year,
-                        venue=candidate.venue,
-                        doi=candidate.doi,
-                        abstract=candidate.abstract,
-                        metadata_provenance={
-                            "provider": self.provider.name,
-                            "external_id": candidate.external_id,
-                            "source_uri": candidate.source_uri,
-                        },
-                    )
-                    db.add(paper)
-                    db.flush()
+        total_candidates = 0
+        for route in routes:
+            route_query = self._route_query(query, route)
+            candidates = self.provider.search(route_query, limit)
+            total_candidates += len(candidates)
+            with self.database.session() as db:
+                for rank, candidate in enumerate(candidates, start=1):
+                    paper = self._find_paper(db, project_id, candidate)
+                    if paper is None:
+                        paper = Paper(
+                            project_id=project_id,
+                            canonical_title=candidate.title,
+                            authors=candidate.authors,
+                            year=candidate.year,
+                            venue=candidate.venue,
+                            doi=candidate.doi,
+                            abstract=candidate.abstract,
+                            metadata_provenance={
+                                "provider": self.provider.name,
+                                "external_id": candidate.external_id,
+                                "source_uri": candidate.source_uri,
+                            },
+                        )
+                        db.add(paper)
+                        db.flush()
+                        db.add(
+                            CorpusMembership(
+                                project_id=project_id,
+                                paper_id=paper.id,
+                                status="candidate",
+                                relevance_score=candidate.score or 0.0,
+                                relevance_rationale=(
+                                    f"Returned by {self.provider.name} for the {route} route"
+                                ),
+                            )
+                        )
+                    self._persist_abstract(db, paper, candidate)
                     db.add(
-                        CorpusMembership(
+                        DiscoveryEvent(
                             project_id=project_id,
                             paper_id=paper.id,
-                            status="candidate",
-                            relevance_score=candidate.score or 0.0,
-                            relevance_rationale=(
-                                f"Returned by {self.provider.name} for the supplied query"
-                            ),
+                            route=route,
+                            query=route_query,
+                            action="candidate",
+                            rank=rank,
+                            score=candidate.score,
+                            rationale=f"Returned by {self.provider.name} for the {route} route",
+                            provider=self.provider.name,
                         )
                     )
-                self._persist_abstract(db, paper, candidate)
                 db.add(
-                    DiscoveryEvent(
+                    UsageCostEvent(
                         project_id=project_id,
-                        paper_id=paper.id,
-                        route="semantic_search",
-                        query=query,
-                        action="candidate",
-                        rank=rank,
-                        score=candidate.score,
-                        rationale=f"Returned by {self.provider.name} for the supplied query",
                         provider=self.provider.name,
+                        external_api_calls=1,
                     )
                 )
-            db.add(
-                UsageCostEvent(
-                    project_id=project_id,
-                    provider=self.provider.name,
-                    external_api_calls=1,
-                )
-            )
-            return len(candidates)
+        return total_candidates, len(routes)
+
+    @staticmethod
+    def _route_query(query: str, route: str) -> str:
+        suffixes = {
+            "semantic_search": "",
+            "survey_search": " review survey benchmark",
+            "recent_search": " recent latest",
+        }
+        return f"{query}{suffixes[route]}"
 
     def _persist_abstract(self, db, paper: Paper, candidate: DiscoveryCandidate) -> None:
         abstract = (candidate.abstract or "").strip()

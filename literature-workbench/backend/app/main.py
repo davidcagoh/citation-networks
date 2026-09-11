@@ -251,7 +251,9 @@ def create_app(
     @app.post("/projects/{project_id}/runs/discovery", status_code=201)
     def run_discovery(project_id: str, value: DiscoveryRequest) -> dict:
         try:
-            count = discovery.search(project_id, value.query, value.limit)
+            count, route_count = discovery.search_routes(
+                project_id, value.query, value.limit, value.routes
+            )
         except DiscoveryProviderError as exc:
             if str(exc) == "Project not found":
                 raise HTTPException(404, str(exc)) from exc
@@ -259,6 +261,7 @@ def create_app(
         return {
             "project_id": project_id,
             "candidate_count": count,
+            "route_count": route_count,
             "provider": discovery.provider.name,
             "query": value.query,
         }
