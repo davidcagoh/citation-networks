@@ -80,3 +80,24 @@ def test_verification_rejects_evidence_from_another_project(tmp_path: Path) -> N
         response = client.post(f"/projects/{first}/runs/verification")
         assert response.status_code == 201
         assert response.json()["issue_count"] == 1
+
+
+def test_verification_flags_cross_source_claim_without_relation(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = _completed_project(client)
+        with app.state.database.session() as database:
+            claim = database.scalar(
+                select(SynthesisClaim).where(SynthesisClaim.project_id == project_id)
+            )
+            assert claim is not None
+            claim.inference_level = "cross_source_synthesis"
+            claim.supporting_relation_ids = []
+
+        response = client.post(f"/projects/{project_id}/runs/verification")
+
+        assert response.status_code == 201
+        assert response.json()["issue_count"] == 1
+        issue = client.get(f"/projects/{project_id}/verification").json()["issues"][0]
+        assert issue["issue_type"] == "unsupported_synthesis"
+        assert issue["severity"] == "medium"
