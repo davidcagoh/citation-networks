@@ -80,6 +80,20 @@ describe("workbench API adapter", () => {
     expect(fetchMock).toHaveBeenNthCalledWith(2, "http://api/projects/project-1/protocol", expect.objectContaining({ method: "PUT" }));
   });
 
+  it("loads the corpus checkpoint audit", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      project_id: "project-1", checkpoint: "corpus", status: "incomplete",
+      routes: { executed: ["semantic_search"], count: 1 },
+      screening: { total: 2, selected: 1, unresolved_candidates: 1, excluded: 0 },
+      source_text: { selected_with_usable_text: 1, selected_total: 1 },
+      limitations: ["candidate papers remain unscreened"],
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").getCoverageAudit("project-1"))
+      .resolves.toMatchObject({ status: "incomplete", limitations: ["candidate papers remain unscreened"] });
+  });
+
   it("runs idempotent acquisition for discovered papers", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
       project_id: "project-1", paper_count: 2, available_count: 2, degraded_count: 0,
