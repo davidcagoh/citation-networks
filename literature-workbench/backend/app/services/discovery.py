@@ -238,7 +238,10 @@ class OpenAlexProvider:
         work = self._request_json(f"{self.endpoint}/{work_id}", "citation expansion")
         candidates = []
         for referenced_id in (work.get("referenced_works") or [])[:limit]:
-            referenced = self._request_json(referenced_id, "citation expansion")
+            referenced_work_id = str(referenced_id).rstrip("/").rsplit("/", 1)[-1]
+            referenced = self._request_json(
+                f"{self.endpoint}/{referenced_work_id}", "citation expansion"
+            )
             if self._valid(referenced):
                 candidates.append(self._candidate(referenced))
         return candidates
