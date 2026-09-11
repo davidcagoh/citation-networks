@@ -67,6 +67,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 49 | Coverage audits expose directional citation/co-citation expansion counts, graph edges, and network-discovered papers for inspectable saturation diagnostics. | `backend/tests/test_discovery.py::test_citation_expansion_persists_directional_edges_and_provenance`, frontend parser/UI checks | PASS |
 | 50 | Discovery requests enforce their external-call budget before any provider request is made, returning a clear 429 when the planned fan-out would exceed the cap. | `backend/tests/test_discovery.py::test_discovery_enforces_the_requested_external_call_budget` | PASS |
 | 51 | Acquisition attempts eligible discovered direct full-text links through the injected safe fetcher, records fetched/failed counts, and preserves abstract fallback. | `backend/tests/test_sources.py::test_acquisition_fetches_eligible_discovered_full_text_links` | PASS |
+| 52 | Discovery responses report actual external fan-out calls so callers can reconcile provider usage with the preview and cap. | `backend/tests/test_discovery.py::test_multi_source_search_usage_counts_each_provider_attempt`, `frontend/tests/api.test.ts` | PASS |
 
 ## Validation evidence
 

@@ -411,6 +411,10 @@ def create_app(
             "candidate_count": count,
             "route_count": route_count,
             "filtered_count": filtered_count,
+            "external_api_calls": sum(
+                3 if route == "cross_disciplinary_search" else 1
+                for route in value.routes
+            ) * len(getattr(discovery.provider, "providers", [discovery.provider])),
             "provider": discovery.provider.name,
             "query": value.query,
         }

@@ -83,6 +83,8 @@ Discovery also enforces the request's external-call cap before fan-out begins
 (100 calls by default for the API request). A multi-source request consumes one
 call per configured provider per route query, matching scope-preview estimates;
 an over-budget request returns HTTP 429 without contacting a provider.
+The discovery response also returns `external_api_calls`, the actual planned
+fan-out count for that request, for immediate reconciliation in clients.
 
 ## Deferred extensions
 
