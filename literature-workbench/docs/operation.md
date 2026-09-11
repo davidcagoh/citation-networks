@@ -14,7 +14,9 @@
    fields, interdisciplinary methods, and applications in adjacent fields.
    Broad-mode stopping certificates additionally require complete date signals
    on the recent route, citation signals on the seminal route, and at least one
-   review-, survey-, or benchmark-like work from the survey route.
+   review-, survey-, or benchmark-like work from the survey route. When multiple
+   providers are configured, every required route must also complete on every
+   provider; the audit remains incomplete if one provider partially fails.
 4. Screen live candidates in **Corpus**. Candidates are not sent to the
    pipeline until they are included or pinned.
 5. Choose **Build grounded review** in **Run / Costs**. This runs idempotent

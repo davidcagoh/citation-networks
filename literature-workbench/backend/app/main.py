@@ -1022,6 +1022,25 @@ def create_app(
                 {"provider": provider, "attempts": totals[0], "failures": totals[1]}
                 for provider, totals in provider_totals.items()
             ]
+            provider_names = set(provider_totals)
+            provider_fanout_complete = len(provider_names) <= 1 or all(
+                any(
+                    event.route == route
+                    and event.provider == provider
+                    and event.action == "provider_attempt"
+                    and event.rationale == "Provider search completed"
+                    for event in events
+                )
+                and not any(
+                    event.route == route
+                    and event.provider == provider
+                    and event.action == "provider_attempt"
+                    and event.rationale == "Provider search failed"
+                    for event in events
+                )
+                for route in required_routes
+                for provider in provider_names
+            )
             signal_by_route = {item["route"]: item for item in signal_coverage}
             signal_requirements = {
                 "recent_search": "papers_with_publication_date",
@@ -1070,6 +1089,8 @@ def create_app(
                 limitations.append("latest/seminal routes lack complete provider signals")
             if mode in {"comprehensive", "systematic"} and not survey_route_has_review_hit:
                 limitations.append("survey route returned no review-like work")
+            if mode in {"comprehensive", "systematic"} and not provider_fanout_complete:
+                limitations.append("required provider fan-out is incomplete")
             all_candidates_screened = not candidates
             selected_sources_available = selected_with_text == len(selected)
             stopping_certificate = {
@@ -1082,6 +1103,7 @@ def create_app(
                     "selected_sources_available": selected_sources_available,
                     "quality_signals_available": quality_signals_available,
                     "survey_route_has_review_hit": survey_route_has_review_hit,
+                    "provider_fanout_complete": provider_fanout_complete,
                 },
             }
             ready = stopping_certificate["status"] == "satisfied"
