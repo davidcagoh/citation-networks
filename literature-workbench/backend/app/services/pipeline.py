@@ -44,6 +44,10 @@ class RunNotResumableError(Exception):
     """Raised when a completed run is asked to resume."""
 
 
+class ActiveRunError(Exception):
+    """Raised when a project already has a run awaiting work or approval."""
+
+
 class RunNotAwaitingCorpusApprovalError(Exception):
     """Raised when corpus approval is requested for a run at another state."""
 
@@ -187,6 +191,22 @@ class PipelineService:
     ) -> Run:
         with self.database.session() as db:
             self._require_project(db, project_id)
+            active_run = db.scalar(
+                select(Run).where(
+                    Run.project_id == project_id,
+                    Run.status.in_(
+                        [
+                            "running",
+                            "awaiting_corpus_approval",
+                            "awaiting_structure_approval",
+                        ]
+                    ),
+                )
+            )
+            if active_run is not None:
+                raise ActiveRunError(
+                    f"Project already has an active pipeline run ({active_run.id})"
+                )
             active_membership_count = len(
                 list(
                     db.scalars(

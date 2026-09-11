@@ -59,6 +59,7 @@ from app.services.discovery import (
 )
 from app.services.export import ExportFormat, ProjectExporter
 from app.services.pipeline import (
+    ActiveRunError,
     BudgetExceededError,
     CorpusRequiredError,
     PipelineService,
@@ -619,6 +620,8 @@ def create_app(
         except CorpusRequiredError as exc:
             raise HTTPException(409, str(exc)) from exc
         except BudgetExceededError as exc:
+            raise HTTPException(409, str(exc)) from exc
+        except ActiveRunError as exc:
             raise HTTPException(409, str(exc)) from exc
 
     @app.post("/projects/{project_id}/runs/{run_id}/resume", status_code=201)
