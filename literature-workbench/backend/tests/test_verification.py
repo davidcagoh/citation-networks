@@ -32,7 +32,9 @@ def test_verification_flags_unsupported_claim_and_allows_resolution(tmp_path: Pa
     with TestClient(app) as client:
         project_id = _completed_project(client)
         with app.state.database.session() as database:
-            claim = database.scalar(select(SynthesisClaim).where(SynthesisClaim.project_id == project_id))
+            claim = database.scalar(
+                select(SynthesisClaim).where(SynthesisClaim.project_id == project_id)
+            )
             assert claim is not None
             claim.supporting_evidence_span_ids = []
 
@@ -52,4 +54,6 @@ def test_verification_flags_unsupported_claim_and_allows_resolution(tmp_path: Pa
         assert resolved.json()["status"] == "resolved"
 
         with app.state.database.session() as database:
-            assert database.scalar(select(VerificationIssue.status).where(VerificationIssue.id == issue["id"])) == "resolved"
+            assert database.scalar(
+                select(VerificationIssue.status).where(VerificationIssue.id == issue["id"])
+            ) == "resolved"

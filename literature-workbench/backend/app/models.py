@@ -170,6 +170,22 @@ class SynthesisClaim(Base):
     verification_status: Mapped[str] = mapped_column(String(30), default="grounded")
 
 
+class VerificationIssue(Base):
+    __tablename__ = "verification_issues"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), index=True
+    )
+    claim_id: Mapped[str | None] = mapped_column(
+        ForeignKey("synthesis_claims.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    issue_type: Mapped[str] = mapped_column(String(50))
+    severity: Mapped[str] = mapped_column(String(20))
+    message: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(20), default="open")
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
+
+
 class ReviewSentence(Base):
     __tablename__ = "review_sentences"
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)

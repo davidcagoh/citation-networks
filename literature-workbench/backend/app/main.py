@@ -9,7 +9,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
 
 from app.db import Database
-from app.domain import CorpusMembershipUpdate, DiscoveryRequest, ProjectCreate, ReviewPlanUpdate
+from app.domain import (
+    CorpusMembershipUpdate,
+    DiscoveryRequest,
+    ProjectCreate,
+    ReviewPlanUpdate,
+    VerificationIssueUpdate,
+)
 from app.models import (
     CorpusMembership,
     DiscoveryEvent,
@@ -26,6 +32,7 @@ from app.models import (
     StageRun,
     SynthesisClaim,
     UsageCostEvent,
+    VerificationIssue,
 )
 from app.services.discovery import (
     DiscoveryProvider,
@@ -40,6 +47,7 @@ from app.services.pipeline import (
     RunNotResumableError,
     select_preferred_documents,
 )
+from app.services.verification import VerificationService
 
 MAX_EVIDENCE_RESPONSE_CHARS = 1200
 DEFAULT_ALLOWED_ORIGINS = ("http://localhost:3000", "http://127.0.0.1:3000")
@@ -91,6 +99,7 @@ def create_app(
     )
     pipeline = PipelineService(database)
     discovery = DiscoveryService(database, discovery_provider or SemanticScholarProvider())
+    verification = VerificationService(database)
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -104,6 +113,7 @@ def create_app(
     app.state.database = database
     app.state.pipeline = pipeline
     app.state.discovery = discovery
+    app.state.verification = verification
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_allowed_origins(),
@@ -411,6 +421,64 @@ def create_app(
                 "thesis": plan.thesis,
                 "organizing_principle": plan.organizing_principle,
                 "sections": plan.sections,
+            }
+
+    @app.post("/projects/{project_id}/runs/verification", status_code=201)
+    def run_verification(project_id: str) -> dict:
+        try:
+            issue_ids = verification.verify(project_id)
+        except ValueError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        return {"project_id": project_id, "issue_count": len(issue_ids), "issue_ids": issue_ids}
+
+    @app.get("/projects/{project_id}/verification")
+    def get_verification(project_id: str) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            issues = list(
+                db.scalars(
+                    select(VerificationIssue)
+                    .where(VerificationIssue.project_id == project_id)
+                    .order_by(VerificationIssue.created_at, VerificationIssue.id)
+                )
+            )
+            return {
+                "project_id": project_id,
+                "issues": [
+                    {
+                        "id": issue.id,
+                        "claim_id": issue.claim_id,
+                        "issue_type": issue.issue_type,
+                        "severity": issue.severity,
+                        "message": issue.message,
+                        "status": issue.status,
+                    }
+                    for issue in issues
+                ],
+            }
+
+    @app.patch("/projects/{project_id}/verification/{issue_id}")
+    def update_verification_issue(
+        project_id: str, issue_id: str, value: VerificationIssueUpdate
+    ) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            issue = db.scalar(
+                select(VerificationIssue).where(
+                    VerificationIssue.id == issue_id,
+                    VerificationIssue.project_id == project_id,
+                )
+            )
+            if issue is None:
+                raise HTTPException(404, "Verification issue not found")
+            issue.status = value.status
+            return {
+                "id": issue.id,
+                "claim_id": issue.claim_id,
+                "issue_type": issue.issue_type,
+                "severity": issue.severity,
+                "message": issue.message,
+                "status": issue.status,
             }
 
     @app.get("/projects/{project_id}/review")

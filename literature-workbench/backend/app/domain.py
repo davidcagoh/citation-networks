@@ -69,6 +69,10 @@ class ReviewPlanUpdate(BaseModel):
     sections: list[PlanSection] = Field(min_length=1, max_length=50)
 
 
+class VerificationIssueUpdate(BaseModel):
+    status: Literal["open", "resolved", "accepted", "dismissed"]
+
+
 class EvidenceSpanCreate(BaseModel):
     paper_id: str
     source_document_id: str
