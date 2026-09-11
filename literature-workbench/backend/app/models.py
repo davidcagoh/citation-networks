@@ -42,6 +42,22 @@ class ResearchBrief(Base):
     created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
+class ReviewProtocol(Base):
+    __tablename__ = "review_protocols"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), unique=True, index=True
+    )
+    review_mode: Mapped[str] = mapped_column(String(30), default="sufficient")
+    research_questions: Mapped[list[str]] = mapped_column(JSON, default=list)
+    inclusion_criteria: Mapped[list[str]] = mapped_column(JSON, default=list)
+    exclusion_criteria: Mapped[list[str]] = mapped_column(JSON, default=list)
+    sources: Mapped[list[str]] = mapped_column(JSON, default=list)
+    cutoff_date: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    update_policy: Mapped[str] = mapped_column(String(30), default="on_demand")
+    updated_at: Mapped[datetime] = mapped_column(default=utcnow, onupdate=utcnow)
+
+
 class Paper(Base):
     __tablename__ = "papers"
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)

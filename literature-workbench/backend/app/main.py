@@ -16,10 +16,11 @@ from app.domain import (
     PipelineRequest,
     ProjectCreate,
     ReviewPlanUpdate,
+    ReviewProtocolUpdate,
     ScopePreviewRequest,
     SourceTextRequest,
-    resource_envelope_for_mode,
     VerificationIssueUpdate,
+    resource_envelope_for_mode,
 )
 from app.models import (
     CorpusMembership,
@@ -29,6 +30,7 @@ from app.models import (
     Project,
     ResearchBrief,
     ReviewPlan,
+    ReviewProtocol,
     ReviewSentence,
     Run,
     ScientificEntity,
@@ -168,6 +170,13 @@ def create_app(
                     review_mode=value.review_mode,
                 )
             )
+            db.add(
+                ReviewProtocol(
+                    project_id=project.id,
+                    review_mode=value.review_mode,
+                    research_questions=[value.prompt],
+                )
+            )
             return _project_json(project)
 
     @app.get("/projects/{project_id}")
@@ -177,6 +186,51 @@ def create_app(
             if project is None:
                 raise HTTPException(404, "Project not found")
             return _project_json(project)
+
+    def _protocol_json(protocol: ReviewProtocol) -> dict:
+        return {
+            "id": protocol.id,
+            "project_id": protocol.project_id,
+            "review_mode": protocol.review_mode,
+            "research_questions": protocol.research_questions,
+            "inclusion_criteria": protocol.inclusion_criteria,
+            "exclusion_criteria": protocol.exclusion_criteria,
+            "sources": protocol.sources,
+            "cutoff_date": protocol.cutoff_date,
+            "update_policy": protocol.update_policy,
+            "updated_at": protocol.updated_at.isoformat(),
+        }
+
+    @app.get("/projects/{project_id}/protocol")
+    def get_protocol(project_id: str) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            protocol = db.scalar(
+                select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
+            )
+            if protocol is None:
+                raise HTTPException(404, "Review protocol not found")
+            return _protocol_json(protocol)
+
+    @app.put("/projects/{project_id}/protocol")
+    def update_protocol(project_id: str, value: ReviewProtocolUpdate) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            protocol = db.scalar(
+                select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
+            )
+            if protocol is None:
+                protocol = ReviewProtocol(project_id=project_id)
+                db.add(protocol)
+            protocol.review_mode = value.review_mode
+            protocol.research_questions = value.research_questions
+            protocol.inclusion_criteria = value.inclusion_criteria
+            protocol.exclusion_criteria = value.exclusion_criteria
+            protocol.sources = value.sources
+            protocol.cutoff_date = value.cutoff_date.isoformat() if value.cutoff_date else None
+            protocol.update_policy = value.update_policy
+            db.flush()
+            return _protocol_json(protocol)
 
     @app.delete("/projects/{project_id}", status_code=204)
     def delete_project(project_id: str) -> None:

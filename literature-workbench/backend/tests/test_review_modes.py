@@ -82,7 +82,9 @@ def test_project_and_run_persist_the_selected_review_mode(tmp_path: Path) -> Non
         assert response.status_code == 201
         assert response.json()["review_mode"] == "systematic"
         with app.state.database.session() as database:
-            brief = database.scalar(select(ResearchBrief).where(ResearchBrief.project_id == project_id))
+            brief = database.scalar(
+                select(ResearchBrief).where(ResearchBrief.project_id == project_id)
+            )
             run = database.scalar(select(Run).where(Run.project_id == project_id))
             assert brief is not None and brief.review_mode == "systematic"
             assert run is not None and run.review_mode == "systematic"

@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -62,6 +63,26 @@ class PipelineRequest(BaseModel):
     max_papers: int = Field(default=50, ge=1, le=500)
     max_external_api_calls: int = Field(default=100, ge=0, le=10_000)
     max_cost_usd: float = Field(default=5.0, ge=0, le=100_000)
+
+
+class ReviewProtocolUpdate(BaseModel):
+    review_mode: ReviewMode = "sufficient"
+    research_questions: list[str] = Field(min_length=1, max_length=20)
+    inclusion_criteria: list[str] = Field(default_factory=list, max_length=50)
+    exclusion_criteria: list[str] = Field(default_factory=list, max_length=50)
+    sources: list[str] = Field(default_factory=list, max_length=50)
+    cutoff_date: date | None = None
+    update_policy: Literal["on_demand"] = "on_demand"
+
+    @field_validator(
+        "research_questions", "inclusion_criteria", "exclusion_criteria", "sources"
+    )
+    @classmethod
+    def reject_blank_items(cls, values: list[str]) -> list[str]:
+        cleaned = [value.strip() for value in values]
+        if any(not value for value in cleaned):
+            raise ValueError("list items must contain non-whitespace text")
+        return cleaned
 
 
 class ScopePreviewRequest(BaseModel):
