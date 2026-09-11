@@ -30,6 +30,22 @@ describe("workbench API adapter", () => {
     }));
   });
 
+  it("ingests a fetched source URL as a project paper", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({
+      project_id: "project-1", paper_id: "paper-1", status: "included",
+      source_type: "fetched_text", source_uri: "https://8.8.8.8/paper.txt",
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(createWorkbenchApi("http://api").ingestSourceUrl("project-1", {
+      title: "Study", source_uri: "https://8.8.8.8/paper.txt",
+    })).resolves.toMatchObject({ source_type: "fetched_text" });
+    expect(fetchMock).toHaveBeenCalledWith("http://api/projects/project-1/sources/url", expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({ title: "Study", source_uri: "https://8.8.8.8/paper.txt" }),
+    }));
+  });
+
   it("loads a scope preview with a projected budget", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({
       project_id: "project-1",
