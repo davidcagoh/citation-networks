@@ -87,7 +87,7 @@ describe("workbench API adapter", () => {
       stopping_certificate: {
         status: "satisfied", mode: "comprehensive",
         required_routes: ["semantic_search", "survey_search", "recent_search"],
-        checks: { required_routes_executed: true, all_candidates_screened: true, selected_sources_available: true },
+        checks: { required_routes_executed: true, all_candidates_screened: true, selected_sources_available: true, provider_fanout_complete: false },
       },
     }));
     vi.stubGlobal("fetch", fetchMock);
@@ -97,6 +97,7 @@ describe("workbench API adapter", () => {
       route: "semantic_search", candidate_events: 4, unique_papers: 3,
     });
     expect(audit.stopping_certificate).toMatchObject({ status: "satisfied", mode: "comprehensive" });
+    expect(audit.stopping_certificate.checks.provider_fanout_complete).toBe(false);
   });
 
   it("expands a paper through a directional citation route", async () => {
