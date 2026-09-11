@@ -39,6 +39,7 @@ This report records the implementation tranche derived from the review-engine pl
 | 21 | Zotero imports prefer a published record over a preprint while retaining the preprint as alternate provenance. | `backend/tests/test_zotero.py::test_zotero_prefers_published_record_but_retains_preprint_provenance` | PASS |
 | 22 | Corpus audits expose candidate yield and unique-paper yield for every executed discovery route. | `backend/tests/test_discovery.py::test_coverage_audit_explains_corpus_checkpoint_readiness`, `frontend/tests/api.test.ts` | PASS |
 | 23 | Discovery preserves provider citation-count and publication-date signals through the API and screening UI. | `backend/tests/test_discovery.py::test_discovery_persists_candidates_and_route_provenance`, frontend type/lint checks | PASS |
+| 24 | PRISMA reporting reconciles identified records, deduplicated records, screening, retrieval, inclusion, and exclusion in the systematic-review UI. | `backend/tests/test_protocol.py::test_prisma_report_reconciles_protocol_search_and_screening_flow`, `frontend/tests/api.test.ts`, `frontend/tests/workbench.test.tsx` | PASS |
 
 ## Validation evidence
 
@@ -46,7 +47,7 @@ This report records the implementation tranche derived from the review-engine pl
 - Backend: `uv run pytest -q` → 70 passed.
 - Backend coverage: `uv run pytest --cov=app --cov-report=term-missing` → 85.68%, above the 80% requirement.
 - Backend lint: `uv run ruff check app tests` → PASS.
-- Frontend: `npm test -- --run` → 45 passed.
+- Frontend: `npm test -- --run` → 46 passed.
 - Frontend lint: `npm run lint` → PASS.
 - Frontend types: `npx tsc --noEmit` → PASS.
 
