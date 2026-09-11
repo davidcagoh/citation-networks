@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -312,7 +313,10 @@ class PipelineService:
                 for span_id in entity.evidence_span_ids
             }
             for span in evidence_spans.values():
-                if span.extractor_version == "fixture-v1" and span.id not in referenced_span_ids:
+                if (
+                    span.extractor_version in {"fixture-v1", "abstract-heuristic-v1"}
+                    and span.id not in referenced_span_ids
+                ):
                     db.delete(span)
             db.flush()
 
@@ -322,16 +326,31 @@ class PipelineService:
             if document is None:
                 self._discard_extraction(paper.id, existing)
                 continue
-            if not document.text or not paper.metadata_provenance.get("evidence"):
+            if not document.text:
                 with self.database.session() as db:
                     persisted = db.get(SourceDocument, document.id)
                     assert persisted is not None
                     persisted.parsing_quality = "degraded"
                 self._discard_extraction(paper.id, existing)
                 continue
-            start, evidence_text = self._bounded_evidence(
-                document.text, paper.metadata_provenance.get("evidence")
+            fixture_extraction = bool(
+                paper.metadata_provenance.get("evidence")
+                and paper.metadata_provenance.get("entity_type")
+                and paper.metadata_provenance.get("entity_label")
             )
+            extractor_version = "fixture-v1" if fixture_extraction else "abstract-heuristic-v1"
+            if fixture_extraction:
+                start, evidence_text = self._bounded_evidence(
+                    document.text, paper.metadata_provenance.get("evidence")
+                )
+                entity_type = paper.metadata_provenance["entity_type"]
+                entity_label = paper.metadata_provenance["entity_label"]
+                extraction_method = "deterministic-fixture"
+            else:
+                start, evidence_text = self._abstract_evidence(document.text)
+                entity_type = "claim"
+                entity_label = paper.canonical_title
+                extraction_method = extractor_version
             existing_spans = (
                 [
                     evidence_spans[span_id]
@@ -345,6 +364,7 @@ class PipelineService:
                 existing is not None
                 and len(existing_spans) == len(existing.evidence_span_ids)
                 and all(span.source_document_id == document.id for span in existing_spans)
+                and all(span.extractor_version == extractor_version for span in existing_spans)
                 and any(
                     span.start_offset == start and span.verbatim_text == evidence_text
                     for span in existing_spans
@@ -360,7 +380,9 @@ class PipelineService:
                 db.execute(
                     delete(EvidenceSpan).where(
                         EvidenceSpan.paper_id == paper.id,
-                        EvidenceSpan.extractor_version == "fixture-v1",
+                        EvidenceSpan.extractor_version.in_(
+                            ["fixture-v1", "abstract-heuristic-v1"]
+                        ),
                     )
                 )
             span = self.provenance.add_span(
@@ -371,15 +393,17 @@ class PipelineService:
                     start_offset=start,
                     end_offset=start + len(evidence_text),
                     verbatim_text=evidence_text,
+                    extractor_version=extractor_version,
                 )
             )
             entity = self.provenance.add_entity(
                 ScientificEntityCreate(
                     paper_id=paper.id,
-                    type=paper.metadata_provenance["entity_type"],
-                    normalized_label=paper.metadata_provenance["entity_label"],
+                    type=entity_type,
+                    normalized_label=entity_label,
                     description=evidence_text,
                     evidence_span_ids=[span.id],
+                    extraction_method=extraction_method,
                 )
             )
             created.extend([span.id, entity.id])
@@ -408,6 +432,12 @@ class PipelineService:
         start = max(0, anchor_start - 300)
         return start, text[start : start + MAX_EVIDENCE_CHARS]
 
+    @staticmethod
+    def _abstract_evidence(text: str) -> tuple[int, str]:
+        cleaned = text.strip()
+        first_sentence = re.split(r"(?<=[.!?])\s+", cleaned, maxsplit=1)[0]
+        return 0, first_sentence[:MAX_EVIDENCE_CHARS]
+
     def _relate(self, project_id: str) -> list[str]:
         with self.database.session() as db:
             existing = list(
@@ -427,10 +457,17 @@ class PipelineService:
                     .order_by(Paper.year, Paper.canonical_title)
                 )
             )
-            desired_pairs = {
-                ((source.id,), (target.id,))
-                for source, target in zip(entities, entities[1:], strict=False)
-            }
+            fixture_entities = all(
+                entity.extraction_method == "deterministic-fixture" for entity in entities
+            )
+            desired_pairs = (
+                {
+                    ((source.id,), (target.id,))
+                    for source, target in zip(entities, entities[1:], strict=False)
+                }
+                if fixture_entities
+                else set()
+            )
             for relation in existing:
                 key = (tuple(relation.source_entity_ids), tuple(relation.target_entity_ids))
                 if key not in desired_pairs:
@@ -442,6 +479,8 @@ class PipelineService:
                 if (tuple(relation.source_entity_ids), tuple(relation.target_entity_ids))
                 in desired_pairs
             ]
+        if not desired_pairs:
+            return []
         relation_types = ["addresses_bottleneck_from", "contrasts_with", "extends"]
         existing_by_endpoints: dict[
             tuple[tuple[str, ...], tuple[str, ...]], ScientificRelation
@@ -534,7 +573,10 @@ class PipelineService:
             db.flush()
             claims: list[SynthesisClaim] = []
             for entity in entities:
-                text = papers[entity.paper_id].metadata_provenance.get("claim")
+                text = (
+                    papers[entity.paper_id].metadata_provenance.get("claim")
+                    or entity.description
+                )
                 if not text:
                     continue
                 incoming = incoming_relations.get(entity.id)
@@ -568,16 +610,28 @@ class PipelineService:
                 db.flush()
                 claims.append(claim)
 
-            section_metadata = [
-                (
-                    "From traces to consolidation",
-                    "Explain why accumulated memories motivate more selective recall.",
-                ),
-                (
-                    "Structure and conflict",
-                    "Compare structural responses to dependency and consistency failures.",
-                ),
-            ]
+            live_only = bool(entities) and all(
+                entity.extraction_method == "abstract-heuristic-v1" for entity in entities
+            )
+            section_metadata = (
+                [
+                    (
+                        "Direct findings from discovered papers",
+                        "Summarize provider-supplied abstract evidence before deeper extraction.",
+                    )
+                ]
+                if live_only
+                else [
+                    (
+                        "From traces to consolidation",
+                        "Explain why accumulated memories motivate more selective recall.",
+                    ),
+                    (
+                        "Structure and conflict",
+                        "Compare structural responses to dependency and consistency failures.",
+                    ),
+                ]
+            )
             sections = []
             for section_index, claim_start in enumerate(range(0, len(claims), 2)):
                 section_claims = claims[claim_start : claim_start + 2]
@@ -608,10 +662,15 @@ class PipelineService:
             plan = existing_plan or ReviewPlan(project_id=project_id)
             plan.title = f"Evidence structure for {project.title}"
             plan.thesis = (
-                "Agent-memory architectures evolve by responding to specific recall failures, "
+                "The discovered literature is currently represented by directly inspectable "
+                "abstract evidence; deeper synthesis should follow source acquisition."
+                if live_only
+                else "Agent-memory architectures evolve by responding to specific recall failures, "
                 "with each mechanism introducing a new operational trade-off."
             )
-            plan.organizing_principle = "failure to design response"
+            plan.organizing_principle = (
+                "source evidence to synthesis" if live_only else "failure to design response"
+            )
             plan.sections = sections
             if existing_plan is None:
                 db.add(plan)

@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 from sqlalchemy import select
 
 from app.db import Database
-from app.models import CorpusMembership, DiscoveryEvent, Paper, Project
+from app.models import CorpusMembership, DiscoveryEvent, Paper, Project, SourceDocument
 
 
 class DiscoveryProviderError(Exception):
@@ -91,10 +91,11 @@ class DiscoveryService:
         self.provider = provider
 
     def search(self, project_id: str, query: str, limit: int) -> int:
-        candidates = self.provider.search(query, limit)
         with self.database.session() as db:
             if db.get(Project, project_id) is None:
                 raise DiscoveryProviderError("Project not found")
+        candidates = self.provider.search(query, limit)
+        with self.database.session() as db:
             for rank, candidate in enumerate(candidates, start=1):
                 paper = self._find_paper(db, project_id, candidate)
                 if paper is None:
@@ -125,6 +126,7 @@ class DiscoveryService:
                             ),
                         )
                     )
+                self._persist_abstract(db, paper, candidate)
                 db.add(
                     DiscoveryEvent(
                         project_id=project_id,
@@ -139,6 +141,32 @@ class DiscoveryService:
                     )
                 )
             return len(candidates)
+
+    def _persist_abstract(self, db, paper: Paper, candidate: DiscoveryCandidate) -> None:
+        abstract = (candidate.abstract or "").strip()
+        if not abstract:
+            return
+        source_uri = candidate.source_uri or (
+            f"https://api.semanticscholar.org/graph/v1/paper/{candidate.external_id}"
+        )
+        existing = db.scalar(
+            select(SourceDocument).where(
+                SourceDocument.paper_id == paper.id,
+                SourceDocument.source_type == "abstract",
+                SourceDocument.source_uri == source_uri,
+            )
+        )
+        if existing is None:
+            db.add(
+                SourceDocument(
+                    paper_id=paper.id,
+                    source_type="abstract",
+                    source_uri=source_uri,
+                    text=abstract,
+                    parsing_quality="complete",
+                    parser=f"{self.provider.name}-abstract-v1",
+                )
+            )
 
     @staticmethod
     def _find_paper(db, project_id: str, candidate: DiscoveryCandidate) -> Paper | None:
