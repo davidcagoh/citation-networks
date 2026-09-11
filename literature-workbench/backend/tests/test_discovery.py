@@ -766,6 +766,7 @@ def test_broader_coverage_audit_emits_stopping_certificate(tmp_path: Path) -> No
             "quality_signals_available": True,
             "survey_route_has_review_hit": True,
             "provider_fanout_complete": True,
+            "selected_reports_retrieved": True,
         }
 
 
@@ -827,6 +828,42 @@ def test_broader_audit_rejects_missing_latest_and_seminal_signals(tmp_path: Path
     assert audit["stopping_certificate"]["checks"]["survey_route_has_review_hit"] is False
     assert "latest/seminal routes lack complete provider signals" in audit["limitations"]
     assert "survey route returned no review-like work" in audit["limitations"]
+
+
+def test_systematic_audit_requires_retrieved_reports(tmp_path: Path) -> None:
+    provider = FakeDiscoveryProvider()
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}", discovery_provider=provider)
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={
+                "title": "Memory",
+                "prompt": "Find memory systems",
+                "review_mode": "systematic",
+            },
+        ).json()["id"]
+        client.post(
+            f"/projects/{project_id}/runs/discovery",
+            json={
+                "query": "memory",
+                "limit": 1,
+                "routes": [
+                    "semantic_search", "survey_search", "recent_search", "seminal_search",
+                    "cross_disciplinary_search",
+                ],
+            },
+        )
+        for paper in client.get(f"/projects/{project_id}/corpus").json()["papers"]:
+            client.patch(
+                f"/projects/{project_id}/corpus/{paper['id']}",
+                json={"status": "included"},
+            )
+
+        audit = client.get(f"/projects/{project_id}/coverage-audit").json()
+
+    assert audit["stopping_certificate"]["status"] == "incomplete"
+    assert audit["stopping_certificate"]["checks"]["selected_reports_retrieved"] is False
+    assert "systematic review has selected reports not retrieved" in audit["limitations"]
 
 
 def test_discovery_validates_query_and_limit(tmp_path: Path) -> None:
