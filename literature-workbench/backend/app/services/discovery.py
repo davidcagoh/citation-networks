@@ -153,7 +153,9 @@ class DiscoveryService:
         total_candidates = 0
         for route in routes:
             route_query = self._route_query(query, route)
-            candidates = self.provider.search(route_query, limit)
+            candidates = self._order_candidates(
+                self.provider.search(route_query, limit), route
+            )
             total_candidates += len(candidates)
             with self.database.session() as db:
                 for rank, candidate in enumerate(candidates, start=1):
@@ -211,6 +213,36 @@ class DiscoveryService:
                     )
                 )
         return total_candidates, len(routes)
+
+    @staticmethod
+    def _order_candidates(
+        candidates: Sequence[DiscoveryCandidate], route: str
+    ) -> list[DiscoveryCandidate]:
+        if route == "recent_search":
+            return sorted(
+                candidates,
+                key=lambda candidate: candidate.publication_date
+                or (str(candidate.year) if candidate.year is not None else ""),
+                reverse=True,
+            )
+        if route == "seminal_search":
+            return sorted(
+                candidates,
+                key=lambda candidate: candidate.citation_count
+                if candidate.citation_count is not None
+                else -1,
+                reverse=True,
+            )
+        if route == "survey_search":
+            return sorted(
+                candidates,
+                key=lambda candidate: any(
+                    term in f"{candidate.title} {candidate.abstract or ''}".casefold()
+                    for term in ("survey", "review", "benchmark")
+                ),
+                reverse=True,
+            )
+        return list(candidates)
 
     def expand_citations(
         self, project_id: str, paper_id: str, direction: str, limit: int
