@@ -34,6 +34,10 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   const [verificationIssues, setVerificationIssues] = useState<VerificationIssue[]>([]);
   const [maxPapers, setMaxPapers] = useState(50);
   const [reviewMode, setReviewMode] = useState<ReviewMode>("sufficient");
+  const [researchQuestions, setResearchQuestions] = useState("");
+  const [inclusionCriteria, setInclusionCriteria] = useState("");
+  const [exclusionCriteria, setExclusionCriteria] = useState("");
+  const [cutoffDate, setCutoffDate] = useState("");
   const [scopePreview, setScopePreview] = useState<ScopePreview | null>(null);
   const [previewProjectId, setPreviewProjectId] = useState<string | null>(null);
   const [evidenceLoading, setEvidenceLoading] = useState(false);
@@ -52,6 +56,19 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     complete: "Complete",
   };
 
+  async function persistProtocol(projectId: string) {
+    const questions = researchQuestions.split("\n").map((item) => item.trim()).filter(Boolean);
+    await api.updateProtocol(projectId, {
+      review_mode: reviewMode,
+      research_questions: questions.length > 0 ? questions : [prompt.trim()],
+      inclusion_criteria: inclusionCriteria.split("\n").map((item) => item.trim()).filter(Boolean),
+      exclusion_criteria: exclusionCriteria.split("\n").map((item) => item.trim()).filter(Boolean),
+      sources: ["zotero", "openalex", "semantic-scholar"],
+      cutoff_date: cutoffDate || null,
+      update_policy: "on_demand",
+    });
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!title.trim() || !prompt.trim()) return;
@@ -67,6 +84,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     try {
       setRunState("creating");
       const project = await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
+      await persistProtocol(project.id);
       setRunState("ingesting");
       const ingest = await api.ingestFixture(project.id);
       setRunState("running");
@@ -93,6 +111,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
       const project = previewProjectId
         ? { id: previewProjectId }
         : await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
+      await persistProtocol(project.id);
       setRunState("discovering");
       const discovery = await api.runDiscovery(project.id, prompt.trim(), 20);
       const workspace = await api.getWorkspace(project.id);
@@ -112,6 +131,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     try {
       setRunState("creating");
       const project = await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
+      await persistProtocol(project.id);
       const preview = await api.scopePreview(project.id, { mode: reviewMode, max_papers: maxPapers });
       setScopePreview(preview);
       setPreviewProjectId(project.id);
@@ -128,6 +148,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     try {
       setRunState("creating");
       const project = await api.createProject({ title: title.trim(), prompt: prompt.trim(), review_mode: reviewMode });
+      await persistProtocol(project.id);
       await api.ingestSourceText(project.id, {
         title: title.trim(),
         source_uri: `user://${project.id}/source-text`,
@@ -335,7 +356,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
             key={activeTab}
           >
             {activeTab === "Brief" && (
-              <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} preview={scopePreview} />
+              <BriefForm title={title} prompt={prompt} sourceText={sourceText} reviewMode={reviewMode} onReviewMode={setReviewMode} researchQuestions={researchQuestions} onResearchQuestions={setResearchQuestions} inclusionCriteria={inclusionCriteria} onInclusionCriteria={setInclusionCriteria} exclusionCriteria={exclusionCriteria} onExclusionCriteria={setExclusionCriteria} cutoffDate={cutoffDate} onCutoffDate={setCutoffDate} busy={busy} status={statusText[runState]} onTitle={(value) => { setTitle(value); setScopePreview(null); setPreviewProjectId(null); }} onPrompt={(value) => { setPrompt(value); setResearchQuestions(value); setScopePreview(null); setPreviewProjectId(null); }} onSourceText={setSourceText} onSubmit={handleSubmit} onDiscover={handleDiscovery} onPreview={handleScopePreview} onImport={handleImportSource} preview={scopePreview} />
             )}
             {activeTab === "Corpus" && <Corpus workspace={session?.workspace ?? null} paperCount={session?.paperCount ?? null} onScreen={screenPaper} />}
             {activeTab === "Structure" && <Structure workspace={session?.workspace ?? null} onSave={savePlan} />}
@@ -358,9 +379,13 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   );
 }
 
-function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, busy, status, onTitle, onPrompt, onSourceText, onSubmit, onDiscover, onPreview, onImport, preview }: {
+function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, researchQuestions, onResearchQuestions, inclusionCriteria, onInclusionCriteria, exclusionCriteria, onExclusionCriteria, cutoffDate, onCutoffDate, busy, status, onTitle, onPrompt, onSourceText, onSubmit, onDiscover, onPreview, onImport, preview }: {
   title: string; prompt: string; sourceText: string; busy: boolean; status: string;
   reviewMode: ReviewMode; onReviewMode: (value: ReviewMode) => void;
+  researchQuestions: string; onResearchQuestions: (value: string) => void;
+  inclusionCriteria: string; onInclusionCriteria: (value: string) => void;
+  exclusionCriteria: string; onExclusionCriteria: (value: string) => void;
+  cutoffDate: string; onCutoffDate: (value: string) => void;
   onTitle: (value: string) => void; onPrompt: (value: string) => void;
   onSourceText: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -390,6 +415,22 @@ function BriefForm({ title, prompt, sourceText, reviewMode, onReviewMode, busy, 
           <option value="comprehensive">Comprehensive Survey</option>
           <option value="systematic">Systematic Review (PRISMA)</option>
         </select>
+      </div>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="research-questions">Research questions <span className={styles.hint}>One per line</span></label>
+        <textarea id="research-questions" aria-label="Research questions" className={styles.textarea} value={researchQuestions} onChange={(event) => onResearchQuestions(event.target.value)} placeholder="Which questions should the review answer?" />
+      </div>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="inclusion-criteria">Inclusion criteria <span className={styles.hint}>One per line</span></label>
+        <textarea id="inclusion-criteria" aria-label="Inclusion criteria" className={styles.textarea} value={inclusionCriteria} onChange={(event) => onInclusionCriteria(event.target.value)} placeholder="What belongs in the corpus?" />
+      </div>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="exclusion-criteria">Exclusion criteria <span className={styles.hint}>One per line</span></label>
+        <textarea id="exclusion-criteria" aria-label="Exclusion criteria" className={styles.textarea} value={exclusionCriteria} onChange={(event) => onExclusionCriteria(event.target.value)} placeholder="What should be excluded?" />
+      </div>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="cutoff-date">Literature cutoff <span className={styles.hint}>Optional</span></label>
+        <input id="cutoff-date" aria-label="Literature cutoff" className={styles.input} type="date" value={cutoffDate} onChange={(event) => onCutoffDate(event.target.value)} />
       </div>
       <div className={styles.actionRow}>
         <button className={styles.primary} type="submit" disabled={busy}>{busy ? status : "Create and run fixture"}</button>
