@@ -469,8 +469,8 @@ describe("workbench API adapter", () => {
     const workspace = await createWorkbenchApi("http://api").getWorkspace("project-1", "run-1");
     expect(workspace.plan?.title).toBe("Current");
     expect(workspace.costs.stages).toEqual([
-      { stage: "writing", status: "completed", calls: 2, input_tokens: 20, output_tokens: 7, cost: 0.01 },
-      { stage: "planning", status: "completed", calls: 0, input_tokens: 0, output_tokens: 0, cost: 0 },
+      { stage: "writing", provider: "deterministic-fixture", model: "rules-v1", status: "completed", calls: 2, input_tokens: 20, output_tokens: 7, cost: 0.01 },
+      { stage: "planning", provider: "deterministic-fixture", model: "rules-v1", status: "completed", calls: 0, input_tokens: 0, output_tokens: 0, cost: 0 },
     ]);
   });
 
