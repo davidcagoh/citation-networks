@@ -1,9 +1,11 @@
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 
 from app.domain import ResourceEnvelope, ScopePreviewRequest
 from app.main import create_app
+from app.models import ResearchBrief, Run
 
 
 def test_scope_preview_request_supports_the_three_review_contracts() -> None:
@@ -58,3 +60,29 @@ def test_scope_preview_rejects_unknown_review_mode(tmp_path: Path) -> None:
         )
 
         assert response.status_code == 422
+
+
+def test_project_and_run_persist_the_selected_review_mode(tmp_path: Path) -> None:
+    app = create_app(f"sqlite:///{tmp_path / 'workbench.db'}")
+    with TestClient(app) as client:
+        project_id = client.post(
+            "/projects",
+            json={
+                "title": "Memory",
+                "prompt": "Survey memory systems for LLM agents",
+                "review_mode": "systematic",
+            },
+        ).json()["id"]
+        client.post(f"/projects/{project_id}/fixtures/provenance-corpus")
+        response = client.post(
+            f"/projects/{project_id}/runs/pipeline",
+            json={"review_mode": "systematic"},
+        )
+
+        assert response.status_code == 201
+        assert response.json()["review_mode"] == "systematic"
+        with app.state.database.session() as database:
+            brief = database.scalar(select(ResearchBrief).where(ResearchBrief.project_id == project_id))
+            run = database.scalar(select(Run).where(Run.project_id == project_id))
+            assert brief is not None and brief.review_mode == "systematic"
+            assert run is not None and run.review_mode == "systematic"
