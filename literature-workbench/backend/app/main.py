@@ -214,6 +214,63 @@ def create_app(
                 raise HTTPException(404, "Review protocol not found")
             return _protocol_json(protocol)
 
+    @app.get("/projects/{project_id}/prisma-report")
+    def prisma_report(project_id: str) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            protocol = db.scalar(
+                select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
+            )
+            if protocol is None:
+                raise HTTPException(404, "Review protocol not found")
+            memberships = list(
+                db.scalars(
+                    select(CorpusMembership).where(CorpusMembership.project_id == project_id)
+                )
+            )
+            events = list(
+                db.scalars(
+                    select(DiscoveryEvent)
+                    .where(DiscoveryEvent.project_id == project_id)
+                    .order_by(DiscoveryEvent.created_at, DiscoveryEvent.id)
+                )
+            )
+            identification_events = [event for event in events if event.action == "candidate"]
+            queries = list(
+                dict.fromkeys(event.query for event in identification_events if event.query)
+            )
+            routes = list(dict.fromkeys(event.route for event in identification_events))
+            last_search = (
+                identification_events[-1].created_at.isoformat() if identification_events else None
+            )
+            return {
+                "project_id": project_id,
+                "review_mode": protocol.review_mode,
+                "protocol": {
+                    "research_questions": protocol.research_questions,
+                    "inclusion_criteria": protocol.inclusion_criteria,
+                    "exclusion_criteria": protocol.exclusion_criteria,
+                    "sources": protocol.sources,
+                    "cutoff_date": protocol.cutoff_date,
+                    "update_policy": protocol.update_policy,
+                },
+                "search": {
+                    "routes": routes,
+                    "queries": queries,
+                    "last_search_at": last_search,
+                },
+                "flow": {
+                    "identified": len(identification_events),
+                    "screened": len(memberships),
+                    "included": sum(
+                        membership.status in {"included", "pinned"} for membership in memberships
+                    ),
+                    "excluded": sum(
+                        membership.status == "excluded" for membership in memberships
+                    ),
+                },
+            }
+
     @app.put("/projects/{project_id}/protocol")
     def update_protocol(project_id: str, value: ReviewProtocolUpdate) -> dict:
         with database.session() as db:

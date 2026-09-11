@@ -14,25 +14,25 @@ class ProtocolDiscoveryProvider:
     def search(self, query: str, limit: int) -> list[DiscoveryCandidate]:
         return [
             DiscoveryCandidate(
-                external_id=f"{query}-1",
-                title=f"Study for {query}",
+                external_id="paper-1",
+                title="Study for memory",
                 authors=["Researcher"],
                 year=2025,
                 venue="Test Venue",
                 doi=None,
                 abstract="Abstract.",
-                source_uri=f"https://example.test/{query}",
+                source_uri="https://example.test/memory-1",
                 score=0.9,
             ),
             DiscoveryCandidate(
-                external_id=f"{query}-2",
-                title=f"Follow-up for {query}",
+                external_id="paper-2",
+                title="Follow-up for memory",
                 authors=["Researcher"],
                 year=2024,
                 venue="Test Venue",
                 doi=None,
                 abstract="Abstract.",
-                source_uri=f"https://example.test/{query}/2",
+                source_uri="https://example.test/memory-2",
                 score=0.8,
             ),
         ][:limit]
