@@ -5,6 +5,7 @@ import math
 import os
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import date
 from typing import Protocol
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -145,18 +146,26 @@ class DiscoveryService:
         return self.search_routes(project_id, query, limit, ["semantic_search"])[0]
 
     def search_routes(
-        self, project_id: str, query: str, limit: int, routes: Sequence[str]
-    ) -> tuple[int, int]:
+        self,
+        project_id: str,
+        query: str,
+        limit: int,
+        routes: Sequence[str],
+        cutoff_date: str | None = None,
+    ) -> tuple[int, int, int]:
         with self.database.session() as db:
             if db.get(Project, project_id) is None:
                 raise DiscoveryProviderError("Project not found")
             self._ensure_provider_approved(db, project_id)
         total_candidates = 0
+        filtered_candidates = 0
         for route in routes:
             route_query = self._route_query(query, route)
             candidates = self._order_candidates(
                 self.provider.search(route_query, limit), route
             )
+            candidates, excluded_count = self._apply_cutoff(candidates, cutoff_date)
+            filtered_candidates += excluded_count
             total_candidates += len(candidates)
             with self.database.session() as db:
                 for rank, candidate in enumerate(candidates, start=1):
@@ -222,7 +231,33 @@ class DiscoveryService:
                         external_api_calls=1,
                     )
                 )
-        return total_candidates, len(routes)
+        return total_candidates, len(routes), filtered_candidates
+
+    @staticmethod
+    def _apply_cutoff(
+        candidates: Sequence[DiscoveryCandidate], cutoff_date: str | None
+    ) -> tuple[list[DiscoveryCandidate], int]:
+        if cutoff_date is None:
+            return list(candidates), 0
+        cutoff = date.fromisoformat(cutoff_date)
+        retained: list[DiscoveryCandidate] = []
+        excluded = 0
+        for candidate in candidates:
+            published = None
+            if candidate.publication_date:
+                try:
+                    published = date.fromisoformat(candidate.publication_date)
+                except ValueError:
+                    pass
+            if (published is not None and published > cutoff) or (
+                published is None
+                and candidate.year is not None
+                and candidate.year > cutoff.year
+            ):
+                excluded += 1
+            else:
+                retained.append(candidate)
+        return retained, excluded
 
     @staticmethod
     def _order_candidates(

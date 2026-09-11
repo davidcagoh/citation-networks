@@ -363,9 +363,15 @@ def create_app(
 
     @app.post("/projects/{project_id}/runs/discovery", status_code=201)
     def run_discovery(project_id: str, value: DiscoveryRequest) -> dict:
+        with database.session() as db:
+            require_project(db, project_id)
+            protocol = db.scalar(
+                select(ReviewProtocol).where(ReviewProtocol.project_id == project_id)
+            )
+            cutoff_date = protocol.cutoff_date if protocol else None
         try:
-            count, route_count = discovery.search_routes(
-                project_id, value.query, value.limit, value.routes
+            count, route_count, filtered_count = discovery.search_routes(
+                project_id, value.query, value.limit, value.routes, cutoff_date
             )
         except DiscoveryProviderError as exc:
             if str(exc) == "Project not found":
@@ -377,6 +383,7 @@ def create_app(
             "project_id": project_id,
             "candidate_count": count,
             "route_count": route_count,
+            "filtered_count": filtered_count,
             "provider": discovery.provider.name,
             "query": value.query,
         }
@@ -475,8 +482,12 @@ def create_app(
                 db.scalars(select(Paper.id).where(Paper.project_id == project_id))
             )
         try:
-            candidate_count, route_count = discovery.search_routes(
-                project_id, project.prompt, value.limit, routes
+            candidate_count, route_count, filtered_count = discovery.search_routes(
+                project_id,
+                project.prompt,
+                value.limit,
+                routes,
+                protocol.cutoff_date if protocol else None,
             )
         except DiscoveryProviderError as exc:
             if str(exc) == "Project not found":
@@ -503,6 +514,7 @@ def create_app(
             "candidate_count": candidate_count,
             "new_paper_count": len(after_ids - before_ids),
             "route_count": route_count,
+            "filtered_count": filtered_count,
             "last_updated_at": persisted_updated_at.isoformat(),
         }
 

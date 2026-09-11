@@ -612,11 +612,12 @@ function parseProviderApproval(value: unknown): ProviderApproval {
   };
 }
 
-function parseDiscovery(value: unknown): { candidate_count: number; route_count: number; provider: string; query: string } {
+function parseDiscovery(value: unknown): { candidate_count: number; route_count: number; filtered_count: number; provider: string; query: string } {
   const discovery = object(value, "discovery");
   return {
     candidate_count: number(discovery.candidate_count, "discovery.candidate_count"),
     route_count: number(discovery.route_count ?? 1, "discovery.route_count"),
+    filtered_count: number(discovery.filtered_count ?? 0, "discovery.filtered_count"),
     provider: string(discovery.provider, "discovery.provider"),
     query: string(discovery.query, "discovery.query"),
   };
