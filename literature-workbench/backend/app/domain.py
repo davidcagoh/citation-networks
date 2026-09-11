@@ -54,6 +54,12 @@ class DiscoveryRequest(BaseModel):
         return value
 
 
+class PipelineRequest(BaseModel):
+    max_papers: int = Field(default=50, ge=1, le=500)
+    max_external_api_calls: int = Field(default=100, ge=0, le=10_000)
+    max_cost_usd: float = Field(default=5.0, ge=0, le=100_000)
+
+
 class PlanSection(BaseModel):
     title: str = Field(min_length=1, max_length=300)
     purpose: str = Field(min_length=1, max_length=10_000)

@@ -169,7 +169,8 @@ describe("Literature Workbench", () => {
     await user.click(screen.getByRole("tab", { name: "Run / Costs" }));
     await user.click(screen.getByRole("button", { name: "Build grounded review" }));
 
-    expect(api.runPipeline).toHaveBeenCalledWith("project-1");
+    expect(api.acquire).toHaveBeenCalledWith("project-1");
+    expect(api.runPipeline).toHaveBeenCalledWith("project-1", { max_papers: 50 });
   });
 
   it("runs the supplied-corpus workflow and exposes claim evidence", async () => {

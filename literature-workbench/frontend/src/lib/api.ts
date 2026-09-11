@@ -118,7 +118,11 @@ export interface WorkbenchApi {
     issueId: string,
     status: VerificationIssue["status"],
   ): Promise<VerificationIssue>;
-  runPipeline(projectId: string): Promise<{ id: string; status: string }>;
+  runPipeline(projectId: string, budget?: {
+    max_papers?: number;
+    max_external_api_calls?: number;
+    max_cost_usd?: number;
+  }): Promise<{ id: string; status: string }>;
   getWorkspace(projectId: string, runId?: string): Promise<Workspace>;
   getClaimEvidence(projectId: string, claimId: string, signal?: AbortSignal): Promise<ClaimEvidence>;
 }
@@ -471,8 +475,11 @@ export function createWorkbenchApi(
           method: "PATCH",
           body: JSON.stringify({ status }),
         }),
-    runPipeline: (projectId) =>
-      request(baseUrl, `/projects/${projectId}/runs/pipeline`, parseRun, { method: "POST" }),
+    runPipeline: (projectId, budget) =>
+      request(baseUrl, `/projects/${projectId}/runs/pipeline`, parseRun, {
+        method: "POST",
+        ...(budget ? { body: JSON.stringify(budget) } : {}),
+      }),
     async getWorkspace(projectId, runId) {
       const runRequest = runId
         ? request(

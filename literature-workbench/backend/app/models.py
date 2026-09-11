@@ -209,6 +209,10 @@ class Run(Base):
         ForeignKey("projects.id", ondelete="CASCADE"), index=True
     )
     status: Mapped[str] = mapped_column(String(30), default="running")
+    max_papers: Mapped[int] = mapped_column(Integer, default=50)
+    max_external_api_calls: Mapped[int] = mapped_column(Integer, default=100)
+    max_cost_usd: Mapped[float] = mapped_column(Float, default=5.0)
+    estimated_cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
     started_at: Mapped[datetime] = mapped_column(default=utcnow)
     completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
 

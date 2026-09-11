@@ -31,6 +31,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
   const [error, setError] = useState<string | null>(null);
   const [selectedEvidence, setSelectedEvidence] = useState<ClaimEvidence | null>(null);
   const [verificationIssues, setVerificationIssues] = useState<VerificationIssue[]>([]);
+  const [maxPapers, setMaxPapers] = useState(50);
   const [evidenceLoading, setEvidenceLoading] = useState(false);
   const evidenceController = useRef<AbortController | null>(null);
   const evidenceSequence = useRef(0);
@@ -164,7 +165,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
     try {
       setRunState("running");
       await api.acquire(session.projectId);
-      const run = await api.runPipeline(session.projectId);
+      const run = await api.runPipeline(session.projectId, { max_papers: maxPapers });
       const workspace = await api.getWorkspace(session.projectId, run.id);
       setSession((current) => current ? {
         ...current,
@@ -301,7 +302,7 @@ export function WorkbenchApp({ api }: { api: WorkbenchApi }) {
                 onResolve={resolveVerificationIssue}
               />
             )}
-            {activeTab === "Run / Costs" && <Costs workspace={session?.workspace ?? null} status={statusText[runState]} onBuild={buildReview} busy={busy} />}
+            {activeTab === "Run / Costs" && <Costs workspace={session?.workspace ?? null} status={statusText[runState]} onBuild={buildReview} busy={busy} maxPapers={maxPapers} onMaxPapers={setMaxPapers} />}
           </section>
         </main>
       </div>
@@ -504,11 +505,13 @@ function EvidenceDetail({ evidence }: { evidence: ClaimEvidence }) {
   );
 }
 
-function Costs({ workspace, status, onBuild, busy }: {
+function Costs({ workspace, status, onBuild, busy, maxPapers, onMaxPapers }: {
   workspace: Workspace | null;
   status: string;
   onBuild: () => Promise<void>;
   busy: boolean;
+  maxPapers: number;
+  onMaxPapers: (value: number) => void;
 }) {
   if (!workspace) return <Empty text="Stage usage will appear after the first pipeline run." />;
   const stages = workspace.costs.stages;
@@ -522,6 +525,10 @@ function Costs({ workspace, status, onBuild, busy }: {
           {busy ? status : "Build grounded review"}
         </button>
         <span className={styles.microcopy}>Uses included and pinned papers only.</span>
+      </div>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="max-papers">Paper budget <span className={styles.hint}>Hard cap for this run</span></label>
+        <input id="max-papers" className={styles.input} type="number" min="1" max="500" value={maxPapers} onChange={(event) => onMaxPapers(Math.max(1, Number(event.target.value) || 1))} disabled={busy} />
       </div>
       <div className={styles.costTotal}>
         <div className={styles.costMetric}><strong>${cost.toFixed(2)}</strong><span>Total spend</span></div>

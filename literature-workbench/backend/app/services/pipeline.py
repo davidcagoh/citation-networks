@@ -35,6 +35,10 @@ class CorpusRequiredError(Exception):
     """Raised when a pipeline run has no persisted corpus."""
 
 
+class BudgetExceededError(Exception):
+    """Raised before a run would exceed its configured budget."""
+
+
 class RunNotResumableError(Exception):
     """Raised when a completed run is asked to resume."""
 
@@ -162,7 +166,14 @@ class PipelineService:
                 "degraded_count": len(papers) - available_count,
             }
 
-    def run(self, project_id: str) -> Run:
+    def run(
+        self,
+        project_id: str,
+        *,
+        max_papers: int = 50,
+        max_external_api_calls: int = 100,
+        max_cost_usd: float = 5.0,
+    ) -> Run:
         with self.database.session() as db:
             self._require_project(db, project_id)
             active_membership_count = len(
@@ -179,7 +190,17 @@ class PipelineService:
                 raise CorpusRequiredError(
                     "Include or pin at least one paper before running the pipeline"
                 )
-            run = Run(project_id=project_id)
+            if active_membership_count > max_papers:
+                raise BudgetExceededError(
+                    f"Run budget allows {max_papers} papers, but "
+                    f"{active_membership_count} are selected"
+                )
+            run = Run(
+                project_id=project_id,
+                max_papers=max_papers,
+                max_external_api_calls=max_external_api_calls,
+                max_cost_usd=max_cost_usd,
+            )
             db.add(run)
             db.flush()
         return self._run_stages(run.id, project_id, start_position=0, existing_stages={})
@@ -588,14 +609,16 @@ class PipelineService:
                     select(ScientificRelation).where(ScientificRelation.project_id == project_id)
                 )
             )
+            relations_by_endpoints = {
+                (tuple(relation.source_entity_ids), tuple(relation.target_entity_ids)): relation
+                for relation in relations
+            }
             relations = [
-                next(
-                    relation
-                    for relation in relations
-                    if relation.source_entity_ids == [entities[index].id]
-                    and relation.target_entity_ids == [entities[index + 1].id]
-                )
+                relations_by_endpoints[key]
                 for index in range(len(entities) - 1)
+                if (
+                    key := ((entities[index].id,), (entities[index + 1].id,))
+                ) in relations_by_endpoints
             ]
             papers = {
                 paper.id: paper

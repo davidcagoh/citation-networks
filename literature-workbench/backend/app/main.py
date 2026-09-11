@@ -13,6 +13,7 @@ from app.db import Database
 from app.domain import (
     CorpusMembershipUpdate,
     DiscoveryRequest,
+    PipelineRequest,
     ProjectCreate,
     ReviewPlanUpdate,
     VerificationIssueUpdate,
@@ -43,6 +44,7 @@ from app.services.discovery import (
 )
 from app.services.export import ExportFormat, ProjectExporter
 from app.services.pipeline import (
+    BudgetExceededError,
     CorpusRequiredError,
     PipelineService,
     ProjectNotFoundError,
@@ -78,6 +80,12 @@ def _run_json(run: Run) -> dict:
         "status": run.status,
         "started_at": run.started_at.isoformat(),
         "completed_at": run.completed_at.isoformat() if run.completed_at else None,
+        "budget": {
+            "max_papers": run.max_papers,
+            "max_external_api_calls": run.max_external_api_calls,
+            "max_cost_usd": run.max_cost_usd,
+            "estimated_cost_usd": run.estimated_cost_usd,
+        },
     }
 
 
@@ -204,12 +212,22 @@ def create_app(
             raise HTTPException(404, str(exc)) from exc
 
     @app.post("/projects/{project_id}/runs/pipeline", status_code=201)
-    def run_pipeline(project_id: str) -> dict:
+    def run_pipeline(project_id: str, value: PipelineRequest | None = None) -> dict:
+        request = value or PipelineRequest()
         try:
-            return _run_json(pipeline.run(project_id))
+            return _run_json(
+                pipeline.run(
+                    project_id,
+                    max_papers=request.max_papers,
+                    max_external_api_calls=request.max_external_api_calls,
+                    max_cost_usd=request.max_cost_usd,
+                )
+            )
         except ProjectNotFoundError as exc:
             raise HTTPException(404, str(exc)) from exc
         except CorpusRequiredError as exc:
+            raise HTTPException(409, str(exc)) from exc
+        except BudgetExceededError as exc:
             raise HTTPException(409, str(exc)) from exc
 
     @app.post("/projects/{project_id}/runs/{run_id}/resume", status_code=201)
