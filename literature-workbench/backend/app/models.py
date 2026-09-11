@@ -248,6 +248,7 @@ class ReviewSentence(Base):
         ForeignKey("synthesis_claims.id", ondelete="CASCADE"), nullable=True
     )
     citation_paper_ids: Mapped[list[str]] = mapped_column(JSON, default=list)
+    evidence_span_ids: Mapped[list[str]] = mapped_column(JSON, default=list)
 
 
 class Run(Base):

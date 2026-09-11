@@ -907,6 +907,7 @@ class PipelineService:
                     sentence.text = claim.text
                     sentence.substantive = True
                     sentence.citation_paper_ids = paper_ids
+                    sentence.evidence_span_ids = list(claim.supporting_evidence_span_ids)
                     db.flush()
                     created.append(sentence.id)
                     position += 1

@@ -1015,6 +1015,7 @@ def create_app(
                     "substantive": sentence.substantive,
                     "claim_id": sentence.claim_id,
                     "citation_paper_ids": sentence.citation_paper_ids,
+                    "evidence_span_ids": sentence.evidence_span_ids,
                 }
                 sentence_json.append(item)
                 grouped[sentence.section_title].append(item)
