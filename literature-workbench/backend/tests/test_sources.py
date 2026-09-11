@@ -178,6 +178,12 @@ def test_fetches_public_source_url_with_provenance_and_blocks_private_targets(
             assert source is not None
             assert source.source_uri == "https://8.8.8.8/paper.txt"
         assert source.parser == "url-fetch-v1"
+        assert client.post(f"/projects/{project_id}/runs/pipeline").status_code == 201
+
+    with app.state.database.session() as database:
+        span = database.scalar(select(EvidenceSpan))
+        assert span is not None
+        assert span.extractor_version == "fulltext-heuristic-v1"
 
 
 def test_acquisition_fetches_eligible_discovered_full_text_links(tmp_path: Path) -> None:
